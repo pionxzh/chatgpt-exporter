@@ -1,0 +1,25 @@
+{
+  "name": "@pionxzh/chatgpt-userscript",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "title": "ChatGPT Exporter",
+  "description": "Easily export the whole ChatGPT conversation history for further analysis or sharing.",
+  "author": "pionxzh",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test:type": "tsc --noEmit",
+    "test": "pnpm run test:type",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "sentinel-js": "^0.0.5",
+    "vite-plugin-monkey": "^2.7.3"
+  },
+  "devDependencies": {
+    "vite": "^3.1.4"
+  }
+}
