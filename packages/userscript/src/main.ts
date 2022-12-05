@@ -3,9 +3,24 @@ import './style.scss'
 import { copyToClipboard, downloadFile, getBase64FromImg, onloadSafe } from './utils'
 import templateHtml from './template.html?raw'
 
-appendLeftSidebarItem()
+type ConversationLine = |
+{ type: 'text'; text: string } |
+{ type: 'image'; src: string } |
+{ type: 'code'; code: string } |
+{ type: 'code-block'; lang: string; code: string } |
+{ type: 'link'; text: string; href: string }
 
-function appendLeftSidebarItem() {
+interface ConversationItem {
+    author: {
+        name: string
+        avatar: string
+    }
+    lines: ConversationLine[][]
+}
+
+main()
+
+function main() {
     onloadSafe(() => {
         const firstItem = document.querySelector('[class^="Navigation__NavMenuItem"]')
         if (!firstItem) return
@@ -29,21 +44,6 @@ function appendLeftSidebarItem() {
         htmlButton.addEventListener('click', () => exportToHtml())
         container.appendChild(htmlButton)
     })
-}
-
-type ConversationLine = |
-{ type: 'text'; text: string } |
-{ type: 'image'; src: string } |
-{ type: 'code'; code: string } |
-{ type: 'code-block'; lang: string; code: string } |
-{ type: 'link'; text: string; href: string }
-
-interface ConversationItem {
-    author: {
-        name: string
-        avatar: string
-    }
-    lines: ConversationLine[][]
 }
 
 function copyToText() {

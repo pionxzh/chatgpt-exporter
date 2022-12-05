@@ -25,7 +25,7 @@ Install **Tampermonkey** **（[Chrome](https://www.tampermonkey.net/)** / **[Fir
 
 | Greasyfork                                                                         | GitHub                                                                                       |
 | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| [Insatall](https://greasyfork.org/scripts/456055-chatgpt-exporter) | [Insatall](https://raw.githubusercontent.com/pionxzh/chatgpt-exporter/main/dist/chatgpt.user.js) |
+| [Insatall](https://greasyfork.org/scripts/456055-chatgpt-exporter) | [Insatall](https://raw.githubusercontent.com/pionxzh/chatgpt-exporter/master/dist/chatgpt.user.js) |
 
 # Example
 
