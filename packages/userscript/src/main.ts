@@ -1,4 +1,4 @@
-import { chatGPTAvatar, chatGPTAvatarSVG, fileCode, iconCopy } from './icons'
+import { chatGPTAvatarSVG, fileCode, iconCopy } from './icons'
 import './style.scss'
 import { copyToClipboard, downloadFile, getBase64FromImg, onloadSafe } from './utils'
 import templateHtml from './template.html?raw'
@@ -124,7 +124,7 @@ function getConversation(): ConversationItem[] {
         // actually we can get the name from the avatar's alt
         // but let's keep it anonymous for privacy reasons
         const name = avatarEl?.getAttribute('alt') ? 'You' : 'ChatGPT'
-        const avatar = avatarEl ? getBase64FromImg(avatarEl) : chatGPTAvatar
+        const avatar = avatarEl ? getBase64FromImg(avatarEl) : ''
 
         const textNode = <HTMLDivElement>item.children?.[1]?.firstChild?.firstChild
         if (!textNode) return
