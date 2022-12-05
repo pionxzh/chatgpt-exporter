@@ -16,7 +16,6 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
-    "sentinel-js": "^0.0.5",
     "vite-plugin-monkey": "^2.7.3"
   },
   "devDependencies": {
