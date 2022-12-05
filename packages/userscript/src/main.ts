@@ -23,11 +23,6 @@ function appendLeftSidebarItem() {
         copyButton.addEventListener('click', () => copyToText())
         container.appendChild(copyButton)
 
-        // const txtButton = <HTMLAnchorElement>firstItem.cloneNode(true)
-        // txtButton.removeAttribute('href')
-        // txtButton.innerHTML = `${fileLines}Export .txt`
-        // container.appendChild(txtButton)
-
         const htmlButton = <HTMLAnchorElement>firstItem.cloneNode(true)
         htmlButton.removeAttribute('href')
         htmlButton.innerHTML = `${fileCode}Export to .html`
@@ -49,7 +44,6 @@ interface ConversationItem {
         avatar: string
     }
     lines: ConversationLine[][]
-    // text: string
 }
 
 function copyToText() {
@@ -164,16 +158,6 @@ function parseTextNode(textNode: HTMLDivElement): ConversationLine[][] {
             }
             case 'P':
             default: {
-                // const html = child.innerHTML
-                // const text = html
-                //     .replace(/<br>/g, '\r\n')
-                //     .replace(/<code>/g, '`')
-                //     .replace(/<\/code>/g, '`')
-                //     // image to [image]
-                //     .replace(/<img[^>]+>/g, '[image]')
-                //     // link to href
-                //     .replace(/<a[^>]+href="([^"]+)"[^>]*>([^<]+)<\/a>/g, '[$2]($1)')
-
                 const line: ConversationLine[] = []
                 const nodes = Array.from(child.childNodes)
                 if (nodes.length === 0) {
@@ -213,7 +197,6 @@ function parseTextNode(textNode: HTMLDivElement): ConversationLine[][] {
                     })
                 }
                 lines.push(line)
-
                 break
             }
         }
