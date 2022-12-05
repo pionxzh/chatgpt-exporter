@@ -1,7 +1,7 @@
 import html2canvas from 'html2canvas'
 import { chatGPTAvatarSVG, fileCode, iconCamera, iconCopy } from './icons'
 import './style.scss'
-import { copyToClipboard, downloadFile, downloadUrl, getBase64FromImg, onloadSafe, sleep } from './utils'
+import { copyToClipboard, downloadFile, downloadUrl, getBase64FromImg, onloadSafe, sleep, timestamp } from './utils'
 import templateHtml from './template.html?raw'
 
 type ConversationLine = |
@@ -33,10 +33,7 @@ function main() {
         const copiedHtml = `${iconCopy}Copied`
         const onCopyText = (e: MouseEvent) => {
             const items = getConversation()
-            if (items.length === 0) {
-                alert('No conversation found. Please send a message first.')
-                return
-            }
+            if (items.length === 0) return alert('No conversation found. Please send a message first.')
 
             const text = conversationToText(items)
             copyToClipboard(text)
@@ -69,10 +66,7 @@ function createMenuItem(icon: string, title: string, onClick: (e: MouseEvent) =>
 
 function exportToHtml() {
     const items = getConversation()
-    if (items.length === 0) {
-        alert('No conversation found. Please send a message first.')
-        return
-    }
+    if (items.length === 0) return alert('No conversation found. Please send a message first.')
 
     const lang = document.documentElement.lang ?? 'en'
     const conversationHtml = items.map((item) => {
@@ -118,7 +112,7 @@ ${linesHtml}
         .replace('{{lang}}', lang)
         .replace('{{content}}', conversationHtml)
 
-    const fileName = `ChatGPT-${new Date().toISOString().replace(/:/g, '-').replace(/\..+/, '')}.html`
+    const fileName = `ChatGPT-${timestamp()}.html`
     downloadFile(fileName, 'text/html', html)
 }
 
@@ -163,7 +157,7 @@ async function exportToPng() {
 
     const dataUrl = canvas.toDataURL('image/png', 1)
         .replace(/^data:image\/[^;]/, 'data:application/octet-stream')
-    const fileName = `ChatGPT-${new Date().toISOString().replace(/:/g, '-').replace(/\..+/, '')}.png`
+    const fileName = `ChatGPT-${timestamp()}.png`
     downloadUrl(fileName, dataUrl)
 }
 

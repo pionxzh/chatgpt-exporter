@@ -55,3 +55,7 @@ export function getBase64FromImg(el: HTMLImageElement) {
 export function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
+
+export function timestamp() {
+    return new Date().toISOString().replace(/:/g, '-').replace(/\..+/, '')
+}
