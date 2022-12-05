@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.0.0...userscript-v1.1.0) (2022-12-05)
+
+
+### Features
+
+* show copied status ([fdc0109](https://github.com/pionxzh/chatgpt-exporter/commit/fdc0109cfe89e226e9f6862b81e33656061de492))
+* support export png (screenshot) ([7aa7c0f](https://github.com/pionxzh/chatgpt-exporter/commit/7aa7c0f4fdae9e1c258b82224ad4e4fe5848d376))
+
 ## [1.0.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.0.0...userscript-v1.0.0) (2022-12-05)
 
 
