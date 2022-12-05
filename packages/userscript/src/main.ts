@@ -133,15 +133,9 @@ async function exportToPng() {
 
     // hide irrelevant elements
     thread.style.height = 'auto'
-
-    const alertWrapper = document.querySelector('[class^="_app__AlertWrapper"]')
-    if (alertWrapper) alertWrapper.remove()
-
-    const positionForm = document.querySelector('[class^="Thread__PositionForm"]') as HTMLElement
-    if (positionForm) positionForm.style.display = 'none'
-
-    const bottomSpacer = document.querySelector('[class^="ThreadLayout__BottomSpacer"]') as HTMLElement
-    if (bottomSpacer) bottomSpacer.style.display = 'none'
+    document.querySelectorAll('[class^="_app__AlertWrapper"], [class^="Thread__PositionForm"], [class^="ThreadLayout__BottomSpacer"]').forEach((element) => {
+        element.classList.add('hidden')
+    })
 
     const threadWrapper = document.querySelector('[class^="Thread__Wrapper"]')
     if (threadWrapper && threadWrapper.children.length > 1) {
@@ -167,9 +161,10 @@ async function exportToPng() {
         leftSidebar.style.display = ''
         mainContent.style.paddingLeft = ''
     }
-    if (positionForm) positionForm.style.display = ''
-    if (bottomSpacer) bottomSpacer.style.display = ''
     thread.style.height = ''
+    document.querySelectorAll('[class^="_app__AlertWrapper"], [class^="Thread__PositionForm"], [class^="ThreadLayout__BottomSpacer"]').forEach((element) => {
+        element.classList.remove('hidden')
+    })
 
     const dataUrl = canvas.toDataURL('image/png', 1)
         .replace(/^data:image\/[^;]/, 'data:application/octet-stream')
