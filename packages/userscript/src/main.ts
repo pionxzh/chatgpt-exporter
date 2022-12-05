@@ -32,10 +32,28 @@ function main() {
         divider.className = 'Navigation__NavMenuDivider'
         container.appendChild(divider)
 
+        const copyHtml = `${iconCopy}Copy`
+        const copiedHtml = `${iconCopy}Copied`
         const copyButton = <HTMLAnchorElement>firstItem.cloneNode(true)
         copyButton.removeAttribute('href')
-        copyButton.innerHTML = `${iconCopy}Copy`
-        copyButton.addEventListener('click', () => copyToText())
+        copyButton.innerHTML = copyHtml
+        copyButton.addEventListener('click', () => {
+            const items = getConversation()
+            if (items.length === 0) {
+                // eslint-disable-next-line no-alert
+                alert('No conversation found. Please send a message first.')
+                return
+            }
+
+            const text = conversationToText(items)
+            copyToClipboard(text)
+
+            copyButton.innerHTML = copiedHtml
+            setTimeout(() => {
+                copyButton.innerHTML = copyHtml
+                copyButton.classList.remove('copied')
+            }, 3000)
+        })
         container.appendChild(copyButton)
 
         const htmlButton = <HTMLAnchorElement>firstItem.cloneNode(true)
@@ -44,18 +62,6 @@ function main() {
         htmlButton.addEventListener('click', () => exportToHtml())
         container.appendChild(htmlButton)
     })
-}
-
-function copyToText() {
-    const items = getConversation()
-    if (items.length === 0) {
-        // eslint-disable-next-line no-alert
-        alert('No conversation found. Please send a message first.')
-        return
-    }
-
-    const text = conversationToText(items)
-    copyToClipboard(text)
 }
 
 function exportToHtml() {
