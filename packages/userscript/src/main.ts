@@ -23,25 +23,17 @@ main()
 
 function main() {
     onloadSafe(() => {
-        const firstItem = document.querySelector('[class^="Navigation__NavMenuItem"]')
-        if (!firstItem) return
-
-        const container = firstItem.parentElement
-        if (!container) return
+        const lastMenuItem = document.querySelector('[class^="Navigation__NavMenuItem"]:last-child')
+        if (!lastMenuItem) return
 
         const divider = document.createElement('div')
         divider.className = 'Navigation__NavMenuDivider'
-        container.appendChild(divider)
 
         const copyHtml = `${iconCopy}Copy`
         const copiedHtml = `${iconCopy}Copied`
-        const copyButton = <HTMLAnchorElement>firstItem.cloneNode(true)
-        copyButton.removeAttribute('href')
-        copyButton.innerHTML = copyHtml
-        copyButton.addEventListener('click', () => {
+        const onCopyText = (e: MouseEvent) => {
             const items = getConversation()
             if (items.length === 0) {
-                // eslint-disable-next-line no-alert
                 alert('No conversation found. Please send a message first.')
                 return
             }
@@ -49,32 +41,35 @@ function main() {
             const text = conversationToText(items)
             copyToClipboard(text)
 
-            copyButton.innerHTML = copiedHtml
+            const menuItem = e.target as HTMLAnchorElement
+            menuItem.innerHTML = copiedHtml
             setTimeout(() => {
-                copyButton.innerHTML = copyHtml
-                copyButton.classList.remove('copied')
+                menuItem.innerHTML = copyHtml
             }, 3000)
-        })
-        container.appendChild(copyButton)
+        }
 
-        const imageButton = <HTMLAnchorElement>firstItem.cloneNode(true)
-        imageButton.removeAttribute('href')
-        imageButton.innerHTML = `${iconCamera}Screenshot`
-        imageButton.addEventListener('click', () => exportToPng())
-        container.appendChild(imageButton)
+        const textExport = createMenuItem(iconCopy, 'Copy', onCopyText)
+        const pngExport = createMenuItem(iconCamera, 'Screenshot', exportToPng)
+        const htmlExport = createMenuItem(fileCode, 'Export WebPage', exportToHtml)
 
-        const htmlButton = <HTMLAnchorElement>firstItem.cloneNode(true)
-        htmlButton.removeAttribute('href')
-        htmlButton.innerHTML = `${fileCode}Export WebPage`
-        htmlButton.addEventListener('click', () => exportToHtml())
-        container.appendChild(htmlButton)
+        lastMenuItem.after(divider)
+        divider.after(textExport, pngExport, htmlExport)
     })
+}
+
+function createMenuItem(icon: string, title: string, onClick: (e: MouseEvent) => void) {
+    const lastMenuItem = document.querySelector('[class^="Navigation__NavMenuItem"]:last-child')!
+    const menuItem = lastMenuItem.cloneNode(true) as HTMLAnchorElement
+    menuItem.removeAttribute('href')
+    menuItem.innerHTML = `${icon}${title}`
+    menuItem.addEventListener('click', onClick)
+
+    return menuItem
 }
 
 function exportToHtml() {
     const items = getConversation()
     if (items.length === 0) {
-        // eslint-disable-next-line no-alert
         alert('No conversation found. Please send a message first.')
         return
     }
