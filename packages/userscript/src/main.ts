@@ -1,6 +1,7 @@
-import { chatGPTAvatarSVG, fileCode, iconCopy } from './icons'
+import html2canvas from 'html2canvas'
+import { chatGPTAvatarSVG, fileCode, iconCamera, iconCopy } from './icons'
 import './style.scss'
-import { copyToClipboard, downloadFile, getBase64FromImg, onloadSafe } from './utils'
+import { copyToClipboard, downloadFile, downloadUrl, getBase64FromImg, onloadSafe, sleep } from './utils'
 import templateHtml from './template.html?raw'
 
 type ConversationLine = |
@@ -56,9 +57,15 @@ function main() {
         })
         container.appendChild(copyButton)
 
+        const imageButton = <HTMLAnchorElement>firstItem.cloneNode(true)
+        imageButton.removeAttribute('href')
+        imageButton.innerHTML = `${iconCamera}Screenshot`
+        imageButton.addEventListener('click', () => exportToPng())
+        container.appendChild(imageButton)
+
         const htmlButton = <HTMLAnchorElement>firstItem.cloneNode(true)
         htmlButton.removeAttribute('href')
-        htmlButton.innerHTML = `${fileCode}Export to .html`
+        htmlButton.innerHTML = `${fileCode}Export WebPage`
         htmlButton.addEventListener('click', () => exportToHtml())
         container.appendChild(htmlButton)
     })
@@ -118,6 +125,56 @@ ${linesHtml}
 
     const fileName = `ChatGPT-${new Date().toISOString().replace(/:/g, '-').replace(/\..+/, '')}.html`
     downloadFile(fileName, 'text/html', html)
+}
+
+async function exportToPng() {
+    const thread = document.querySelector('[class^="ThreadLayout__NodeWrapper"]') as HTMLElement
+    if (!thread) return
+
+    // hide irrelevant elements
+    thread.style.height = 'auto'
+
+    const alertWrapper = document.querySelector('[class^="_app__AlertWrapper"]')
+    if (alertWrapper) alertWrapper.remove()
+
+    const positionForm = document.querySelector('[class^="Thread__PositionForm"]') as HTMLElement
+    if (positionForm) positionForm.style.display = 'none'
+
+    const bottomSpacer = document.querySelector('[class^="ThreadLayout__BottomSpacer"]') as HTMLElement
+    if (bottomSpacer) bottomSpacer.style.display = 'none'
+
+    const threadWrapper = document.querySelector('[class^="Thread__Wrapper"]')
+    if (threadWrapper && threadWrapper.children.length > 1) {
+        const leftSidebar = threadWrapper.children[1] as HTMLElement
+        const mainContent = threadWrapper.children[0] as HTMLElement
+        leftSidebar.style.display = 'none'
+        mainContent.style.paddingLeft = '0'
+    }
+
+    await sleep(100)
+
+    const canvas = await html2canvas(thread, {
+        scrollX: -window.scrollX,
+        scrollY: -window.scrollY,
+        windowWidth: thread.scrollWidth,
+        windowHeight: thread.scrollHeight,
+    })
+
+    // restore the layout
+    if (threadWrapper && threadWrapper.children.length > 1) {
+        const leftSidebar = threadWrapper.children[1] as HTMLElement
+        const mainContent = threadWrapper.children[0] as HTMLElement
+        leftSidebar.style.display = ''
+        mainContent.style.paddingLeft = ''
+    }
+    if (positionForm) positionForm.style.display = ''
+    if (bottomSpacer) bottomSpacer.style.display = ''
+    thread.style.height = ''
+
+    const dataUrl = canvas.toDataURL('image/png', 1)
+        .replace(/^data:image\/[^;]/, 'data:application/octet-stream')
+    const fileName = `ChatGPT-${new Date().toISOString().replace(/:/g, '-').replace(/\..+/, '')}.png`
+    downloadUrl(fileName, dataUrl)
 }
 
 function getConversation(): ConversationItem[] {

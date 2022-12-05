@@ -16,6 +16,7 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "html2canvas": "^1.4.1",
     "vite-plugin-monkey": "^2.7.3"
   },
   "devDependencies": {

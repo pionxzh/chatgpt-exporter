@@ -33,6 +33,15 @@ export function downloadFile(filename: string, type: string, content: string) {
     document.body.removeChild(a)
 }
 
+export function downloadUrl(filename: string, url: string) {
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+}
+
 export function getBase64FromImg(el: HTMLImageElement) {
     const canvas = document.createElement('canvas')
     canvas.width = el.naturalWidth
@@ -41,4 +50,8 @@ export function getBase64FromImg(el: HTMLImageElement) {
     if (!ctx) return ''
     ctx.drawImage(el, 0, 0)
     return canvas.toDataURL('image/png')
+}
+
+export function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms))
 }
