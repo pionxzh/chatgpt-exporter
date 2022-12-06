@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.1.0...userscript-v1.1.1) (2022-12-06)
+
+
+### Bug Fixes
+
+* follow the layout changes on chatgpt side ([5b42412](https://github.com/pionxzh/chatgpt-exporter/commit/5b424128af8442b731833f31d55273e555174f5e))
+
 ## [1.1.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.0.0...userscript-v1.1.0) (2022-12-05)
 
 
