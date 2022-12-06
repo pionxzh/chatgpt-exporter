@@ -23,8 +23,12 @@ main()
 
 function main() {
     onloadSafe(() => {
-        const lastMenuItem = document.querySelector('[class^="Navigation__NavMenuItem"]:last-child')
-        if (!lastMenuItem) return
+        const container = document.querySelector('nav > a')?.parentElement
+        if (!container) {
+            console.error('Failed to find the container element.')
+            alert('Failed to find the container element. Please report this issue to the developer.')
+            return
+        }
 
         const divider = document.createElement('div')
         divider.className = 'Navigation__NavMenuDivider'
@@ -49,14 +53,14 @@ function main() {
         const pngExport = createMenuItem(iconCamera, 'Screenshot', exportToPng)
         const htmlExport = createMenuItem(fileCode, 'Export WebPage', exportToHtml)
 
-        lastMenuItem.after(divider)
+        container.appendChild(divider)
         divider.after(textExport, pngExport, htmlExport)
     })
 }
 
 function createMenuItem(icon: string, title: string, onClick: (e: MouseEvent) => void) {
-    const lastMenuItem = document.querySelector('[class^="Navigation__NavMenuItem"]:last-child')!
-    const menuItem = lastMenuItem.cloneNode(true) as HTMLAnchorElement
+    const firstMenuItem = document.querySelector('nav > a')!
+    const menuItem = firstMenuItem.cloneNode(true) as HTMLAnchorElement
     menuItem.removeAttribute('href')
     menuItem.innerHTML = `${icon}${title}`
     menuItem.addEventListener('click', onClick)
@@ -117,22 +121,11 @@ ${linesHtml}
 }
 
 async function exportToPng() {
-    const thread = document.querySelector('[class^="ThreadLayout__NodeWrapper"]') as HTMLElement
-    if (!thread) return
+    const thread = document.querySelector('main .group')?.parentElement as HTMLElement
+    if (!thread || thread.children.length === 0) return
 
-    // hide irrelevant elements
-    thread.style.height = 'auto'
-    document.querySelectorAll('[class^="_app__AlertWrapper"], [class^="Thread__PositionForm"], [class^="ThreadLayout__BottomSpacer"]').forEach((element) => {
-        element.classList.add('hidden')
-    })
-
-    const threadWrapper = document.querySelector('[class^="Thread__Wrapper"]')
-    if (threadWrapper && threadWrapper.children.length > 1) {
-        const leftSidebar = threadWrapper.children[1] as HTMLElement
-        const mainContent = threadWrapper.children[0] as HTMLElement
-        leftSidebar.style.display = 'none'
-        mainContent.style.paddingLeft = '0'
-    }
+    // hide bottom bar
+    thread.children[thread.children.length - 1].classList.add('hidden')
 
     await sleep(100)
 
@@ -144,16 +137,7 @@ async function exportToPng() {
     })
 
     // restore the layout
-    if (threadWrapper && threadWrapper.children.length > 1) {
-        const leftSidebar = threadWrapper.children[1] as HTMLElement
-        const mainContent = threadWrapper.children[0] as HTMLElement
-        leftSidebar.style.display = ''
-        mainContent.style.paddingLeft = ''
-    }
-    thread.style.height = ''
-    document.querySelectorAll('[class^="_app__AlertWrapper"], [class^="Thread__PositionForm"], [class^="ThreadLayout__BottomSpacer"]').forEach((element) => {
-        element.classList.remove('hidden')
-    })
+    thread.children[thread.children.length - 1].classList.remove('hidden')
 
     const dataUrl = canvas.toDataURL('image/png', 1)
         .replace(/^data:image\/[^;]/, 'data:application/octet-stream')
@@ -162,18 +146,15 @@ async function exportToPng() {
 }
 
 function getConversation(): ConversationItem[] {
-    const thread = document.querySelector('[class^="ThreadLayout__NodeWrapper"]')
-    if (!thread) return []
-
     const items: ConversationItem[] = []
-    thread.querySelectorAll('[class^="ConversationItem__Message"]').forEach((item) => {
-        const avatarEl = item.querySelector<HTMLImageElement>('[class^="Avatar__Wrapper"] img:not([aria-hidden="true"])')
+    document.querySelectorAll('main .group').forEach((item) => {
+        const avatarEl = item.querySelector<HTMLImageElement>('span img:not([aria-hidden="true"])')
         // actually we can get the name from the avatar's alt
         // but let's keep it anonymous for privacy reasons
         const name = avatarEl?.getAttribute('alt') ? 'You' : 'ChatGPT'
         const avatar = avatarEl ? getBase64FromImg(avatarEl) : ''
 
-        const textNode = <HTMLDivElement>item.children?.[1]?.firstChild?.firstChild
+        const textNode = <HTMLDivElement>item.querySelector('.markdown') ?? item.querySelector('.w-full > .whitespace-pre-wrap')
         if (!textNode) return
 
         const lines = parseTextNode(textNode)
