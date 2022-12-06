@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatGPT Exporter
 // @namespace    pionxzh
-// @version      1.1.0
+// @version      1.1.1
 // @author       pionxzh
 // @description  Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @license      MIT
@@ -7531,6 +7531,9 @@
   function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
+  function timestamp() {
+    return new Date().toISOString().replace(/:/g, "-").replace(/\..+/, "");
+  }
   const templateHtml = `<!DOCTYPE html>
 <html lang="{{lang}}" data-theme="light">
 <head>
@@ -7723,54 +7726,49 @@
   main();
   function main() {
     onloadSafe(() => {
-      const firstItem = document.querySelector('[class^="Navigation__NavMenuItem"]');
-      if (!firstItem)
+      var _a;
+      const container = (_a = document.querySelector("nav > a")) == null ? void 0 : _a.parentElement;
+      if (!container) {
+        console.error("Failed to find the container element.");
+        alert("Failed to find the container element. Please report this issue to the developer.");
         return;
-      const container = firstItem.parentElement;
-      if (!container)
-        return;
+      }
       const divider = document.createElement("div");
       divider.className = "Navigation__NavMenuDivider";
-      container.appendChild(divider);
       const copyHtml = `${iconCopy}Copy`;
       const copiedHtml = `${iconCopy}Copied`;
-      const copyButton = firstItem.cloneNode(true);
-      copyButton.removeAttribute("href");
-      copyButton.innerHTML = copyHtml;
-      copyButton.addEventListener("click", () => {
+      const onCopyText = (e2) => {
         const items = getConversation();
-        if (items.length === 0) {
-          alert("No conversation found. Please send a message first.");
-          return;
-        }
+        if (items.length === 0)
+          return alert("No conversation found. Please send a message first.");
         const text = conversationToText(items);
         copyToClipboard(text);
-        copyButton.innerHTML = copiedHtml;
+        const menuItem = e2.target;
+        menuItem.innerHTML = copiedHtml;
         setTimeout(() => {
-          copyButton.innerHTML = copyHtml;
-          copyButton.classList.remove("copied");
+          menuItem.innerHTML = copyHtml;
         }, 3e3);
-      });
-      container.appendChild(copyButton);
-      const imageButton = firstItem.cloneNode(true);
-      imageButton.removeAttribute("href");
-      imageButton.innerHTML = `${iconCamera}Screenshot`;
-      imageButton.addEventListener("click", () => exportToPng());
-      container.appendChild(imageButton);
-      const htmlButton = firstItem.cloneNode(true);
-      htmlButton.removeAttribute("href");
-      htmlButton.innerHTML = `${fileCode}Export WebPage`;
-      htmlButton.addEventListener("click", () => exportToHtml());
-      container.appendChild(htmlButton);
+      };
+      const textExport = createMenuItem(iconCopy, "Copy", onCopyText);
+      const pngExport = createMenuItem(iconCamera, "Screenshot", exportToPng);
+      const htmlExport = createMenuItem(fileCode, "Export WebPage", exportToHtml);
+      container.appendChild(divider);
+      divider.after(textExport, pngExport, htmlExport);
     });
+  }
+  function createMenuItem(icon, title, onClick) {
+    const firstMenuItem = document.querySelector("nav > a");
+    const menuItem = firstMenuItem.cloneNode(true);
+    menuItem.removeAttribute("href");
+    menuItem.innerHTML = `${icon}${title}`;
+    menuItem.addEventListener("click", onClick);
+    return menuItem;
   }
   function exportToHtml() {
     var _a;
     const items = getConversation();
-    if (items.length === 0) {
-      alert("No conversation found. Please send a message first.");
-      return;
-    }
+    if (items.length === 0)
+      return alert("No conversation found. Please send a message first.");
     const lang = (_a = document.documentElement.lang) != null ? _a : "en";
     const conversationHtml = items.map((item) => {
       const { author: { name, avatar }, lines } = item;
@@ -7805,30 +7803,15 @@ ${linesHtml}
 </div>`;
     }).join("");
     const html = templateHtml.replace("{{time}}", new Date().toISOString()).replace("{{lang}}", lang).replace("{{content}}", conversationHtml);
-    const fileName = `ChatGPT-${new Date().toISOString().replace(/:/g, "-").replace(/\..+/, "")}.html`;
+    const fileName = `ChatGPT-${timestamp()}.html`;
     downloadFile(fileName, "text/html", html);
   }
   async function exportToPng() {
-    const thread = document.querySelector('[class^="ThreadLayout__NodeWrapper"]');
-    if (!thread)
+    var _a;
+    const thread = (_a = document.querySelector("main .group")) == null ? void 0 : _a.parentElement;
+    if (!thread || thread.children.length === 0)
       return;
-    thread.style.height = "auto";
-    const alertWrapper = document.querySelector('[class^="_app__AlertWrapper"]');
-    if (alertWrapper)
-      alertWrapper.remove();
-    const positionForm = document.querySelector('[class^="Thread__PositionForm"]');
-    if (positionForm)
-      positionForm.style.display = "none";
-    const bottomSpacer = document.querySelector('[class^="ThreadLayout__BottomSpacer"]');
-    if (bottomSpacer)
-      bottomSpacer.style.display = "none";
-    const threadWrapper = document.querySelector('[class^="Thread__Wrapper"]');
-    if (threadWrapper && threadWrapper.children.length > 1) {
-      const leftSidebar = threadWrapper.children[1];
-      const mainContent = threadWrapper.children[0];
-      leftSidebar.style.display = "none";
-      mainContent.style.paddingLeft = "0";
-    }
+    thread.children[thread.children.length - 1].classList.add("hidden");
     await sleep(100);
     const canvas = await html2canvas(thread, {
       scrollX: -window.scrollX,
@@ -7836,32 +7819,19 @@ ${linesHtml}
       windowWidth: thread.scrollWidth,
       windowHeight: thread.scrollHeight
     });
-    if (threadWrapper && threadWrapper.children.length > 1) {
-      const leftSidebar = threadWrapper.children[1];
-      const mainContent = threadWrapper.children[0];
-      leftSidebar.style.display = "";
-      mainContent.style.paddingLeft = "";
-    }
-    if (positionForm)
-      positionForm.style.display = "";
-    if (bottomSpacer)
-      bottomSpacer.style.display = "";
-    thread.style.height = "";
+    thread.children[thread.children.length - 1].classList.remove("hidden");
     const dataUrl = canvas.toDataURL("image/png", 1).replace(/^data:image\/[^;]/, "data:application/octet-stream");
-    const fileName = `ChatGPT-${new Date().toISOString().replace(/:/g, "-").replace(/\..+/, "")}.png`;
+    const fileName = `ChatGPT-${timestamp()}.png`;
     downloadUrl(fileName, dataUrl);
   }
   function getConversation() {
-    const thread = document.querySelector('[class^="ThreadLayout__NodeWrapper"]');
-    if (!thread)
-      return [];
     const items = [];
-    thread.querySelectorAll('[class^="ConversationItem__Message"]').forEach((item) => {
-      var _a, _b, _c;
-      const avatarEl = item.querySelector('[class^="Avatar__Wrapper"] img:not([aria-hidden="true"])');
+    document.querySelectorAll("main .group").forEach((item) => {
+      var _a;
+      const avatarEl = item.querySelector('span img:not([aria-hidden="true"])');
       const name = (avatarEl == null ? void 0 : avatarEl.getAttribute("alt")) ? "You" : "ChatGPT";
       const avatar = avatarEl ? getBase64FromImg(avatarEl) : "";
-      const textNode = (_c = (_b = (_a = item.children) == null ? void 0 : _a[1]) == null ? void 0 : _b.firstChild) == null ? void 0 : _c.firstChild;
+      const textNode = (_a = item.querySelector(".markdown")) != null ? _a : item.querySelector(".w-full > .whitespace-pre-wrap");
       if (!textNode)
         return;
       const lines = parseTextNode(textNode);
