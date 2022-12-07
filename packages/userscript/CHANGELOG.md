@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.1.1...userscript-v1.1.2) (2022-12-07)
+
+
+### Bug Fixes
+
+* escape text content ([76d4082](https://github.com/pionxzh/chatgpt-exporter/commit/76d408287c8faae57be4a726ca34fdfddf8c537f))
+* preserve line break in html requestion ([b6e4baf](https://github.com/pionxzh/chatgpt-exporter/commit/b6e4bafabe6ef5c3e5a4aca0a721a27e7d612450))
+
 ## [1.1.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.1.0...userscript-v1.1.1) (2022-12-06)
 
 
