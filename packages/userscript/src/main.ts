@@ -1,7 +1,7 @@
 import html2canvas from 'html2canvas'
 import { chatGPTAvatarSVG, fileCode, iconCamera, iconCopy } from './icons'
 import './style.scss'
-import { copyToClipboard, downloadFile, downloadUrl, getBase64FromImg, onloadSafe, sleep, timestamp } from './utils'
+import { copyToClipboard, downloadFile, downloadUrl, escapeHtml, getBase64FromImg, onloadSafe, sleep, timestamp } from './utils'
 import templateHtml from './template.html?raw'
 
 type ConversationLine = |
@@ -84,15 +84,15 @@ function exportToHtml() {
             const lineHtml = line.map((item) => {
                 switch (item.type) {
                     case 'text':
-                        return item.text
+                        return escapeHtml(item.text)
                     case 'image':
                         return `<img src="${item.src}" referrerpolicy="no-referrer" />`
                     case 'code':
-                        return `<code>${item.code}</code>`
+                        return `<code>${escapeHtml(item.code)}</code>`
                     case 'code-block':
-                        return `<pre><code class="language-${item.lang}">${item.code}</code></pre>`
+                        return `<pre><code class="language-${item.lang}">${escapeHtml(item.code)}</code></pre>`
                     case 'link':
-                        return `<a href="${item.href}" target="_blank" rel="noopener noreferrer">${item.text}</a>`
+                        return `<a href="${item.href}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.text)}</a>`
                     default:
                         return ''
                 }
