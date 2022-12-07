@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatGPT Exporter
 // @namespace    pionxzh
-// @version      1.1.1
+// @version      1.1.2
 // @author       pionxzh
 // @description  Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @license      MIT
@@ -7534,6 +7534,9 @@
   function timestamp() {
     return new Date().toISOString().replace(/:/g, "-").replace(/\..+/, "");
   }
+  function escapeHtml(html) {
+    return html.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+  }
   const templateHtml = `<!DOCTYPE html>
 <html lang="{{lang}}" data-theme="light">
 <head>
@@ -7686,6 +7689,7 @@
             width: 100%;
             font-size: 1rem;
             line-height: 1.5;
+            white-space: pre-wrap;
         }
     </style>
 </head>
@@ -7777,15 +7781,15 @@
         const lineHtml = line.map((item2) => {
           switch (item2.type) {
             case "text":
-              return item2.text;
+              return escapeHtml(item2.text);
             case "image":
               return `<img src="${item2.src}" referrerpolicy="no-referrer" />`;
             case "code":
-              return `<code>${item2.code}</code>`;
+              return `<code>${escapeHtml(item2.code)}</code>`;
             case "code-block":
-              return `<pre><code class="language-${item2.lang}">${item2.code}</code></pre>`;
+              return `<pre><code class="language-${item2.lang}">${escapeHtml(item2.code)}</code></pre>`;
             case "link":
-              return `<a href="${item2.href}" target="_blank" rel="noopener noreferrer">${item2.text}</a>`;
+              return `<a href="${item2.href}" target="_blank" rel="noopener noreferrer">${escapeHtml(item2.text)}</a>`;
             default:
               return "";
           }
