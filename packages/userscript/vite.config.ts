@@ -19,7 +19,7 @@ export default defineConfig({
                 'license': packageJson.license,
                 'match': 'https://chat.openai.com/chat',
                 'icon': 'https://chat.openai.com/favicon.ico',
-                'run-at': 'document-start',
+                'run-at': 'document-end',
             },
             build: {
                 fileName: 'chatgpt.user.js',
