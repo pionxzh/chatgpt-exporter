@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.1.2...userscript-v1.2.0) (2022-12-10)
+
+
+### Features
+
+* fix the unstable menu injection ([8fef5ae](https://github.com/pionxzh/chatgpt-exporter/commit/8fef5ae7cd1466c243cb92e17ebebba46dc2c309))
+
 ## [1.1.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.1.1...userscript-v1.1.2) (2022-12-07)
 
 
