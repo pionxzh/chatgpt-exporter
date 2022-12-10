@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         ChatGPT Exporter
 // @namespace    pionxzh
-// @version      1.1.2
+// @version      1.2.0
 // @author       pionxzh
 // @description  Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @license      MIT
 // @icon         https://chat.openai.com/favicon.ico
 // @match        https://chat.openai.com/chat
-// @run-at       document-start
+// @run-at       document-end
 // ==/UserScript==
 
 (n=>{const e=document.createElement("style");e.dataset.source="vite-plugin-monkey",e.innerText=n,document.head.appendChild(e)})(`.Navigation__NavMenuDivider {
