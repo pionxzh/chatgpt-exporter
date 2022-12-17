@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.3.0...userscript-v1.3.1) (2022-12-17)
+
+
+### Bug Fixes
+
+* prevent alert on cf-protection page ([d40ac3e](https://github.com/pionxzh/chatgpt-exporter/commit/d40ac3e728394a0ff2723c2e3cf86a1ef51c7cea))
+
 ## [1.3.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.2.0...userscript-v1.3.0) (2022-12-17)
 
 
