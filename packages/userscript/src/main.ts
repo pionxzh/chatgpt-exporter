@@ -8,7 +8,9 @@ type ConversationLine = |
 { type: 'image'; src: string } |
 { type: 'code'; code: string } |
 { type: 'code-block'; lang: string; code: string } |
-{ type: 'link'; text: string; href: string }
+{ type: 'link'; text: string; href: string } |
+{ type: 'ordered-list-item'; items: string[] } |
+{ type: 'unordered-list-item'; items: string[] }
 
 interface ConversationItem {
     author: {
@@ -92,11 +94,18 @@ function exportToHtml() {
                         return `<pre><code class="language-${item.lang}">${escapeHtml(item.code)}</code></pre>`
                     case 'link':
                         return `<a href="${item.href}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.text)}</a>`
+                    case 'ordered-list-item':
+                        return `<ol>${item.items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
+                    case 'unordered-list-item':
+                        return `<ul>${item.items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
                     default:
                         return ''
                 }
             }).join('')
-            return lineHtml.startsWith('<pre>') ? lineHtml : `<p>${lineHtml}</p>`
+
+            const skipTags = ['pre', 'ul', 'ol']
+            if (skipTags.some(tag => lineHtml.startsWith(`<${tag}>`))) return lineHtml
+            return `<p>${lineHtml}</p>`
         }).join('')
 
         return `
@@ -183,6 +192,16 @@ function parseTextNode(textNode: HTMLDivElement): ConversationLine[][] {
                 }
                 break
             }
+            case 'OL': {
+                const items = Array.from(child.children).map(item => item.textContent ?? '')
+                lines.push([{ type: 'ordered-list-item', items }])
+                break
+            }
+            case 'UL': {
+                const items = Array.from(child.children).map(item => item.textContent ?? '')
+                lines.push([{ type: 'unordered-list-item', items }])
+                break
+            }
             case 'P':
             default: {
                 const line: ConversationLine[] = []
@@ -241,6 +260,8 @@ function conversationToText(conversation: ConversationItem[]) {
                     case 'text': return item.text
                     case 'image': return '[image]'
                     case 'link': return `[${item.text}](${item.href})`
+                    case 'ordered-list-item': return item.items.map((item, index) => `${index + 1}. ${item}`).join('\r\n')
+                    case 'unordered-list-item': return item.items.map(item => `- ${item}`).join('\r\n')
                     case 'code': return `\`${item.code}\``
                     case 'code-block': return `\`\`\`${item.lang}\r\n${item.code}\`\`\``
                     default: return ''
