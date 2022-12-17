@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatGPT Exporter
 // @namespace    pionxzh
-// @version      1.3.0
+// @version      1.3.1
 // @author       pionxzh
 // @description  Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @license      MIT
@@ -7731,7 +7731,6 @@
       const container = firstMenuItem == null ? void 0 : firstMenuItem.parentElement;
       if (!firstMenuItem || !container) {
         console.error("Failed to locate the menu container element.");
-        alert("Failed to locate the menu container element. Please report this issue to the developer.");
         return;
       }
       const divider = document.createElement("div");
