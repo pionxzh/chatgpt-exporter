@@ -28,7 +28,7 @@ function main() {
         const container = firstMenuItem?.parentElement
         if (!firstMenuItem || !container) {
             console.error('Failed to locate the menu container element.')
-            alert('Failed to locate the menu container element. Please report this issue to the developer.')
+            // alert('Failed to locate the menu container element. Please report this issue to the developer.')
             return
         }
 
