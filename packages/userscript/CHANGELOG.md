@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.3.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.2.0...userscript-v1.3.0) (2022-12-17)
+
+
+### Features
+
+* improve the code block style with hightligh.js ([5101b41](https://github.com/pionxzh/chatgpt-exporter/commit/5101b4159ce0f314afa28772b1fe4f6d02900021))
+* support ordered-list and unordered-list ([ce87909](https://github.com/pionxzh/chatgpt-exporter/commit/ce87909e7bc50ee5653b8478e0c96c7688c1332d))
+* support syntax highlight for HTML output ([5a1b518](https://github.com/pionxzh/chatgpt-exporter/commit/5a1b51895e529eebbf43bbf83c3d83eb52f12935))
+
+
+### Bug Fixes
+
+* update menu layout to follow chatgpt layout changes ([aa0abec](https://github.com/pionxzh/chatgpt-exporter/commit/aa0abec06f4ec2c2e3c859e7d569373f5ae9b46c))
+* update user input selector to follow chatgpt layout changes ([cbb3483](https://github.com/pionxzh/chatgpt-exporter/commit/cbb348334aba53450a62f4013291145db09360a9))
+
 ## [1.2.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.1.2...userscript-v1.2.0) (2022-12-10)
 
 
