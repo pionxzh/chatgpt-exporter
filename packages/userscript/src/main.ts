@@ -154,7 +154,7 @@ function getConversation(): ConversationItem[] {
         const name = avatarEl?.getAttribute('alt') ? 'You' : 'ChatGPT'
         const avatar = avatarEl ? getBase64FromImg(avatarEl) : ''
 
-        const textNode = <HTMLDivElement>item.querySelector('.markdown') ?? item.querySelector('.w-full > .whitespace-pre-wrap')
+        const textNode = <HTMLDivElement>item.querySelector('.markdown') ?? item.querySelector('.w-full .whitespace-pre-wrap')
         if (!textNode) return
 
         const lines = parseTextNode(textNode)
