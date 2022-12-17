@@ -1,6 +1,5 @@
 import html2canvas from 'html2canvas'
 import { chatGPTAvatarSVG, fileCode, iconCamera, iconCopy } from './icons'
-import './style.scss'
 import { copyToClipboard, downloadFile, downloadUrl, escapeHtml, getBase64FromImg, onloadSafe, sleep, timestamp } from './utils'
 import templateHtml from './template.html?raw'
 
@@ -23,17 +22,19 @@ main()
 
 function main() {
     onloadSafe(() => {
-        const container = document.querySelector('nav > a')?.parentElement
-        if (!container) {
-            console.error('Failed to find the container element.')
-            alert('Failed to find the container element. Please report this issue to the developer.')
+        const firstMenuItem = document.querySelector('nav > a')
+        const container = firstMenuItem?.parentElement
+        if (!firstMenuItem || !container) {
+            console.error('Failed to locate the menu container element.')
+            alert('Failed to locate the menu container element. Please report this issue to the developer.')
             return
         }
 
         const divider = document.createElement('div')
-        divider.className = 'Navigation__NavMenuDivider'
+        divider.className = 'border-b border-white/20'
+        divider.style.marginBottom = '0.5rem'
 
-        const copyHtml = `${iconCopy}Copy`
+        const copyHtml = `${iconCopy}Copy Text`
         const copiedHtml = `${iconCopy}Copied`
         const onCopyText = (e: MouseEvent) => {
             const items = getConversation()
@@ -49,12 +50,10 @@ function main() {
             }, 3000)
         }
 
-        const textExport = createMenuItem(iconCopy, 'Copy', onCopyText)
+        const textExport = createMenuItem(iconCopy, 'Copy Text', onCopyText)
         const pngExport = createMenuItem(iconCamera, 'Screenshot', exportToPng)
         const htmlExport = createMenuItem(fileCode, 'Export WebPage', exportToHtml)
-
-        container.appendChild(divider)
-        divider.after(textExport, pngExport, htmlExport)
+        firstMenuItem.after(divider, textExport, pngExport, htmlExport)
     })
 }
 
