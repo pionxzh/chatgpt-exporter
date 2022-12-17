@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatGPT Exporter
 // @namespace    pionxzh
-// @version      1.2.0
+// @version      1.3.0
 // @author       pionxzh
 // @description  Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @license      MIT
@@ -9,12 +9,6 @@
 // @match        https://chat.openai.com/chat
 // @run-at       document-end
 // ==/UserScript==
-
-(n=>{const e=document.createElement("style");e.dataset.source="vite-plugin-monkey",e.innerText=n,document.head.appendChild(e)})(`.Navigation__NavMenuDivider {
-  border-bottom: 1px solid #e1e4e8;
-  margin: 0 0 16px;
-  padding: 0;
-}`);
 
 (function() {
   "use strict";
@@ -2490,8 +2484,8 @@
       initialValue: "solid",
       prefix: false,
       type: 2,
-      parse: function(_context, style2) {
-        switch (style2) {
+      parse: function(_context, style) {
+        switch (style) {
           case "none":
             return 0;
           case "dashed":
@@ -3579,9 +3573,9 @@
     }
     return CSSParsedCounterDeclaration2;
   }();
-  var parse = function(context, descriptor, style2) {
+  var parse = function(context, descriptor, style) {
     var tokenizer = new Tokenizer();
-    var value = style2 !== null && typeof style2 !== "undefined" ? style2.toString() : descriptor.initialValue;
+    var value = style !== null && typeof style !== "undefined" ? style.toString() : descriptor.initialValue;
     tokenizer.write(value);
     var parser = new Parser(tokenizer.read());
     switch (descriptor.type) {
@@ -4576,10 +4570,10 @@
         return _this.counters[counter].pop();
       });
     };
-    CounterState2.prototype.parse = function(style2) {
+    CounterState2.prototype.parse = function(style) {
       var _this = this;
-      var counterIncrement2 = style2.counterIncrement;
-      var counterReset2 = style2.counterReset;
+      var counterIncrement2 = style.counterIncrement;
+      var counterReset2 = style.counterReset;
       var canReset = true;
       if (counterIncrement2 !== null) {
         counterIncrement2.forEach(function(entry) {
@@ -5142,9 +5136,9 @@
             }
             return css2;
           }, "");
-          var style2 = node.cloneNode(false);
-          style2.textContent = css;
-          return style2;
+          var style = node.cloneNode(false);
+          style.textContent = css;
+          return style;
         }
       } catch (e2) {
         this.context.logger.error("Unable to access cssRules property", e2);
@@ -5245,7 +5239,7 @@
       if (window2 && isElementNode(node) && (isHTMLElementNode(node) || isSVGElementNode(node))) {
         var clone = this.createElementClone(node);
         clone.style.transitionProperty = "none";
-        var style2 = window2.getComputedStyle(node);
+        var style = window2.getComputedStyle(node);
         var styleBefore = window2.getComputedStyle(node, ":before");
         var styleAfter = window2.getComputedStyle(node, ":after");
         if (this.referenceElement === node && isHTMLElementNode(clone)) {
@@ -5254,7 +5248,7 @@
         if (isBodyElement(clone)) {
           createPseudoHideStyles(clone);
         }
-        var counters = this.counters.parse(new CSSParsedCounterDeclaration(this.context, style2));
+        var counters = this.counters.parse(new CSSParsedCounterDeclaration(this.context, style));
         var before = this.resolvePseudoContent(node, clone, styleBefore, PseudoElementType.BEFORE);
         if (isCustomElement(node)) {
           copyStyles = true;
@@ -5270,8 +5264,8 @@
           clone.appendChild(after);
         }
         this.counters.pop(counters);
-        if (style2 && (this.options.copyStyles || isSVGElementNode(node)) && !isIFrameElement(node) || copyStyles) {
-          copyCSSStyles(style2, clone);
+        if (style && (this.options.copyStyles || isSVGElementNode(node)) && !isIFrameElement(node) || copyStyles) {
+          copyCSSStyles(style, clone);
         }
         if (node.scrollTop !== 0 || node.scrollLeft !== 0) {
           this.scrolledElements.push([clone, node.scrollLeft, node.scrollTop]);
@@ -5283,20 +5277,20 @@
       }
       return node.cloneNode(false);
     };
-    DocumentCloner2.prototype.resolvePseudoContent = function(node, clone, style2, pseudoElt) {
+    DocumentCloner2.prototype.resolvePseudoContent = function(node, clone, style, pseudoElt) {
       var _this = this;
-      if (!style2) {
+      if (!style) {
         return;
       }
-      var value = style2.content;
+      var value = style.content;
       var document2 = clone.ownerDocument;
-      if (!document2 || !value || value === "none" || value === "-moz-alt-content" || style2.display === "none") {
+      if (!document2 || !value || value === "none" || value === "-moz-alt-content" || style.display === "none") {
         return;
       }
-      this.counters.parse(new CSSParsedCounterDeclaration(this.context, style2));
-      var declaration = new CSSParsedPseudoDeclaration(this.context, style2);
+      this.counters.parse(new CSSParsedCounterDeclaration(this.context, style));
+      var declaration = new CSSParsedPseudoDeclaration(this.context, style);
       var anonymousReplacedElement = document2.createElement("html2canvaspseudoelement");
-      copyCSSStyles(style2, anonymousReplacedElement);
+      copyCSSStyles(style, anonymousReplacedElement);
       declaration.content.forEach(function(token) {
         if (token.type === 0) {
           anonymousReplacedElement.appendChild(document2.createTextNode(token.value));
@@ -5422,11 +5416,11 @@
     "d",
     "content"
   ];
-  var copyCSSStyles = function(style2, target) {
-    for (var i2 = style2.length - 1; i2 >= 0; i2--) {
-      var property = style2.item(i2);
+  var copyCSSStyles = function(style, target) {
+    for (var i2 = style.length - 1; i2 >= 0; i2--) {
+      var property = style.item(i2);
       if (ignoredStyleProperties.indexOf(property) === -1) {
-        target.style.setProperty(property, style2.getPropertyValue(property));
+        target.style.setProperty(property, style.getPropertyValue(property));
       }
     }
     return target;
@@ -5472,9 +5466,9 @@
   var createStyles = function(body, styles) {
     var document2 = body.ownerDocument;
     if (document2) {
-      var style2 = document2.createElement("style");
-      style2.textContent = styles;
-      body.appendChild(style2);
+      var style = document2.createElement("style");
+      style.textContent = styles;
+      body.appendChild(style);
     }
   };
   var CacheStorage = function() {
@@ -7092,14 +7086,14 @@
         });
       });
     };
-    CanvasRenderer2.prototype.renderDashedDottedBorder = function(color2, width, side, curvePoints, style2) {
+    CanvasRenderer2.prototype.renderDashedDottedBorder = function(color2, width, side, curvePoints, style) {
       return __awaiter(this, void 0, void 0, function() {
         var strokePaths, boxPaths, startX, startY, endX, endY, length, dashLength, spaceLength, useLineDash, multiplier, numberOfDashes, minSpace, maxSpace, path1, path2, path1, path2;
         return __generator(this, function(_a) {
           this.ctx.save();
           strokePaths = parsePathForBorderStroke(curvePoints, side);
           boxPaths = parsePathForBorder(curvePoints, side);
-          if (style2 === 2) {
+          if (style === 2) {
             this.path(boxPaths);
             this.ctx.clip();
           }
@@ -7123,14 +7117,14 @@
             length = Math.abs(startY - endY);
           }
           this.ctx.beginPath();
-          if (style2 === 3) {
+          if (style === 3) {
             this.formatPath(strokePaths);
           } else {
             this.formatPath(boxPaths.slice(0, 2));
           }
           dashLength = width < 3 ? width * 3 : width * 2;
           spaceLength = width < 3 ? width * 2 : width;
-          if (style2 === 3) {
+          if (style === 3) {
             dashLength = width;
             spaceLength = width;
           }
@@ -7148,13 +7142,13 @@
             spaceLength = maxSpace <= 0 || Math.abs(spaceLength - minSpace) < Math.abs(spaceLength - maxSpace) ? minSpace : maxSpace;
           }
           if (useLineDash) {
-            if (style2 === 3) {
+            if (style === 3) {
               this.ctx.setLineDash([0, dashLength + spaceLength]);
             } else {
               this.ctx.setLineDash([dashLength, spaceLength]);
             }
           }
-          if (style2 === 3) {
+          if (style === 3) {
             this.ctx.lineCap = "round";
             this.ctx.lineWidth = width;
           } else {
@@ -7163,7 +7157,7 @@
           this.ctx.strokeStyle = asString(color2);
           this.ctx.stroke();
           this.ctx.setLineDash([]);
-          if (style2 === 2) {
+          if (style === 2) {
             if (isBezierCurve(boxPaths[0])) {
               path1 = boxPaths[3];
               path2 = boxPaths[0];
@@ -7480,7 +7474,6 @@
   const iconCamera = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4" fill="currentColor"><!--! Font Awesome Pro 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M149.1 64.8L138.7 96H64C28.7 96 0 124.7 0 160V416c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H373.3L362.9 64.8C356.4 45.2 338.1 32 317.4 32H194.6c-20.7 0-39 13.2-45.5 32.8zM256 384c-53 0-96-43-96-96s43-96 96-96s96 43 96 96s-43 96-96 96z"/></svg>';
   const iconCopy = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4" fill="currentColor"><!--! Font Awesome Pro 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg>';
   const chatGPTAvatarSVG = '<svg width="1.5rem" height="1.5rem" viewBox="0 0 41 41" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-width="1.5"><path d="M37.5324 16.8707C37.9808 15.5241 38.1363 14.0974 37.9886 12.6859C37.8409 11.2744 37.3934 9.91076 36.676 8.68622C35.6126 6.83404 33.9882 5.3676 32.0373 4.4985C30.0864 3.62941 27.9098 3.40259 25.8215 3.85078C24.8796 2.7893 23.7219 1.94125 22.4257 1.36341C21.1295 0.785575 19.7249 0.491269 18.3058 0.500197C16.1708 0.495044 14.0893 1.16803 12.3614 2.42214C10.6335 3.67624 9.34853 5.44666 8.6917 7.47815C7.30085 7.76286 5.98686 8.3414 4.8377 9.17505C3.68854 10.0087 2.73073 11.0782 2.02839 12.312C0.956464 14.1591 0.498905 16.2988 0.721698 18.4228C0.944492 20.5467 1.83612 22.5449 3.268 24.1293C2.81966 25.4759 2.66413 26.9026 2.81182 28.3141C2.95951 29.7256 3.40701 31.0892 4.12437 32.3138C5.18791 34.1659 6.8123 35.6322 8.76321 36.5013C10.7141 37.3704 12.8907 37.5973 14.9789 37.1492C15.9208 38.2107 17.0786 39.0587 18.3747 39.6366C19.6709 40.2144 21.0755 40.5087 22.4946 40.4998C24.6307 40.5054 26.7133 39.8321 28.4418 38.5772C30.1704 37.3223 31.4556 35.5506 32.1119 33.5179C33.5027 33.2332 34.8167 32.6547 35.9659 31.821C37.115 30.9874 38.0728 29.9178 38.7752 28.684C39.8458 26.8371 40.3023 24.6979 40.0789 22.5748C39.8556 20.4517 38.9639 18.4544 37.5324 16.8707ZM22.4978 37.8849C20.7443 37.8874 19.0459 37.2733 17.6994 36.1501C17.7601 36.117 17.8666 36.0586 17.936 36.0161L25.9004 31.4156C26.1003 31.3019 26.2663 31.137 26.3813 30.9378C26.4964 30.7386 26.5563 30.5124 26.5549 30.2825V19.0542L29.9213 20.998C29.9389 21.0068 29.9541 21.0198 29.9656 21.0359C29.977 21.052 29.9842 21.0707 29.9867 21.0902V30.3889C29.9842 32.375 29.1946 34.2791 27.7909 35.6841C26.3872 37.0892 24.4838 37.8806 22.4978 37.8849ZM6.39227 31.0064C5.51397 29.4888 5.19742 27.7107 5.49804 25.9832C5.55718 26.0187 5.66048 26.0818 5.73461 26.1244L13.699 30.7248C13.8975 30.8408 14.1233 30.902 14.3532 30.902C14.583 30.902 14.8088 30.8408 15.0073 30.7248L24.731 25.1103V28.9979C24.7321 29.0177 24.7283 29.0376 24.7199 29.0556C24.7115 29.0736 24.6988 29.0893 24.6829 29.1012L16.6317 33.7497C14.9096 34.7416 12.8643 35.0097 10.9447 34.4954C9.02506 33.9811 7.38785 32.7263 6.39227 31.0064ZM4.29707 13.6194C5.17156 12.0998 6.55279 10.9364 8.19885 10.3327C8.19885 10.4013 8.19491 10.5228 8.19491 10.6071V19.808C8.19351 20.0378 8.25334 20.2638 8.36823 20.4629C8.48312 20.6619 8.64893 20.8267 8.84863 20.9404L18.5723 26.5542L15.206 28.4979C15.1894 28.5089 15.1703 28.5155 15.1505 28.5173C15.1307 28.5191 15.1107 28.516 15.0924 28.5082L7.04046 23.8557C5.32135 22.8601 4.06716 21.2235 3.55289 19.3046C3.03862 17.3858 3.30624 15.3413 4.29707 13.6194ZM31.955 20.0556L22.2312 14.4411L25.5976 12.4981C25.6142 12.4872 25.6333 12.4805 25.6531 12.4787C25.6729 12.4769 25.6928 12.4801 25.7111 12.4879L33.7631 17.1364C34.9967 17.849 36.0017 18.8982 36.6606 20.1613C37.3194 21.4244 37.6047 22.849 37.4832 24.2684C37.3617 25.6878 36.8382 27.0432 35.9743 28.1759C35.1103 29.3086 33.9415 30.1717 32.6047 30.6641C32.6047 30.5947 32.6047 30.4733 32.6047 30.3889V21.188C32.6066 20.9586 32.5474 20.7328 32.4332 20.5338C32.319 20.3348 32.154 20.1698 31.955 20.0556ZM35.3055 15.0128C35.2464 14.9765 35.1431 14.9142 35.069 14.8717L27.1045 10.2712C26.906 10.1554 26.6803 10.0943 26.4504 10.0943C26.2206 10.0943 25.9948 10.1554 25.7963 10.2712L16.0726 15.8858V11.9982C16.0715 11.9783 16.0753 11.9585 16.0837 11.9405C16.0921 11.9225 16.1048 11.9068 16.1207 11.8949L24.1719 7.25025C25.4053 6.53903 26.8158 6.19376 28.2383 6.25482C29.6608 6.31589 31.0364 6.78077 32.2044 7.59508C33.3723 8.40939 34.2842 9.53945 34.8334 10.8531C35.3826 12.1667 35.5464 13.6095 35.3055 15.0128ZM14.2424 21.9419L10.8752 19.9981C10.8576 19.9893 10.8423 19.9763 10.8309 19.9602C10.8195 19.9441 10.8122 19.9254 10.8098 19.9058V10.6071C10.8107 9.18295 11.2173 7.78848 11.9819 6.58696C12.7466 5.38544 13.8377 4.42659 15.1275 3.82264C16.4173 3.21869 17.8524 2.99464 19.2649 3.1767C20.6775 3.35876 22.0089 3.93941 23.1034 4.85067C23.0427 4.88379 22.937 4.94215 22.8668 4.98473L14.9024 9.58517C14.7025 9.69878 14.5366 9.86356 14.4215 10.0626C14.3065 10.2616 14.2466 10.4877 14.2479 10.7175L14.2424 21.9419ZM16.071 17.9991L20.4018 15.4978L24.7325 17.9975V22.9985L20.4018 25.4983L16.071 22.9985V17.9991Z" fill="currentColor"></path></svg>';
-  const style = "";
   function onloadSafe(fn) {
     if (document.readyState === "complete") {
       fn();
@@ -7544,6 +7537,10 @@
     <link rel="icon" href="https://chat.openai.com/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ChatGPT Conversation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"><\/script>
+    <script>hljs.highlightAll()
+<\/script>
 
     <style>
         :root {
@@ -7589,7 +7586,8 @@
             border: 1px solid #e2e8f0;
         }
 
-        p:first-child {
+        p:first-child,
+        ol:first-child {
             margin-top: 0;
         }
 
@@ -7609,7 +7607,6 @@
             background-color: #000000;
             overflow-x: auto;
             margin: 0;
-            padding: 8px 16px;
             border-radius: 0.375rem;
         }
 
@@ -7730,16 +7727,17 @@
   main();
   function main() {
     onloadSafe(() => {
-      var _a;
-      const container = (_a = document.querySelector("nav > a")) == null ? void 0 : _a.parentElement;
-      if (!container) {
-        console.error("Failed to find the container element.");
-        alert("Failed to find the container element. Please report this issue to the developer.");
+      const firstMenuItem = document.querySelector("nav > a");
+      const container = firstMenuItem == null ? void 0 : firstMenuItem.parentElement;
+      if (!firstMenuItem || !container) {
+        console.error("Failed to locate the menu container element.");
+        alert("Failed to locate the menu container element. Please report this issue to the developer.");
         return;
       }
       const divider = document.createElement("div");
-      divider.className = "Navigation__NavMenuDivider";
-      const copyHtml = `${iconCopy}Copy`;
+      divider.className = "border-b border-white/20";
+      divider.style.marginBottom = "0.5rem";
+      const copyHtml = `${iconCopy}Copy Text`;
       const copiedHtml = `${iconCopy}Copied`;
       const onCopyText = (e2) => {
         const items = getConversation();
@@ -7753,11 +7751,10 @@
           menuItem.innerHTML = copyHtml;
         }, 3e3);
       };
-      const textExport = createMenuItem(iconCopy, "Copy", onCopyText);
+      const textExport = createMenuItem(iconCopy, "Copy Text", onCopyText);
       const pngExport = createMenuItem(iconCamera, "Screenshot", exportToPng);
       const htmlExport = createMenuItem(fileCode, "Export WebPage", exportToHtml);
-      container.appendChild(divider);
-      divider.after(textExport, pngExport, htmlExport);
+      firstMenuItem.after(divider, textExport, pngExport, htmlExport);
     });
   }
   function createMenuItem(icon, title, onClick) {
@@ -7790,11 +7787,18 @@
               return `<pre><code class="language-${item2.lang}">${escapeHtml(item2.code)}</code></pre>`;
             case "link":
               return `<a href="${item2.href}" target="_blank" rel="noopener noreferrer">${escapeHtml(item2.text)}</a>`;
+            case "ordered-list-item":
+              return `<ol>${item2.items.map((item3) => `<li>${escapeHtml(item3)}</li>`).join("")}</ul>`;
+            case "unordered-list-item":
+              return `<ul>${item2.items.map((item3) => `<li>${escapeHtml(item3)}</li>`).join("")}</ul>`;
             default:
               return "";
           }
         }).join("");
-        return lineHtml.startsWith("<pre>") ? lineHtml : `<p>${lineHtml}</p>`;
+        const skipTags = ["pre", "ul", "ol"];
+        if (skipTags.some((tag) => lineHtml.startsWith(`<${tag}>`)))
+          return lineHtml;
+        return `<p>${lineHtml}</p>`;
       }).join("");
       return `
 <div class="conversation-item">
@@ -7835,7 +7839,7 @@ ${linesHtml}
       const avatarEl = item.querySelector('span img:not([aria-hidden="true"])');
       const name = (avatarEl == null ? void 0 : avatarEl.getAttribute("alt")) ? "You" : "ChatGPT";
       const avatar = avatarEl ? getBase64FromImg(avatarEl) : "";
-      const textNode = (_a = item.querySelector(".markdown")) != null ? _a : item.querySelector(".w-full > .whitespace-pre-wrap");
+      const textNode = (_a = item.querySelector(".markdown")) != null ? _a : item.querySelector(".w-full .whitespace-pre-wrap");
       if (!textNode)
         return;
       const lines = parseTextNode(textNode);
@@ -7861,6 +7865,22 @@ ${linesHtml}
             const lang = (_d = (_c = classList.find((c) => c.startsWith("language-"))) == null ? void 0 : _c.replace("language-", "")) != null ? _d : "";
             lines.push([{ type: "code-block", lang, code }]);
           }
+          break;
+        }
+        case "OL": {
+          const items = Array.from(child.children).map((item) => {
+            var _a2;
+            return (_a2 = item.textContent) != null ? _a2 : "";
+          });
+          lines.push([{ type: "ordered-list-item", items }]);
+          break;
+        }
+        case "UL": {
+          const items = Array.from(child.children).map((item) => {
+            var _a2;
+            return (_a2 = item.textContent) != null ? _a2 : "";
+          });
+          lines.push([{ type: "unordered-list-item", items }]);
           break;
         }
         case "P":
@@ -7916,6 +7936,10 @@ ${linesHtml}
               return "[image]";
             case "link":
               return `[${item2.text}](${item2.href})`;
+            case "ordered-list-item":
+              return item2.items.map((item3, index) => `${index + 1}. ${item3}`).join("\r\n");
+            case "unordered-list-item":
+              return item2.items.map((item3) => `- ${item3}`).join("\r\n");
             case "code":
               return `\`${item2.code}\``;
             case "code-block":
