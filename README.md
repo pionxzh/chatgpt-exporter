@@ -47,3 +47,7 @@ However, please keep in mind that as a large language model, ChatGPT has not bee
 
 ## Screenshot
 ![ChatGPT-2022-12-05T14-30-08](https://user-images.githubusercontent.com/9910706/205663680-6ac97fac-39b0-495c-bee4-8ef37713a9ae.png)
+
+# Contribution
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md)
