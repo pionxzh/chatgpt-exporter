@@ -17,7 +17,7 @@ export default defineConfig({
                 'namespace': packageJson.author,
                 'description': packageJson.description,
                 'license': packageJson.license,
-                'match': 'https://chat.openai.com/chat',
+                'match': ['https://chat.openai.com/chat', 'https://chat.openai.com/chat/*'],
                 'icon': 'https://chat.openai.com/favicon.ico',
                 'run-at': 'document-end',
             },
