@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         ChatGPT Exporter
 // @namespace    pionxzh
-// @version      1.3.1
+// @version      1.3.2
 // @author       pionxzh
 // @description  Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @license      MIT
 // @icon         https://chat.openai.com/favicon.ico
 // @match        https://chat.openai.com/chat
+// @match        https://chat.openai.com/chat/*
 // @run-at       document-end
 // ==/UserScript==
 
@@ -7470,6 +7471,91 @@
     var defaultBackgroundColor = typeof backgroundColorOverride === "string" ? parseColor(context, backgroundColorOverride) : backgroundColorOverride === null ? COLORS.TRANSPARENT : 4294967295;
     return element === ownerDocument.documentElement ? isTransparent(documentBackgroundColor) ? isTransparent(bodyBackgroundColor) ? defaultBackgroundColor : bodyBackgroundColor : documentBackgroundColor : defaultBackgroundColor;
   };
+  var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
+  var sentinel_umd = { exports: {} };
+  (function(module, exports) {
+    (function(root, factory) {
+      {
+        module.exports = factory();
+      }
+    })(commonjsGlobal, function() {
+      var isArray = Array.isArray, selectorToAnimationMap = {}, animationCallbacks = {}, styleEl, styleSheet, cssRules;
+      return {
+        on: function(cssSelectors, callback) {
+          if (!callback)
+            return;
+          if (!styleEl) {
+            var doc = document, head = doc.head;
+            doc.addEventListener("animationstart", function(ev, callbacks, l, i2) {
+              callbacks = animationCallbacks[ev.animationName];
+              if (!callbacks)
+                return;
+              ev.stopImmediatePropagation();
+              l = callbacks.length;
+              for (i2 = 0; i2 < l; i2++)
+                callbacks[i2](ev.target);
+            }, true);
+            styleEl = doc.createElement("style");
+            head.insertBefore(styleEl, head.firstChild);
+            styleSheet = styleEl.sheet;
+            cssRules = styleSheet.cssRules;
+          }
+          (isArray(cssSelectors) ? cssSelectors : [cssSelectors]).map(function(selector, animId, isCustomName) {
+            animId = selectorToAnimationMap[selector];
+            if (!animId) {
+              isCustomName = selector[0] == "!";
+              selectorToAnimationMap[selector] = animId = isCustomName ? selector.slice(1) : "sentinel-" + Math.random().toString(16).slice(2);
+              cssRules[styleSheet.insertRule(
+                "@keyframes " + animId + "{from{transform:none;}to{transform:none;}}",
+                cssRules.length
+              )]._id = selector;
+              if (!isCustomName) {
+                cssRules[styleSheet.insertRule(
+                  selector + "{animation-duration:0.0001s;animation-name:" + animId + ";}",
+                  cssRules.length
+                )]._id = selector;
+              }
+              selectorToAnimationMap[selector] = animId;
+            }
+            (animationCallbacks[animId] = animationCallbacks[animId] || []).push(callback);
+          });
+        },
+        off: function(cssSelectors, callback) {
+          (isArray(cssSelectors) ? cssSelectors : [cssSelectors]).map(function(selector, animId, callbackList, i2) {
+            if (!(animId = selectorToAnimationMap[selector]))
+              return;
+            callbackList = animationCallbacks[animId];
+            if (callback) {
+              i2 = callbackList.length;
+              while (i2--) {
+                if (callbackList[i2] === callback)
+                  callbackList.splice(i2, 1);
+              }
+            } else {
+              callbackList = [];
+            }
+            if (callbackList.length)
+              return;
+            i2 = cssRules.length;
+            while (i2--) {
+              if (cssRules[i2]._id == selector)
+                styleSheet.deleteRule(i2);
+            }
+            delete selectorToAnimationMap[selector];
+            delete animationCallbacks[animId];
+          });
+        },
+        reset: function() {
+          selectorToAnimationMap = {};
+          animationCallbacks = {};
+          if (styleEl)
+            styleEl.parentNode.removeChild(styleEl);
+          styleEl = 0;
+        }
+      };
+    });
+  })(sentinel_umd);
+  const sentinel = sentinel_umd.exports;
   const fileCode = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="w-4 h-4" fill="currentColor"><!--! Font Awesome Pro 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zM256 0V128H384L256 0zM153 289l-31 31 31 31c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L71 337c-9.4-9.4-9.4-24.6 0-33.9l48-48c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9zM265 255l48 48c9.4 9.4 9.4 24.6 0 33.9l-48 48c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l31-31-31-31c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0z"/></svg>';
   const iconCamera = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4" fill="currentColor"><!--! Font Awesome Pro 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M149.1 64.8L138.7 96H64C28.7 96 0 124.7 0 160V416c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H373.3L362.9 64.8C356.4 45.2 338.1 32 317.4 32H194.6c-20.7 0-39 13.2-45.5 32.8zM256 384c-53 0-96-43-96-96s43-96 96-96s96 43 96 96s-43 96-96 96z"/></svg>';
   const iconCopy = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4" fill="currentColor"><!--! Font Awesome Pro 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg>';
@@ -7727,15 +7813,11 @@
   main();
   function main() {
     onloadSafe(() => {
-      const firstMenuItem = document.querySelector("nav > a");
-      const container = firstMenuItem == null ? void 0 : firstMenuItem.parentElement;
-      if (!firstMenuItem || !container) {
-        console.error("Failed to locate the menu container element.");
+      const nav = document.querySelector("nav");
+      if (!nav) {
+        console.error("Failed to locate the nav element. Please report this issue to the developer.");
         return;
       }
-      const divider = document.createElement("div");
-      divider.className = "border-b border-white/20";
-      divider.style.marginBottom = "0.5rem";
       const copyHtml = `${iconCopy}Copy Text`;
       const copiedHtml = `${iconCopy}Copied`;
       const onCopyText = (e2) => {
@@ -7750,15 +7832,46 @@
           menuItem.innerHTML = copyHtml;
         }, 3e3);
       };
+      const divider = createDivider();
       const textExport = createMenuItem(iconCopy, "Copy Text", onCopyText);
       const pngExport = createMenuItem(iconCamera, "Screenshot", exportToPng);
       const htmlExport = createMenuItem(fileCode, "Export WebPage", exportToHtml);
-      firstMenuItem.after(divider, textExport, pngExport, htmlExport);
+      const container = createMenuContainer();
+      container.append(textExport, pngExport, htmlExport, divider);
     });
   }
+  function createMenuContainer() {
+    const container = document.createElement("div");
+    container.id = "exporter-menu";
+    container.className = "pt-1";
+    const chatList = document.querySelector("nav > div");
+    if (chatList) {
+      chatList.after(container);
+      sentinel.on("nav > div.overflow-y-auto", (el) => {
+        const nav = document.querySelector("nav");
+        if (container.parentElement !== nav) {
+          el.after(container);
+        }
+      });
+    } else {
+      const nav = document.querySelector("nav");
+      nav.append(container);
+      sentinel.on("nav", (el) => {
+        if (container.parentElement !== nav) {
+          el.append(container);
+        }
+      });
+    }
+    return container;
+  }
+  function createDivider() {
+    const divider = document.createElement("div");
+    divider.className = "border-b border-white/20";
+    return divider;
+  }
   function createMenuItem(icon, title, onClick) {
-    const firstMenuItem = document.querySelector("nav > a");
-    const menuItem = firstMenuItem.cloneNode(true);
+    const menuItem = document.createElement("a");
+    menuItem.className = "flex py-3 px-3 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm mb-2 flex-shrink-0 border border-white/20";
     menuItem.removeAttribute("href");
     menuItem.innerHTML = `${icon}${title}`;
     menuItem.addEventListener("click", onClick);
