@@ -1,4 +1,5 @@
 import html2canvas from 'html2canvas'
+import sentinel from 'sentinel-js'
 import { chatGPTAvatarSVG, fileCode, iconCamera, iconCopy } from './icons'
 import { copyToClipboard, downloadFile, downloadUrl, escapeHtml, getBase64FromImg, onloadSafe, sleep, timestamp } from './utils'
 import templateHtml from './template.html?raw'
@@ -24,17 +25,12 @@ main()
 
 function main() {
     onloadSafe(() => {
-        const firstMenuItem = document.querySelector('nav > a')
-        const container = firstMenuItem?.parentElement
-        if (!firstMenuItem || !container) {
-            console.error('Failed to locate the menu container element.')
-            // alert('Failed to locate the menu container element. Please report this issue to the developer.')
+        const nav = document.querySelector('nav')
+        if (!nav) {
+            console.error('Failed to locate the nav element. Please report this issue to the developer.')
+            // alert('Failed to locate the nav element. Please report this issue to the developer.')
             return
         }
-
-        const divider = document.createElement('div')
-        divider.className = 'border-b border-white/20'
-        divider.style.marginBottom = '0.5rem'
 
         const copyHtml = `${iconCopy}Copy Text`
         const copiedHtml = `${iconCopy}Copied`
@@ -52,16 +48,52 @@ function main() {
             }, 3000)
         }
 
+        const divider = createDivider()
         const textExport = createMenuItem(iconCopy, 'Copy Text', onCopyText)
         const pngExport = createMenuItem(iconCamera, 'Screenshot', exportToPng)
         const htmlExport = createMenuItem(fileCode, 'Export WebPage', exportToHtml)
-        firstMenuItem.after(divider, textExport, pngExport, htmlExport)
+        const container = createMenuContainer()
+        container.append(textExport, pngExport, htmlExport, divider)
     })
 }
 
+function createMenuContainer() {
+    const container = document.createElement('div')
+    container.id = 'exporter-menu'
+    container.className = 'pt-1'
+
+    const chatList = document.querySelector('nav > div')
+    if (chatList) {
+        chatList.after(container)
+        sentinel.on('nav > div.overflow-y-auto', (el) => {
+            const nav = document.querySelector('nav')!
+            if (container.parentElement !== nav) {
+                el.after(container)
+            }
+        })
+    }
+    else {
+        const nav = document.querySelector('nav')!
+        nav.append(container)
+        sentinel.on('nav', (el) => {
+            if (container.parentElement !== nav) {
+                el.append(container)
+            }
+        })
+    }
+
+    return container
+}
+
+function createDivider() {
+    const divider = document.createElement('div')
+    divider.className = 'border-b border-white/20'
+    return divider
+}
+
 function createMenuItem(icon: string, title: string, onClick: (e: MouseEvent) => void) {
-    const firstMenuItem = document.querySelector('nav > a')!
-    const menuItem = firstMenuItem.cloneNode(true) as HTMLAnchorElement
+    const menuItem = document.createElement('a')
+    menuItem.className = 'flex py-3 px-3 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm mb-2 flex-shrink-0 border border-white/20'
     menuItem.removeAttribute('href')
     menuItem.innerHTML = `${icon}${title}`
     menuItem.addEventListener('click', onClick)

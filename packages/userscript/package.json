@@ -17,7 +17,8 @@
   },
   "dependencies": {
     "html2canvas": "^1.4.1",
-    "vite-plugin-monkey": "^2.7.3"
+    "sentinel-js": "^0.0.5",
+    "vite-plugin-monkey": "^2.10.0"
   },
   "devDependencies": {
     "vite": "^3.1.4"
