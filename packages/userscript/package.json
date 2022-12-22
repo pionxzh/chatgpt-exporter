@@ -21,6 +21,6 @@
     "vite-plugin-monkey": "^2.10.0"
   },
   "devDependencies": {
-    "vite": "^3.1.4"
+    "vite": "^4.0.3"
   }
 }
