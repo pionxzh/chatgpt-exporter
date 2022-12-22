@@ -37,9 +37,17 @@ You:
 I'm creating a ChatGPT Exporter. What do you think?
 
 ChatGPT:
-It sounds like you're planning on creating a tool that uses the ChatGPT model to export text. ChatGPT is a large language model trained by OpenAI that is designed to generate human-like text responses based on a given input. It can be used for a variety of applications, such as chatbots, automated responses to customer inquiries, and more.
+It sounds like you're planning on creating a tool that uses the ChatGPT model 
+to export text. ChatGPT is a large language model trained by OpenAI that is 
+designed to generate human-like text responses based on a given input. It can 
+be used for a variety of applications, such as chatbots, automated responses 
+to customer inquiries, and more.
 
-However, please keep in mind that as a large language model, ChatGPT has not been specifically trained for any specific task, so the quality of the generated text will depend on how it is used and the context in which it is applied. It's important to use ChatGPT responsibly and consider the potential consequences of using it in any given situation.
+However, please keep in mind that as a large language model, ChatGPT has not 
+been specifically trained for any specific task, so the quality of the 
+generated text will depend on how it is used and the context in which it is 
+applied. It's important to use ChatGPT responsibly and consider the potential 
+consequences of using it in any given situation.
 ```
 
 ## HTML
