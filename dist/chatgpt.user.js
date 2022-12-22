@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatGPT Exporter
 // @namespace    pionxzh
-// @version      1.3.2
+// @version      1.3.3
 // @author       pionxzh
 // @description  Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @license      MIT
@@ -7472,7 +7472,15 @@
     return element === ownerDocument.documentElement ? isTransparent(documentBackgroundColor) ? isTransparent(bodyBackgroundColor) ? defaultBackgroundColor : bodyBackgroundColor : documentBackgroundColor : defaultBackgroundColor;
   };
   var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
-  var sentinel_umd = { exports: {} };
+  var sentinel_umdExports = {};
+  var sentinel_umd = {
+    get exports() {
+      return sentinel_umdExports;
+    },
+    set exports(v) {
+      sentinel_umdExports = v;
+    }
+  };
   (function(module, exports) {
     (function(root, factory) {
       {
@@ -7496,7 +7504,7 @@
                 callbacks[i2](ev.target);
             }, true);
             styleEl = doc.createElement("style");
-            head.insertBefore(styleEl, head.firstChild);
+            head.append(styleEl);
             styleSheet = styleEl.sheet;
             cssRules = styleSheet.cssRules;
           }
@@ -7555,7 +7563,7 @@
       };
     });
   })(sentinel_umd);
-  const sentinel = sentinel_umd.exports;
+  const sentinel = sentinel_umdExports;
   const fileCode = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="w-4 h-4" fill="currentColor"><!--! Font Awesome Pro 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zM256 0V128H384L256 0zM153 289l-31 31 31 31c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L71 337c-9.4-9.4-9.4-24.6 0-33.9l48-48c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9zM265 255l48 48c9.4 9.4 9.4 24.6 0 33.9l-48 48c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l31-31-31-31c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0z"/></svg>';
   const iconCamera = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4" fill="currentColor"><!--! Font Awesome Pro 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M149.1 64.8L138.7 96H64C28.7 96 0 124.7 0 160V416c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H373.3L362.9 64.8C356.4 45.2 338.1 32 317.4 32H194.6c-20.7 0-39 13.2-45.5 32.8zM256 384c-53 0-96-43-96-96s43-96 96-96s96 43 96 96s-43 96-96 96z"/></svg>';
   const iconCopy = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4" fill="currentColor"><!--! Font Awesome Pro 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg>';
@@ -7844,7 +7852,7 @@
     const container = document.createElement("div");
     container.id = "exporter-menu";
     container.className = "pt-1";
-    const chatList = document.querySelector("nav > div");
+    const chatList = document.querySelector("nav > div.overflow-y-auto");
     if (chatList) {
       chatList.after(container);
       sentinel.on("nav > div.overflow-y-auto", (el) => {
@@ -7878,11 +7886,10 @@
     return menuItem;
   }
   function exportToHtml() {
-    var _a;
     const items = getConversation();
     if (items.length === 0)
       return alert("No conversation found. Please send a message first.");
-    const lang = (_a = document.documentElement.lang) != null ? _a : "en";
+    const lang = document.documentElement.lang ?? "en";
     const conversationHtml = items.map((item) => {
       const { author: { name, avatar }, lines } = item;
       const avatarEl = name === "ChatGPT" ? `${chatGPTAvatarSVG}` : `<img src="${avatar}" alt="${name}" />`;
@@ -7947,11 +7954,10 @@ ${linesHtml}
   function getConversation() {
     const items = [];
     document.querySelectorAll("main .group").forEach((item) => {
-      var _a;
       const avatarEl = item.querySelector('span img:not([aria-hidden="true"])');
       const name = (avatarEl == null ? void 0 : avatarEl.getAttribute("alt")) ? "You" : "ChatGPT";
       const avatar = avatarEl ? getBase64FromImg(avatarEl) : "";
-      const textNode = (_a = item.querySelector(".markdown")) != null ? _a : item.querySelector(".w-full .whitespace-pre-wrap");
+      const textNode = item.querySelector(".markdown") ?? item.querySelector(".w-full .whitespace-pre-wrap");
       if (!textNode)
         return;
       const lines = parseTextNode(textNode);
@@ -7960,10 +7966,10 @@ ${linesHtml}
     return items;
   }
   function parseTextNode(textNode) {
-    var _a, _b, _c, _d, _e;
+    var _a;
     const children = textNode.children;
     if (!children || children.length === 0) {
-      return [[{ type: "text", text: (_a = textNode.textContent) != null ? _a : "" }]];
+      return [[{ type: "text", text: textNode.textContent ?? "" }]];
     }
     const lines = [];
     for (let i2 = 0; i2 < children.length; i2++) {
@@ -7972,26 +7978,20 @@ ${linesHtml}
         case "PRE": {
           const codeEl = child.querySelector("code");
           if (codeEl) {
-            const code = (_b = codeEl.textContent) != null ? _b : "";
+            const code = codeEl.textContent ?? "";
             const classList = Array.from(codeEl.classList);
-            const lang = (_d = (_c = classList.find((c) => c.startsWith("language-"))) == null ? void 0 : _c.replace("language-", "")) != null ? _d : "";
+            const lang = ((_a = classList.find((c) => c.startsWith("language-"))) == null ? void 0 : _a.replace("language-", "")) ?? "";
             lines.push([{ type: "code-block", lang, code }]);
           }
           break;
         }
         case "OL": {
-          const items = Array.from(child.children).map((item) => {
-            var _a2;
-            return (_a2 = item.textContent) != null ? _a2 : "";
-          });
+          const items = Array.from(child.children).map((item) => item.textContent ?? "");
           lines.push([{ type: "ordered-list-item", items }]);
           break;
         }
         case "UL": {
-          const items = Array.from(child.children).map((item) => {
-            var _a2;
-            return (_a2 = item.textContent) != null ? _a2 : "";
-          });
+          const items = Array.from(child.children).map((item) => item.textContent ?? "");
           lines.push([{ type: "unordered-list-item", items }]);
           break;
         }
@@ -8000,29 +8000,29 @@ ${linesHtml}
           const line = [];
           const nodes = Array.from(child.childNodes);
           if (nodes.length === 0) {
-            const text = (_e = child.textContent) != null ? _e : "";
+            const text = child.textContent ?? "";
             line.push({ type: "text", text });
           } else {
             nodes.forEach((item) => {
-              var _a2, _b2, _c2, _d2, _e2, _f;
+              var _a2;
               switch (item.nodeType) {
                 case 1: {
                   if ("href" in item) {
-                    const href = (_a2 = item.getAttribute("href")) != null ? _a2 : "";
-                    const text = (_b2 = item.textContent) != null ? _b2 : href;
+                    const href = item.getAttribute("href") ?? "";
+                    const text = item.textContent ?? href;
                     line.push({ type: "link", text, href });
-                  } else if (((_c2 = item.tagName) == null ? void 0 : _c2.toUpperCase()) === "IMG") {
-                    const src = (_d2 = item.getAttribute("src")) != null ? _d2 : "";
+                  } else if (((_a2 = item.tagName) == null ? void 0 : _a2.toUpperCase()) === "IMG") {
+                    const src = item.getAttribute("src") ?? "";
                     line.push({ type: "image", src });
                   } else {
-                    const text = (_e2 = item.textContent) != null ? _e2 : "";
+                    const text = item.textContent ?? "";
                     line.push({ type: "code", code: text });
                   }
                   break;
                 }
                 case 3:
                 default: {
-                  const text = (_f = item.textContent) != null ? _f : "";
+                  const text = item.textContent ?? "";
                   line.push({ type: "text", text });
                   break;
                 }
