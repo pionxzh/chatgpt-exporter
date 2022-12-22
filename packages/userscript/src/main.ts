@@ -62,7 +62,7 @@ function createMenuContainer() {
     container.id = 'exporter-menu'
     container.className = 'pt-1'
 
-    const chatList = document.querySelector('nav > div')
+    const chatList = document.querySelector('nav > div.overflow-y-auto')
     if (chatList) {
         chatList.after(container)
         sentinel.on('nav > div.overflow-y-auto', (el) => {

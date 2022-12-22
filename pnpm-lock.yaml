@@ -1,5 +1,10 @@
 lockfileVersion: 5.4
 
+patchedDependencies:
+  sentinel-js@0.0.5:
+    hash: 4xqsksf5w62wic46kncafprj3e
+    path: patches/sentinel-js@0.0.5.patch
+
 importers:
 
   .:
@@ -38,7 +43,7 @@ importers:
       vite-plugin-monkey: ^2.10.0
     dependencies:
       html2canvas: 1.4.1
-      sentinel-js: 0.0.5
+      sentinel-js: 0.0.5_4xqsksf5w62wic46kncafprj3e
       vite-plugin-monkey: 2.10.0_vite@3.1.4
     devDependencies:
       vite: 3.1.4
@@ -3261,9 +3266,10 @@ packages:
       lru-cache: 6.0.0
     dev: true
 
-  /sentinel-js/0.0.5:
+  /sentinel-js/0.0.5_4xqsksf5w62wic46kncafprj3e:
     resolution: {integrity: sha512-Pk27UCVN4ub6fwFNgoMLMKG8vb6E9odXhMMG+WV3tGJLLv8fIwqzyrYgEoW3KtpgAQ1qn2MgZdJ0GOSpDfn8OQ==}
     dev: false
+    patched: true
 
   /shebang-command/2.0.0:
     resolution: {integrity: sha512-kHxr2zZpYtdmrN1qDjrrX/Z1rR1kG8Dx+gkpK1G4eXmvXswmcE1hTWBWYUzlraYw1/yZp6YuDY77YtvbN0dmDA==}
