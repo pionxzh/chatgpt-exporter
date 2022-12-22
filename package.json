@@ -9,6 +9,9 @@
   "engines": {
     "node": ">=16.0.0"
   },
+  "commitlint": {
+    "extends": ["@commitlint/config-conventional"]
+  },
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
@@ -20,6 +23,8 @@
     "prepare": "husky install"
   },
   "devDependencies": {
+    "@commitlint/cli": "^17.3.0",
+    "@commitlint/config-conventional": "^17.3.0",
     "@pionxzh/eslint-config-ts": "^0.1.1",
     "@types/node": "^18.11.17",
     "cpy-cli": "^4.2.0",
