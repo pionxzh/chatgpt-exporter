@@ -4,7 +4,7 @@ import { chatGPTAvatarSVG, fileCode, iconCamera, iconCopy } from './icons'
 import { copyToClipboard, downloadFile, downloadUrl, escapeHtml, getBase64FromImg, onloadSafe, sleep, timestamp } from './utils'
 import templateHtml from './template.html?raw'
 
-type ConversationLine = |
+type ConversationLineNode = |
 { type: 'text'; text: string } |
 { type: 'image'; src: string } |
 { type: 'code'; code: string } |
@@ -13,12 +13,14 @@ type ConversationLine = |
 { type: 'ordered-list-item'; items: string[] } |
 { type: 'unordered-list-item'; items: string[] }
 
-interface ConversationItem {
+type ConversationLine = ConversationLineNode[]
+
+interface Conversation {
     author: {
         name: string
         avatar: string
     }
-    lines: ConversationLine[][]
+    lines: ConversationLine[]
 }
 
 main()
@@ -28,7 +30,6 @@ function main() {
         const nav = document.querySelector('nav')
         if (!nav) {
             console.error('Failed to locate the nav element. Please report this issue to the developer.')
-            // alert('Failed to locate the nav element. Please report this issue to the developer.')
             return
         }
 
@@ -185,8 +186,8 @@ async function exportToPng() {
     downloadUrl(fileName, dataUrl)
 }
 
-function getConversation(): ConversationItem[] {
-    const items: ConversationItem[] = []
+function getConversation(): Conversation[] {
+    const items: Conversation[] = []
     document.querySelectorAll('main .group').forEach((item) => {
         const avatarEl = item.querySelector<HTMLImageElement>('span img:not([aria-hidden="true"])')
         // actually we can get the name from the avatar's alt
@@ -204,13 +205,13 @@ function getConversation(): ConversationItem[] {
     return items
 }
 
-function parseTextNode(textNode: HTMLDivElement): ConversationLine[][] {
+function parseTextNode(textNode: HTMLDivElement): ConversationLine[] {
     const children = textNode.children
     if (!children || children.length === 0) {
         return [[{ type: 'text', text: textNode.textContent ?? '' }]]
     }
 
-    const lines: ConversationLine[][] = []
+    const lines: ConversationLine[] = []
     for (let i = 0; i < children.length; i++) {
         const child = children[i]
         switch (child.tagName.toUpperCase()) {
@@ -236,7 +237,7 @@ function parseTextNode(textNode: HTMLDivElement): ConversationLine[][] {
             }
             case 'P':
             default: {
-                const line: ConversationLine[] = []
+                const line: ConversationLine = []
                 const nodes = Array.from(child.childNodes)
                 if (nodes.length === 0) {
                     const text = child.textContent ?? ''
@@ -283,7 +284,7 @@ function parseTextNode(textNode: HTMLDivElement): ConversationLine[][] {
     return lines
 }
 
-function conversationToText(conversation: ConversationItem[]) {
+function conversationToText(conversation: Conversation[]) {
     return conversation.map((item) => {
         const { author: { name }, lines } = item
         const text = lines.map((line) => {
