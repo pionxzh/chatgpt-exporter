@@ -1,6 +1,6 @@
 import html2canvas from 'html2canvas'
 import sentinel from 'sentinel-js'
-import { chatGPTAvatarSVG, fileCode, iconCamera, iconCopy } from './icons'
+import { chatGPTAvatarSVG, fileCode, iconCamera, iconCopy, iconMarkdown } from './icons'
 import { copyToClipboard, downloadFile, downloadUrl, escapeHtml, getBase64FromImg, onloadSafe, sleep, timestamp } from './utils'
 import templateHtml from './template.html?raw'
 
@@ -52,9 +52,10 @@ function main() {
         const divider = createDivider()
         const textExport = createMenuItem(iconCopy, 'Copy Text', onCopyText)
         const pngExport = createMenuItem(iconCamera, 'Screenshot', exportToPng)
+        const mdExport = createMenuItem(iconMarkdown, 'Export Markdown', exportToMarkdown)
         const htmlExport = createMenuItem(fileCode, 'Export WebPage', exportToHtml)
         const container = createMenuContainer()
-        container.append(textExport, pngExport, htmlExport, divider)
+        container.append(textExport, pngExport, mdExport, htmlExport, divider)
     })
 }
 
@@ -100,6 +101,14 @@ function createMenuItem(icon: string, title: string, onClick: (e: MouseEvent) =>
     menuItem.addEventListener('click', onClick)
 
     return menuItem
+}
+
+function exportToMarkdown() {
+    const items = getConversation()
+    if (items.length === 0) return alert('No conversation found. Please send a message first.')
+
+    const text = conversationToMarkdown(items)
+    downloadFile(`chatgpt-${timestamp()}.md`, 'text/markdown', text)
 }
 
 function exportToHtml() {
@@ -287,20 +296,30 @@ function parseTextNode(textNode: HTMLDivElement): ConversationLine[] {
 function conversationToText(conversation: Conversation[]) {
     return conversation.map((item) => {
         const { author: { name }, lines } = item
-        const text = lines.map((line) => {
-            return line.map((item) => {
-                switch (item.type) {
-                    case 'text': return item.text
-                    case 'image': return '[image]'
-                    case 'link': return `[${item.text}](${item.href})`
-                    case 'ordered-list-item': return item.items.map((item, index) => `${index + 1}. ${item}`).join('\r\n')
-                    case 'unordered-list-item': return item.items.map(item => `- ${item}`).join('\r\n')
-                    case 'code': return `\`${item.code}\``
-                    case 'code-block': return `\`\`\`${item.lang}\r\n${item.code}\`\`\``
-                    default: return ''
-                }
-            }).join('')
-        }).join('\r\n\r\n')
+        const text = lines.map(line => lineToText(line)).join('\r\n\r\n')
         return `${name}:\r\n${text}`
     }).join('\r\n\r\n')
+}
+
+function conversationToMarkdown(conversation: Conversation[]) {
+    return conversation.map((item) => {
+        const { author: { name }, lines } = item
+        const text = lines.map(line => lineToText(line)).join('\r\n\r\n')
+        return `#### ${name}:\r\n${text}`
+    }).join('\r\n\r\n')
+}
+
+function lineToText(line: ConversationLine): string {
+    return line.map((item) => {
+        switch (item.type) {
+            case 'text': return item.text
+            case 'image': return '[image]'
+            case 'link': return `[${item.text}](${item.href})`
+            case 'ordered-list-item': return item.items.map((item, index) => `${index + 1}. ${item}`).join('\r\n')
+            case 'unordered-list-item': return item.items.map(item => `- ${item}`).join('\r\n')
+            case 'code': return `\`${item.code}\``
+            case 'code-block': return `\`\`\`${item.lang}\r\n${item.code}\`\`\``
+            default: return ''
+        }
+    }).join('')
 }
