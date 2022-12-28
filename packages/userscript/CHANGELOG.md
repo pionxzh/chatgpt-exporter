@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.3.3...userscript-v1.4.0) (2022-12-28)
+
+
+### Features
+
+* support markdown export ([306ed2b](https://github.com/pionxzh/chatgpt-exporter/commit/306ed2b5edf6635f281707f030b80eb2683d3770))
+
 ## [1.3.3](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.3.2...userscript-v1.3.3) (2022-12-22)
 
 
