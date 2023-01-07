@@ -215,14 +215,22 @@ function getConversation(): Conversation[] {
 }
 
 function parseTextNode(textNode: HTMLDivElement): ConversationLine[] {
-    const children = textNode.children
-    if (!children || children.length === 0) {
-        return [[{ type: 'text', text: textNode.textContent ?? '' }]]
-    }
+    const warningBoxClass = 'bg-orange-500/10'
+    const childNodes = textNode.childNodes ? Array.from(textNode.childNodes) : []
+    const validChildNodes = childNodes.filter((c) => {
+        // filter out non-element and non-text nodes
+        if (!(c instanceof Element || c instanceof Text)) return false
+
+        // filter out the alert box
+        return !(c instanceof Element && c.classList.contains(warningBoxClass))
+    })
+    if (validChildNodes.length === 0) return [[{ type: 'text', text: textNode.textContent ?? '' }]]
+    if (validChildNodes.length === 1 && validChildNodes[0] instanceof Text) return [[{ type: 'text', text: validChildNodes[0].textContent ?? '' }]]
 
     const lines: ConversationLine[] = []
-    for (let i = 0; i < children.length; i++) {
-        const child = children[i]
+    Array.from(textNode.children).forEach((child) => {
+        if (child.classList.contains(warningBoxClass)) return
+
         switch (child.tagName.toUpperCase()) {
             case 'PRE': {
                 const codeEl = child.querySelector('code')
@@ -288,7 +296,7 @@ function parseTextNode(textNode: HTMLDivElement): ConversationLine[] {
                 break
             }
         }
-    }
+    })
 
     return lines
 }
