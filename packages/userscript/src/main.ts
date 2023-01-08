@@ -1,8 +1,10 @@
 import html2canvas from 'html2canvas'
 import sentinel from 'sentinel-js'
-import { chatGPTAvatarSVG, fileCode, iconCamera, iconCopy, iconMarkdown } from './icons'
+import { chatGPTAvatarSVG, fileCode, iconArrowRightFromBracket, iconCamera, iconCopy, iconMarkdown } from './icons'
 import { copyToClipboard, downloadFile, downloadUrl, escapeHtml, getBase64FromImg, onloadSafe, sleep, timestamp } from './utils'
 import templateHtml from './template.html?raw'
+
+import './style.css'
 
 type ConversationLineNode = |
 { type: 'text'; text: string } |
@@ -51,19 +53,24 @@ function main() {
         }
 
         const divider = createDivider()
+        const exportButton = createMenuItem(iconArrowRightFromBracket, 'Export', () => {})
+        const dropdown = document.createElement('div')
+        dropdown.classList.add('dropdown-menu', 'bg-gray-900')
+
         const textExport = createMenuItem(iconCopy, 'Copy Text', onCopyText)
         const pngExport = createMenuItem(iconCamera, 'Screenshot', exportToPng)
-        const mdExport = createMenuItem(iconMarkdown, 'Export Markdown', exportToMarkdown)
-        const htmlExport = createMenuItem(fileCode, 'Export WebPage', exportToHtml)
+        const mdExport = createMenuItem(iconMarkdown, 'Markdown', exportToMarkdown)
+        const htmlExport = createMenuItem(fileCode, 'WebPage (HTML)', exportToHtml)
         const container = createMenuContainer()
-        container.append(textExport, pngExport, mdExport, htmlExport, divider)
+        dropdown.append(textExport, pngExport, mdExport, htmlExport)
+        container.append(exportButton, dropdown, divider)
     })
 }
 
 function createMenuContainer() {
     const container = document.createElement('div')
     container.id = 'exporter-menu'
-    container.className = 'pt-1'
+    container.className = 'pt-1 relative'
 
     const chatList = document.querySelector('nav > div.overflow-y-auto')
     if (chatList) {
