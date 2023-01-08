@@ -11,7 +11,8 @@ type ConversationLineNode = |
 { type: 'code-block'; lang: string; code: string } |
 { type: 'link'; text: string; href: string } |
 { type: 'ordered-list-item'; items: string[] } |
-{ type: 'unordered-list-item'; items: string[] }
+{ type: 'unordered-list-item'; items: string[] } |
+{ type: 'table'; headers: string[]; rows: string[][] }
 
 type ConversationLine = ConversationLineNode[]
 
@@ -140,12 +141,17 @@ function exportToHtml() {
                         return `<ol>${item.items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ol>`
                     case 'unordered-list-item':
                         return `<ul>${item.items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
+                    case 'table': {
+                        const header = item.headers.map(item => `<th>${escapeHtml(item)}</th>`).join('')
+                        const body = item.rows.map(row => `<tr>${row.map(item => `<td>${escapeHtml(item)}</td>`).join('')}</tr>`).join('')
+                        return `<table><thead><tr>${header}</tr></thead><tbody>${body}</tbody></table>`
+                    }
                     default:
                         return ''
                 }
             }).join('')
 
-            const skipTags = ['pre', 'ul', 'ol']
+            const skipTags = ['pre', 'ul', 'ol', 'table']
             if (skipTags.some(tag => lineHtml.startsWith(`<${tag}>`))) return lineHtml
             return `<p>${lineHtml}</p>`
         }).join('')
@@ -252,6 +258,12 @@ function parseTextNode(textNode: HTMLDivElement): ConversationLine[] {
                 lines.push([{ type: 'unordered-list-item', items }])
                 break
             }
+            case 'TABLE': {
+                const headers = Array.from(child.querySelector('thead tr')?.children ?? []).map(item => item.textContent ?? '')
+                const rows = Array.from(child.querySelector('tbody')?.children ?? []).map(row => Array.from(row.children).map(item => item.textContent ?? ''))
+                lines.push([{ type: 'table', headers, rows }])
+                break
+            }
             case 'P':
             default: {
                 const line: ConversationLine = []
@@ -327,7 +339,34 @@ function lineToText(line: ConversationLine): string {
             case 'unordered-list-item': return item.items.map(item => `- ${item}`).join('\r\n')
             case 'code': return `\`${item.code}\``
             case 'code-block': return `\`\`\`${item.lang}\r\n${item.code}\`\`\``
+            case 'table': return transformTableToMarkdown(item.headers, item.rows)
             default: return ''
         }
     }).join('')
 }
+
+function transformTableToMarkdown(headers: string[], rows: string[][]): string {
+    let markdown = ''
+
+    // Find the maximum width of each column
+    const columnWidths: number[] = []
+    for (let i = 0; i < headers.length; i++) {
+        let maxWidth = headers[i].length
+        rows.forEach((row) => {
+            maxWidth = Math.max(maxWidth, row[i].length)
+        })
+        columnWidths.push(maxWidth)
+    }
+
+    // Add the headers
+    markdown += `${headers.map((header, i) => header.padEnd(columnWidths[i])).join(' | ')}\n`
+    markdown += `${headers.map((_header, i) => '-'.repeat(columnWidths[i])).join(' | ')}\n`
+
+    // Add the rows
+    rows.forEach((row) => {
+        markdown += `${row.map((cell, i) => cell.padEnd(columnWidths[i])).join(' | ')}\n`
+    })
+
+    return markdown
+}
+
