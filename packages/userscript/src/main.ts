@@ -137,7 +137,7 @@ function exportToHtml() {
                     case 'link':
                         return `<a href="${item.href}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.text)}</a>`
                     case 'ordered-list-item':
-                        return `<ol>${item.items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
+                        return `<ol>${item.items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ol>`
                     case 'unordered-list-item':
                         return `<ul>${item.items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
                     default:
