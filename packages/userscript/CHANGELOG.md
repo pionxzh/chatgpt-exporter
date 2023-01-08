@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.5.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.4.0...userscript-v1.5.0) (2023-01-08)
+
+
+### Features
+
+* adopt dropdown layout ([92b713b](https://github.com/pionxzh/chatgpt-exporter/commit/92b713ba21ed7663d00ba02ebc6ab7f5995897df)), closes [#31](https://github.com/pionxzh/chatgpt-exporter/issues/31)
+* support table parsing and exporting ([dd3bd49](https://github.com/pionxzh/chatgpt-exporter/commit/dd3bd49e9eb06c02ad179272ce39991c8721e861)), closes [#32](https://github.com/pionxzh/chatgpt-exporter/issues/32)
+
+
+### Bug Fixes
+
+* filter out content policy warning ([15b2e54](https://github.com/pionxzh/chatgpt-exporter/commit/15b2e54d3a433a5f6739d6e6ee4ffa3a4c2d3849)), closes [#33](https://github.com/pionxzh/chatgpt-exporter/issues/33)
+* fix missing closing of ordered-list ([1ef646e](https://github.com/pionxzh/chatgpt-exporter/commit/1ef646e442fd8c5f7da9183238ec09f63dd9107b))
+
 ## [1.4.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.3.3...userscript-v1.4.0) (2022-12-28)
 
 
