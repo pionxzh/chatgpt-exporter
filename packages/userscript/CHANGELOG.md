@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.6.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.5.0...userscript-v1.6.0) (2023-01-11)
+
+
+### Features
+
+* support menu injection on mobile view ([90c4001](https://github.com/pionxzh/chatgpt-exporter/commit/90c4001dd50db88456e80d3a479b30b1799da0f1))
+* support to customize the filename ([85b64b0](https://github.com/pionxzh/chatgpt-exporter/commit/85b64b07de5db51dd6158cdc5b24abb62d57b876))
+
+
+### Bug Fixes
+
+* filter out content policy danger ([7881d89](https://github.com/pionxzh/chatgpt-exporter/commit/7881d89c20e9aad46604deecab4f9f72769d1c79)), closes [#33](https://github.com/pionxzh/chatgpt-exporter/issues/33)
+
 ## [1.5.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.4.0...userscript-v1.5.0) (2023-01-08)
 
 
