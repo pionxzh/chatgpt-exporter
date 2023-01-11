@@ -30,12 +30,6 @@ main()
 
 function main() {
     onloadSafe(() => {
-        const nav = document.querySelector('nav')
-        if (!nav) {
-            console.error('Failed to locate the nav element. Please report this issue to the developer.')
-            return
-        }
-
         const copyHtml = `${iconCopy}Copy Text`
         const copiedHtml = `${iconCopy}Copied`
         const onCopyText = (e: MouseEvent) => {
@@ -72,25 +66,15 @@ function createMenuContainer() {
     container.id = 'exporter-menu'
     container.className = 'pt-1 relative'
 
-    const chatList = document.querySelector('nav > div.overflow-y-auto')
-    if (chatList) {
-        chatList.after(container)
-        sentinel.on('nav > div.overflow-y-auto', (el) => {
-            const nav = document.querySelector('nav')!
-            if (container.parentElement !== nav) {
-                el.after(container)
-            }
-        })
-    }
-    else {
-        const nav = document.querySelector('nav')!
-        nav.append(container)
-        sentinel.on('nav', (el) => {
-            if (container.parentElement !== nav) {
-                el.append(container)
-            }
-        })
-    }
+    sentinel.on('nav', (nav) => {
+        const chatList = document.querySelector('nav > div.overflow-y-auto')
+        if (chatList) {
+            chatList.after(container)
+        }
+        else {
+            nav.append(container)
+        }
+    })
 
     return container
 }
