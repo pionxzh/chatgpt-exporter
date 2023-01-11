@@ -212,21 +212,28 @@ function getConversation(): Conversation[] {
 }
 
 function parseTextNode(textNode: HTMLDivElement): ConversationLine[] {
-    const warningBoxClass = 'bg-orange-500/10'
+    const warningClassName = 'bg-orange-500/10'
+    const dangerClassName = 'bg-red-500/10'
+
     const childNodes = textNode.childNodes ? Array.from(textNode.childNodes) : []
     const validChildNodes = childNodes.filter((c) => {
-        // filter out non-element and non-text nodes
-        if (!(c instanceof Element || c instanceof Text)) return false
+        if (c instanceof Text) return true
 
         // filter out the alert box
-        return !(c instanceof Element && c.classList.contains(warningBoxClass))
+        if (c instanceof Element) {
+            return !(c.classList.contains(warningClassName) || c.classList.contains(dangerClassName))
+        }
+
+        // other nodes are not supported
+        return false
     })
     if (validChildNodes.length === 0) return [[{ type: 'text', text: textNode.textContent ?? '' }]]
     if (validChildNodes.length === 1 && validChildNodes[0] instanceof Text) return [[{ type: 'text', text: validChildNodes[0].textContent ?? '' }]]
 
     const lines: ConversationLine[] = []
     Array.from(textNode.children).forEach((child) => {
-        if (child.classList.contains(warningBoxClass)) return
+        if (child.classList.contains(warningClassName)) return
+        if (child.classList.contains(dangerClassName)) return
 
         switch (child.tagName.toUpperCase()) {
             case 'PRE': {
