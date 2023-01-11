@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import monkey from 'vite-plugin-monkey'
+import preact from '@preact/preset-vite'
 import packageJson from './package.json'
 
 // https://vitejs.dev/config/
@@ -9,8 +10,12 @@ export default defineConfig({
         charset: 'utf8',
     },
     plugins: [
+        preact({
+            devToolsEnabled: false,
+            devtoolsInProd: false,
+        }),
         monkey({
-            entry: 'src/main.ts',
+            entry: 'src/main.tsx',
             userscript: {
                 'name': packageJson.title,
                 'author': packageJson.author,

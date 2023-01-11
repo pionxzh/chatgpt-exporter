@@ -27,7 +27,7 @@
   "devDependencies": {
     "@commitlint/cli": "^17.3.0",
     "@commitlint/config-conventional": "^17.3.0",
-    "@pionxzh/eslint-config-ts": "^0.1.1",
+    "@pionxzh/eslint-config-react": "^0.1.1",
     "@types/node": "^18.11.17",
     "cpy-cli": "^4.2.0",
     "eslint": "^8.30.0",
