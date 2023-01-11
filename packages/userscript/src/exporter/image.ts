@@ -1,8 +1,8 @@
 import html2canvas from 'html2canvas'
-import { downloadUrl } from '../utils/download'
-import { sleep, timestamp } from '../utils/utils'
+import { downloadUrl, getFileNameWithFormat } from '../utils/download'
+import { sleep } from '../utils/utils'
 
-export async function exportToPng() {
+export async function exportToPng(fileNameFormat: string) {
     const thread = document.querySelector('main .group')?.parentElement as HTMLElement
     if (!thread || thread.children.length === 0) return
 
@@ -23,6 +23,6 @@ export async function exportToPng() {
 
     const dataUrl = canvas.toDataURL('image/png', 1)
         .replace(/^data:image\/[^;]/, 'data:application/octet-stream')
-    const fileName = `ChatGPT-${timestamp()}.png`
+    const fileName = getFileNameWithFormat(fileNameFormat, 'png')
     downloadUrl(fileName, dataUrl)
 }

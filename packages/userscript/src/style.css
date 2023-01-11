@@ -1,9 +1,24 @@
+.inputFieldSet {
+    display: block;
+    border-width: 2px;
+    border-style: groove;
+}
+
+.inputFieldSet legend {
+    margin-left: 4px;
+}
+
+.inputFieldSet input {
+    background-color: transparent;
+    box-shadow: none!important;
+}
+
 .dropdown-menu {
     display: none;
     position: absolute;
     flex-direction: column;
     left: calc(100% + 1rem);
-    top: 0;
+    top: -4.2rem;
     width: 220px;
     padding: .75rem .4rem 0 .4rem;
     border-radius: .375rem;
@@ -19,11 +34,11 @@
     height: 100%;
 }
 
-.dropdown-menu::after {
+#exporter-menu:hover::after {
     content: '';
     position: absolute;
-    top: 1rem;
-    left: -0.5rem;
+    top: 1.2rem;
+    right: -1rem;
     width: 0;
     height: 0;
     border-top: .5rem solid transparent;

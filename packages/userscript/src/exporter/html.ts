@@ -1,11 +1,10 @@
 import { ChatGPTAvatar } from '../icons'
 import { getConversation } from '../parser'
-import { timestamp } from '../utils/utils'
-import { downloadFile } from '../utils/download'
+import { downloadFile, getFileNameWithFormat } from '../utils/download'
 
 import templateHtml from '../template.html?raw'
 
-export function exportToHtml() {
+export function exportToHtml(fileNameFormat: string) {
     const conversations = getConversation()
     if (conversations.length === 0) return alert('No conversation found. Please send a message first.')
 
@@ -65,7 +64,7 @@ ${linesHtml}
         .replace('{{lang}}', lang)
         .replace('{{content}}', conversationHtml)
 
-    const fileName = `ChatGPT-${timestamp()}.html`
+    const fileName = getFileNameWithFormat(fileNameFormat, 'html')
     downloadFile(fileName, 'text/html', html)
 }
 
