@@ -4,7 +4,7 @@
     "composite": true,
     "types": ["vite/client"],
     "jsx": "react-jsx",
-    "jsxImportSource": "preact",
+    "jsxImportSource": "preact"
   },
   "include": [
     "src",
