@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatGPT Exporter
 // @namespace    pionxzh
-// @version      1.6.0
+// @version      1.7.0
 // @author       pionxzh
 // @description  Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @license      MIT
@@ -486,6 +486,34 @@
       if (child.classList.contains(dangerClassName))
         return;
       switch (child.tagName.toUpperCase()) {
+        case "HR": {
+          lines.push([{
+            type: "hr"
+          }]);
+          break;
+        }
+        case "H1":
+        case "H2":
+        case "H3":
+        case "H4":
+        case "H5":
+        case "H6": {
+          const text = child.textContent ?? "";
+          lines.push([{
+            type: "heading",
+            level: parseInt(child.tagName[1]),
+            text
+          }]);
+          break;
+        }
+        case "BLOCKQUOTE": {
+          const text = child.textContent ?? "";
+          lines.push([{
+            type: "quote",
+            text
+          }]);
+          break;
+        }
         case "PRE": {
           const codeEl = child.querySelector("code");
           if (codeEl) {
@@ -538,33 +566,52 @@
             });
           } else {
             nodes.forEach((item) => {
-              var _a2;
               switch (item.nodeType) {
-                case 1: {
-                  if ("href" in item) {
-                    const href = item.getAttribute("href") ?? "";
-                    const text = item.textContent ?? href;
+                case document.ELEMENT_NODE: {
+                  const element = item;
+                  const tagName = element.tagName.toUpperCase();
+                  if (element instanceof HTMLAnchorElement) {
+                    const href = element.getAttribute("href") ?? "";
+                    const text = element.textContent ?? href;
                     line.push({
                       type: "link",
                       text,
                       href
                     });
-                  } else if (((_a2 = item.tagName) == null ? void 0 : _a2.toUpperCase()) === "IMG") {
-                    const src = item.getAttribute("src") ?? "";
+                  } else if (element instanceof HTMLImageElement) {
+                    const src = element.getAttribute("src") ?? "";
                     line.push({
                       type: "image",
                       src
                     });
-                  } else {
-                    const text = item.textContent ?? "";
+                  } else if (tagName === "B" || tagName === "STRONG") {
+                    const text = element.textContent ?? "";
+                    line.push({
+                      type: "bold",
+                      text
+                    });
+                  } else if (tagName === "I" || tagName === "EM") {
+                    const text = element.textContent ?? "";
+                    line.push({
+                      type: "italic",
+                      text
+                    });
+                  } else if (tagName === "CODE") {
+                    const code = element.textContent ?? "";
                     line.push({
                       type: "code",
-                      code: text
+                      code
+                    });
+                  } else {
+                    const text = element.textContent ?? "";
+                    line.push({
+                      type: "text",
+                      text
                     });
                   }
                   break;
                 }
-                case 3:
+                case document.TEXT_NODE:
                 default: {
                   const text = item.textContent ?? "";
                   line.push({
@@ -605,6 +652,34 @@
       document.body.removeChild(textarea);
     }
   }
+  function hrToMarkdown() {
+    return "---";
+  }
+  function headingToMarkdown(node) {
+    return `${"#".repeat(node.level)} ${node.text}`;
+  }
+  function quoteToMarkdown(node) {
+    return `> ${node.text}`;
+  }
+  function imageToMarkdown(node) {
+    return `![image](${node.src})`;
+  }
+  function linkToMarkdown(node) {
+    return `[${node.text}](${node.href})`;
+  }
+  function orderedListToMarkdown(node) {
+    return node.items.map((item, index) => `${index + 1}. ${item}`).join("\r\n");
+  }
+  function unorderedListToMarkdown(node) {
+    return node.items.map((item) => `- ${item}`).join("\r\n");
+  }
+  function codeToMarkdown(node) {
+    return `\`${node.code}\``;
+  }
+  function codeBlockToMarkdown(node) {
+    return `\`\`\`${node.lang}\r
+${node.code}\`\`\``;
+  }
   function tableToMarkdown(headers, rows) {
     let markdown = "";
     const columnWidths = [];
@@ -643,27 +718,39 @@ ${text2}`;
     copyToClipboard(text);
   }
   function lineToText(line) {
-    return line.map((item) => {
-      switch (item.type) {
+    return line.map((node) => {
+      const nodeType = node.type;
+      switch (nodeType) {
+        case "hr":
+          return hrToMarkdown();
         case "text":
-          return item.text;
+          return node.text;
+        case "bold":
+          return node.text;
+        case "italic":
+          return node.text;
+        case "heading":
+          return headingToMarkdown(node);
+        case "quote":
+          return quoteToMarkdown(node);
         case "image":
           return "[image]";
         case "link":
-          return `[${item.text}](${item.href})`;
+          return linkToMarkdown(node);
         case "ordered-list-item":
-          return item.items.map((item2, index) => `${index + 1}. ${item2}`).join("\r\n");
+          return orderedListToMarkdown(node);
         case "unordered-list-item":
-          return item.items.map((item2) => `- ${item2}`).join("\r\n");
+          return unorderedListToMarkdown(node);
         case "code":
-          return `\`${item.code}\``;
+          return codeToMarkdown(node);
         case "code-block":
-          return `\`\`\`${item.lang}\r
-${item.code}\`\`\``;
+          return codeBlockToMarkdown(node);
         case "table":
-          return tableToMarkdown(item.headers, item.rows);
+          return tableToMarkdown(node.headers, node.rows);
         default:
-          return "";
+          ((x) => {
+            throw new Error(`${x} was unhandled!`);
+          })(nodeType);
       }
     }).join("");
   }
@@ -8283,10 +8370,47 @@ ${item.code}\`\`\``;
         },
         lines
       } = item;
-      const text = lines.map((line) => lineToText(line)).join("\r\n\r\n");
+      const text = lines.map((line) => lineToMD(line)).join("\r\n\r\n");
       return `#### ${name}:\r
 ${text}`;
     }).join("\r\n\r\n");
+  }
+  function lineToMD(line) {
+    return line.map((node) => {
+      const nodeType = node.type;
+      switch (nodeType) {
+        case "hr":
+          return hrToMarkdown();
+        case "text":
+          return node.text;
+        case "bold":
+          return `**${node.text}**`;
+        case "italic":
+          return `*${node.text}*`;
+        case "heading":
+          return headingToMarkdown(node);
+        case "quote":
+          return quoteToMarkdown(node);
+        case "image":
+          return imageToMarkdown(node);
+        case "link":
+          return linkToMarkdown(node);
+        case "ordered-list-item":
+          return orderedListToMarkdown(node);
+        case "unordered-list-item":
+          return unorderedListToMarkdown(node);
+        case "code":
+          return codeToMarkdown(node);
+        case "code-block":
+          return codeBlockToMarkdown(node);
+        case "table":
+          return tableToMarkdown(node.headers, node.rows);
+        default:
+          ((x) => {
+            throw new Error(`${x} was unhandled!`);
+          })(nodeType);
+      }
+    }).join("");
   }
   var _ = 0;
   function o$1(o2, e2, n2, t2, f2) {
@@ -8370,8 +8494,12 @@ ${text}`;
     <style>
         :root {
             --tw-prose-code: #111827;
-            --page-bg: #fff;
-            --page-text: #111827;
+            --tw-prose-hr: #e5e7eb;
+            --tw-prose-links: #111827;
+            --tw-prose-headings: #111827;
+            --tw-prose-quotes: #111827;
+            --page-bg: #f7f7f8;
+            --page-text: #374151;
             --conversation-odd-bg: rgba(247,247,248);
             --th-boarders: #4b5563;
             --td-boarders: #374151;
@@ -8379,9 +8507,18 @@ ${text}`;
 
         [data-theme="dark"] {
             --tw-prose-code: #f9fafb;
+            --tw-prose-hr: #374151;
+            --tw-prose-links: #fff;
+            --tw-prose-headings: #fff;
+            --tw-prose-quotes: #f3f4f6;
             --page-bg: rgba(52,53,65);
             --page-text: #fff;
             --conversation-odd-bg: rgb(68,70,84);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-size: 16px;
         }
 
         body {
@@ -8413,7 +8550,14 @@ ${text}`;
             border: 1px solid #e2e8f0;
         }
 
-        p:first-child,
+        a {
+            color: var(--tw-prose-links);
+            font-weight: 500;
+            text-decoration-line: underline;
+            text-underline-offset: 2px;
+        }
+
+        .conversation-content > p:first-child,
         ol:first-child {
             margin-top: 0;
         }
@@ -8429,6 +8573,14 @@ ${text}`;
             content: "\`";
         }
 
+        hr {
+            width: 100%;
+            height: 0;
+            border: 1px solid var(--tw-prose-hr);
+            margin-bottom: 1em;
+            margin-top: 1em;
+        }
+
         pre {
             color: #ffffff;
             background-color: #000000;
@@ -8442,6 +8594,71 @@ ${text}`;
             font-weight: 400;
             font-size: .875em;
             line-height: 1.7142857;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--tw-prose-headings);
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 2.25em;
+            font-weight: 600;
+            line-height: 1.1111111;
+            margin-bottom: 0.8888889em;
+            margin-top: 0;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            font-weight: 700;
+            line-height: 1.3333333;
+            margin-bottom: 1em;
+            margin-top: 2em;
+        }
+
+        h3 {
+            font-size: 1.25em;
+            font-weight: 600;
+            line-height: 1.6;
+            margin-bottom: .6em;
+            margin-top: 1.6em;
+        }
+
+        h4 {
+            font-weight: 400;
+            line-height: 1.5;
+            margin-bottom: .5em;
+            margin-top: 1.5em
+        }
+
+        h3,h4 {
+            margin-bottom: .5rem;
+            margin-top: 1rem;
+        }
+
+        h5 {
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 2px solid rgba(142,142,160,1);
+            color: var(--tw-prose-quotes);
+            font-style: italic;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 1rem;
+            margin: 1.6em 0;
+            padding-left: 1em;
+            quotes: "\\201C""\\201D""\\2018""\\2019";
+        }
+
+        blockquote p:first-of-type:before {
+            content: open-quote;
+        }
+
+        blockquote p:last-of-type:after {
+            content: close-quote;
         }
 
         table {
@@ -8579,13 +8796,15 @@ ${text}`;
             height: 100%;
         }
 
-        .conversation-content {
+        .conversation-content-wrapper {
             display: flex;
             flex-direction: column;
             width: 100%;
+        }
+
+        .conversation-content {
             font-size: 1rem;
             line-height: 1.5;
-            white-space: pre-wrap;
         }
     </style>
 </head>
@@ -8638,44 +8857,59 @@ ${text}`;
       } = item;
       const avatarEl = name === "ChatGPT" ? `${ChatGPTAvatar}` : `<img src="${avatar}" alt="${name}" />`;
       const linesHtml = lines.map((line) => {
-        const lineHtml = line.map((item2) => {
-          switch (item2.type) {
+        const lineHtml = line.map((node) => {
+          const nodeType = node.type;
+          switch (nodeType) {
+            case "hr":
+              return "<hr>";
             case "text":
-              return escapeHtml(item2.text);
+              return escapeHtml(node.text);
+            case "bold":
+              return `<strong>${escapeHtml(node.text)}</strong>`;
+            case "italic":
+              return `<em>${escapeHtml(node.text)}</em>`;
+            case "heading":
+              return `<h${node.level}>${escapeHtml(node.text)}</h${node.level}>`;
+            case "quote":
+              return `<blockquote><p>${escapeHtml(node.text)}</p></blockquote>`;
             case "image":
-              return `<img src="${item2.src}" referrerpolicy="no-referrer" />`;
-            case "code":
-              return `<code>${escapeHtml(item2.code)}</code>`;
-            case "code-block":
-              return `<pre><code class="language-${item2.lang}">${escapeHtml(item2.code)}</code></pre>`;
+              return `<img src="${node.src}" referrerpolicy="no-referrer" />`;
             case "link":
-              return `<a href="${item2.href}" target="_blank" rel="noopener noreferrer">${escapeHtml(item2.text)}</a>`;
+              return `<a href="${node.href}" target="_blank" rel="noopener noreferrer">${escapeHtml(node.text)}</a>`;
             case "ordered-list-item":
-              return `<ol>${item2.items.map((item3) => `<li>${escapeHtml(item3)}</li>`).join("")}</ol>`;
+              return `<ol>${node.items.map((item2) => `<li>${escapeHtml(item2)}</li>`).join("")}</ol>`;
             case "unordered-list-item":
-              return `<ul>${item2.items.map((item3) => `<li>${escapeHtml(item3)}</li>`).join("")}</ul>`;
+              return `<ul>${node.items.map((item2) => `<li>${escapeHtml(item2)}</li>`).join("")}</ul>`;
+            case "code":
+              return `<code>${escapeHtml(node.code)}</code>`;
+            case "code-block":
+              return `<pre><code class="language-${node.lang}">${escapeHtml(node.code)}</code></pre>`;
             case "table": {
-              const header = item2.headers.map((item3) => `<th>${escapeHtml(item3)}</th>`).join("");
-              const body = item2.rows.map((row) => `<tr>${row.map((item3) => `<td>${escapeHtml(item3)}</td>`).join("")}</tr>`).join("");
+              const header = node.headers.map((item2) => `<th>${escapeHtml(item2)}</th>`).join("");
+              const body = node.rows.map((row) => `<tr>${row.map((item2) => `<td>${escapeHtml(item2)}</td>`).join("")}</tr>`).join("");
               return `<table><thead><tr>${header}</tr></thead><tbody>${body}</tbody></table>`;
             }
             default:
-              return "";
+              ((x) => {
+                throw new Error(`${x} was unhandled!`);
+              })(nodeType);
           }
         }).join("");
-        const skipTags = ["pre", "ul", "ol", "table"];
-        if (skipTags.some((tag) => lineHtml.startsWith(`<${tag}>`)))
+        const skipWrap = ["hr", "h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "ul", "ol", "pre", "table"];
+        if (skipWrap.some((tag) => lineHtml.startsWith(`<${tag}>`)))
           return lineHtml;
         return `<p>${lineHtml}</p>`;
       }).join("");
       return `
 <div class="conversation-item">
-<div class="author">
-    ${avatarEl}
+    <div class="author">
+        ${avatarEl}
     </div>
-<div class="conversation-content">
-${linesHtml}
-</div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            ${linesHtml}
+        </div>
+    </div>
 </div>`;
     }).join("");
     const html = templateHtml.replace("{{time}}", new Date().toISOString()).replace("{{lang}}", lang).replace("{{content}}", conversationHtml);
