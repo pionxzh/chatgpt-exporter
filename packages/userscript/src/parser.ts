@@ -81,8 +81,7 @@ function parseTextNode(textNode: HTMLDivElement): ConversationLine[] {
                 else {
                     nodes.forEach((item) => {
                         switch (item.nodeType) {
-                            // code
-                            case 1: {
+                            case document.ELEMENT_NODE: {
                                 // detect is it a link
                                 if ('href' in item) {
                                     const href = (item as HTMLAnchorElement).getAttribute('href') ?? ''
@@ -100,8 +99,7 @@ function parseTextNode(textNode: HTMLDivElement): ConversationLine[] {
                                 }
                                 break
                             }
-                            // text
-                            case 3:
+                            case document.TEXT_NODE:
                             default: {
                                 const text = item.textContent ?? ''
                                 line.push({ type: 'text', text })
