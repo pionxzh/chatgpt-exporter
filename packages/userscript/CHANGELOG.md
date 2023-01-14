@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.6.0...userscript-v1.7.0) (2023-01-14)
+
+
+### Features
+
+* support heading, quote, bold, italic and separator ([3083135](https://github.com/pionxzh/chatgpt-exporter/commit/3083135ace99509b046024039a3a1b19c0cd8693)), closes [#37](https://github.com/pionxzh/chatgpt-exporter/issues/37)
+
 ## [1.6.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.5.0...userscript-v1.6.0) (2023-01-11)
 
 
