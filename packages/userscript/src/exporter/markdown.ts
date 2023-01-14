@@ -1,7 +1,7 @@
 import { getConversation } from '../parser'
-import type { Conversation } from '../type'
+import type { Conversation, ConversationLine } from '../type'
 import { downloadFile, getFileNameWithFormat } from '../utils/download'
-import { lineToText } from './text'
+import { codeBlockToMarkdown, codeToMarkdown, headingToMarkdown, hrToMarkdown, imageToMarkdown, linkToMarkdown, orderedListToMarkdown, quoteToMarkdown, tableToMarkdown, unorderedListToMarkdown } from '../utils/markdown'
 
 export function exportToMarkdown(fileNameFormat: string) {
     const conversations = getConversation()
@@ -15,7 +15,32 @@ export function exportToMarkdown(fileNameFormat: string) {
 function conversationToMarkdown(conversation: Conversation[]) {
     return conversation.map((item) => {
         const { author: { name }, lines } = item
-        const text = lines.map(line => lineToText(line)).join('\r\n\r\n')
+        const text = lines.map(line => lineToMD(line)).join('\r\n\r\n')
         return `#### ${name}:\r\n${text}`
     }).join('\r\n\r\n')
+}
+
+function lineToMD(line: ConversationLine): string {
+    // eslint-disable-next-line array-callback-return
+    return line.map((node) => {
+        const nodeType = node.type
+        switch (nodeType) {
+            case 'hr': return hrToMarkdown()
+            case 'text': return node.text
+            case 'bold': return `**${node.text}**`
+            case 'italic': return `*${node.text}*`
+            case 'heading': return headingToMarkdown(node)
+            case 'quote': return quoteToMarkdown(node)
+            case 'image': return imageToMarkdown(node)
+            case 'link': return linkToMarkdown(node)
+            case 'ordered-list-item': return orderedListToMarkdown(node)
+            case 'unordered-list-item': return unorderedListToMarkdown(node)
+            case 'code': return codeToMarkdown(node)
+            case 'code-block': return codeBlockToMarkdown(node)
+            case 'table': return tableToMarkdown(node.headers, node.rows)
+            default: ((x: never) => {
+                throw new Error(`${x} was unhandled!`)
+            })(nodeType)
+        }
+    }).join('')
 }

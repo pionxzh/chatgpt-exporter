@@ -1,7 +1,7 @@
 import type { ConversationLine } from '../type'
 import { getConversation } from '../parser'
 import { copyToClipboard } from '../utils/clipboard'
-import { tableToMarkdown } from '../utils/markdown'
+import { codeBlockToMarkdown, codeToMarkdown, headingToMarkdown, hrToMarkdown, linkToMarkdown, orderedListToMarkdown, quoteToMarkdown, tableToMarkdown, unorderedListToMarkdown } from '../utils/markdown'
 
 export function exportToText() {
     const conversations = getConversation()
@@ -16,18 +16,27 @@ export function exportToText() {
     copyToClipboard(text)
 }
 
-export function lineToText(line: ConversationLine): string {
-    return line.map((item) => {
-        switch (item.type) {
-            case 'text': return item.text
+function lineToText(line: ConversationLine): string {
+    // eslint-disable-next-line array-callback-return
+    return line.map((node) => {
+        const nodeType = node.type
+        switch (nodeType) {
+            case 'hr': return hrToMarkdown()
+            case 'text': return node.text
+            case 'bold': return node.text
+            case 'italic': return node.text
+            case 'heading': return headingToMarkdown(node)
+            case 'quote': return quoteToMarkdown(node)
             case 'image': return '[image]'
-            case 'link': return `[${item.text}](${item.href})`
-            case 'ordered-list-item': return item.items.map((item, index) => `${index + 1}. ${item}`).join('\r\n')
-            case 'unordered-list-item': return item.items.map(item => `- ${item}`).join('\r\n')
-            case 'code': return `\`${item.code}\``
-            case 'code-block': return `\`\`\`${item.lang}\r\n${item.code}\`\`\``
-            case 'table': return tableToMarkdown(item.headers, item.rows)
-            default: return ''
+            case 'link': return linkToMarkdown(node)
+            case 'ordered-list-item': return orderedListToMarkdown(node)
+            case 'unordered-list-item': return unorderedListToMarkdown(node)
+            case 'code': return codeToMarkdown(node)
+            case 'code-block': return codeBlockToMarkdown(node)
+            case 'table': return tableToMarkdown(node.headers, node.rows)
+            default: ((x: never) => {
+                throw new Error(`${x} was unhandled!`)
+            })(nodeType)
         }
     }).join('')
 }

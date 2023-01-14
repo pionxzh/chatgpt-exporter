@@ -44,6 +44,25 @@ function parseTextNode(textNode: HTMLDivElement): ConversationLine[] {
         if (child.classList.contains(dangerClassName)) return
 
         switch (child.tagName.toUpperCase()) {
+            case 'HR': {
+                lines.push([{ type: 'hr' }])
+                break
+            }
+            case 'H1':
+            case 'H2':
+            case 'H3':
+            case 'H4':
+            case 'H5':
+            case 'H6': {
+                const text = child.textContent ?? ''
+                lines.push([{ type: 'heading', level: parseInt(child.tagName[1]), text }])
+                break
+            }
+            case 'BLOCKQUOTE': {
+                const text = child.textContent ?? ''
+                lines.push([{ type: 'quote', text }])
+                break
+            }
             case 'PRE': {
                 const codeEl = child.querySelector('code')
                 if (codeEl) {
@@ -82,20 +101,33 @@ function parseTextNode(textNode: HTMLDivElement): ConversationLine[] {
                     nodes.forEach((item) => {
                         switch (item.nodeType) {
                             case document.ELEMENT_NODE: {
-                                // detect is it a link
-                                if ('href' in item) {
-                                    const href = (item as HTMLAnchorElement).getAttribute('href') ?? ''
-                                    const text = item.textContent ?? href
+                                const element = item as HTMLElement
+                                const tagName = element.tagName.toUpperCase()
+
+                                if (element instanceof HTMLAnchorElement) {
+                                    const href = element.getAttribute('href') ?? ''
+                                    const text = element.textContent ?? href
                                     line.push({ type: 'link', text, href })
                                 }
-                                // detect is it an image
-                                else if ((item as HTMLImageElement).tagName?.toUpperCase() === 'IMG') {
-                                    const src = (item as HTMLImageElement).getAttribute('src') ?? ''
+                                else if (element instanceof HTMLImageElement) {
+                                    const src = element.getAttribute('src') ?? ''
                                     line.push({ type: 'image', src })
                                 }
+                                else if (tagName === 'B' || tagName === 'STRONG') {
+                                    const text = element.textContent ?? ''
+                                    line.push({ type: 'bold', text })
+                                }
+                                else if (tagName === 'I' || tagName === 'EM') {
+                                    const text = element.textContent ?? ''
+                                    line.push({ type: 'italic', text })
+                                }
+                                else if (tagName === 'CODE') {
+                                    const code = element.textContent ?? ''
+                                    line.push({ type: 'code', code })
+                                }
                                 else {
-                                    const text = item.textContent ?? ''
-                                    line.push({ type: 'code', code: text })
+                                    const text = element.textContent ?? ''
+                                    line.push({ type: 'text', text })
                                 }
                                 break
                             }

@@ -16,6 +16,7 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "skipLibCheck": true,
+    "strictNullChecks": true,
     "useDefineForClassFields": true
   },
   "exclude": [

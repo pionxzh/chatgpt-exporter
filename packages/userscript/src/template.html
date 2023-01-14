@@ -13,8 +13,12 @@
     <style>
         :root {
             --tw-prose-code: #111827;
-            --page-bg: #fff;
-            --page-text: #111827;
+            --tw-prose-hr: #e5e7eb;
+            --tw-prose-links: #111827;
+            --tw-prose-headings: #111827;
+            --tw-prose-quotes: #111827;
+            --page-bg: #f7f7f8;
+            --page-text: #374151;
             --conversation-odd-bg: rgba(247,247,248);
             --th-boarders: #4b5563;
             --td-boarders: #374151;
@@ -22,9 +26,18 @@
 
         [data-theme="dark"] {
             --tw-prose-code: #f9fafb;
+            --tw-prose-hr: #374151;
+            --tw-prose-links: #fff;
+            --tw-prose-headings: #fff;
+            --tw-prose-quotes: #f3f4f6;
             --page-bg: rgba(52,53,65);
             --page-text: #fff;
             --conversation-odd-bg: rgb(68,70,84);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-size: 16px;
         }
 
         body {
@@ -56,7 +69,14 @@
             border: 1px solid #e2e8f0;
         }
 
-        p:first-child,
+        a {
+            color: var(--tw-prose-links);
+            font-weight: 500;
+            text-decoration-line: underline;
+            text-underline-offset: 2px;
+        }
+
+        .conversation-content > p:first-child,
         ol:first-child {
             margin-top: 0;
         }
@@ -72,6 +92,14 @@
             content: "`";
         }
 
+        hr {
+            width: 100%;
+            height: 0;
+            border: 1px solid var(--tw-prose-hr);
+            margin-bottom: 1em;
+            margin-top: 1em;
+        }
+
         pre {
             color: #ffffff;
             background-color: #000000;
@@ -85,6 +113,71 @@
             font-weight: 400;
             font-size: .875em;
             line-height: 1.7142857;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--tw-prose-headings);
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 2.25em;
+            font-weight: 600;
+            line-height: 1.1111111;
+            margin-bottom: 0.8888889em;
+            margin-top: 0;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            font-weight: 700;
+            line-height: 1.3333333;
+            margin-bottom: 1em;
+            margin-top: 2em;
+        }
+
+        h3 {
+            font-size: 1.25em;
+            font-weight: 600;
+            line-height: 1.6;
+            margin-bottom: .6em;
+            margin-top: 1.6em;
+        }
+
+        h4 {
+            font-weight: 400;
+            line-height: 1.5;
+            margin-bottom: .5em;
+            margin-top: 1.5em
+        }
+
+        h3,h4 {
+            margin-bottom: .5rem;
+            margin-top: 1rem;
+        }
+
+        h5 {
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 2px solid rgba(142,142,160,1);
+            color: var(--tw-prose-quotes);
+            font-style: italic;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 1rem;
+            margin: 1.6em 0;
+            padding-left: 1em;
+            quotes: "\201C""\201D""\2018""\2019";
+        }
+
+        blockquote p:first-of-type:before {
+            content: open-quote;
+        }
+
+        blockquote p:last-of-type:after {
+            content: close-quote;
         }
 
         table {
@@ -222,13 +315,15 @@
             height: 100%;
         }
 
-        .conversation-content {
+        .conversation-content-wrapper {
             display: flex;
             flex-direction: column;
             width: 100%;
+        }
+
+        .conversation-content {
             font-size: 1rem;
             line-height: 1.5;
-            white-space: pre-wrap;
         }
     </style>
 </head>

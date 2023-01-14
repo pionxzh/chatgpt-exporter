@@ -17,45 +17,66 @@ export function exportToHtml(fileNameFormat: string) {
             : `<img src="${avatar}" alt="${name}" />`
 
         const linesHtml = lines.map((line) => {
-            const lineHtml = line.map((item) => {
-                switch (item.type) {
+            // eslint-disable-next-line array-callback-return
+            const lineHtml = line.map((node) => {
+                const nodeType = node.type
+                switch (nodeType) {
+                    case 'hr': return '<hr>'
                     case 'text':
-                        return escapeHtml(item.text)
+                        return escapeHtml(node.text)
+                    case 'bold':
+                        return `<strong>${escapeHtml(node.text)}</strong>`
+                    case 'italic':
+                        return `<em>${escapeHtml(node.text)}</em>`
+                    case 'heading':
+                        return `<h${node.level}>${escapeHtml(node.text)}</h${node.level}>`
+                    case 'quote':
+                        return `<blockquote><p>${escapeHtml(node.text)}</p></blockquote>`
                     case 'image':
-                        return `<img src="${item.src}" referrerpolicy="no-referrer" />`
-                    case 'code':
-                        return `<code>${escapeHtml(item.code)}</code>`
-                    case 'code-block':
-                        return `<pre><code class="language-${item.lang}">${escapeHtml(item.code)}</code></pre>`
+                        return `<img src="${node.src}" referrerpolicy="no-referrer" />`
                     case 'link':
-                        return `<a href="${item.href}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.text)}</a>`
+                        return `<a href="${node.href}" target="_blank" rel="noopener noreferrer">${escapeHtml(node.text)}</a>`
                     case 'ordered-list-item':
-                        return `<ol>${item.items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ol>`
+                        return `<ol>${node.items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ol>`
                     case 'unordered-list-item':
-                        return `<ul>${item.items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
+                        return `<ul>${node.items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
+                    case 'code':
+                        return `<code>${escapeHtml(node.code)}</code>`
+                    case 'code-block':
+                        return `<pre><code class="language-${node.lang}">${escapeHtml(node.code)}</code></pre>`
                     case 'table': {
-                        const header = item.headers.map(item => `<th>${escapeHtml(item)}</th>`).join('')
-                        const body = item.rows.map(row => `<tr>${row.map(item => `<td>${escapeHtml(item)}</td>`).join('')}</tr>`).join('')
+                        const header = node.headers.map(item => `<th>${escapeHtml(item)}</th>`).join('')
+                        const body = node.rows.map(row => `<tr>${row.map(item => `<td>${escapeHtml(item)}</td>`).join('')}</tr>`).join('')
                         return `<table><thead><tr>${header}</tr></thead><tbody>${body}</tbody></table>`
                     }
-                    default:
-                        return ''
+                    default: ((x: never) => {
+                        throw new Error(`${x} was unhandled!`)
+                    })(nodeType)
                 }
             }).join('')
 
-            const skipTags = ['pre', 'ul', 'ol', 'table']
-            if (skipTags.some(tag => lineHtml.startsWith(`<${tag}>`))) return lineHtml
+            const skipWrap = [
+                'hr',
+                'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                'blockquote',
+                'ul', 'ol',
+                'pre',
+                'table',
+            ]
+            if (skipWrap.some(tag => lineHtml.startsWith(`<${tag}>`))) return lineHtml
             return `<p>${lineHtml}</p>`
         }).join('')
 
         return `
 <div class="conversation-item">
-<div class="author">
-    ${avatarEl}
+    <div class="author">
+        ${avatarEl}
     </div>
-<div class="conversation-content">
-${linesHtml}
-</div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            ${linesHtml}
+        </div>
+    </div>
 </div>`
     }).join('')
 
