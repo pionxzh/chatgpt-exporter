@@ -51,7 +51,7 @@ export function Menu() {
                 Export
             </MenuItem>
             <Dropdown>
-            <fieldset className="inputFieldSet mb-2 rounded-md border-white/20 hover:bg-gray-500/10 duration-200">
+            <fieldset className="inputFieldSet mb-2 rounded-md text-white border-white/20 hover:bg-gray-500/10 duration-200">
                 <legend className="inputLabel px-2 text-xs">File Name: {'{title}, {timestamp}' }</legend>
                     <input
                         className="border-none text-sm w-full"
