@@ -49,9 +49,6 @@ export function exportToHtml(fileNameFormat: string) {
                         const body = node.rows.map(row => `<tr>${row.map(item => `<td>${escapeHtml(item)}</td>`).join('')}</tr>`).join('')
                         return `<table><thead><tr>${header}</tr></thead><tbody>${body}</tbody></table>`
                     }
-                    default: ((x: never) => {
-                        throw new Error(`${x} was unhandled!`)
-                    })(nodeType)
                 }
             }).join('')
 

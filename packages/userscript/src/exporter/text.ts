@@ -34,9 +34,6 @@ function lineToText(line: ConversationLine): string {
             case 'code': return codeToMarkdown(node)
             case 'code-block': return codeBlockToMarkdown(node)
             case 'table': return tableToMarkdown(node.headers, node.rows)
-            default: ((x: never) => {
-                throw new Error(`${x} was unhandled!`)
-            })(nodeType)
         }
     }).join('')
 }

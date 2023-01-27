@@ -17,6 +17,7 @@
     "noImplicitReturns": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
+    "verbatimModuleSyntax": true,
     "useDefineForClassFields": true
   },
   "exclude": [
