@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.7.0...userscript-v1.7.1) (2023-01-27)
+
+
+### Bug Fixes
+
+* tweak file name field styles to look nicer when light theme is active ([cc757de](https://github.com/pionxzh/chatgpt-exporter/commit/cc757de0cc00188f09d539c3a6922eddac600917))
+
 ## [1.7.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.6.0...userscript-v1.7.0) (2023-01-14)
 
 
