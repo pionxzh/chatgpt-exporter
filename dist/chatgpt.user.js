@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatGPT Exporter
 // @namespace    pionxzh
-// @version      1.7.0
+// @version      1.7.1
 // @author       pionxzh
 // @description  Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @license      MIT
@@ -747,10 +747,6 @@ ${text2}`;
           return codeBlockToMarkdown(node);
         case "table":
           return tableToMarkdown(node.headers, node.rows);
-        default:
-          ((x) => {
-            throw new Error(`${x} was unhandled!`);
-          })(nodeType);
       }
     }).join("");
   }
@@ -8405,10 +8401,6 @@ ${text}`;
           return codeBlockToMarkdown(node);
         case "table":
           return tableToMarkdown(node.headers, node.rows);
-        default:
-          ((x) => {
-            throw new Error(`${x} was unhandled!`);
-          })(nodeType);
       }
     }).join("");
   }
@@ -8889,10 +8881,6 @@ ${text}`;
               const body = node.rows.map((row) => `<tr>${row.map((item2) => `<td>${escapeHtml(item2)}</td>`).join("")}</tr>`).join("");
               return `<table><thead><tr>${header}</tr></thead><tbody>${body}</tbody></table>`;
             }
-            default:
-              ((x) => {
-                throw new Error(`${x} was unhandled!`);
-              })(nodeType);
           }
         }).join("");
         const skipWrap = ["hr", "h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "ul", "ol", "pre", "table"];
@@ -9093,7 +9081,7 @@ ${text}`;
         children: [o$1(IconArrowRightFromBracket, {}), "Export"]
       }), o$1(Dropdown, {
         children: [o$1("fieldset", {
-          className: "inputFieldSet mb-2 rounded-md border-white/20 hover:bg-gray-500/10 duration-200",
+          className: "inputFieldSet mb-2 rounded-md text-white border-white/20 hover:bg-gray-500/10 duration-200",
           children: [o$1("legend", {
             className: "inputLabel px-2 text-xs",
             children: ["File Name: ", "{title}, {timestamp}"]
