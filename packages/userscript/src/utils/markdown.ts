@@ -30,8 +30,9 @@ export function linkToMarkdown(node: LinkNode) {
 }
 
 export function orderedListToMarkdown(node: OrderedListNode) {
+    const start = node.start ?? 1
     return node.items
-        .map((item, index) => `${index + 1}. ${item}`)
+        .map((item, index) => `${start + index}. ${item}`)
         .join('\r\n')
 }
 

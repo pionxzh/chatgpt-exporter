@@ -8,7 +8,7 @@ export interface ImageNode { type: 'image'; src: string }
 export interface CodeNode { type: 'code'; code: string }
 export interface CodeBlockNode { type: 'code-block'; lang: string; code: string }
 export interface LinkNode { type: 'link'; text: string; href: string }
-export interface OrderedListNode { type: 'ordered-list-item'; items: string[] }
+export interface OrderedListNode { type: 'ordered-list-item'; items: string[]; start?: number }
 export interface UnorderedListNode { type: 'unordered-list-item'; items: string[] }
 export interface TableNode { type: 'table'; headers: string[]; rows: string[][] }
 

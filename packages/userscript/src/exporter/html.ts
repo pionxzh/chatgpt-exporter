@@ -37,7 +37,7 @@ export function exportToHtml(fileNameFormat: string) {
                     case 'link':
                         return `<a href="${node.href}" target="_blank" rel="noopener noreferrer">${escapeHtml(node.text)}</a>`
                     case 'ordered-list-item':
-                        return `<ol>${node.items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ol>`
+                        return `<ol${node.start ? ` start=${node.start}` : ''}>${node.items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ol>`
                     case 'unordered-list-item':
                         return `<ul>${node.items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
                     case 'code':

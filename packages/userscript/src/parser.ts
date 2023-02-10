@@ -74,8 +74,10 @@ function parseTextNode(textNode: HTMLDivElement): ConversationLine[] {
                 break
             }
             case 'OL': {
+                const _start = child.getAttribute('start')
+                const start = _start ? parseInt(_start) : undefined
                 const items = Array.from(child.children).map(item => item.textContent ?? '')
-                lines.push([{ type: 'ordered-list-item', items }])
+                lines.push([{ type: 'ordered-list-item', items, start }])
                 break
             }
             case 'UL': {
