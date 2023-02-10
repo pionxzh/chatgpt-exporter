@@ -1,6 +1,7 @@
 import type {
     CodeBlockNode,
     CodeNode,
+    ConversationLine,
     HeadingNode,
     ImageNode,
     LinkNode,
@@ -29,16 +30,18 @@ export function linkToMarkdown(node: LinkNode) {
     return `[${node.text}](${node.href})`
 }
 
-export function orderedListToMarkdown(node: OrderedListNode) {
+type LineMapper = (line: ConversationLine) => string
+
+export function orderedListToMarkdown(node: OrderedListNode, lineMapper: LineMapper) {
     const start = node.start ?? 1
     return node.items
-        .map((item, index) => `${start + index}. ${item}`)
+        .map((item, index) => `${start + index}. ${lineMapper(item)}`)
         .join('\r\n')
 }
 
-export function unorderedListToMarkdown(node: UnorderedListNode) {
+export function unorderedListToMarkdown(node: UnorderedListNode, lineMapper: LineMapper) {
     return node.items
-        .map(item => `- ${item}`)
+        .map(item => `- ${lineMapper(item)}`)
         .join('\r\n')
 }
 

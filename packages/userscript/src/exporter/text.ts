@@ -29,8 +29,8 @@ function lineToText(line: ConversationLine): string {
             case 'quote': return quoteToMarkdown(node)
             case 'image': return '[image]'
             case 'link': return linkToMarkdown(node)
-            case 'ordered-list-item': return orderedListToMarkdown(node)
-            case 'unordered-list-item': return unorderedListToMarkdown(node)
+            case 'ordered-list-item': return orderedListToMarkdown(node, lineToText)
+            case 'unordered-list-item': return unorderedListToMarkdown(node, lineToText)
             case 'code': return codeToMarkdown(node)
             case 'code-block': return codeBlockToMarkdown(node)
             case 'table': return tableToMarkdown(node.headers, node.rows)

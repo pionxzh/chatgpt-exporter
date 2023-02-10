@@ -12,14 +12,14 @@ export function getConversation(): Conversation[] {
         const textNode = item.querySelector<HTMLDivElement>('.markdown') ?? item.querySelector('.w-full .whitespace-pre-wrap')
         if (!textNode) return
 
-        const lines = parseTextNode(textNode)
+        const lines = parseParagraph(textNode)
         items.push({ author: { name, avatar }, lines })
     })
 
     return items
 }
 
-function parseTextNode(textNode: HTMLDivElement): ConversationLine[] {
+function parseParagraph(textNode: HTMLDivElement): ConversationLine[] {
     const warningClassName = 'bg-orange-500/10'
     const dangerClassName = 'bg-red-500/10'
 
@@ -76,12 +76,20 @@ function parseTextNode(textNode: HTMLDivElement): ConversationLine[] {
             case 'OL': {
                 const _start = child.getAttribute('start')
                 const start = _start ? parseInt(_start) : undefined
-                const items = Array.from(child.children).map(item => item.textContent ?? '')
+                // FIXME: this inner selector is too monkey-patched
+                // we should find a better way to parse the nested content
+                const items = Array.from(child.children).map((item) => {
+                    const el = item.firstElementChild?.tagName === 'P' ? item.firstElementChild : item
+                    return parseLine(el)
+                })
                 lines.push([{ type: 'ordered-list-item', items, start }])
                 break
             }
             case 'UL': {
-                const items = Array.from(child.children).map(item => item.textContent ?? '')
+                const items = Array.from(child.children).map((item) => {
+                    const el = item.firstElementChild?.tagName === 'P' ? item.firstElementChild : item
+                    return parseLine(el)
+                })
                 lines.push([{ type: 'unordered-list-item', items }])
                 break
             }
@@ -93,62 +101,68 @@ function parseTextNode(textNode: HTMLDivElement): ConversationLine[] {
             }
             case 'P':
             default: {
-                const line: ConversationLine = []
-                const nodes = Array.from(child.childNodes)
-                if (nodes.length === 0) {
-                    const text = child.textContent ?? ''
-                    line.push({ type: 'text', text })
-                }
-                else {
-                    nodes.forEach((item) => {
-                        switch (item.nodeType) {
-                            case document.ELEMENT_NODE: {
-                                const element = item as HTMLElement
-                                const tagName = element.tagName.toUpperCase()
-
-                                if (element instanceof HTMLAnchorElement) {
-                                    const href = element.getAttribute('href') ?? ''
-                                    const text = element.textContent ?? href
-                                    line.push({ type: 'link', text, href })
-                                }
-                                else if (element instanceof HTMLImageElement) {
-                                    const src = element.getAttribute('src') ?? ''
-                                    line.push({ type: 'image', src })
-                                }
-                                else if (tagName === 'B' || tagName === 'STRONG') {
-                                    const text = element.textContent ?? ''
-                                    line.push({ type: 'bold', text })
-                                }
-                                else if (tagName === 'I' || tagName === 'EM') {
-                                    const text = element.textContent ?? ''
-                                    line.push({ type: 'italic', text })
-                                }
-                                else if (tagName === 'CODE') {
-                                    const code = element.textContent ?? ''
-                                    line.push({ type: 'code', code })
-                                }
-                                else {
-                                    const text = element.textContent ?? ''
-                                    line.push({ type: 'text', text })
-                                }
-                                break
-                            }
-                            case document.TEXT_NODE:
-                            default: {
-                                const text = item.textContent ?? ''
-                                line.push({ type: 'text', text })
-                                break
-                            }
-                        }
-                    })
-                }
-                lines.push(line)
+                const line = parseLine(child)
+                if (line.length > 0) lines.push(line)
                 break
             }
         }
     })
 
     return lines
+}
+
+function parseLine(el: Element): ConversationLine {
+    const line: ConversationLine = []
+    const nodes = Array.from(el.childNodes)
+    if (nodes.length === 0) {
+        const text = el.textContent ?? ''
+        line.push({ type: 'text', text })
+    }
+    else {
+        nodes.forEach((item) => {
+            switch (item.nodeType) {
+                case document.ELEMENT_NODE: {
+                    const element = item as HTMLElement
+                    const tagName = element.tagName.toUpperCase()
+
+                    if (element instanceof HTMLAnchorElement) {
+                        const href = element.getAttribute('href') ?? ''
+                        const text = element.textContent ?? href
+                        line.push({ type: 'link', text, href })
+                    }
+                    else if (element instanceof HTMLImageElement) {
+                        const src = element.getAttribute('src') ?? ''
+                        line.push({ type: 'image', src })
+                    }
+                    else if (tagName === 'B' || tagName === 'STRONG') {
+                        const text = element.textContent ?? ''
+                        line.push({ type: 'bold', text })
+                    }
+                    else if (tagName === 'I' || tagName === 'EM') {
+                        const text = element.textContent ?? ''
+                        line.push({ type: 'italic', text })
+                    }
+                    else if (tagName === 'CODE') {
+                        const code = element.textContent ?? ''
+                        line.push({ type: 'code', code })
+                    }
+                    else {
+                        const text = element.textContent ?? ''
+                        line.push({ type: 'text', text })
+                    }
+                    break
+                }
+                case document.TEXT_NODE:
+                default: {
+                    const text = item.textContent ?? ''
+                    line.push({ type: 'text', text })
+                    break
+                }
+            }
+        })
+    }
+
+    return line
 }
 
 function getBase64FromImg(el: HTMLImageElement) {
