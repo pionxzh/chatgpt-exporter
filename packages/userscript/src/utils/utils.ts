@@ -14,4 +14,3 @@ export function sleep(ms: number) {
 export function timestamp() {
     return new Date().toISOString().replace(/:/g, '-').replace(/\..+/, '')
 }
-
