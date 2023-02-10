@@ -81,14 +81,16 @@
             margin-top: 0;
         }
 
-        p>code {
+        p>code, li>code {
             color: var(--tw-prose-code);
             font-weight: 600;
             font-size: .875em;
         }
 
         p>code::before,
-        p>code::after {
+        p>code::after,
+        li>code::before,
+        li>code::after {
             content: "`";
         }
 
@@ -178,6 +180,15 @@
 
         blockquote p:last-of-type:after {
             content: close-quote;
+        }
+
+        ol, ul {
+            padding-left: 1rem;
+        }
+
+        ::marker {
+            color: #6b7280;
+            font-weight: 400;
         }
 
         table {
