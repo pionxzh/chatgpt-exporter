@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.7.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.7.1...userscript-v1.7.2) (2023-02-10)
+
+
+### Bug Fixes
+
+* fix content parsing and rendering in list ([4fdc916](https://github.com/pionxzh/chatgpt-exporter/commit/4fdc9166ff902c747464612465f443df6705288b)), closes [#43](https://github.com/pionxzh/chatgpt-exporter/issues/43)
+* improve the style of list ([1049a77](https://github.com/pionxzh/chatgpt-exporter/commit/1049a7743e22fdedfb46338c4b1c222b204ea934))
+* respect `start` attribute on ordered-list ([35ef064](https://github.com/pionxzh/chatgpt-exporter/commit/35ef0645750c722ceaa0cbe9e70f40df7878a752))
+
 ## [1.7.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.7.0...userscript-v1.7.1) (2023-01-27)
 
 
