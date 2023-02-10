@@ -17,13 +17,13 @@
   },
   "dependencies": {
     "html2canvas": "^1.4.1",
-    "preact": "^10.11.3",
+    "preact": "^10.12.1",
     "sanitize-filename": "^1.6.3",
     "sentinel-js": "^0.0.5",
     "vite-plugin-monkey": "^2.11.1"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.5.0",
-    "vite": "^4.0.4"
+    "vite": "^4.1.1"
   }
 }
