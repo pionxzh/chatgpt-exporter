@@ -3,7 +3,7 @@
   "type": "module",
   "version": "1.0.0",
   "private": true,
-  "packageManager": "pnpm@7.12.2",
+  "packageManager": "pnpm@7.27.0",
   "author": "pionxzh",
   "license": "MIT",
   "engines": {
@@ -25,14 +25,14 @@
     "prepare": "husky install"
   },
   "devDependencies": {
-    "@commitlint/cli": "^17.4.2",
-    "@commitlint/config-conventional": "^17.4.2",
+    "@commitlint/cli": "^17.4.3",
+    "@commitlint/config-conventional": "^17.4.3",
     "@pionxzh/eslint-config-react": "^0.2.0",
     "@types/node": "^18.13.0",
     "cpy-cli": "^4.2.0",
-    "eslint": "^8.33.0",
+    "eslint": "^8.34.0",
     "husky": "^8.0.3",
-    "lint-staged": "^13.1.1",
+    "lint-staged": "^13.1.2",
     "rimraf": "^4.1.2",
     "turbo": "^1.7.4",
     "typescript": "5.0.0-beta"
