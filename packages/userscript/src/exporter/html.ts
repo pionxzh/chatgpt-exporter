@@ -77,11 +77,10 @@ function lineToHtml(line: ConversationLine): string {
                 return `<img src="${node.src}" referrerpolicy="no-referrer" />`
             case 'link':
                 return `<a href="${node.href}" target="_blank" rel="noopener noreferrer">${escapeHtml(node.text)}</a>`
-            case 'ordered-list-item':
-                return `<ol${node.start ? ` start=${node.start}` : ''}>${node.items.map((item) => {
-                    console.log(item, lineToHtml(item))
-                    return `<li>${lineToHtml(item)}</li>`
-                }).join('')}</ol>`
+            case 'ordered-list-item': {
+                const start = node.start ? ` start=${node.start}` : ''
+                return `<ol${start}>${node.items.map(item => `<li>${lineToHtml(item)}</li>`).join('')}</ol>`
+            }
             case 'unordered-list-item':
                 return `<ul>${node.items.map(item => `<li>${lineToHtml(item)}</li>`).join('')}</ul>`
             case 'code':
