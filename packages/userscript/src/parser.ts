@@ -9,21 +9,25 @@ export function getConversation(): Conversation[] {
         const name = avatarEl?.getAttribute('alt') ? 'You' : 'ChatGPT'
         const avatar = avatarEl ? getBase64FromImg(avatarEl) : ''
 
-        const textNode = item.querySelector<HTMLDivElement>('.markdown') ?? item.querySelector('.w-full .whitespace-pre-wrap')
-        if (!textNode) return
+        // normally, ChatGPT will only generate one paragraph
+        // but sometimes ChatGPT will put an paragraph with ZWSP at the start
+        // anyway, we will try to get all the paragraphs
+        let paragraphNodes = Array.from(item.querySelectorAll('.markdown'))
+        if (paragraphNodes.length === 0) paragraphNodes = Array.from(item.querySelectorAll('.w-full .whitespace-pre-wrap'))
+        if (paragraphNodes.length === 0) return
 
-        const lines = parseParagraph(textNode)
+        const lines = paragraphNodes.map(paragraphNode => parseParagraph(paragraphNode)).flat()
         items.push({ author: { name, avatar }, lines })
     })
 
     return items
 }
 
-function parseParagraph(textNode: HTMLDivElement): ConversationLine[] {
-    const warningClassName = 'bg-orange-500/10'
-    const dangerClassName = 'bg-red-500/10'
+const warningClassName = 'bg-orange-500/10'
+const dangerClassName = 'bg-red-500/10'
 
-    const childNodes = textNode.childNodes ? Array.from(textNode.childNodes) : []
+function parseParagraph(element: Element): ConversationLine[] {
+    const childNodes = element.childNodes ? Array.from(element.childNodes) : []
     const validChildNodes = childNodes.filter((c) => {
         if (c instanceof Text) return true
 
@@ -35,11 +39,11 @@ function parseParagraph(textNode: HTMLDivElement): ConversationLine[] {
         // other nodes are not supported
         return false
     })
-    if (validChildNodes.length === 0) return [[{ type: 'text', text: textNode.textContent ?? '' }]]
+    if (validChildNodes.length === 0) return [[{ type: 'text', text: element.textContent ?? '' }]]
     if (validChildNodes.length === 1 && validChildNodes[0] instanceof Text) return [[{ type: 'text', text: validChildNodes[0].textContent ?? '' }]]
 
     const lines: ConversationLine[] = []
-    Array.from(textNode.children).forEach((child) => {
+    Array.from(element.children).forEach((child) => {
         if (child.classList.contains(warningClassName)) return
         if (child.classList.contains(dangerClassName)) return
 
@@ -76,20 +80,24 @@ function parseParagraph(textNode: HTMLDivElement): ConversationLine[] {
             case 'OL': {
                 const _start = child.getAttribute('start')
                 const start = _start ? parseInt(_start) : undefined
-                // FIXME: this inner selector is too monkey-patched
-                // we should find a better way to parse the nested content
-                const items = Array.from(child.children).map((item) => {
-                    const el = item.firstElementChild?.tagName === 'P' ? item.firstElementChild : item
-                    return parseLine(el)
-                })
+                if (child.children.length === 0) {
+                    const items = [[parseLine(child)]]
+                    lines.push([{ type: 'ordered-list-item', items, start }])
+                    break
+                }
+                const children = Array.from(child.children)
+                const items = children.map(item => parseParagraph(item))
                 lines.push([{ type: 'ordered-list-item', items, start }])
                 break
             }
             case 'UL': {
-                const items = Array.from(child.children).map((item) => {
-                    const el = item.firstElementChild?.tagName === 'P' ? item.firstElementChild : item
-                    return parseLine(el)
-                })
+                if (child.children.length === 0) {
+                    const items = [[parseLine(child)]]
+                    lines.push([{ type: 'unordered-list-item', items }])
+                    break
+                }
+                const children = Array.from(child.children)
+                const items = children.map(item => parseParagraph(item))
                 lines.push([{ type: 'unordered-list-item', items }])
                 break
             }

@@ -35,13 +35,13 @@ type LineMapper = (line: ConversationLine) => string
 export function orderedListToMarkdown(node: OrderedListNode, lineMapper: LineMapper) {
     const start = node.start ?? 1
     return node.items
-        .map((item, index) => `${start + index}. ${lineMapper(item)}`)
+        .map((item, index) => `${start + index}. ${item.map(line => lineMapper(line)).join('\r\n')}`)
         .join('\r\n')
 }
 
 export function unorderedListToMarkdown(node: UnorderedListNode, lineMapper: LineMapper) {
     return node.items
-        .map(item => `- ${lineMapper(item)}`)
+        .map(item => `- ${item.map(line => lineMapper(line)).join('\r\n')}`)
         .join('\r\n')
 }
 

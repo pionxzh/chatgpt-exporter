@@ -79,10 +79,13 @@ function lineToHtml(line: ConversationLine): string {
                 return `<a href="${node.href}" target="_blank" rel="noopener noreferrer">${escapeHtml(node.text)}</a>`
             case 'ordered-list-item': {
                 const start = node.start ? ` start=${node.start}` : ''
-                return `<ol${start}>${node.items.map(item => `<li>${lineToHtml(item)}</li>`).join('')}</ol>`
+                const content = node.items.map(item => `<li>${item.map(line => lineToHtml(line)).join('\r\n')}</li>`).join('')
+                return `<ol${start}>${content}</ol>`
             }
-            case 'unordered-list-item':
-                return `<ul>${node.items.map(item => `<li>${lineToHtml(item)}</li>`).join('')}</ul>`
+            case 'unordered-list-item':{
+                const content = node.items.map(item => `<li>${item.map(line => lineToHtml(line)).join('\r\n')}</li>`).join('')
+                return `<ul>${content}</ul>`
+            }
             case 'code':
                 return `<code>${escapeHtml(node.code)}</code>`
             case 'code-block':
