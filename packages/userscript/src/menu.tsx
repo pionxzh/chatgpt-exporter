@@ -27,9 +27,12 @@ const MenuItem: FC<MenuItemProps> = ({ children, onClick }) => {
 
 const Dropdown: FC = ({ children }) => {
     return (
-        <div className="dropdown-menu bg-gray-900">
-            {children}
-        </div>
+        <>
+            <div className="dropdown-backdrop"></div>
+            <div className="dropdown-menu bg-gray-900">
+                {children}
+            </div>
+        </>
     )
 }
 
@@ -51,8 +54,8 @@ export function Menu() {
                 Export
             </MenuItem>
             <Dropdown>
-            <fieldset className="inputFieldSet mb-2 rounded-md text-white border-white/20 hover:bg-gray-500/10 duration-200">
-                <legend className="inputLabel px-2 text-xs">File Name: {'{title}, {timestamp}' }</legend>
+                <fieldset className="inputFieldSet mb-2 rounded-md text-white border-white/20 hover:bg-gray-500/10 duration-200">
+                    <legend className="inputLabel px-2 text-xs">File Name: {'{title}, {timestamp}' }</legend>
                     <input
                         className="border-none text-sm w-full"
                         type="text"

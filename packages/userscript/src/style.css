@@ -13,6 +13,19 @@
     box-shadow: none!important;
 }
 
+.dropdown-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0,0,0,.5);
+    z-index: 998;
+    animation-name: pointerFadeIn;
+    animation-duration: .3s;
+}
+
 .dropdown-menu {
     display: none;
     position: absolute;
@@ -23,6 +36,7 @@
     padding: .75rem .4rem 0 .4rem;
     border-radius: .375rem;
     box-shadow: 0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px -1px rgba(0,0,0,.1);
+    animation: fadeIn .3s;
 }
 
 .dropdown-menu::before {
@@ -44,8 +58,81 @@
     border-top: .5rem solid transparent;
     border-bottom: .5rem solid transparent;
     border-right: .5rem solid #202123;
+    animation: fadeIn .3s;
 }
 
-#exporter-menu:hover .dropdown-menu {
+#exporter-menu:not(:has(.dropdown-backdrop:hover)):hover .dropdown-menu {
     display: flex;
+}
+
+@media screen and (hover: none) and (max-width: 768px) {
+    .dropdown-menu {
+        position: fixed;
+        left: 0;
+        top: unset;
+        bottom: 0;
+        width: 100%;
+        border-radius: 0;
+        box-shadow: none;
+        z-index: 999;
+        animation: slideUp .3s;
+    }
+
+    @supports selector(:has(.test:hover)) {
+        #exporter-menu:not(:has(.dropdown-backdrop:hover)):hover .dropdown-backdrop {
+            display: block;
+        }
+
+        #exporter-menu:has(.dropdown-backdrop:hover):hover .dropdown-backdrop {
+            display: block;
+            pointer-events: none;
+            opacity: 0;
+            animation-name: pointerFadeInReverse;
+        }
+    }
+
+    #exporter-menu:hover::after {
+        display: none;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+@keyframes pointerFadeIn {
+    from {
+        opacity: 0;
+        pointer-events: none;
+    }
+    to {
+        opacity: 1;
+        pointer-events: auto;
+    }
+}
+
+/* Using `animation-direction: reverse` is not working in our case */
+@keyframes pointerFadeInReverse {
+    from {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    to {
+        opacity: 0;
+        pointer-events: none;
+    }
 }
