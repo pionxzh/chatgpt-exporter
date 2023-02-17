@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.8.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.7.2...userscript-v1.8.0) (2023-02-17)
+
+
+### Features
+
+* support mobile ([d7f7d0a](https://github.com/pionxzh/chatgpt-exporter/commit/d7f7d0adb8ae47b57c5272c22ed9afed0b133ac9)), closes [#45](https://github.com/pionxzh/chatgpt-exporter/issues/45)
+* support passing theme to exported html ([c9ad754](https://github.com/pionxzh/chatgpt-exporter/commit/c9ad754bbae981a20c3dcb05345833664f17fe44)), closes [#47](https://github.com/pionxzh/chatgpt-exporter/issues/47)
+
+
+### Bug Fixes
+
+* fix content parsing inside list ([c09bbcc](https://github.com/pionxzh/chatgpt-exporter/commit/c09bbccadc8e3694aaf7180ca11186341bd9b7d7)), closes [#48](https://github.com/pionxzh/chatgpt-exporter/issues/48)
+* unify line break to \n ([cd5e7a4](https://github.com/pionxzh/chatgpt-exporter/commit/cd5e7a4b519f47a0ccce9f9cf94277bcc05399ad)), closes [#49](https://github.com/pionxzh/chatgpt-exporter/issues/49)
+
 ## [1.7.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.7.1...userscript-v1.7.2) (2023-02-10)
 
 
