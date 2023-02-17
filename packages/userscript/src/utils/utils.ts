@@ -14,3 +14,7 @@ export function sleep(ms: number) {
 export function timestamp() {
     return new Date().toISOString().replace(/:/g, '-').replace(/\..+/, '')
 }
+
+export function getColorScheme(): 'light' | 'dark' {
+    return document.documentElement.style.getPropertyValue('color-scheme') as 'light' | 'dark'
+}

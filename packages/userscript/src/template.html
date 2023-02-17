@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{lang}}" data-theme="light">
+<html lang="{{lang}}" data-theme="{{theme}}">
 <head>
     <meta charset="UTF-8" />
     <link rel="icon" href="https://chat.openai.com/favicon.ico" />
@@ -361,13 +361,20 @@
 
 
     <script>
-        function toggleDarkMode() {
+        function toggleDarkMode(mode) {
             const html = document.querySelector('html')
             const isDarkMode = html.getAttribute('data-theme') === 'dark'
-            html.setAttribute('data-theme', isDarkMode ? 'light' : 'dark')
+            const newMode = mode || (isDarkMode ? 'light' : 'dark')
+            if (newMode !== 'dark' && newMode !== 'light') return
+            html.setAttribute('data-theme', newMode)
         }
 
-        document.querySelector('.toggle').addEventListener('click', toggleDarkMode)
+        // Support for ?theme=dark
+        const urlParams = new URLSearchParams(window.location.search)
+        const theme = urlParams.get('theme')
+        if (theme) toggleDarkMode(theme)
+
+        document.querySelector('.toggle').addEventListener('click', () => toggleDarkMode())
     </script>
 </body>
 

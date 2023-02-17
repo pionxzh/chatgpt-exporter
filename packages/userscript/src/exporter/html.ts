@@ -4,6 +4,7 @@ import { downloadFile, getFileNameWithFormat } from '../utils/download'
 
 import templateHtml from '../template.html?raw'
 import type { ConversationLine } from '../type'
+import { getColorScheme } from '../utils/utils'
 
 const skipWrap = [
     'hr',
@@ -49,6 +50,7 @@ export function exportToHtml(fileNameFormat: string) {
     const html = templateHtml
         .replace('{{time}}', new Date().toISOString())
         .replace('{{lang}}', lang)
+        .replace('{{theme}}', getColorScheme())
         .replace('{{content}}', conversationHtml)
 
     const fileName = getFileNameWithFormat(fileNameFormat, 'html')
