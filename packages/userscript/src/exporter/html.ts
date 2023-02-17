@@ -5,6 +5,7 @@ import { downloadFile, getFileNameWithFormat } from '../utils/download'
 import templateHtml from '../template.html?raw'
 import type { ConversationLine } from '../type'
 import { getColorScheme } from '../utils/utils'
+import { standardizeLineBreaks } from '../utils/text'
 
 const skipWrap = [
     'hr',
@@ -54,7 +55,7 @@ export function exportToHtml(fileNameFormat: string) {
         .replace('{{content}}', conversationHtml)
 
     const fileName = getFileNameWithFormat(fileNameFormat, 'html')
-    downloadFile(fileName, 'text/html', html)
+    downloadFile(fileName, 'text/html', standardizeLineBreaks(html))
 }
 
 function lineToHtml(line: ConversationLine): string {
@@ -79,11 +80,11 @@ function lineToHtml(line: ConversationLine): string {
                 return `<a href="${node.href}" target="_blank" rel="noopener noreferrer">${escapeHtml(node.text)}</a>`
             case 'ordered-list-item': {
                 const start = node.start ? ` start=${node.start}` : ''
-                const content = node.items.map(item => `<li>${item.map(line => lineToHtml(line)).join('\r\n')}</li>`).join('')
+                const content = node.items.map(item => `<li>${item.map(line => lineToHtml(line)).join('\n')}</li>`).join('')
                 return `<ol${start}>${content}</ol>`
             }
             case 'unordered-list-item':{
-                const content = node.items.map(item => `<li>${item.map(line => lineToHtml(line)).join('\r\n')}</li>`).join('')
+                const content = node.items.map(item => `<li>${item.map(line => lineToHtml(line)).join('\n')}</li>`).join('')
                 return `<ul>${content}</ul>`
             }
             case 'code':

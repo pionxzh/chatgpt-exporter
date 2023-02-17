@@ -2,6 +2,7 @@ import type { ConversationLine } from '../type'
 import { getConversation } from '../parser'
 import { copyToClipboard } from '../utils/clipboard'
 import { codeBlockToMarkdown, codeToMarkdown, headingToMarkdown, hrToMarkdown, linkToMarkdown, orderedListToMarkdown, quoteToMarkdown, tableToMarkdown, unorderedListToMarkdown } from '../utils/markdown'
+import { standardizeLineBreaks } from '../utils/text'
 
 export function exportToText() {
     const conversations = getConversation()
@@ -9,11 +10,11 @@ export function exportToText() {
 
     const text = conversations.map((item) => {
         const { author: { name }, lines } = item
-        const text = lines.map(line => lineToText(line)).join('\r\n\r\n')
-        return `${name}:\r\n${text}`
-    }).join('\r\n\r\n')
+        const text = lines.map(line => lineToText(line)).join('\n\n')
+        return `${name}:\n${text}`
+    }).join('\n\n')
 
-    copyToClipboard(text)
+    copyToClipboard(standardizeLineBreaks(text))
 }
 
 function lineToText(line: ConversationLine): string {

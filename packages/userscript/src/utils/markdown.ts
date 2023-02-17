@@ -35,14 +35,14 @@ type LineMapper = (line: ConversationLine) => string
 export function orderedListToMarkdown(node: OrderedListNode, lineMapper: LineMapper) {
     const start = node.start ?? 1
     return node.items
-        .map((item, index) => `${start + index}. ${item.map(line => lineMapper(line)).join('\r\n')}`)
-        .join('\r\n')
+        .map((item, index) => `${start + index}. ${item.map(line => lineMapper(line)).join('\n')}`)
+        .join('\n')
 }
 
 export function unorderedListToMarkdown(node: UnorderedListNode, lineMapper: LineMapper) {
     return node.items
-        .map(item => `- ${item.map(line => lineMapper(line)).join('\r\n')}`)
-        .join('\r\n')
+        .map(item => `- ${item.map(line => lineMapper(line)).join('\n')}`)
+        .join('\n')
 }
 
 export function codeToMarkdown(node: CodeNode) {
@@ -50,7 +50,7 @@ export function codeToMarkdown(node: CodeNode) {
 }
 
 export function codeBlockToMarkdown(node: CodeBlockNode) {
-    return `\`\`\`${node.lang}\r\n${node.code}\`\`\``
+    return `\`\`\`${node.lang}\n${node.code}\`\`\``
 }
 
 export function tableToMarkdown(headers: string[], rows: string[][]): string {
