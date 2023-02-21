@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatGPT Exporter
 // @namespace    pionxzh
-// @version      1.8.0
+// @version      1.8.1
 // @author       pionxzh
 // @description  Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @license      MIT
@@ -76,8 +76,16 @@
     animation: fadeIn .3s;
 }
 
-#exporter-menu:not(:has(.dropdown-backdrop:hover)):hover .dropdown-menu {
-    display: flex;
+@supports not selector(:has(.test:hover)) {
+    #exporter-menu:hover .dropdown-menu {
+        display: flex;
+    }
+}
+
+@supports selector(:has(.test:hover)) {
+    #exporter-menu:not(:has(.dropdown-backdrop:hover)):hover .dropdown-menu {
+        display: flex;
+    }
 }
 
 @media screen and (hover: none) and (max-width: 768px) {
