@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.8.0...userscript-v1.8.1) (2023-02-21)
+
+
+### Bug Fixes
+
+* missing menu on firefox ([c397e8f](https://github.com/pionxzh/chatgpt-exporter/commit/c397e8f755feadd24a3b9609752c16c1b4197e61)), closes [#51](https://github.com/pionxzh/chatgpt-exporter/issues/51)
+
 ## [1.8.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.7.2...userscript-v1.8.0) (2023-02-17)
 
 
