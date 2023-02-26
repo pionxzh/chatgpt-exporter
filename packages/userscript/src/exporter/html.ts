@@ -48,11 +48,14 @@ export function exportToHtml(fileNameFormat: string) {
 </div>`
     }).join('')
 
+    const title = document.title === 'New chat' ? 'ChatGPT Conversation' : document.title
+
     const html = templateHtml
-        .replace('{{time}}', new Date().toISOString())
-        .replace('{{lang}}', lang)
-        .replace('{{theme}}', getColorScheme())
-        .replace('{{content}}', conversationHtml)
+        .replaceAll('{{title}}', title)
+        .replaceAll('{{time}}', new Date().toISOString())
+        .replaceAll('{{lang}}', lang)
+        .replaceAll('{{theme}}', getColorScheme())
+        .replaceAll('{{content}}', conversationHtml)
 
     const fileName = getFileNameWithFormat(fileNameFormat, 'html')
     downloadFile(fileName, 'text/html', standardizeLineBreaks(html))
