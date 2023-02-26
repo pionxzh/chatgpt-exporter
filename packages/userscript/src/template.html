@@ -301,6 +301,7 @@
 
         .author {
             display: flex;
+            flex: 0 0 30px;
             justify-content: center;
             align-items: center;
             width: 30px;
@@ -308,6 +309,7 @@
             border-radius: 0.125rem;
             margin-right: 1rem;
             background-color: rgb(16, 163, 127);
+            overflow: hidden;
         }
 
         .author svg {
@@ -321,8 +323,8 @@
 
         .conversation-content-wrapper {
             display: flex;
+            flex: 1 1 auto;
             flex-direction: column;
-            width: 100%;
         }
 
         .conversation-content {
