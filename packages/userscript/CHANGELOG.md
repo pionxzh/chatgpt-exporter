@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.9.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.8.1...userscript-v1.9.0) (2023-02-27)
+
+
+### Features
+
+* make title of html align with the conversation title ([88804e0](https://github.com/pionxzh/chatgpt-exporter/commit/88804e0c814cf43f9f85a4dfd7ca1961fbcca466)), closes [#46](https://github.com/pionxzh/chatgpt-exporter/issues/46)
+* support image in chat ([8be8add](https://github.com/pionxzh/chatgpt-exporter/commit/8be8add7ddc4c0b1951340cb12f3878adacd0874)), closes [#58](https://github.com/pionxzh/chatgpt-exporter/issues/58)
+
+
+### Bug Fixes
+
+* hide redundent model bar in screenshot export ([f79f3f6](https://github.com/pionxzh/chatgpt-exporter/commit/f79f3f692f2b0f9d9c431758b413aeddaa0e7d7a))
+* improve shrinked avatar in exported html ([f8e09bc](https://github.com/pionxzh/chatgpt-exporter/commit/f8e09bc57fc82db2e3c764ff7b149f50d34e79b2))
+* rework metadata appearence in HTML export ([#56](https://github.com/pionxzh/chatgpt-exporter/issues/56)) ([bcf4e9d](https://github.com/pionxzh/chatgpt-exporter/commit/bcf4e9d19eae575e208ca37838b95723ba79f0f4))
+* try fix [#53](https://github.com/pionxzh/chatgpt-exporter/issues/53) with specific scale in html2canvas ([fefda82](https://github.com/pionxzh/chatgpt-exporter/commit/fefda8245a8d5f8750ca06ccbda4797d72dccf68))
+
 ## [1.8.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.8.0...userscript-v1.8.1) (2023-02-21)
 
 
