@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ChatGPT Exporter
 // @namespace    pionxzh
-// @version      1.8.1
+// @version      1.9.0
 // @author       pionxzh
 // @description  Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @license      MIT
@@ -13,7 +13,16 @@
 // @run-at       document-end
 // ==/UserScript==
 
-(e=>{const n=document.createElement("style");n.dataset.source="vite-plugin-monkey",n.innerText=e,document.head.appendChild(n)})(`.inputFieldSet {
+(e=>{const n=document.createElement("style");n.dataset.source="vite-plugin-monkey",n.innerText=e,document.head.appendChild(n)})(`img[src*="https://source.unsplash.com/"] {
+    visibility: hidden;
+}
+
+/* hide the flickering */
+p > img[src*="https://images.unsplash.com/"] {
+    animation: fadeIn .3s;
+}
+
+.inputFieldSet {
     display: block;
     border-width: 2px;
     border-style: groove;
@@ -747,9 +756,11 @@
               });
             } else if (element instanceof HTMLImageElement) {
               const src = element.getAttribute("src") ?? "";
+              const alt = element.getAttribute("alt");
               line.push({
                 type: "image",
-                src
+                src,
+                alt
               });
             } else if (tagName === "B" || tagName === "STRONG") {
               const text = element.textContent ?? "";
@@ -824,7 +835,8 @@
     return `> ${node.text}`;
   }
   function imageToMarkdown(node) {
-    return `![image](${node.src})`;
+    const alt = node.alt ?? "image";
+    return `![${alt}](${node.src})`;
   }
   function linkToMarkdown(node) {
     return `[${node.text}](${node.href})`;
@@ -899,8 +911,11 @@ ${text2}`;
           return headingToMarkdown(node);
         case "quote":
           return quoteToMarkdown(node);
-        case "image":
-          return "[image]";
+        case "image": {
+          if (node.src.startsWith("data:"))
+            return "[image]";
+          return imageToMarkdown(node);
+        }
         case "link":
           return linkToMarkdown(node);
         case "ordered-list-item":
@@ -8877,23 +8892,40 @@ ${text2}`;
     const title = sanitizeFilename(document.title).replace(/\s+/g, "_");
     return format.replace("{title}", title).replace("{timestamp}", timestamp()).concat(`.${ext}`);
   }
+  function fnIgnoreElements(el) {
+    return typeof el.shadowRoot === "object" && el.shadowRoot !== null;
+  }
   async function exportToPng(fileNameFormat) {
     var _a;
     const thread = (_a = document.querySelector("main .group")) == null ? void 0 : _a.parentElement;
     if (!thread || thread.children.length === 0)
       return;
+    Array.from(thread.children).forEach((el) => {
+      const text = el.textContent;
+      if (text === "Model: Default" || text === "Model: Legacy") {
+        el.classList.add("hidden");
+      }
+    });
     thread.children[thread.children.length - 1].classList.add("hidden");
     await sleep(100);
     const canvas = await html2canvas(thread, {
+      scale: 1,
+      useCORS: true,
       scrollX: -window.scrollX,
       scrollY: -window.scrollY,
       windowWidth: thread.scrollWidth,
-      windowHeight: thread.scrollHeight
+      windowHeight: thread.scrollHeight,
+      ignoreElements: fnIgnoreElements
     });
-    thread.children[thread.children.length - 1].classList.remove("hidden");
+    Array.from(thread.children).forEach((el) => {
+      if (el.classList.contains("hidden")) {
+        el.classList.remove("hidden");
+      }
+    });
     const dataUrl = canvas.toDataURL("image/png", 1).replace(/^data:image\/[^;]/, "data:application/octet-stream");
     const fileName = getFileNameWithFormat(fileNameFormat, "png");
     downloadUrl(fileName, dataUrl);
+    window.URL.revokeObjectURL(dataUrl);
   }
   function exportToMarkdown(fileNameFormat) {
     const conversations = getConversation();
@@ -9022,7 +9054,7 @@ ${text}`;
     <meta charset="UTF-8" />
     <link rel="icon" href="https://chat.openai.com/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ChatGPT Conversation</title>
+    <title>{{title}}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"><\/script>
     <script>
@@ -9090,7 +9122,7 @@ ${text}`;
 
         a {
             color: var(--tw-prose-links);
-            font-weight: 500;
+            font-size: 0.8rem;
             text-decoration-line: underline;
             text-underline-offset: 2px;
         }
@@ -9291,17 +9323,9 @@ ${text}`;
             font-size: 1.5rem;
         }
 
-        .conversation-header .conversation-time {
+        .conversation-header .conversation-export {
             margin-top: 0.5rem;
             font-size: 0.8rem;
-        }
-
-        .conversation-header .conversation-time-label {
-            font-weight: bold;
-        }
-
-        .conversation-header .conversation-time-value {
-            margin-left: 0.5rem;
         }
 
         .conversation-header p {
@@ -9327,6 +9351,7 @@ ${text}`;
 
         .author {
             display: flex;
+            flex: 0 0 30px;
             justify-content: center;
             align-items: center;
             width: 30px;
@@ -9334,6 +9359,7 @@ ${text}`;
             border-radius: 0.125rem;
             margin-right: 1rem;
             background-color: rgb(16, 163, 127);
+            overflow: hidden;
         }
 
         .author svg {
@@ -9347,13 +9373,23 @@ ${text}`;
 
         .conversation-content-wrapper {
             display: flex;
+            position: relative;
+            overflow: hidden;
+            flex: 1 1 auto;
             flex-direction: column;
-            width: 100%;
         }
 
         .conversation-content {
             font-size: 1rem;
             line-height: 1.5;
+        }
+
+        .conversation-content img, .conversation-content video {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 2em;
+            margin-top: 2em;
         }
     </style>
 </head>
@@ -9361,17 +9397,17 @@ ${text}`;
 <body>
     <div class="conversation">
         <div class="conversation-header">
-            <h1>ChatGPT Conversation
+            <h1>{{title}}
                 <button class="toggle">
                     <svg class="sun" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
                     <svg class="moon" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </button>
             </h1>
-            <div class="conversation-time">
-                <span class="conversation-time-label">Time:</span>
-                <span class="conversation-time-value">{{time}}</span>
+            <div class="conversation-export">
+                <p>Exported by
+                <a href="https://github.com/pionxzh/chatgpt-exporter">ChatGPT Exporter</a>
+                at {{time}}</p>
             </div>
-            <p>Generated by <a href="https://github.com/pionxzh/chatgpt-exporter">ChatGPT Exporter</a></p>
         </div>
 
         {{content}}
@@ -9431,7 +9467,8 @@ ${text}`;
     </div>
 </div>`;
     }).join("");
-    const html = templateHtml.replace("{{time}}", new Date().toISOString()).replace("{{lang}}", lang).replace("{{theme}}", getColorScheme()).replace("{{content}}", conversationHtml);
+    const title = document.title === "New chat" ? "ChatGPT Conversation" : document.title;
+    const html = templateHtml.replaceAll("{{title}}", title).replaceAll("{{time}}", new Date().toISOString()).replaceAll("{{lang}}", lang).replaceAll("{{theme}}", getColorScheme()).replaceAll("{{content}}", conversationHtml);
     const fileName = getFileNameWithFormat(fileNameFormat, "html");
     downloadFile(fileName, "text/html", standardizeLineBreaks(html));
   }
@@ -9694,6 +9731,27 @@ ${text}`;
           chatList.after(container);
         } else {
           nav.append(container);
+        }
+      });
+      const imageMap = /* @__PURE__ */ new Map();
+      sentinel.on("img", (img) => {
+        const src = img.src;
+        if (src.startsWith("https://source.unsplash.com/")) {
+          if (imageMap.has(src)) {
+            img.src = imageMap.get(src);
+            return;
+          }
+          const xhr = new XMLHttpRequest();
+          xhr.open("HEAD", src, true);
+          xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+              const finalUrl = xhr.responseURL;
+              img.src = finalUrl;
+              img.originalSrc = src;
+              imageMap.set(src, finalUrl);
+            }
+          };
+          xhr.send();
         }
       });
     });
