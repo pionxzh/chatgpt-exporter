@@ -12,6 +12,7 @@
     "esModuleInterop": true,
     "composite": true,
     "noEmit": true,
+    "noImplicitAny": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
