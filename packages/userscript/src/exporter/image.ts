@@ -11,6 +11,14 @@ export async function exportToPng(fileNameFormat: string) {
     const thread = document.querySelector('main .group')?.parentElement as HTMLElement
     if (!thread || thread.children.length === 0) return
 
+    // hide model bar
+    Array.from(thread.children).forEach((el) => {
+        const text = el.textContent
+        if (text === 'Model: Default' || text === 'Model: Legacy') {
+            el.classList.add('hidden')
+        }
+    })
+
     // hide bottom bar
     thread.children[thread.children.length - 1].classList.add('hidden')
 
@@ -26,7 +34,11 @@ export async function exportToPng(fileNameFormat: string) {
     })
 
     // restore the layout
-    thread.children[thread.children.length - 1].classList.remove('hidden')
+    Array.from(thread.children).forEach((el) => {
+        if (el.classList.contains('hidden')) {
+            el.classList.remove('hidden')
+        }
+    })
 
     const dataUrl = canvas.toDataURL('image/png', 1)
         .replace(/^data:image\/[^;]/, 'data:application/octet-stream')
