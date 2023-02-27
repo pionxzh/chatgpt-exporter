@@ -17,10 +17,18 @@ export default defineConfig({
         monkey({
             entry: 'src/main.tsx',
             userscript: {
-                'name': packageJson.title,
+                'name': {
+                    '': packageJson.title,
+                    'zh-CN': packageJson['title:zh-CN'],
+                    'zh-TW': packageJson['title:zh-TW'],
+                },
                 'author': packageJson.author,
                 'namespace': packageJson.author,
-                'description': packageJson.description,
+                'description': {
+                    '': packageJson.description,
+                    'zh-CN': packageJson['description:zh-CN'],
+                    'zh-TW': packageJson['description:zh-TW'],
+                },
                 'license': packageJson.license,
                 'match': ['https://chat.openai.com/chat', 'https://chat.openai.com/chat/*'],
                 'icon': 'https://chat.openai.com/favicon.ico',
