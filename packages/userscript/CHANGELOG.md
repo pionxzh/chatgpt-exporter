@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.9.0...userscript-v1.9.1) (2023-02-27)
+
+
+### Miscellaneous Chores
+
+* script title and description support chinese ([2147a91](https://github.com/pionxzh/chatgpt-exporter/commit/2147a91740e8dd8b7ebae655cfbbf05ed9b7b93b))
+
 ## [1.9.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.8.1...userscript-v1.9.0) (2023-02-27)
 
 
