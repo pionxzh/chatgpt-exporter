@@ -6,6 +6,7 @@ import templateHtml from '../template.html?raw'
 import type { ConversationLine } from '../type'
 import { getColorScheme } from '../utils/utils'
 import { standardizeLineBreaks } from '../utils/text'
+import { fetchConversation } from '../api'
 
 const skipWrap = [
     'hr',
@@ -16,13 +17,50 @@ const skipWrap = [
     'table',
 ]
 
-export function exportToHtml(fileNameFormat: string) {
+export async function exportToHtml(fileNameFormat: string) {
     const conversations = getConversation()
     if (conversations.length === 0) return alert('No conversation found. Please send a message first.')
 
+    let date = ''
+    let timestamps: number[] = []
+
+    const conv = await fetchConversation()
+    console.log(conv)
+
+    if (conv) {
+        date = new Date(conv.create_time).toISOString().split('T')[0]
+
+        let current_node: string | null = conv.current_node
+        const nodes = Object.values(conv.mapping)
+        const result = []
+        while (current_node) {
+            const node = nodes.find(n => n.id === current_node)
+            if (!node) break
+
+            if (node.message) result.unshift(node)
+            current_node = node.parent
+        }
+
+        console.log(result)
+        timestamps = result.map(node => node.message?.create_time ?? 0)
+    }
+
     const lang = document.documentElement.lang ?? 'en'
-    const conversationHtml = conversations.map((item) => {
+    const conversationHtml = conversations.map((item, index) => {
         const { author: { name, avatar }, lines } = item
+
+        const timestamp = timestamps?.[index] ?? ''
+        let ts_date = ''
+        let ts_time = ''
+
+        if (timestamp) {
+            const date = new Date(timestamp * 1000)
+            const isoStr = date.toISOString()
+            // format: 2022-01-01 10:12:00 UTC
+            ts_date = `${isoStr.split('T')[0]} ${isoStr.split('T')[1].split('.')[0]} UTC`
+            // format: 10:12 AM
+            ts_time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+        }
 
         const avatarEl = name === 'ChatGPT'
             ? `${ChatGPTAvatar}`
@@ -45,6 +83,7 @@ export function exportToHtml(fileNameFormat: string) {
             ${linesHtml}
         </div>
     </div>
+    ${timestamp ? `<div class="time" title="${ts_date}">${ts_time}</div>` : ''}
 </div>`
     }).join('')
 
@@ -52,6 +91,7 @@ export function exportToHtml(fileNameFormat: string) {
 
     const html = templateHtml
         .replaceAll('{{title}}', title)
+        .replaceAll('{{date}}', date)
         .replaceAll('{{time}}', new Date().toISOString())
         .replaceAll('{{lang}}', lang)
         .replaceAll('{{theme}}', getColorScheme())
