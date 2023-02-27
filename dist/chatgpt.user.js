@@ -1,16 +1,20 @@
 // ==UserScript==
-// @name         ChatGPT Exporter
-// @namespace    pionxzh
-// @version      1.9.0
-// @author       pionxzh
-// @description  Easily export the whole ChatGPT conversation history for further analysis or sharing.
-// @license      MIT
-// @icon         https://chat.openai.com/favicon.ico
-// @match        https://chat.openai.com/chat
-// @match        https://chat.openai.com/chat/*
-// @grant        GM_getValue
-// @grant        GM_setValue
-// @run-at       document-end
+// @name               ChatGPT Exporter
+// @name:zh-CN         ChatGPT Exporter
+// @name:zh-TW         ChatGPT Exporter
+// @namespace          pionxzh
+// @version            1.9.1
+// @author             pionxzh
+// @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
+// @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
+// @description:zh-TW  輕鬆匯出 ChatGPT 聊天紀錄，以便進一步分析或分享。
+// @license            MIT
+// @icon               https://chat.openai.com/favicon.ico
+// @match              https://chat.openai.com/chat
+// @match              https://chat.openai.com/chat/*
+// @grant              GM_getValue
+// @grant              GM_setValue
+// @run-at             document-end
 // ==/UserScript==
 
 (e=>{const n=document.createElement("style");n.dataset.source="vite-plugin-monkey",n.innerText=e,document.head.appendChild(n)})(`img[src*="https://source.unsplash.com/"] {
