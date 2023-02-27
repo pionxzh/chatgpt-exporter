@@ -23,7 +23,8 @@ export function quoteToMarkdown(node: QuoteNode) {
 }
 
 export function imageToMarkdown(node: ImageNode) {
-    return `![image](${node.src})`
+    const alt = node.alt ?? 'image'
+    return `![${alt}](${node.src})`
 }
 
 export function linkToMarkdown(node: LinkNode) {

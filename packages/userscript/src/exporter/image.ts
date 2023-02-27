@@ -26,6 +26,7 @@ export async function exportToPng(fileNameFormat: string) {
 
     const canvas = await html2canvas(thread, {
         scale: 1,
+        useCORS: true,
         scrollX: -window.scrollX,
         scrollY: -window.scrollY,
         windowWidth: thread.scrollWidth,

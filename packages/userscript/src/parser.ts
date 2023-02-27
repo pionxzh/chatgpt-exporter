@@ -140,7 +140,8 @@ function parseLine(el: Element): ConversationLine {
                     }
                     else if (element instanceof HTMLImageElement) {
                         const src = element.getAttribute('src') ?? ''
-                        line.push({ type: 'image', src })
+                        const alt = element.getAttribute('alt')
+                        line.push({ type: 'image', src, alt })
                     }
                     else if (tagName === 'B' || tagName === 'STRONG') {
                         const text = element.textContent ?? ''

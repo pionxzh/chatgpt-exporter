@@ -4,7 +4,7 @@ export interface BoldNode { type: 'bold'; text: string }
 export interface ItalicNode { type: 'italic'; text: string }
 export interface HeadingNode { type: 'heading'; level: number; text: string }
 export interface QuoteNode { type: 'quote'; text: string }
-export interface ImageNode { type: 'image'; src: string }
+export interface ImageNode { type: 'image'; src: string; alt: string | null }
 export interface CodeNode { type: 'code'; code: string }
 export interface CodeBlockNode { type: 'code-block'; lang: string; code: string }
 export interface LinkNode { type: 'link'; text: string; href: string }

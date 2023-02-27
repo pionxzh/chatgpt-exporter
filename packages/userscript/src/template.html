@@ -323,6 +323,8 @@
 
         .conversation-content-wrapper {
             display: flex;
+            position: relative;
+            overflow: hidden;
             flex: 1 1 auto;
             flex-direction: column;
         }
@@ -330,6 +332,14 @@
         .conversation-content {
             font-size: 1rem;
             line-height: 1.5;
+        }
+
+        .conversation-content img, .conversation-content video {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 2em;
+            margin-top: 2em;
         }
     </style>
 </head>

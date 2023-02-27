@@ -1,7 +1,7 @@
 import type { ConversationLine } from '../type'
 import { getConversation } from '../parser'
 import { copyToClipboard } from '../utils/clipboard'
-import { codeBlockToMarkdown, codeToMarkdown, headingToMarkdown, hrToMarkdown, linkToMarkdown, orderedListToMarkdown, quoteToMarkdown, tableToMarkdown, unorderedListToMarkdown } from '../utils/markdown'
+import { codeBlockToMarkdown, codeToMarkdown, headingToMarkdown, hrToMarkdown, imageToMarkdown, linkToMarkdown, orderedListToMarkdown, quoteToMarkdown, tableToMarkdown, unorderedListToMarkdown } from '../utils/markdown'
 import { standardizeLineBreaks } from '../utils/text'
 
 export function exportToText() {
@@ -28,7 +28,10 @@ function lineToText(line: ConversationLine): string {
             case 'italic': return node.text
             case 'heading': return headingToMarkdown(node)
             case 'quote': return quoteToMarkdown(node)
-            case 'image': return '[image]'
+            case 'image': {
+                if (node.src.startsWith('data:')) return '[image]'
+                return imageToMarkdown(node)
+            }
             case 'link': return linkToMarkdown(node)
             case 'ordered-list-item': return orderedListToMarkdown(node, lineToText)
             case 'unordered-list-item': return unorderedListToMarkdown(node, lineToText)
