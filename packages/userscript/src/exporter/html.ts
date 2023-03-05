@@ -1,77 +1,42 @@
-import { ChatGPTAvatar } from '../icons'
-import { getConversation } from '../parser'
-import { downloadFile, getFileNameWithFormat } from '../utils/download'
-
 import templateHtml from '../template.html?raw'
-import type { ConversationLine } from '../type'
+import { downloadFile, getFileNameWithFormat } from '../utils/download'
 import { getColorScheme } from '../utils/utils'
 import { standardizeLineBreaks } from '../utils/text'
-import { fetchConversation } from '../api'
-
-const skipWrap = [
-    'hr',
-    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-    'blockquote',
-    'ul', 'ol',
-    'pre',
-    'table',
-]
+import { baseUrl, getConversations } from '../api'
+import { fromMarkdown, toHtml } from '../utils/markdown'
+import { getUserAvatar } from '../page'
 
 export async function exportToHtml(fileNameFormat: string) {
-    const conversations = getConversation()
-    if (conversations.length === 0) return alert('No conversation found. Please send a message first.')
+    const { id, title, conversations } = await getConversations()
 
-    let date = ''
-    let timestamps: number[] = []
+    const userAvatar = await getUserAvatar()
 
-    const conv = await fetchConversation()
-    console.log(conv)
+    const conversationHtml = conversations.map((item) => {
+        const author = item.message?.author.role === 'assistant' ? 'ChatGPT' : 'You'
+        const avatarEl = author === 'ChatGPT'
+            ? '<svg width="41" height="41"><use xlink:href="#chatgpt" /></svg>'
+            : `<img alt="${author}" />`
+        const content = item.message?.content.parts.join('\n') ?? ''
+        let conversationContent = content
 
-    if (conv) {
-        date = new Date(conv.create_time).toISOString().split('T')[0]
-
-        let current_node: string | null = conv.current_node
-        const nodes = Object.values(conv.mapping)
-        const result = []
-        while (current_node) {
-            const node = nodes.find(n => n.id === current_node)
-            if (!node) break
-
-            if (node.message) result.unshift(node)
-            current_node = node.parent
+        // User's message will not be reformatted
+        if (author === 'ChatGPT') {
+            const root = fromMarkdown(content)
+            conversationContent = toHtml(root)
         }
 
-        console.log(result)
-        timestamps = result.map(node => node.message?.create_time ?? 0)
-    }
-
-    const lang = document.documentElement.lang ?? 'en'
-    const conversationHtml = conversations.map((item, index) => {
-        const { author: { name, avatar }, lines } = item
-
-        const timestamp = timestamps?.[index] ?? ''
-        let ts_date = ''
-        let ts_time = ''
+        const timestamp = item.message?.create_time ?? ''
+        let conversationDate = ''
+        let conversationTime = ''
 
         if (timestamp) {
             const date = new Date(timestamp * 1000)
             const isoStr = date.toISOString()
             // format: 2022-01-01 10:12:00 UTC
-            ts_date = `${isoStr.split('T')[0]} ${isoStr.split('T')[1].split('.')[0]} UTC`
+            conversationDate = `${isoStr.split('T')[0]} ${isoStr.split('T')[1].split('.')[0]} UTC`
             // format: 10:12 AM
-            ts_time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+            conversationTime = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
         }
-
-        const avatarEl = name === 'ChatGPT'
-            ? `${ChatGPTAvatar}`
-            : `<img src="${avatar}" alt="${name}" />`
-
-        const linesHtml = lines.map((line) => {
-            const lineHtml = lineToHtml(line)
-
-            if (skipWrap.some(tag => lineHtml.startsWith(`<${tag}`))) return lineHtml
-            return `<p>${lineHtml}</p>`
-        }).join('')
 
         return `
 <div class="conversation-item">
@@ -80,74 +45,30 @@ export async function exportToHtml(fileNameFormat: string) {
     </div>
     <div class="conversation-content-wrapper">
         <div class="conversation-content">
-            ${linesHtml}
+            ${conversationContent}
         </div>
     </div>
-    ${timestamp ? `<div class="time" title="${ts_date}">${ts_time}</div>` : ''}
+    ${timestamp ? `<div class="time" title="${conversationDate}">${conversationTime}</div>` : ''}
 </div>`
-    }).join('')
+    }).join('\n\n')
 
-    const title = document.title === 'New chat' ? 'ChatGPT Conversation' : document.title
+    // TODO:
+    const date = ''
+    const time = new Date().toISOString()
+    const source = `${baseUrl}/chat/${id}`
+    const lang = document.documentElement.lang ?? 'en'
+    const theme = getColorScheme()
 
     const html = templateHtml
         .replaceAll('{{title}}', title)
         .replaceAll('{{date}}', date)
-        .replaceAll('{{time}}', new Date().toISOString())
+        .replaceAll('{{time}}', time)
+        .replaceAll('{{source}}', source)
         .replaceAll('{{lang}}', lang)
-        .replaceAll('{{theme}}', getColorScheme())
+        .replaceAll('{{theme}}', theme)
+        .replaceAll('{{avatar}}', userAvatar)
         .replaceAll('{{content}}', conversationHtml)
 
     const fileName = getFileNameWithFormat(fileNameFormat, 'html')
     downloadFile(fileName, 'text/html', standardizeLineBreaks(html))
-}
-
-function lineToHtml(line: ConversationLine): string {
-    // eslint-disable-next-line array-callback-return
-    return line.map((node) => {
-        const nodeType = node.type
-        switch (nodeType) {
-            case 'hr': return '<hr>'
-            case 'text':
-                return escapeHtml(node.text)
-            case 'bold':
-                return `<strong>${escapeHtml(node.text)}</strong>`
-            case 'italic':
-                return `<em>${escapeHtml(node.text)}</em>`
-            case 'heading':
-                return `<h${node.level}>${escapeHtml(node.text)}</h${node.level}>`
-            case 'quote':
-                return `<blockquote><p>${escapeHtml(node.text)}</p></blockquote>`
-            case 'image':
-                return `<img src="${node.src}" referrerpolicy="no-referrer" />`
-            case 'link':
-                return `<a href="${node.href}" target="_blank" rel="noopener noreferrer">${escapeHtml(node.text)}</a>`
-            case 'ordered-list-item': {
-                const start = node.start ? ` start=${node.start}` : ''
-                const content = node.items.map(item => `<li>${item.map(line => lineToHtml(line)).join('\n')}</li>`).join('')
-                return `<ol${start}>${content}</ol>`
-            }
-            case 'unordered-list-item':{
-                const content = node.items.map(item => `<li>${item.map(line => lineToHtml(line)).join('\n')}</li>`).join('')
-                return `<ul>${content}</ul>`
-            }
-            case 'code':
-                return `<code>${escapeHtml(node.code)}</code>`
-            case 'code-block':
-                return `<pre><code class="language-${node.lang}">${escapeHtml(node.code)}</code></pre>`
-            case 'table': {
-                const header = node.headers.map(item => `<th>${escapeHtml(item)}</th>`).join('')
-                const body = node.rows.map(row => `<tr>${row.map(item => `<td>${escapeHtml(item)}</td>`).join('')}</tr>`).join('')
-                return `<table><thead><tr>${header}</tr></thead><tbody>${body}</tbody></table>`
-            }
-        }
-    }).join('')
-}
-
-function escapeHtml(html: string) {
-    return html
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;')
 }

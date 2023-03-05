@@ -21,11 +21,11 @@ export function downloadUrl(filename: string, url: string) {
     document.body.removeChild(a)
 }
 
-export function getFileNameWithFormat(format: string, ext: string) {
-    const title = sanitize(document.title).replace(/\s+/g, '_')
+export function getFileNameWithFormat(format: string, ext: string, { title = document.title } = {}) {
+    const _title = sanitize(title).replace(/\s+/g, '_')
 
     return format
-        .replace('{title}', title)
+        .replace('{title}', _title)
         .replace('{timestamp}', timestamp())
         .concat(`.${ext}`)
 }
