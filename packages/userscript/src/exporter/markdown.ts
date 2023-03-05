@@ -1,44 +1,36 @@
-import { getConversation } from '../parser'
-import type { Conversation, ConversationLine } from '../type'
+import { getConversations } from '../api'
+import { fromMarkdown, toMarkdown } from '../utils/markdown'
 import { downloadFile, getFileNameWithFormat } from '../utils/download'
-import { codeBlockToMarkdown, codeToMarkdown, headingToMarkdown, hrToMarkdown, imageToMarkdown, linkToMarkdown, orderedListToMarkdown, quoteToMarkdown, tableToMarkdown, unorderedListToMarkdown } from '../utils/markdown'
 import { standardizeLineBreaks } from '../utils/text'
 
-export function exportToMarkdown(fileNameFormat: string) {
-    const conversations = getConversation()
-    if (conversations.length === 0) return alert('No conversation found. Please send a message first.')
+export async function exportToMarkdown(fileNameFormat: string) {
+    // const { id, title, createTime, conversations } = await getConversations()
+    const { conversations } = await getConversations()
 
-    const text = conversationToMarkdown(conversations)
-    const fileName = getFileNameWithFormat(fileNameFormat, 'md')
-    downloadFile(fileName, 'text/markdown', standardizeLineBreaks(text))
-}
+    // const date = ''
+    // const source = `${baseUrl}/chat/${id}`
+    // const frontMatter = `---
+    // title: ${title}
+    // date: ${date}
+    // source: ${source}
+    // ---`
 
-function conversationToMarkdown(conversation: Conversation[]) {
-    return conversation.map((item) => {
-        const { author: { name }, lines } = item
-        const text = lines.map(line => lineToMD(line)).join('\n\n')
-        return `#### ${name}:\n${text}`
-    }).join('\n\n')
-}
+    const content = conversations.map((item) => {
+        const author = item.message?.author.role === 'assistant' ? 'ChatGPT' : 'You'
+        const content = item.message?.content.parts.join('\n') ?? ''
+        let message = content
 
-function lineToMD(line: ConversationLine): string {
-    // eslint-disable-next-line array-callback-return
-    return line.map((node) => {
-        const nodeType = node.type
-        switch (nodeType) {
-            case 'hr': return hrToMarkdown()
-            case 'text': return node.text
-            case 'bold': return `**${node.text}**`
-            case 'italic': return `*${node.text}*`
-            case 'heading': return headingToMarkdown(node)
-            case 'quote': return quoteToMarkdown(node)
-            case 'image': return imageToMarkdown(node)
-            case 'link': return linkToMarkdown(node)
-            case 'ordered-list-item': return orderedListToMarkdown(node, lineToMD)
-            case 'unordered-list-item': return unorderedListToMarkdown(node, lineToMD)
-            case 'code': return codeToMarkdown(node)
-            case 'code-block': return codeBlockToMarkdown(node)
-            case 'table': return tableToMarkdown(node.headers, node.rows)
+        // User's message will not be reformatted
+        if (author === 'ChatGPT') {
+            const root = fromMarkdown(content)
+            message = toMarkdown(root)
         }
-    }).join('')
+        return `#### ${author}:\n${message}`
+    }).join('\n\n')
+
+    // const markdown = `${frontMatter}\n\n${content}`
+    const markdown = content
+
+    const fileName = getFileNameWithFormat(fileNameFormat, 'md')
+    downloadFile(fileName, 'text/markdown', standardizeLineBreaks(markdown))
 }

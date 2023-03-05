@@ -1,6 +1,6 @@
 import sentinel from 'sentinel-js'
 import { render } from 'preact'
-import { Menu } from './menu'
+import { Menu } from './ui/menu'
 import { onloadSafe } from './utils/utils'
 
 main()

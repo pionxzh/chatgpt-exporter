@@ -20,14 +20,26 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "hast-util-to-html": "^8.0.4",
     "html2canvas": "^1.4.1",
+    "mdast": "^3.0.0",
+    "mdast-util-from-markdown": "^1.3.0",
+    "mdast-util-frontmatter": "^1.0.1",
+    "mdast-util-gfm": "^2.0.2",
+    "mdast-util-to-hast": "^12.3.0",
+    "mdast-util-to-markdown": "^1.5.0",
+    "micromark-extension-frontmatter": "^1.0.1",
+    "micromark-extension-gfm": "^2.0.1",
     "preact": "^10.12.1",
     "sanitize-filename": "^1.6.3",
     "sentinel-js": "^0.0.5",
+    "urlcat": "^2.0.4",
     "vite-plugin-monkey": "^2.11.1"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.5.0",
+    "@types/mdast": "^3.0.10",
+    "@types/unist": "^2.0.6",
     "vite": "^4.1.1"
   }
 }

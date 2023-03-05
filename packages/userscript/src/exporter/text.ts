@@ -1,43 +1,32 @@
-import type { ConversationLine } from '../type'
-import { getConversation } from '../parser'
+import type { Emphasis, Strong } from 'mdast'
 import { copyToClipboard } from '../utils/clipboard'
-import { codeBlockToMarkdown, codeToMarkdown, headingToMarkdown, hrToMarkdown, imageToMarkdown, linkToMarkdown, orderedListToMarkdown, quoteToMarkdown, tableToMarkdown, unorderedListToMarkdown } from '../utils/markdown'
 import { standardizeLineBreaks } from '../utils/text'
+import { getConversations } from '../api'
+import { flatMap, fromMarkdown, toMarkdown } from '../utils/markdown'
 
-export function exportToText() {
-    const conversations = getConversation()
-    if (conversations.length === 0) return alert('No conversation found. Please send a message first.')
+export async function exportToText() {
+    const { conversations } = await getConversations()
 
     const text = conversations.map((item) => {
-        const { author: { name }, lines } = item
-        const text = lines.map(line => lineToText(line)).join('\n\n')
-        return `${name}:\n${text}`
+        const author = item.message?.author.role === 'assistant' ? 'ChatGPT' : 'You'
+        const content = item.message?.content.parts.join('\n') ?? ''
+        let message = content
+
+        // User's message will not be reformatted
+        if (author === 'ChatGPT') {
+            const root = fromMarkdown(content)
+            flatMap(root, (item) => {
+                // Replace strong/bold with text
+                if (item.type === 'strong') return (item as Strong).children
+                // Replace emphasis/italic with text
+                if (item.type === 'emphasis') return (item as Emphasis).children
+
+                return [item]
+            })
+            message = toMarkdown(root)
+        }
+        return `${author}:\n${message}`
     }).join('\n\n')
 
     copyToClipboard(standardizeLineBreaks(text))
-}
-
-function lineToText(line: ConversationLine): string {
-    // eslint-disable-next-line array-callback-return
-    return line.map((node) => {
-        const nodeType = node.type
-        switch (nodeType) {
-            case 'hr': return hrToMarkdown()
-            case 'text': return node.text
-            case 'bold': return node.text
-            case 'italic': return node.text
-            case 'heading': return headingToMarkdown(node)
-            case 'quote': return quoteToMarkdown(node)
-            case 'image': {
-                if (node.src.startsWith('data:')) return '[image]'
-                return imageToMarkdown(node)
-            }
-            case 'link': return linkToMarkdown(node)
-            case 'ordered-list-item': return orderedListToMarkdown(node, lineToText)
-            case 'unordered-list-item': return unorderedListToMarkdown(node, lineToText)
-            case 'code': return codeToMarkdown(node)
-            case 'code-block': return codeBlockToMarkdown(node)
-            case 'table': return tableToMarkdown(node.headers, node.rows)
-        }
-    }).join('')
 }

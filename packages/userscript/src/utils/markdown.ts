@@ -1,80 +1,65 @@
-import type {
-    CodeBlockNode,
-    CodeNode,
-    ConversationLine,
-    HeadingNode,
-    ImageNode,
-    LinkNode,
-    OrderedListNode,
-    QuoteNode,
-    UnorderedListNode,
-} from '../type'
+import type { Options as FmOptions } from 'mdast-util-from-markdown'
+import { fromMarkdown as fm } from 'mdast-util-from-markdown'
+import type { Options as TmOptions } from 'mdast-util-to-markdown'
+import { toMarkdown as tm } from 'mdast-util-to-markdown'
+import type { Content, Parent, Root } from 'mdast'
+import {
+    frontmatterFromMarkdown,
+    frontmatterToMarkdown,
+} from 'mdast-util-frontmatter'
+import { frontmatter } from 'micromark-extension-frontmatter'
+import { gfm } from 'micromark-extension-gfm'
+import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm'
+import { toHast } from 'mdast-util-to-hast'
+import { toHtml as hastToHtml } from 'hast-util-to-html'
+import type { Node } from 'unist'
 
-export function hrToMarkdown() {
-    return '---'
-}
+// ref: https://github.com/rxliuli/mdbook/blob/master/libs/markdown-util
 
-export function headingToMarkdown(node: HeadingNode) {
-    return `${'#'.repeat(node.level)} ${node.text}`
-}
-
-export function quoteToMarkdown(node: QuoteNode) {
-    return `> ${node.text}`
-}
-
-export function imageToMarkdown(node: ImageNode) {
-    const alt = node.alt ?? 'image'
-    return `![${alt}](${node.src})`
-}
-
-export function linkToMarkdown(node: LinkNode) {
-    return `[${node.text}](${node.href})`
-}
-
-type LineMapper = (line: ConversationLine) => string
-
-export function orderedListToMarkdown(node: OrderedListNode, lineMapper: LineMapper) {
-    const start = node.start ?? 1
-    return node.items
-        .map((item, index) => `${start + index}. ${item.map(line => lineMapper(line)).join('\n')}`)
-        .join('\n')
-}
-
-export function unorderedListToMarkdown(node: UnorderedListNode, lineMapper: LineMapper) {
-    return node.items
-        .map(item => `- ${item.map(line => lineMapper(line)).join('\n')}`)
-        .join('\n')
-}
-
-export function codeToMarkdown(node: CodeNode) {
-    return `\`${node.code}\``
-}
-
-export function codeBlockToMarkdown(node: CodeBlockNode) {
-    return `\`\`\`${node.lang}\n${node.code}\`\`\``
-}
-
-export function tableToMarkdown(headers: string[], rows: string[][]): string {
-    let markdown = ''
-
-    // Find the maximum width of each column
-    const columnWidths: number[] = []
-    for (let i = 0; i < headers.length; i++) {
-        let maxWidth = headers[i].length
-        rows.forEach((row) => {
-            maxWidth = Math.max(maxWidth, row[i].length)
-        })
-        columnWidths.push(maxWidth)
-    }
-
-    // Add the headers
-    markdown += `${headers.map((header, i) => header.padEnd(columnWidths[i])).join(' | ')}\n`
-    markdown += `${headers.map((_header, i) => '-'.repeat(columnWidths[i])).join(' | ')}\n`
-
-    // Add the rows
-    rows.forEach((row) => {
-        markdown += `${row.map((cell, i) => cell.padEnd(columnWidths[i])).join(' | ')}\n`
+export function fromMarkdown(content: string, options?: FmOptions): Root {
+    return fm(content, {
+        ...options,
+        extensions: [frontmatter(['yaml']), gfm()].concat(options?.extensions ?? []),
+        mdastExtensions: [
+            frontmatterFromMarkdown(['yaml']),
+            gfmFromMarkdown(),
+        ].concat(options?.mdastExtensions ?? []),
     })
+}
 
-    return markdown
+export function toMarkdown(ast: Content | Root, options?: TmOptions): string {
+    return tm(ast, {
+        bullet: '-',
+        bulletOther: '*',
+        bulletOrdered: '.',
+        emphasis: '*',
+        fence: '`',
+        fences: true,
+        listItemIndent: 'one',
+        resourceLink: false,
+        rule: '-',
+        ruleRepetition: 3,
+        ruleSpaces: false,
+        strong: '*',
+        ...options,
+        extensions: [frontmatterToMarkdown(['yaml']), gfmToMarkdown()].concat(options?.extensions ?? []),
+    })
+}
+
+export function toHtml(node: Root): string {
+    return hastToHtml(toHast(node)!)
+}
+
+export function flatMap<T extends Node>(
+    tree: T,
+    fn: (node: Node, i: number, parent?: Parent) => Node[],
+): T {
+    function transform(node: Node, i: number, parent?: Parent): Node[] {
+        if ('children' in node) {
+            const p = node as unknown as Parent
+            p.children = p.children.flatMap((item, i) => transform(item, i, p)) as any
+        }
+        return fn(node, i, parent)
+    }
+    return transform(tree, 0, undefined)[0] as T
 }

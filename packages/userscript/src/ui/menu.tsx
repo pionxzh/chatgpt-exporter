@@ -1,13 +1,13 @@
 import type { FunctionComponent } from 'preact'
 import type { JSXInternal } from 'preact/src/jsx'
-import { exportToText } from './exporter/text'
-import { exportToPng } from './exporter/image'
-import { exportToMarkdown } from './exporter/markdown'
-import { exportToHtml } from './exporter/html'
+import { exportToText } from '../exporter/text'
+import { exportToPng } from '../exporter/image'
+import { exportToMarkdown } from '../exporter/markdown'
+import { exportToHtml } from '../exporter/html'
+import { useGMStorage } from '../useGMStorage'
 import { FileCode, IconArrowRightFromBracket, IconCamera, IconCopy, IconMarkdown } from './icons'
-import { useGMStorage } from './useGMStorage'
 
-import './style.css'
+import '../style.css'
 
 type FC<P = {}> = FunctionComponent<P>
 
