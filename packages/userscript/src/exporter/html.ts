@@ -9,7 +9,7 @@ import { checkIfConversationStarted, getUserAvatar } from '../page'
 export async function exportToHtml(fileNameFormat: string) {
     if (!checkIfConversationStarted()) {
         alert('Please start a conversation first.')
-        return
+        return false
     }
 
     const { id, title, conversations } = await getConversations()
@@ -76,4 +76,6 @@ export async function exportToHtml(fileNameFormat: string) {
 
     const fileName = getFileNameWithFormat(fileNameFormat, 'html')
     downloadFile(fileName, 'text/html', standardizeLineBreaks(html))
+
+    return true
 }

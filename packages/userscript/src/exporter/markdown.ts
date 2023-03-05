@@ -7,7 +7,7 @@ import { checkIfConversationStarted } from '../page'
 export async function exportToMarkdown(fileNameFormat: string) {
     if (!checkIfConversationStarted()) {
         alert('Please start a conversation first.')
-        return
+        return false
     }
 
     // const { id, title, createTime, conversations } = await getConversations()
@@ -39,4 +39,6 @@ export async function exportToMarkdown(fileNameFormat: string) {
 
     const fileName = getFileNameWithFormat(fileNameFormat, 'md')
     downloadFile(fileName, 'text/markdown', standardizeLineBreaks(markdown))
+
+    return true
 }

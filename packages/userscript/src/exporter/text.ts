@@ -8,7 +8,7 @@ import { checkIfConversationStarted } from '../page'
 export async function exportToText() {
     if (!checkIfConversationStarted()) {
         alert('Please start a conversation first.')
-        return
+        return false
     }
 
     const { conversations } = await getConversations()
@@ -34,4 +34,6 @@ export async function exportToText() {
     }).join('\n\n')
 
     copyToClipboard(standardizeLineBreaks(text))
+
+    return true
 }

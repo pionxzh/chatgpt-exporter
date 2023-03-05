@@ -18,7 +18,7 @@ interface MenuItemProps {
     text: string
     icon?: FC
     successText?: string
-    onClick?: () => void
+    onClick?: (() => boolean) | (() => Promise<boolean>)
 }
 const MenuItem: FC<MenuItemProps> = ({ text, successText, icon: Icon, onClick }) => {
     const [loading, setLoading] = useState(false)
@@ -27,10 +27,12 @@ const MenuItem: FC<MenuItemProps> = ({ text, successText, icon: Icon, onClick })
     const handleClick = async () => {
         if (typeof onClick === 'function') {
             setLoading(true)
-            await onClick()
+            const result = await onClick()
             setLoading(false)
-            setSucceed(true)
-            setTimeout(() => setSucceed(false), TIMEOUT)
+            if (result) {
+                setSucceed(true)
+                setTimeout(() => setSucceed(false), TIMEOUT)
+            }
         }
     }
 
