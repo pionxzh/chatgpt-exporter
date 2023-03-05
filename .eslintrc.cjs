@@ -7,6 +7,7 @@ module.exports = {
         'no-console': 'off',
         'no-alert': 'off',
         'react/prop-types': 'off',
+        'react/no-unknown-property': ['error', { ignore: ['stroke-width'] }],
         '@typescript-eslint/ban-ts-comment': 'off',
         '@typescript-eslint/no-unused-vars': 'off',
     },
