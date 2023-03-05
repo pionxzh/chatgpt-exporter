@@ -4,9 +4,14 @@ import { getColorScheme } from '../utils/utils'
 import { standardizeLineBreaks } from '../utils/text'
 import { baseUrl, getConversations } from '../api'
 import { fromMarkdown, toHtml } from '../utils/markdown'
-import { getUserAvatar } from '../page'
+import { checkIfConversationStarted, getUserAvatar } from '../page'
 
 export async function exportToHtml(fileNameFormat: string) {
+    if (!checkIfConversationStarted()) {
+        alert('Please start a conversation first.')
+        return
+    }
+
     const { id, title, conversations } = await getConversations()
 
     const userAvatar = await getUserAvatar()

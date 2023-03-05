@@ -1,6 +1,7 @@
 import html2canvas from 'html2canvas'
 import { downloadUrl, getFileNameWithFormat } from '../utils/download'
 import { sleep } from '../utils/utils'
+import { checkIfConversationStarted } from '../page'
 
 // https://github.com/niklasvh/html2canvas/issues/2792#issuecomment-1042948572
 function fnIgnoreElements(el: any) {
@@ -8,6 +9,11 @@ function fnIgnoreElements(el: any) {
 }
 
 export async function exportToPng(fileNameFormat: string) {
+    if (!checkIfConversationStarted()) {
+        alert('Please start a conversation first.')
+        return
+    }
+
     const thread = document.querySelector('main .group')?.parentElement as HTMLElement
     if (!thread || thread.children.length === 0) return
 

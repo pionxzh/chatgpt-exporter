@@ -2,8 +2,14 @@ import { getConversations } from '../api'
 import { fromMarkdown, toMarkdown } from '../utils/markdown'
 import { downloadFile, getFileNameWithFormat } from '../utils/download'
 import { standardizeLineBreaks } from '../utils/text'
+import { checkIfConversationStarted } from '../page'
 
 export async function exportToMarkdown(fileNameFormat: string) {
+    if (!checkIfConversationStarted()) {
+        alert('Please start a conversation first.')
+        return
+    }
+
     // const { id, title, createTime, conversations } = await getConversations()
     const { conversations } = await getConversations()
 

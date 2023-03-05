@@ -55,3 +55,7 @@ export async function getUserAvatar(): Promise<string> {
 
     return defaultAvatar
 }
+
+export function checkIfConversationStarted() {
+    return !!document.querySelector('main .group')
+}
