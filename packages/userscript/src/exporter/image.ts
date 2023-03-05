@@ -11,11 +11,11 @@ function fnIgnoreElements(el: any) {
 export async function exportToPng(fileNameFormat: string) {
     if (!checkIfConversationStarted()) {
         alert('Please start a conversation first.')
-        return
+        return false
     }
 
     const thread = document.querySelector('main .group')?.parentElement as HTMLElement
-    if (!thread || thread.children.length === 0) return
+    if (!thread || thread.children.length === 0) return false
 
     // hide model bar
     Array.from(thread.children).forEach((el) => {
@@ -52,4 +52,6 @@ export async function exportToPng(fileNameFormat: string) {
     const fileName = getFileNameWithFormat(fileNameFormat, 'png')
     downloadUrl(fileName, dataUrl)
     window.URL.revokeObjectURL(dataUrl)
+
+    return true
 }
