@@ -3,10 +3,15 @@ import { copyToClipboard } from '../utils/clipboard'
 import { standardizeLineBreaks } from '../utils/text'
 import { getConversations } from '../api'
 import { flatMap, fromMarkdown, toMarkdown } from '../utils/markdown'
+import { checkIfConversationStarted } from '../page'
 
 export async function exportToText() {
-    const { conversations } = await getConversations()
+    if (!checkIfConversationStarted()) {
+        alert('Please start a conversation first.')
+        return
+    }
 
+    const { conversations } = await getConversations()
     const text = conversations.map((item) => {
         const author = item.message?.author.role === 'assistant' ? 'ChatGPT' : 'You'
         const content = item.message?.content.parts.join('\n') ?? ''
