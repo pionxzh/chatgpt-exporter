@@ -1,6 +1,6 @@
 import templateHtml from '../template.html?raw'
 import { downloadFile, getFileNameWithFormat } from '../utils/download'
-import { getColorScheme } from '../utils/utils'
+import { dateStr, getColorScheme } from '../utils/utils'
 import { standardizeLineBreaks } from '../utils/text'
 import { baseUrl, getConversations } from '../api'
 import { fromMarkdown, toHtml } from '../utils/markdown'
@@ -57,8 +57,7 @@ export async function exportToHtml(fileNameFormat: string) {
 </div>`
     }).join('\n\n')
 
-    // TODO:
-    const date = ''
+    const date = dateStr()
     const time = new Date().toISOString()
     const source = `${baseUrl}/chat/${id}`
     const lang = document.documentElement.lang ?? 'en'

@@ -3,6 +3,7 @@ import { fromMarkdown, toMarkdown } from '../utils/markdown'
 import { downloadFile, getFileNameWithFormat } from '../utils/download'
 import { standardizeLineBreaks } from '../utils/text'
 import { checkIfConversationStarted } from '../page'
+// import { dateStr } from '../utils/utils'
 
 export async function exportToMarkdown(fileNameFormat: string) {
     if (!checkIfConversationStarted()) {
@@ -13,7 +14,7 @@ export async function exportToMarkdown(fileNameFormat: string) {
     // const { id, title, createTime, conversations } = await getConversations()
     const { conversations } = await getConversations()
 
-    // const date = ''
+    // const date = dateStr()
     // const source = `${baseUrl}/chat/${id}`
     // const frontMatter = `---
     // title: ${title}

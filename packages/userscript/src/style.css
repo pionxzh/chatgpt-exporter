@@ -7,6 +7,14 @@ p > img[src*="https://images.unsplash.com/"] {
     animation: fadeIn .3s;
 }
 
+.cursor-help {
+    cursor: help;
+}
+
+.select-all {
+    user-select: all!important;
+}
+
 .inputFieldSet {
     display: block;
     border-width: 2px;

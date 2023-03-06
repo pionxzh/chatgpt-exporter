@@ -1,85 +1,83 @@
-import type { FunctionComponent } from 'preact'
 import type { JSXInternal } from 'preact/src/jsx'
-import { useCallback, useState } from 'preact/hooks'
+import { useCallback } from 'preact/hooks'
+import * as Dialog from '@radix-ui/react-dialog'
+import { Cross2Icon } from '@radix-ui/react-icons'
+import sanitize from 'sanitize-filename'
+import type { FC } from '../type'
 import { exportToText } from '../exporter/text'
 import { exportToPng } from '../exporter/image'
 import { exportToMarkdown } from '../exporter/markdown'
 import { exportToHtml } from '../exporter/html'
 import { useGMStorage } from '../useGMStorage'
-import { FileCode, IconArrowRightFromBracket, IconCamera, IconCopy, IconLoading, IconMarkdown } from './icons'
+import { dateStr, timestamp } from '../utils/utils'
+import { getFileNameWithFormat } from '../utils/download'
+import { MenuItem } from './MenuItem'
+import { Divider } from './Divider'
+import { FileCode, IconArrowRightFromBracket, IconCamera, IconCopy, IconMarkdown, IconSetting } from './icons'
+import { Dropdown } from './Dropdown'
+import { useTitle } from './useTitle'
 
 import '../style.css'
-
-type FC<P = {}> = FunctionComponent<P>
-
-const TIMEOUT = 2500
-
-interface MenuItemProps {
-    text: string
-    icon?: FC
-    successText?: string
-    onClick?: (() => boolean) | (() => Promise<boolean>)
-}
-const MenuItem: FC<MenuItemProps> = ({ text, successText, icon: Icon, onClick }) => {
-    const [loading, setLoading] = useState(false)
-    const [succeed, setSucceed] = useState(false)
-
-    const handleClick = async () => {
-        if (typeof onClick === 'function') {
-            setLoading(true)
-            const result = await onClick()
-            setLoading(false)
-            if (result) {
-                setSucceed(true)
-                setTimeout(() => setSucceed(false), TIMEOUT)
-            }
-        }
-    }
-
-    return (
-        <div
-            className="flex py-3 px-3 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm mb-2 flex-shrink-0 border border-white/20"
-            style={{ height: 46 }}
-            onClick={handleClick}
-        >
-            {loading
-                ? (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
-                    <IconLoading />
-                </div>
-                    )
-                : (
-                    <>
-                        {Icon && <Icon />}
-                        {succeed && successText ? successText : text}
-                    </>
-                    )
-            }
-        </div>
-    )
-}
-
-const Dropdown: FC = ({ children }) => {
-    return (
-        <>
-            <div className="dropdown-backdrop"></div>
-            <div className="dropdown-menu bg-gray-900">
-                {children}
-            </div>
-        </>
-    )
-}
-
-const Divider = () => <div className="border-b border-white/20"></div>
+import './dialog.css'
 
 const KEY = 'exporter-format'
-const defaultFormat = 'ChatGPT-{timestamp}'
+const defaultFormat = 'ChatGPT-{title}'
 
-export function Menu() {
-    const [format, setFormat] = useGMStorage(KEY, defaultFormat)
+const SettingDialog: FC<{ format: string; setFormat: (value: string) => void }> = ({ format, setFormat, children }) => {
     const handleChange: JSXInternal.GenericEventHandler<HTMLInputElement> = (e) => {
         setFormat(e.currentTarget.value)
     }
+
+    const _title = useTitle()
+    const title = sanitize(_title).replace(/\s+/g, '_')
+
+    const preview = getFileNameWithFormat(format, '{ext}', { title })
+
+    return (
+        <Dialog.Root>
+            <Dialog.Trigger asChild>
+                {children}
+            </Dialog.Trigger>
+            <Dialog.Portal>
+                <Dialog.Overlay className="DialogOverlay" />
+                <Dialog.Content className="DialogContent">
+                    <Dialog.Title className="DialogTitle">Exporter Setting</Dialog.Title>
+                    <div className="Description">
+                        Available variables:&nbsp;
+                        <span className="cursor-help select-all" title={title}>{'{title}'}</span>
+                        ,&nbsp;
+                        <span className="cursor-help select-all" title={dateStr()}>{'{date}'}</span>
+                        ,&nbsp;
+                        <span className="cursor-help select-all" title={timestamp()}>{'{timestamp}'}</span>
+                    </div>
+                    <fieldset className="Fieldset">
+                        <label className="Label" htmlFor="filename">
+                            File Name
+                        </label>
+                        <input className="Input" id="filename" value={format} onChange={handleChange} />
+                    </fieldset>
+                    <div className="Description">
+                        Preview:&nbsp;
+                        <span className="select-all" style={{ 'text-decoration': 'underline', 'text-underline-offset': 4 }}>{preview}</span>
+                    </div>
+                    <div className="flex mt-6" style={{ justifyContent: 'flex-end' }}>
+                        <Dialog.Close asChild>
+                            <button className="Button green">Save</button>
+                        </Dialog.Close>
+                    </div>
+                    <Dialog.Close asChild>
+                        <button className="IconButton" aria-label="Close">
+                            <Cross2Icon />
+                        </button>
+                    </Dialog.Close>
+                </Dialog.Content>
+            </Dialog.Portal>
+        </Dialog.Root>
+    )
+}
+
+export function Menu() {
+    const [format, setFormat] = useGMStorage(KEY, defaultFormat)
 
     const onClickText = useCallback(() => exportToText(), [])
     const onClickPng = useCallback(() => exportToPng(format), [format])
@@ -93,33 +91,31 @@ export function Menu() {
                 icon={IconArrowRightFromBracket}
             />
             <Dropdown>
-                <fieldset className="inputFieldSet mb-2 rounded-md text-white border-white/20 hover:bg-gray-500/10 duration-200">
-                    <legend className="inputLabel px-2 text-xs">File Name: {'{title}, {timestamp}' }</legend>
-                    <input
-                        className="border-none text-sm w-full"
-                        type="text"
-                        onChange={handleChange}
-                        value={format}
-                    />
-                </fieldset>
+                <SettingDialog format={format} setFormat={setFormat}>
+                    <div><MenuItem text="Setting" icon={IconSetting} /></div>
+                </SettingDialog>
 
                 <MenuItem
                     text="Copy Text"
                     successText="Copied!"
                     icon={IconCopy}
-                    onClick={onClickText} />
+                    onClick={onClickText}
+                />
                 <MenuItem
                     text="Screenshot"
                     icon={IconCamera}
-                    onClick={onClickPng} />
+                    onClick={onClickPng}
+                />
                 <MenuItem
                     text="Markdown"
                     icon={IconMarkdown}
-                    onClick={onClickMarkdown} />
+                    onClick={onClickMarkdown}
+                />
                 <MenuItem
                     text="WebPage (HTML)"
                     icon={FileCode}
-                    onClick={onClickHtml} />
+                    onClick={onClickHtml}
+                />
             </Dropdown>
             <Divider />
         </div>

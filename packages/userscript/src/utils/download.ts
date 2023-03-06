@@ -1,5 +1,5 @@
 import sanitize from 'sanitize-filename'
-import { timestamp } from './utils'
+import { dateStr, timestamp } from './utils'
 
 export function downloadFile(filename: string, type: string, content: string) {
     const blob = new Blob([content], { type })
@@ -26,6 +26,7 @@ export function getFileNameWithFormat(format: string, ext: string, { title = doc
 
     return format
         .replace('{title}', _title)
+        .replace('{date}', dateStr())
         .replace('{timestamp}', timestamp())
         .concat(`.${ext}`)
 }
