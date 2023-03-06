@@ -1,3 +1,5 @@
+export const noop = () => {}
+
 export function onloadSafe(fn: () => void) {
     if (document.readyState === 'complete') {
         fn()
@@ -9,6 +11,13 @@ export function onloadSafe(fn: () => void) {
 
 export function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+export function dateStr(date: Date = new Date()) {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
 }
 
 export function timestamp() {

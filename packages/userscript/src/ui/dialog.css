@@ -1,0 +1,139 @@
+.DialogOverlay {
+    background-color: rgba(0, 0, 0, 0.44);
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    animation: fadeIn 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.DialogContent {
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90vw;
+    max-width: 450px;
+    max-height: 85vh;
+    padding: 16px 24px;
+    z-index: 1001;
+    animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark .DialogContent {
+    background-color: rgba(32,33,35,1);
+    border-color: rgba(64,65,79,1);
+    border-width: 1px;
+}
+
+.DialogTitle {
+    margin: 0 0 16px 0;
+    font-weight: 500;
+    color: #1a1523;
+    font-size: 20px;
+}
+
+.dark .DialogTitle {
+    color: #fff;
+}
+
+.Button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    padding: 0 15px;
+    font-size: 15px;
+    line-height: 1;
+    font-weight: 500;
+    height: 35px;
+}
+.Button.green {
+    background-color: #ddf3e4;
+    color: #18794e;
+}
+.Button.green:hover {
+    background-color: #ccebd7;
+}
+
+.IconButton {
+    font-family: inherit;
+    border-radius: 100%;
+    height: 25px;
+    width: 25px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #6f6e77;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+.IconButton:hover {
+    background-color: rgba(0, 0, 0, 0.06);
+}
+
+.Fieldset {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.Label {
+    font-size: 15px;
+    color: #1a1523;
+    width: 90px;
+    text-align: right;
+}
+
+.dark .Label {
+    color: #fff;
+}
+
+.Input {
+    width: 100%;
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    padding: 0 10px;
+    font-size: 15px;
+    line-height: 1;
+    color: #5a5865;
+    background-color: #f7f7f7;
+    box-shadow: 0 0 0 1px #6f6e77;
+    height: 35px;
+    outline: none;
+}
+
+.dark .Input {
+    background-color: #2f2f2f;
+    color: #fff;
+    box-shadow: 0 0 0 1px #6f6e77;
+}
+
+.Description {
+    font-size: 13px;
+    color: #5a5865;
+    text-align: right;
+    margin-bottom: 4px;
+}
+
+.dark .Description {
+    color: #bcbcbc;
+}
+
+@keyframes contentShow {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -48%) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
