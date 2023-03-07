@@ -1,5 +1,26 @@
 # Changelog
 
+## [2.0.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.9.1...userscript-v2.0.0) (2023-03-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* rewrite the plugin with API based data source
+
+### Features
+
+* add loading effect on menu button ([6e5bc12](https://github.com/pionxzh/chatgpt-exporter/commit/6e5bc125bfd239e4e26d18565956bc22cb2cea3a))
+* add setting dialog/ support `{date}` in filename ([f219def](https://github.com/pionxzh/chatgpt-exporter/commit/f219deff6462d6c691778fa5251e7afa4c94999d))
+* rewrite the plugin with API based data source ([4ecf34a](https://github.com/pionxzh/chatgpt-exporter/commit/4ecf34ab726ec6c38efd213a7a4bfb8b28d67bad))
+* show timestamp on each chat post ([e602c7b](https://github.com/pionxzh/chatgpt-exporter/commit/e602c7b73f5b0e6594af0c55de2569c1c572acf7))
+
+
+### Bug Fixes
+
+* check if conversation started ([a60bedc](https://github.com/pionxzh/chatgpt-exporter/commit/a60bedc6dbb4819f02e9617861c74934e49cb40b))
+* handle failed callback ([6739500](https://github.com/pionxzh/chatgpt-exporter/commit/6739500aa55c37bf093d5de18ef9b84e1b58b6f6))
+* respect line break and improve text style ([c9e60bc](https://github.com/pionxzh/chatgpt-exporter/commit/c9e60bc613f9cc394a09850196d40d8decdf81bf))
+
 ## [1.9.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.9.0...userscript-v1.9.1) (2023-02-27)
 
 
