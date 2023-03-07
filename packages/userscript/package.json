@@ -1,7 +1,7 @@
 {
   "name": "@pionxzh/chatgpt-userscript",
   "type": "module",
-  "version": "1.9.1",
+  "version": "2.0.0",
   "private": true,
   "title": "ChatGPT Exporter",
   "title:zh-CN": "ChatGPT Exporter",
