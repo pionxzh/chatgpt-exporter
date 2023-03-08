@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.1.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.0.0...userscript-v2.1.0) (2023-03-08)
+
+
+### Features
+
+* show message to user when history api disabeld ([9025934](https://github.com/pionxzh/chatgpt-exporter/commit/9025934ced76b0d0b2c71e3c6247c5d233ccb178))
+
+
+### Bug Fixes
+
+* error handling on menu onclick ([f0b7c7f](https://github.com/pionxzh/chatgpt-exporter/commit/f0b7c7f7dc365102e4d25ae246fce6afda3ca876))
+* get accessToken from unsafeWindow and provide a fallback to session API ([0accd66](https://github.com/pionxzh/chatgpt-exporter/commit/0accd66beb740d1b02b2fda392c7d6c20fe5b8dc))
+
 ## [2.0.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v1.9.1...userscript-v2.0.0) (2023-03-07)
 
 
