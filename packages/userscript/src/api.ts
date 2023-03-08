@@ -1,5 +1,18 @@
 import urlcat from 'urlcat'
-import { getAccessToken, getConversationChoice } from './page'
+import { getConversationChoice, getPageAccessToken } from './page'
+
+interface ApiSession {
+    accessToken: string
+    expires: string
+    user: {
+        email: string
+        groups: string[]
+        id: string
+        image: string
+        name: string
+        picture: string
+    }
+}
 
 interface ConversationNode {
     children: string[]
@@ -49,6 +62,7 @@ interface ApiConversations {
 export const baseUrl = 'https://chat.openai.com'
 const apiUrl = `${baseUrl}/backend-api`
 
+const sessionApi = urlcat(baseUrl, '/api/auth/session')
 const conversationApi = (id: string) => urlcat(apiUrl, '/conversation/:id', { id })
 const conversationsApi = (offset: number, limit: number) => urlcat(apiUrl, '/conversations', { offset, limit })
 
@@ -80,13 +94,32 @@ async function fetchConversations(offset = 0, limit = 20): Promise<ApiConversati
 }
 
 async function fetchApi<T>(url: string): Promise<T> {
-    const accessToken = getAccessToken()
+    const accessToken = await getAccessToken()
 
     const response = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } })
     if (!response.ok) {
         throw new Error(response.statusText)
     }
     return response.json()
+}
+
+async function getAccessToken(): Promise<string> {
+    const _accessToken = getPageAccessToken()
+    if (_accessToken) return _accessToken
+
+    const session = await fetchSession()
+    return session.accessToken
+}
+
+let session: ApiSession | null = null
+async function fetchSession(): Promise<ApiSession> {
+    if (session) return session
+    const response = await fetch(sessionApi)
+    if (!response.ok) {
+        throw new Error(response.statusText)
+    }
+    session = await response.json()
+    return session!
 }
 
 class LinkedListItem<T> {

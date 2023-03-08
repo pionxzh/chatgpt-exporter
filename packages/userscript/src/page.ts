@@ -1,3 +1,4 @@
+import { unsafeWindow } from 'vite-plugin-monkey/dist/client'
 import { getBase64FromImageUrl } from './utils/dom'
 
 declare global {
@@ -5,7 +6,14 @@ declare global {
         __NEXT_DATA__?: {
             props: {
                 pageProps: {
-                    accessToken: string
+                    // This seems to be removed on 2023/03/08
+                    accessToken?: string
+                    features: string[]
+                    geoOk: boolean
+                    isUserInCanPayGroup: boolean
+                    shouldDisableHistory: boolean
+                    shouldShowPaidAnnouncement: boolean
+                    showcasePlusUpdate: boolean
                     user: {
                         email: string
                         id: string
@@ -19,14 +27,12 @@ declare global {
     }
 }
 
-export function getAccessToken(): string {
-    const accessToken = window?.__NEXT_DATA__?.props?.pageProps?.accessToken
-    if (!accessToken) throw new Error('No access token found.')
-    return accessToken
+export function getPageAccessToken(): string | null {
+    return unsafeWindow?.__NEXT_DATA__?.props?.pageProps?.accessToken ?? null
 }
 
 function getUserProfile() {
-    const user = window.__NEXT_DATA__?.props.pageProps.user
+    const user = unsafeWindow?.__NEXT_DATA__?.props?.pageProps?.user
     if (!user) throw new Error('No user found.')
     return user
 }
