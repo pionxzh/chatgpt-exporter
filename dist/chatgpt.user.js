@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.0.0
+// @version            2.1.0
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -14,6 +14,7 @@
 // @match              https://chat.openai.com/chat/*
 // @grant              GM_getValue
 // @grant              GM_setValue
+// @grant              unsafeWindow
 // @run-at             document-end
 // ==/UserScript==
 
@@ -32,6 +33,15 @@ p > img[src*="https://images.unsplash.com/"] {
 
 .select-all {
     user-select: all!important;
+}
+
+.menu-item {
+    height: 46px;
+}
+
+.menu-item[disabled] {
+    pointer-events: none;
+    filter: brightness(0.5);
 }
 
 .inputFieldSet {
@@ -84,7 +94,11 @@ p > img[src*="https://images.unsplash.com/"] {
     height: 100%;
 }
 
-#exporter-menu:hover::after {
+#exporter-menu[disabled] {
+    cursor: not-allowed;
+}
+
+#exporter-menu:not([disabled]):hover::after {
     content: '';
     position: absolute;
     top: 1.2rem;
@@ -98,13 +112,13 @@ p > img[src*="https://images.unsplash.com/"] {
 }
 
 @supports not selector(:has(.test:hover)) {
-    #exporter-menu:hover .dropdown-menu {
+    #exporter-menu:not([disabled]):hover .dropdown-menu {
         display: flex;
     }
 }
 
 @supports selector(:has(.test:hover)) {
-    #exporter-menu:not(:has(.dropdown-backdrop:hover)):hover .dropdown-menu {
+    #exporter-menu:not([disabled]):not(:has(.dropdown-backdrop:hover)):hover .dropdown-menu {
         display: flex;
     }
 }
@@ -123,11 +137,11 @@ p > img[src*="https://images.unsplash.com/"] {
     }
 
     @supports selector(:has(.test:hover)) {
-        #exporter-menu:not(:has(.dropdown-backdrop:hover)):hover .dropdown-backdrop {
+        #exporter-menu:not([disabled]):not(:has(.dropdown-backdrop:hover)):hover .dropdown-backdrop {
             display: block;
         }
 
-        #exporter-menu:has(.dropdown-backdrop:hover):hover .dropdown-backdrop {
+        #exporter-menu:not([disabled]):has(.dropdown-backdrop:hover):hover .dropdown-backdrop {
             display: block;
             pointer-events: none;
             opacity: 0;
@@ -3382,6 +3396,12 @@ var __publicField = (obj, key, value) => {
   function notNullOrUndefined(v2) {
     return v2 !== void 0 && v2 !== null;
   }
+  var monkeyWindow = window;
+  var unsafeWindow = /* @__PURE__ */ (() => {
+    return monkeyWindow.unsafeWindow;
+  })();
+  var GM_setValue = /* @__PURE__ */ (() => monkeyWindow.GM_setValue)();
+  var GM_getValue = /* @__PURE__ */ (() => monkeyWindow.GM_getValue)();
   function getBase64FromImg(el) {
     const canvas = document.createElement("canvas");
     canvas.width = el.naturalWidth;
@@ -3405,16 +3425,17 @@ var __publicField = (obj, key, value) => {
       img.onerror = reject;
     });
   }
-  function getAccessToken() {
+  function getPageAccessToken() {
     var _a, _b, _c;
-    const accessToken = (_c = (_b = (_a = window == null ? void 0 : window.__NEXT_DATA__) == null ? void 0 : _a.props) == null ? void 0 : _b.pageProps) == null ? void 0 : _c.accessToken;
-    if (!accessToken)
-      throw new Error("No access token found.");
-    return accessToken;
+    return ((_c = (_b = (_a = unsafeWindow == null ? void 0 : unsafeWindow.__NEXT_DATA__) == null ? void 0 : _a.props) == null ? void 0 : _b.pageProps) == null ? void 0 : _c.accessToken) ?? null;
+  }
+  function getHistoryDisabled() {
+    var _a, _b, _c;
+    return ((_c = (_b = (_a = unsafeWindow == null ? void 0 : unsafeWindow.__NEXT_DATA__) == null ? void 0 : _a.props) == null ? void 0 : _b.pageProps) == null ? void 0 : _c.shouldDisableHistory) ?? false;
   }
   function getUserProfile() {
-    var _a;
-    const user = (_a = window.__NEXT_DATA__) == null ? void 0 : _a.props.pageProps.user;
+    var _a, _b, _c;
+    const user = (_c = (_b = (_a = unsafeWindow == null ? void 0 : unsafeWindow.__NEXT_DATA__) == null ? void 0 : _a.props) == null ? void 0 : _b.pageProps) == null ? void 0 : _c.user;
     if (!user)
       throw new Error("No user found.");
     return user;
@@ -3440,6 +3461,7 @@ var __publicField = (obj, key, value) => {
   }
   const baseUrl = "https://chat.openai.com";
   const apiUrl = `${baseUrl}/backend-api`;
+  const sessionApi = _default(baseUrl, "/api/auth/session");
   const conversationApi = (id) => _default(apiUrl, "/conversation/:id", {
     id
   });
@@ -3471,7 +3493,7 @@ var __publicField = (obj, key, value) => {
     return fetchApi(url);
   }
   async function fetchApi(url) {
-    const accessToken = getAccessToken();
+    const accessToken = await getAccessToken();
     const response = await fetch(url, {
       headers: {
         Authorization: `Bearer ${accessToken}`
@@ -3481,6 +3503,24 @@ var __publicField = (obj, key, value) => {
       throw new Error(response.statusText);
     }
     return response.json();
+  }
+  async function getAccessToken() {
+    const _accessToken = getPageAccessToken();
+    if (_accessToken)
+      return _accessToken;
+    const session2 = await fetchSession();
+    return session2.accessToken;
+  }
+  let session = null;
+  async function fetchSession() {
+    if (session)
+      return session;
+    const response = await fetch(sessionApi);
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+    session = await response.json();
+    return session;
   }
   class LinkedListItem {
     constructor(value2) {
@@ -23460,9 +23500,6 @@ ${message}`;
     downloadFile(fileName, "text/html", standardizeLineBreaks(html2));
     return true;
   }
-  var monkeyWindow = window;
-  var GM_setValue = /* @__PURE__ */ (() => monkeyWindow.GM_setValue)();
-  var GM_getValue = /* @__PURE__ */ (() => monkeyWindow.GM_getValue)();
   function useGMStorage(key2, initialValue) {
     const [storedValue, setStoredValue] = p$1(() => {
       if (typeof window === "undefined") {
@@ -23600,26 +23637,30 @@ ${message}`;
   const MenuItem = ({
     text: text2,
     successText,
+    disabled = false,
     icon: Icon,
     onClick
   }) => {
     const [loading, setLoading] = p$1(false);
     const [succeed, setSucceed] = p$1(false);
     const handleClick = typeof onClick === "function" ? async () => {
-      setLoading(true);
-      const result = await onClick();
-      setLoading(false);
-      if (result) {
-        setSucceed(true);
-        setTimeout(() => setSucceed(false), TIMEOUT);
+      try {
+        setLoading(true);
+        const result = await onClick();
+        if (result) {
+          setSucceed(true);
+          setTimeout(() => setSucceed(false), TIMEOUT);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
       }
     } : void 0;
     return o("div", {
-      className: "flex py-3 px-3 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm mb-2 flex-shrink-0 border border-white/20",
-      style: {
-        height: 46
-      },
+      className: "menu-item flex py-3 px-3 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm mb-2 flex-shrink-0 border border-white/20",
       onClick: handleClick,
+      disabled,
       children: loading ? o("div", {
         className: "flex justify-center items-center w-full h-full",
         children: o(IconLoading, {})
@@ -23754,6 +23795,9 @@ ${message}`;
     });
   };
   function Menu() {
+    const disabled = getHistoryDisabled();
+    const menuText = disabled ? "Exporter unavailable" : "Export";
+    const menuTitle = disabled ? "Exporter is relying on the History API.\nBut History feature is disabled by OpenAI temporarily.\nWe all have to wait for them to bring it back." : "";
     const [format2, setFormat] = useGMStorage(KEY, defaultFormat);
     const onClickText = T$2(() => exportToText(), []);
     const onClickPng = T$2(() => exportToPng(format2), [format2]);
@@ -23762,9 +23806,12 @@ ${message}`;
     return o("div", {
       id: "exporter-menu",
       className: "pt-1 relative",
+      disabled,
+      title: menuTitle,
       children: [o(MenuItem, {
-        text: "Export",
-        icon: IconArrowRightFromBracket
+        text: menuText,
+        icon: IconArrowRightFromBracket,
+        disabled
       }), o(Dropdown, {
         children: [o(SettingDialog, {
           format: format2,
