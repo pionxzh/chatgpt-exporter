@@ -17,12 +17,19 @@ export const MenuItem: FC<MenuItemProps> = ({ text, successText, icon: Icon, onC
 
     const handleClick = typeof onClick === 'function'
         ? async () => {
-            setLoading(true)
-            const result = await onClick()
-            setLoading(false)
-            if (result) {
-                setSucceed(true)
-                setTimeout(() => setSucceed(false), TIMEOUT)
+            try {
+                setLoading(true)
+                const result = await onClick()
+                if (result) {
+                    setSucceed(true)
+                    setTimeout(() => setSucceed(false), TIMEOUT)
+                }
+            }
+            catch (error) {
+                console.error(error)
+            }
+            finally {
+                setLoading(false)
             }
         }
         : undefined
