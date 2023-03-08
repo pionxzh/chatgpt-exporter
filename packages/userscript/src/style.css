@@ -15,6 +15,15 @@ p > img[src*="https://images.unsplash.com/"] {
     user-select: all!important;
 }
 
+.menu-item {
+    height: 46px;
+}
+
+.menu-item[disabled] {
+    pointer-events: none;
+    filter: brightness(0.5);
+}
+
 .inputFieldSet {
     display: block;
     border-width: 2px;
@@ -65,7 +74,11 @@ p > img[src*="https://images.unsplash.com/"] {
     height: 100%;
 }
 
-#exporter-menu:hover::after {
+#exporter-menu[disabled] {
+    cursor: not-allowed;
+}
+
+#exporter-menu:not([disabled]):hover::after {
     content: '';
     position: absolute;
     top: 1.2rem;
@@ -79,13 +92,13 @@ p > img[src*="https://images.unsplash.com/"] {
 }
 
 @supports not selector(:has(.test:hover)) {
-    #exporter-menu:hover .dropdown-menu {
+    #exporter-menu:not([disabled]):hover .dropdown-menu {
         display: flex;
     }
 }
 
 @supports selector(:has(.test:hover)) {
-    #exporter-menu:not(:has(.dropdown-backdrop:hover)):hover .dropdown-menu {
+    #exporter-menu:not([disabled]):not(:has(.dropdown-backdrop:hover)):hover .dropdown-menu {
         display: flex;
     }
 }
@@ -104,11 +117,11 @@ p > img[src*="https://images.unsplash.com/"] {
     }
 
     @supports selector(:has(.test:hover)) {
-        #exporter-menu:not(:has(.dropdown-backdrop:hover)):hover .dropdown-backdrop {
+        #exporter-menu:not([disabled]):not(:has(.dropdown-backdrop:hover)):hover .dropdown-backdrop {
             display: block;
         }
 
-        #exporter-menu:has(.dropdown-backdrop:hover):hover .dropdown-backdrop {
+        #exporter-menu:not([disabled]):has(.dropdown-backdrop:hover):hover .dropdown-backdrop {
             display: block;
             pointer-events: none;
             opacity: 0;

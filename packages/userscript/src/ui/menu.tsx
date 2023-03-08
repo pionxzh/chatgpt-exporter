@@ -11,6 +11,7 @@ import { exportToHtml } from '../exporter/html'
 import { useGMStorage } from '../useGMStorage'
 import { dateStr, timestamp } from '../utils/utils'
 import { getFileNameWithFormat } from '../utils/download'
+import { getHistoryDisabled } from '../page'
 import { MenuItem } from './MenuItem'
 import { Divider } from './Divider'
 import { FileCode, IconArrowRightFromBracket, IconCamera, IconCopy, IconMarkdown, IconSetting } from './icons'
@@ -77,6 +78,10 @@ const SettingDialog: FC<{ format: string; setFormat: (value: string) => void }> 
 }
 
 export function Menu() {
+    const disabled = getHistoryDisabled()
+    const menuText = disabled ? 'Exporter unavailable' : 'Export'
+    const menuTitle = disabled ? 'Exporter is relying on the History API.\nBut History feature is disabled by OpenAI temporarily.\nWe all have to wait for them to bring it back.' : ''
+
     const [format, setFormat] = useGMStorage(KEY, defaultFormat)
 
     const onClickText = useCallback(() => exportToText(), [])
@@ -85,10 +90,11 @@ export function Menu() {
     const onClickHtml = useCallback(() => exportToHtml(format), [format])
 
     return (
-        <div id="exporter-menu" className="pt-1 relative">
+        <div id="exporter-menu" className="pt-1 relative" disabled={disabled} title={menuTitle}>
             <MenuItem
-                text="Export"
+                text={menuText}
                 icon={IconArrowRightFromBracket}
+                disabled={disabled}
             />
             <Dropdown>
                 <SettingDialog format={format} setFormat={setFormat}>

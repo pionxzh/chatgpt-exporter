@@ -31,6 +31,10 @@ export function getPageAccessToken(): string | null {
     return unsafeWindow?.__NEXT_DATA__?.props?.pageProps?.accessToken ?? null
 }
 
+export function getHistoryDisabled(): boolean {
+    return unsafeWindow?.__NEXT_DATA__?.props?.pageProps?.shouldDisableHistory ?? false
+}
+
 function getUserProfile() {
     const user = unsafeWindow?.__NEXT_DATA__?.props?.pageProps?.user
     if (!user) throw new Error('No user found.')
