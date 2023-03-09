@@ -28,6 +28,18 @@ export async function exportToPng(fileNameFormat: string) {
     // hide bottom bar
     thread.children[thread.children.length - 1].classList.add('hidden')
 
+    const avatarEls = Array.from(document.querySelectorAll('img[alt]:not([aria-hidden])'))
+    // disabled the avatar srcset
+    // fix https://github.com/pionxzh/chatgpt-exporter/issues/53
+    // seems related to https://github.com/niklasvh/html2canvas/issues/2218
+    avatarEls.forEach((el) => {
+        const srcset = el.getAttribute('srcset')
+        if (srcset) {
+            el.setAttribute('data-srcset', srcset)
+            el.removeAttribute('srcset')
+        }
+    })
+
     await sleep(100)
 
     const canvas = await html2canvas(thread, {
@@ -44,6 +56,15 @@ export async function exportToPng(fileNameFormat: string) {
     Array.from(thread.children).forEach((el) => {
         if (el.classList.contains('hidden')) {
             el.classList.remove('hidden')
+        }
+    })
+
+    // restore the avatar srcset
+    avatarEls.forEach((el) => {
+        const srcset = el.getAttribute('data-srcset')
+        if (srcset) {
+            el.setAttribute('srcset', srcset)
+            el.removeAttribute('data-srcset')
         }
     })
 
