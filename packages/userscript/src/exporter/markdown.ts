@@ -12,7 +12,7 @@ export async function exportToMarkdown(fileNameFormat: string) {
     }
 
     // const { id, title, createTime, conversations } = await getConversations()
-    const { conversations } = await getConversations()
+    const { title, conversations } = await getConversations()
 
     // const date = dateStr()
     // const source = `${baseUrl}/chat/${id}`
@@ -38,7 +38,7 @@ export async function exportToMarkdown(fileNameFormat: string) {
     // const markdown = `${frontMatter}\n\n${content}`
     const markdown = content
 
-    const fileName = getFileNameWithFormat(fileNameFormat, 'md')
+    const fileName = getFileNameWithFormat(fileNameFormat, 'md', { title })
     downloadFile(fileName, 'text/markdown', standardizeLineBreaks(markdown))
 
     return true

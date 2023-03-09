@@ -73,7 +73,7 @@ export async function exportToHtml(fileNameFormat: string) {
         .replaceAll('{{avatar}}', userAvatar)
         .replaceAll('{{content}}', conversationHtml)
 
-    const fileName = getFileNameWithFormat(fileNameFormat, 'html')
+    const fileName = getFileNameWithFormat(fileNameFormat, 'html', { title })
     downloadFile(fileName, 'text/html', standardizeLineBreaks(html))
 
     return true
