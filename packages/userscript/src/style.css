@@ -57,7 +57,7 @@ p > img[src*="https://images.unsplash.com/"] {
     position: absolute;
     flex-direction: column;
     left: calc(100% + 1rem);
-    top: -4.2rem;
+    top: -3.85rem;
     width: 220px;
     padding: .75rem .4rem 0 .4rem;
     border-radius: .375rem;

@@ -23,8 +23,8 @@
 }
 
 .dark .DialogContent {
-    background-color: rgba(32,33,35,1);
-    border-color: rgba(64,65,79,1);
+    background-color: #2a2a2a;
+    border-color: #40414f;
     border-width: 1px;
 }
 
