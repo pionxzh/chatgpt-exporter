@@ -1,13 +1,6 @@
-import type { Options as FmOptions } from 'mdast-util-from-markdown'
 import { fromMarkdown as fm } from 'mdast-util-from-markdown'
-import type { Options as TmOptions } from 'mdast-util-to-markdown'
 import { toMarkdown as tm } from 'mdast-util-to-markdown'
 import type { Content, Parent, Root } from 'mdast'
-import {
-    frontmatterFromMarkdown,
-    frontmatterToMarkdown,
-} from 'mdast-util-frontmatter'
-import { frontmatter } from 'micromark-extension-frontmatter'
 import { gfm } from 'micromark-extension-gfm'
 import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm'
 import { toHast } from 'mdast-util-to-hast'
@@ -16,18 +9,14 @@ import type { Node } from 'unist'
 
 // ref: https://github.com/rxliuli/mdbook/blob/master/libs/markdown-util
 
-export function fromMarkdown(content: string, options?: FmOptions): Root {
+export function fromMarkdown(content: string): Root {
     return fm(content, {
-        ...options,
-        extensions: [frontmatter(['yaml']), gfm()].concat(options?.extensions ?? []),
-        mdastExtensions: [
-            frontmatterFromMarkdown(['yaml']),
-            gfmFromMarkdown(),
-        ].concat(options?.mdastExtensions ?? []),
+        extensions: [gfm()],
+        mdastExtensions: [gfmFromMarkdown()],
     })
 }
 
-export function toMarkdown(ast: Content | Root, options?: TmOptions): string {
+export function toMarkdown(ast: Content | Root): string {
     return tm(ast, {
         bullet: '-',
         bulletOther: '*',
@@ -41,8 +30,7 @@ export function toMarkdown(ast: Content | Root, options?: TmOptions): string {
         ruleRepetition: 3,
         ruleSpaces: false,
         strong: '*',
-        ...options,
-        extensions: [frontmatterToMarkdown(['yaml']), gfmToMarkdown()].concat(options?.extensions ?? []),
+        extensions: [gfmToMarkdown()],
     })
 }
 

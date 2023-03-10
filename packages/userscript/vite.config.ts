@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite'
-import monkey from 'vite-plugin-monkey'
+import monkey, { cdn } from 'vite-plugin-monkey'
 import preact from '@preact/preset-vite'
 import packageJson from './package.json'
 
@@ -37,6 +37,9 @@ export default defineConfig({
             build: {
                 fileName: 'chatgpt.user.js',
                 minifyCss: false,
+                externalGlobals: [
+                    ['html2canvas', cdn.jsdelivr('html2canvas', 'dist/html2canvas.min.js')],
+                ],
             },
             server: {
                 open: true,
