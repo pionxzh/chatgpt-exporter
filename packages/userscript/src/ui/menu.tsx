@@ -1,7 +1,6 @@
 import type { JSXInternal } from 'preact/src/jsx'
 import { useCallback } from 'preact/hooks'
 import * as Dialog from '@radix-ui/react-dialog'
-import { Cross2Icon } from '@radix-ui/react-icons'
 import sanitize from 'sanitize-filename'
 import type { FC } from '../type'
 import { exportToText } from '../exporter/text'
@@ -14,7 +13,7 @@ import { getFileNameWithFormat } from '../utils/download'
 import { getHistoryDisabled } from '../page'
 import { MenuItem } from './MenuItem'
 import { Divider } from './Divider'
-import { FileCode, IconArrowRightFromBracket, IconCamera, IconCopy, IconMarkdown, IconSetting } from './icons'
+import { FileCode, IconArrowRightFromBracket, IconCamera, IconCopy, IconCross, IconMarkdown, IconSetting } from './icons'
 import { Dropdown } from './Dropdown'
 import { useTitle } from './useTitle'
 
@@ -68,7 +67,7 @@ const SettingDialog: FC<{ format: string; setFormat: (value: string) => void }> 
                     </div>
                     <Dialog.Close asChild>
                         <button className="IconButton" aria-label="Close">
-                            <Cross2Icon />
+                            <IconCross />
                         </button>
                     </Dialog.Close>
                 </Dialog.Content>

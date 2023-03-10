@@ -38,7 +38,6 @@ importers:
       '@preact/preset-vite': ^2.5.0
       '@radix-ui/colors': ^0.1.8
       '@radix-ui/react-dialog': ^1.0.2
-      '@radix-ui/react-icons': ^1.2.0
       '@types/mdast': ^3.0.10
       '@types/unist': ^2.0.6
       hast-util-to-html: ^8.0.4
@@ -60,7 +59,6 @@ importers:
     dependencies:
       '@radix-ui/colors': 0.1.8
       '@radix-ui/react-dialog': 1.0.2_biqbaboplfbrettd7655fr4n2y
-      '@radix-ui/react-icons': 1.2.0_react@18.2.0
       hast-util-to-html: 8.0.4
       html2canvas: 1.4.1
       mdast: 3.0.0
@@ -1004,14 +1002,6 @@ packages:
       '@radix-ui/react-use-callback-ref': 1.0.0_react@18.2.0
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
-    dev: false
-
-  /@radix-ui/react-icons/1.2.0_react@18.2.0:
-    resolution: {integrity: sha512-NqrZxn+Ig6c6MypUt84/Nab9WBFXH75T1mhEhFjPlIYaNkp113pqlo6QdK5r7zb3b7RckDAPgUQACes0aKwcFA==}
-    peerDependencies:
-      react: ^16.x || ^17.x || ^18.x
-    dependencies:
-      react: 18.2.0
     dev: false
 
   /@radix-ui/react-id/1.0.0_react@18.2.0:

@@ -22,7 +22,6 @@
   "dependencies": {
     "@radix-ui/colors": "^0.1.8",
     "@radix-ui/react-dialog": "^1.0.2",
-    "@radix-ui/react-icons": "^1.2.0",
     "hast-util-to-html": "^8.0.4",
     "html2canvas": "^1.4.1",
     "mdast": "^3.0.0",
