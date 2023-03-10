@@ -56,7 +56,7 @@ importers:
       sentinel-js: ^0.0.5
       urlcat: ^2.0.4
       vite: ^4.1.1
-      vite-plugin-monkey: ^2.11.1
+      vite-plugin-monkey: ^2.12.1
     dependencies:
       '@radix-ui/colors': 0.1.8
       '@radix-ui/react-dialog': 1.0.2_biqbaboplfbrettd7655fr4n2y
@@ -75,7 +75,7 @@ importers:
       sanitize-filename: 1.6.3
       sentinel-js: 0.0.5_4xqsksf5w62wic46kncafprj3e
       urlcat: 2.0.4
-      vite-plugin-monkey: 2.11.1_vite@4.1.1
+      vite-plugin-monkey: 2.12.1_vite@4.1.1
     devDependencies:
       '@preact/preset-vite': 2.5.0_3ae3y4hh44lcmdpni6pev6zm6u
       '@types/mdast': 3.0.10
@@ -4272,8 +4272,8 @@ packages:
       mimic-fn: 4.0.0
     dev: true
 
-  /open/8.4.0:
-    resolution: {integrity: sha512-XgFPPM+B28FtCCgSb9I+s9szOC1vZRSwgWsRUA5ylIxRTgKozqjOCrVOqGsYABPYK5qnfqClxZTFBa8PKt2v6Q==}
+  /open/8.4.1:
+    resolution: {integrity: sha512-/4b7qZNhv6Uhd7jjnREh1NjnPxlTq+XNWPG88Ydkj5AILcA5m3ajvcg57pB24EQjKv0dK62XnDqk9c/hkIG5Kg==}
     engines: {node: '>=12'}
     dependencies:
       define-lazy-prop: 2.0.0
@@ -5443,8 +5443,8 @@ packages:
       vfile-message: 3.1.4
     dev: false
 
-  /vite-plugin-monkey/2.11.1_vite@4.1.1:
-    resolution: {integrity: sha512-sdtFhIkkJjKX4Bc5/sFbimRanaYH7fs932VLV6+FsbT+bNgsZ6TBszdaHauuTDLb3HOr37SP1mgkS/NpIwmXtg==}
+  /vite-plugin-monkey/2.12.1_vite@4.1.1:
+    resolution: {integrity: sha512-nIGyVI+bKCU5zrw7UqsN86ZVSvfHaUfJoPoEdeCmciuJXMV7p0A/ymb7N/8lWnSVnwP/yQ/gIDe5/kBONlczSQ==}
     engines: {node: ^14.18 || >= 16, pnpm: '>=6'}
     peerDependencies:
       vite: '>=3.0.0'
@@ -5453,7 +5453,7 @@ packages:
       detect-port: 1.5.1
       htmlparser2: 8.0.1
       mrmime: 1.0.1
-      open: 8.4.0
+      open: 8.4.1
       picocolors: 1.0.0
       vite: 4.1.1
     transitivePeerDependencies:

@@ -17,10 +17,9 @@ interface ApiSession {
 interface ConversationNode {
     children: string[]
     id: string
-    message: {
+    message?: {
         author: {
             role: 'system' | 'assistant' | 'user'
-            name: string | null
             metadata: unknown
         }
         content: {
@@ -31,11 +30,11 @@ interface ConversationNode {
         end_turn: boolean
         id: string
         metadata: unknown
-        recipient: string
+        recipient: 'all' & (string & {})
         update_time: string | null
         weight: number
-    } | null
-    parent: string | null
+    }
+    parent?: string
 }
 
 interface ApiConversation {
@@ -146,7 +145,7 @@ export async function getConversations(): Promise<ConversationResult> {
 
     const result: ConversationNode[] = []
     const nodes = Object.values(conversation.mapping)
-    const root = nodes.find(node => node.parent === null)
+    const root = nodes.find(node => !node.parent)
     if (!root) throw new Error('No root node found.')
 
     const conversationChoices = getConversationChoice()
