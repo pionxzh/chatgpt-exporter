@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.1.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.1.0...userscript-v2.1.2) (2023-03-10)
+
+
+### Bug Fixes
+
+* fix wrong dimensions of user pfp in screenshot export ([ad679cd](https://github.com/pionxzh/chatgpt-exporter/commit/ad679cd107bead80c865eca74efe232673aa200e)), closes [#53](https://github.com/pionxzh/chatgpt-exporter/issues/53)
+* improve layout and style ([0c801cb](https://github.com/pionxzh/chatgpt-exporter/commit/0c801cbf26563dfcf858039ea42f3c8065d8ba65))
+* reduce bundle size by externalizing and dropping modules ([c59faab](https://github.com/pionxzh/chatgpt-exporter/commit/c59faab9a7c9f5e8bdcc4d5d3c75eb1b2ba03680))
+* update API interface (follow what OpenAI updated) ([922cb36](https://github.com/pionxzh/chatgpt-exporter/commit/922cb36018473665f96a073e3e577bb61dc48e1a))
+* use title from API in markdown and html export ([1f6f4d7](https://github.com/pionxzh/chatgpt-exporter/commit/1f6f4d7219aa9ec599e3ebc94a6af250112e5293))
+
 ## [2.1.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.0.0...userscript-v2.1.0) (2023-03-08)
 
 
