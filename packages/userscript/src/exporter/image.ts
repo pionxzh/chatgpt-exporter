@@ -20,7 +20,7 @@ export async function exportToPng(fileNameFormat: string) {
     // hide model bar
     Array.from(thread.children).forEach((el) => {
         const text = el.textContent
-        if (text === 'Model: Default' || text === 'Model: Legacy') {
+        if (text === 'Model: Default' || text === 'Model: Legacy' || text === 'Model: GPT-4') {
             el.classList.add('hidden')
         }
     })
