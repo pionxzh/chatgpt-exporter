@@ -1,9 +1,9 @@
 import type { Emphasis, Strong } from 'mdast'
 import { copyToClipboard } from '../utils/clipboard'
 import { standardizeLineBreaks } from '../utils/text'
-import { getConversations } from '../api'
+import { fetchConversation, getCurrentChatId, processConversation } from '../api'
 import { flatMap, fromMarkdown, toMarkdown } from '../utils/markdown'
-import { checkIfConversationStarted } from '../page'
+import { checkIfConversationStarted, getConversationChoice } from '../page'
 
 export async function exportToText() {
     if (!checkIfConversationStarted()) {
@@ -11,8 +11,11 @@ export async function exportToText() {
         return false
     }
 
-    const { conversations } = await getConversations()
-    const text = conversations.map((item) => {
+    const chatId = await getCurrentChatId()
+    const rawConversation = await fetchConversation(chatId)
+    const conversationChoices = getConversationChoice()
+    const { conversationNodes } = processConversation(rawConversation, conversationChoices)
+    const text = conversationNodes.map((item) => {
         const author = item.message?.author.role === 'assistant' ? 'ChatGPT' : 'You'
         const content = item.message?.content.parts.join('\n') ?? ''
         let message = content

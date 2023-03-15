@@ -15,6 +15,19 @@ p > img[src*="https://images.unsplash.com/"] {
     user-select: all!important;
 }
 
+.Select {
+    padding: 0 0 0 0.5rem;
+    width: 7.5rem;
+    border-radius: 4px;
+    box-shadow: 0 0 0 1px #6f6e77;
+}
+
+.dark .Select {
+    background-color: #2f2f2f;
+    color: #fff;
+    box-shadow: 0 0 0 1px #6f6e77;
+}
+
 .menu-item {
     height: 46px;
 }
@@ -39,6 +52,14 @@ p > img[src*="https://images.unsplash.com/"] {
     box-shadow: none!important;
 }
 
+.row-half {
+    grid-column: auto / span 1;
+}
+
+.row-full {
+    grid-column: auto / span 2;
+}
+
 .dropdown-backdrop {
     display: none;
     position: fixed;
@@ -55,10 +76,11 @@ p > img[src*="https://images.unsplash.com/"] {
 .dropdown-menu {
     display: none;
     position: absolute;
-    flex-direction: column;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 4px;
     left: calc(100% + 1rem);
     top: -3.85rem;
-    width: 220px;
+    width: 260px;
     padding: .75rem .4rem 0 .4rem;
     border-radius: .375rem;
     box-shadow: 0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px -1px rgba(0,0,0,.1);
@@ -93,13 +115,13 @@ p > img[src*="https://images.unsplash.com/"] {
 
 @supports not selector(:has(.test:hover)) {
     #exporter-menu:not([disabled]):hover .dropdown-menu {
-        display: flex;
+        display: grid;
     }
 }
 
 @supports selector(:has(.test:hover)) {
     #exporter-menu:not([disabled]):not(:has(.dropdown-backdrop:hover)):hover .dropdown-menu {
-        display: flex;
+        display: grid;
     }
 }
 

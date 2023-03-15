@@ -1,8 +1,8 @@
 import sanitize from 'sanitize-filename'
 import { dateStr, timestamp } from './utils'
 
-export function downloadFile(filename: string, type: string, content: string) {
-    const blob = new Blob([content], { type })
+export function downloadFile(filename: string, type: string, content: string | Blob) {
+    const blob = content instanceof Blob ? content : new Blob([content], { type })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url

@@ -25,7 +25,7 @@ export function useGMStorage(key: string, initialValue: string): [string, (value
             }
             catch (error) {
                 // If error also return initialValue
-                console.log(error)
+                console.error(error)
                 return initialValue
             }
         }
@@ -48,7 +48,7 @@ export function useGMStorage(key: string, initialValue: string): [string, (value
                 }
             }
             catch (error) {
-                console.log(error)
+                console.error(error)
             }
         }
     }

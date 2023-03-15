@@ -1,10 +1,11 @@
+import JSZip from 'jszip'
 import templateHtml from '../template.html?raw'
 import { downloadFile, getFileNameWithFormat } from '../utils/download'
 import { dateStr, getColorScheme } from '../utils/utils'
 import { standardizeLineBreaks } from '../utils/text'
-import { baseUrl, getConversations } from '../api'
+import { type ConversationResult, baseUrl, fetchConversation, getCurrentChatId, processConversation } from '../api'
 import { fromMarkdown, toHtml } from '../utils/markdown'
-import { checkIfConversationStarted, getUserAvatar } from '../page'
+import { checkIfConversationStarted, getConversationChoice, getUserAvatar } from '../page'
 
 export async function exportToHtml(fileNameFormat: string) {
     if (!checkIfConversationStarted()) {
@@ -12,11 +13,47 @@ export async function exportToHtml(fileNameFormat: string) {
         return false
     }
 
-    const { id, title, conversations } = await getConversations()
+    const userAvatar = await getUserAvatar()
+
+    const chatId = await getCurrentChatId()
+    const rawConversation = await fetchConversation(chatId)
+    const conversationChoices = getConversationChoice()
+    const conversation = processConversation(rawConversation, conversationChoices)
+    const html = conversationToHtml(conversation, userAvatar)
+
+    const fileName = getFileNameWithFormat(fileNameFormat, 'html', { title: conversation.title })
+    downloadFile(fileName, 'text/html', standardizeLineBreaks(html))
+
+    return true
+}
+
+export async function exportAllToHtml(fileNameFormat: string, conversationIds: string[]) {
+    const conversations = await Promise.all(
+        conversationIds.map(async (id) => {
+            const rawConversation = await fetchConversation(id)
+            return processConversation(rawConversation)
+        }),
+    )
 
     const userAvatar = await getUserAvatar()
 
-    const conversationHtml = conversations.map((item) => {
+    const zip = new JSZip()
+    conversations.forEach((conversation) => {
+        const fileName = getFileNameWithFormat(fileNameFormat, 'html', { title: conversation.title })
+        const content = conversationToHtml(conversation, userAvatar)
+        zip.file(fileName, content)
+    })
+
+    const blob = await zip.generateAsync({ type: 'blob' })
+    downloadFile('chatgpt-export.zip', 'application/zip', blob)
+
+    return true
+}
+
+function conversationToHtml(conversation: ConversationResult, avatar: string) {
+    const { id, title, conversationNodes } = conversation
+
+    const conversationHtml = conversationNodes.map((item) => {
         const author = item.message?.author.role === 'assistant' ? 'ChatGPT' : 'You'
         const avatarEl = author === 'ChatGPT'
             ? '<svg width="41" height="41"><use xlink:href="#chatgpt" /></svg>'
@@ -70,11 +107,7 @@ export async function exportToHtml(fileNameFormat: string) {
         .replaceAll('{{source}}', source)
         .replaceAll('{{lang}}', lang)
         .replaceAll('{{theme}}', theme)
-        .replaceAll('{{avatar}}', userAvatar)
+        .replaceAll('{{avatar}}', avatar)
         .replaceAll('{{content}}', conversationHtml)
-
-    const fileName = getFileNameWithFormat(fileNameFormat, 'html', { title })
-    downloadFile(fileName, 'text/html', standardizeLineBreaks(html))
-
-    return true
+    return html
 }

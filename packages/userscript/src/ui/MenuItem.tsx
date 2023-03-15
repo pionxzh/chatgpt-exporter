@@ -9,10 +9,11 @@ export interface MenuItemProps {
     icon?: FC
     successText?: string
     disabled?: boolean
+    className?: string
     onClick?: (() => boolean) | (() => Promise<boolean>)
 }
 
-export const MenuItem: FC<MenuItemProps> = ({ text, successText, disabled = false, icon: Icon, onClick }) => {
+export const MenuItem: FC<MenuItemProps> = ({ text, successText, disabled = false, icon: Icon, onClick, className }) => {
     const [loading, setLoading] = useState(false)
     const [succeed, setSucceed] = useState(false)
 
@@ -37,7 +38,7 @@ export const MenuItem: FC<MenuItemProps> = ({ text, successText, disabled = fals
 
     return (
         <div
-            className="menu-item flex py-3 px-3 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm mb-2 flex-shrink-0 border border-white/20"
+            className={`menu-item flex py-3 px-3 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm mb-2 flex-shrink-0 border border-white/20 ${className}`}
             onClick={handleClick}
             disabled={disabled}
         >

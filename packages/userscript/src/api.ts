@@ -1,5 +1,5 @@
 import urlcat from 'urlcat'
-import { getConversationChoice, getPageAccessToken } from './page'
+import { getPageAccessToken } from './page'
 
 interface ApiSession {
     accessToken: string
@@ -37,7 +37,7 @@ interface ConversationNode {
     parent?: string
 }
 
-interface ApiConversation {
+export interface ApiConversation {
     create_time: number
     current_node: string
     mapping: {
@@ -47,12 +47,18 @@ interface ApiConversation {
     title: string
 }
 
-interface ApiConversations {
-    items: {
-        id: string
-        title: string
-        create_time: number
-    }[]
+export type ApiConversationWithId = ApiConversation & {
+    id: string
+}
+
+export interface ApiConversationItem {
+    id: string
+    title: string
+    create_time: number
+}
+
+export interface ApiConversations {
+    items: ApiConversationItem[]
     limit: number
     offset: number
     total: number
@@ -65,7 +71,7 @@ const sessionApi = urlcat(baseUrl, '/api/auth/session')
 const conversationApi = (id: string) => urlcat(apiUrl, '/conversation/:id', { id })
 const conversationsApi = (offset: number, limit: number) => urlcat(apiUrl, '/conversations', { offset, limit })
 
-async function getCurrentChatId(): Promise<string> {
+export async function getCurrentChatId(): Promise<string> {
     const match = location.pathname.match(/^\/chat\/([a-z0-9-]+)$/i)
     if (match) return match[1]
 
@@ -77,8 +83,7 @@ async function getCurrentChatId(): Promise<string> {
     throw new Error('No chat id found.')
 }
 
-export async function fetchConversation(): Promise<ApiConversation & { id: string }> {
-    const chatId = await getCurrentChatId()
+export async function fetchConversation(chatId: string): Promise<ApiConversationWithId> {
     const url = conversationApi(chatId)
     const conversation = await fetchApi<ApiConversation>(url)
     return {
@@ -87,9 +92,22 @@ export async function fetchConversation(): Promise<ApiConversation & { id: strin
     }
 }
 
-async function fetchConversations(offset = 0, limit = 20): Promise<ApiConversations> {
+export async function fetchConversations(offset = 0, limit = 20): Promise<ApiConversations> {
     const url = conversationsApi(offset, limit)
     return fetchApi(url)
+}
+
+export async function fetchAllConversations(): Promise<ApiConversationItem[]> {
+    const conversations: ApiConversationItem[] = []
+    let offset = 0
+    const limit = 20
+    while (true) {
+        const result = await fetchConversations(offset, limit)
+        conversations.push(...result.items)
+        if (result.items.length < limit) break
+        offset += limit
+    }
+    return conversations
 }
 
 async function fetchApi<T>(url: string): Promise<T> {
@@ -130,16 +148,14 @@ class LinkedListItem<T> {
     }
 }
 
-interface ConversationResult {
+export interface ConversationResult {
     id: string
     title: string
     createTime: number
-    conversations: ConversationNode[]
+    conversationNodes: ConversationNode[]
 }
 
-export async function getConversations(): Promise<ConversationResult> {
-    const conversation = await fetchConversation()
-
+export function processConversation(conversation: ApiConversationWithId, conversationChoices: (number | null)[] = []): ConversationResult {
     const title = conversation.title || 'ChatGPT Conversation'
     const createTime = conversation.create_time
 
@@ -148,9 +164,7 @@ export async function getConversations(): Promise<ConversationResult> {
     const root = nodes.find(node => !node.parent)
     if (!root) throw new Error('No root node found.')
 
-    const conversationChoices = getConversationChoice()
     const nodeMap = new Map(Object.entries(conversation.mapping))
-
     const tail = new LinkedListItem(root)
     const queue = [tail]
     let index = -1
@@ -168,7 +182,7 @@ export async function getConversations(): Promise<ConversationResult> {
 
         const _last = node.children.length - 1
         const choice = conversationChoices[index++] ?? _last
-        const childId = node.children[choice]
+        const childId = node.children[choice] ?? node.children[_last]
         if (!childId) throw new Error('No child node found.')
 
         const child = nodeMap.get(childId)
@@ -183,6 +197,6 @@ export async function getConversations(): Promise<ConversationResult> {
         id: conversation.id,
         title,
         createTime,
-        conversations: result,
+        conversationNodes: result,
     }
 }
