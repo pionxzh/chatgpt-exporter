@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.1.2
+// @version            2.2.0
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -12,6 +12,7 @@
 // @icon               https://chat.openai.com/favicon.ico
 // @match              https://chat.openai.com/chat
 // @match              https://chat.openai.com/chat/*
+// @require            https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js
 // @require            https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js
 // @grant              GM_getValue
 // @grant              GM_setValue
@@ -19,7 +20,50 @@
 // @run-at             document-end
 // ==/UserScript==
 
-(e=>{const n=document.createElement("style");n.dataset.source="vite-plugin-monkey",n.innerText=e,document.head.appendChild(n)})(` img[src*="https://source.unsplash.com/"] {
+(e=>{const n=document.createElement("style");n.dataset.source="vite-plugin-monkey",n.innerText=e,document.head.appendChild(n)})(` .CheckBoxLabel {
+    position: relative;
+    display: flex;
+    font-size: 16px;
+    vertical-align: middle;
+}
+
+.CheckBoxLabel * {
+    cursor: pointer;
+}
+
+.CheckBoxLabel input {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.CheckBoxLabel .IconWrapper {
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    vertical-align: middle;
+    font-size: 1.5rem;
+}
+
+.CheckBoxLabel .Checked {
+    color: rgb(118 194 255);
+}
+
+.dark .CheckBoxLabel .Checked {
+    color: rgb(144, 202, 249);
+}
+
+.CheckBoxLabel .LabelText {
+    margin-left: 0.5rem;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+img[src*="https://source.unsplash.com/"] {
     visibility: hidden;
 }
 
@@ -34,6 +78,19 @@ p > img[src*="https://images.unsplash.com/"] {
 
 .select-all {
     user-select: all!important;
+}
+
+.Select {
+    padding: 0 0 0 0.5rem;
+    width: 7.5rem;
+    border-radius: 4px;
+    box-shadow: 0 0 0 1px #6f6e77;
+}
+
+.dark .Select {
+    background-color: #2f2f2f;
+    color: #fff;
+    box-shadow: 0 0 0 1px #6f6e77;
 }
 
 .menu-item {
@@ -60,6 +117,14 @@ p > img[src*="https://images.unsplash.com/"] {
     box-shadow: none!important;
 }
 
+.row-half {
+    grid-column: auto / span 1;
+}
+
+.row-full {
+    grid-column: auto / span 2;
+}
+
 .dropdown-backdrop {
     display: none;
     position: fixed;
@@ -76,10 +141,11 @@ p > img[src*="https://images.unsplash.com/"] {
 .dropdown-menu {
     display: none;
     position: absolute;
-    flex-direction: column;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 4px;
     left: calc(100% + 1rem);
     top: -3.85rem;
-    width: 220px;
+    width: 260px;
     padding: .75rem .4rem 0 .4rem;
     border-radius: .375rem;
     box-shadow: 0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px -1px rgba(0,0,0,.1);
@@ -114,13 +180,13 @@ p > img[src*="https://images.unsplash.com/"] {
 
 @supports not selector(:has(.test:hover)) {
     #exporter-menu:not([disabled]):hover .dropdown-menu {
-        display: flex;
+        display: grid;
     }
 }
 
 @supports selector(:has(.test:hover)) {
     #exporter-menu:not([disabled]):not(:has(.dropdown-backdrop:hover)):hover .dropdown-menu {
-        display: flex;
+        display: grid;
     }
 }
 
@@ -249,6 +315,12 @@ p > img[src*="https://images.unsplash.com/"] {
     border-width: 1px;
 }
 
+.DialogContent input[type="checkbox"] {
+    border: none;
+    outline: none;
+    box-shadow: none;
+}
+
 .DialogTitle {
     margin: 0 0 16px 0;
     font-weight: 500;
@@ -278,6 +350,15 @@ p > img[src*="https://images.unsplash.com/"] {
 .Button.green:hover {
     background-color: #ccebd7;
 }
+.Button:disabled {
+    opacity: 0.5;
+    color: #6f6e77;
+    background-color: #e0e0e0;
+    cursor: not-allowed;
+}
+.Button:disabled:hover {
+    background-color: #e0e0e0;
+}
 
 .IconButton {
     font-family: inherit;
@@ -306,7 +387,7 @@ p > img[src*="https://images.unsplash.com/"] {
 .Label {
     font-size: 15px;
     color: #1a1523;
-    width: 90px;
+    min-width: 90px;
     text-align: right;
 }
 
@@ -348,6 +429,40 @@ p > img[src*="https://images.unsplash.com/"] {
     color: #bcbcbc;
 }
 
+.SelectToolbar {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: 4px 4px 0 0;
+    border: 1px solid #6f6e77;
+    border-bottom: none;
+}
+
+.SelectList {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    padding: 12px 16px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border: 1px solid #6f6e77;
+    border-radius: 0 0 4px 4px;
+    white-space: nowrap;
+}
+
+.SelectItem {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.SelectItem label, .SelectItem input {
+    cursor: pointer;
+}
+
+.SelectItem span {
+    vertical-align: middle;
+}
+
 @keyframes contentShow {
     from {
         opacity: 0;
@@ -366,7 +481,7 @@ var __publicField = (obj, key, value) => {
   __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
 };
-(function(html2canvas2) {
+(function(html2canvas2, JSZip) {
   "use strict";
   var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
   var sentinel_umdExports = {};
@@ -3159,56 +3274,6 @@ var __publicField = (obj, key, value) => {
   const $5d3850c4d0b4e6c7$export$7c6e2c02157bb7d2 = $5d3850c4d0b4e6c7$export$b6d9565de1e068cf;
   const $5d3850c4d0b4e6c7$export$f99233281efd08a0 = $5d3850c4d0b4e6c7$export$16f7638e4a34b909;
   const $5d3850c4d0b4e6c7$export$f39c2d165cd861fe = $5d3850c4d0b4e6c7$export$fba2fb7cd781b7ac;
-  function _objectWithoutPropertiesLoose(source, excluded) {
-    if (source == null)
-      return {};
-    var target = {};
-    var sourceKeys = Object.keys(source);
-    var key2, i2;
-    for (i2 = 0; i2 < sourceKeys.length; i2++) {
-      key2 = sourceKeys[i2];
-      if (excluded.indexOf(key2) >= 0)
-        continue;
-      target[key2] = source[key2];
-    }
-    return target;
-  }
-  var _excluded$1r = ["color"];
-  var Cross2Icon = /* @__PURE__ */ k(function(_ref, forwardedRef) {
-    var _ref$color = _ref.color, color2 = _ref$color === void 0 ? "currentColor" : _ref$color, props = _objectWithoutPropertiesLoose(_ref, _excluded$1r);
-    return y$1("svg", Object.assign({
-      width: "15",
-      height: "15",
-      viewBox: "0 0 15 15",
-      fill: "none",
-      xmlns: "http://www.w3.org/2000/svg"
-    }, props, {
-      ref: forwardedRef
-    }), y$1("path", {
-      d: "M11.7816 4.03157C12.0062 3.80702 12.0062 3.44295 11.7816 3.2184C11.5571 2.99385 11.193 2.99385 10.9685 3.2184L7.50005 6.68682L4.03164 3.2184C3.80708 2.99385 3.44301 2.99385 3.21846 3.2184C2.99391 3.44295 2.99391 3.80702 3.21846 4.03157L6.68688 7.49999L3.21846 10.9684C2.99391 11.193 2.99391 11.557 3.21846 11.7816C3.44301 12.0061 3.80708 12.0061 4.03164 11.7816L7.50005 8.31316L10.9685 11.7816C11.193 12.0061 11.5571 12.0061 11.7816 11.7816C12.0062 11.557 12.0062 11.193 11.7816 10.9684L8.31322 7.49999L11.7816 4.03157Z",
-      fill: color2,
-      fillRule: "evenodd",
-      clipRule: "evenodd"
-    }));
-  });
-  var _excluded$2l = ["color"];
-  var GearIcon = /* @__PURE__ */ k(function(_ref, forwardedRef) {
-    var _ref$color = _ref.color, color2 = _ref$color === void 0 ? "currentColor" : _ref$color, props = _objectWithoutPropertiesLoose(_ref, _excluded$2l);
-    return y$1("svg", Object.assign({
-      width: "15",
-      height: "15",
-      viewBox: "0 0 15 15",
-      fill: "none",
-      xmlns: "http://www.w3.org/2000/svg"
-    }, props, {
-      ref: forwardedRef
-    }), y$1("path", {
-      d: "M7.07095 0.650238C6.67391 0.650238 6.32977 0.925096 6.24198 1.31231L6.0039 2.36247C5.6249 2.47269 5.26335 2.62363 4.92436 2.81013L4.01335 2.23585C3.67748 2.02413 3.23978 2.07312 2.95903 2.35386L2.35294 2.95996C2.0722 3.2407 2.0232 3.6784 2.23493 4.01427L2.80942 4.92561C2.62307 5.2645 2.47227 5.62594 2.36216 6.00481L1.31209 6.24287C0.924883 6.33065 0.650024 6.6748 0.650024 7.07183V7.92897C0.650024 8.32601 0.924883 8.67015 1.31209 8.75794L2.36228 8.99603C2.47246 9.375 2.62335 9.73652 2.80979 10.0755L2.2354 10.9867C2.02367 11.3225 2.07267 11.7602 2.35341 12.041L2.95951 12.6471C3.24025 12.9278 3.67795 12.9768 4.01382 12.7651L4.92506 12.1907C5.26384 12.377 5.62516 12.5278 6.0039 12.6379L6.24198 13.6881C6.32977 14.0753 6.67391 14.3502 7.07095 14.3502H7.92809C8.32512 14.3502 8.66927 14.0753 8.75705 13.6881L8.99505 12.6383C9.37411 12.5282 9.73573 12.3773 10.0748 12.1909L10.986 12.7653C11.3218 12.977 11.7595 12.928 12.0403 12.6473L12.6464 12.0412C12.9271 11.7604 12.9761 11.3227 12.7644 10.9869L12.1902 10.076C12.3768 9.73688 12.5278 9.37515 12.638 8.99596L13.6879 8.75794C14.0751 8.67015 14.35 8.32601 14.35 7.92897V7.07183C14.35 6.6748 14.0751 6.33065 13.6879 6.24287L12.6381 6.00488C12.528 5.62578 12.3771 5.26414 12.1906 4.92507L12.7648 4.01407C12.9766 3.6782 12.9276 3.2405 12.6468 2.95975L12.0407 2.35366C11.76 2.07292 11.3223 2.02392 10.9864 2.23565L10.0755 2.80989C9.73622 2.62328 9.37437 2.47229 8.99505 2.36209L8.75705 1.31231C8.66927 0.925096 8.32512 0.650238 7.92809 0.650238H7.07095ZM4.92053 3.81251C5.44724 3.44339 6.05665 3.18424 6.71543 3.06839L7.07095 1.50024H7.92809L8.28355 3.06816C8.94267 3.18387 9.5524 3.44302 10.0794 3.81224L11.4397 2.9547L12.0458 3.56079L11.1882 4.92117C11.5573 5.44798 11.8164 6.0575 11.9321 6.71638L13.5 7.07183V7.92897L11.932 8.28444C11.8162 8.94342 11.557 9.55301 11.1878 10.0798L12.0453 11.4402L11.4392 12.0462L10.0787 11.1886C9.55192 11.5576 8.94241 11.8166 8.28355 11.9323L7.92809 13.5002H7.07095L6.71543 11.932C6.0569 11.8162 5.44772 11.5572 4.92116 11.1883L3.56055 12.046L2.95445 11.4399L3.81213 10.0794C3.4431 9.55266 3.18403 8.94326 3.06825 8.2845L1.50002 7.92897V7.07183L3.06818 6.71632C3.18388 6.05765 3.44283 5.44833 3.81171 4.92165L2.95398 3.561L3.56008 2.95491L4.92053 3.81251ZM9.02496 7.50008C9.02496 8.34226 8.34223 9.02499 7.50005 9.02499C6.65786 9.02499 5.97513 8.34226 5.97513 7.50008C5.97513 6.65789 6.65786 5.97516 7.50005 5.97516C8.34223 5.97516 9.02496 6.65789 9.02496 7.50008ZM9.92496 7.50008C9.92496 8.83932 8.83929 9.92499 7.50005 9.92499C6.1608 9.92499 5.07513 8.83932 5.07513 7.50008C5.07513 6.16084 6.1608 5.07516 7.50005 5.07516C8.83929 5.07516 9.92496 6.16084 9.92496 7.50008Z",
-      fill: color2,
-      fillRule: "evenodd",
-      clipRule: "evenodd"
-    }));
-  });
   function isHighSurrogate$1(codePoint) {
     return codePoint >= 55296 && codePoint <= 56319;
   }
@@ -3450,11 +3515,23 @@ var __publicField = (obj, key, value) => {
   }
   const defaultAvatar = "data:image/svg+xml,%3csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20version=%271.1%27%20width=%2730%27%20height=%2730%27/%3e";
   async function getUserAvatar() {
-    const {
-      picture
-    } = getUserProfile();
-    if (picture)
-      return getBase64FromImageUrl(picture);
+    try {
+      const {
+        picture
+      } = getUserProfile();
+      if (picture)
+        return await getBase64FromImageUrl(picture);
+    } catch (e2) {
+      console.error(e2);
+    }
+    try {
+      const avatars = Array.from(document.querySelectorAll("img[alt]:not([aria-hidden])"));
+      const avatar = avatars.find((avatar2) => !avatar2.src.startsWith("data:"));
+      if (avatar)
+        return getBase64FromImg(avatar);
+    } catch (e2) {
+      console.error(e2);
+    }
     return defaultAvatar;
   }
   function checkIfConversationStarted() {
@@ -3480,8 +3557,7 @@ var __publicField = (obj, key, value) => {
     }
     throw new Error("No chat id found.");
   }
-  async function fetchConversation() {
-    const chatId = await getCurrentChatId();
+  async function fetchConversation(chatId) {
     const url = conversationApi(chatId);
     const conversation = await fetchApi(url);
     return {
@@ -3492,6 +3568,19 @@ var __publicField = (obj, key, value) => {
   async function fetchConversations(offset = 0, limit = 20) {
     const url = conversationsApi(offset, limit);
     return fetchApi(url);
+  }
+  async function fetchAllConversations() {
+    const conversations = [];
+    let offset = 0;
+    const limit = 20;
+    while (true) {
+      const result = await fetchConversations(offset, limit);
+      conversations.push(...result.items);
+      if (result.items.length < limit)
+        break;
+      offset += limit;
+    }
+    return conversations;
   }
   async function fetchApi(url) {
     const accessToken = await getAccessToken();
@@ -3530,9 +3619,8 @@ var __publicField = (obj, key, value) => {
       this.value = value;
     }
   }
-  async function getConversations() {
+  function processConversation(conversation, conversationChoices = []) {
     var _a;
-    const conversation = await fetchConversation();
     const title = conversation.title || "ChatGPT Conversation";
     const createTime = conversation.create_time;
     const result = [];
@@ -3540,7 +3628,6 @@ var __publicField = (obj, key, value) => {
     const root2 = nodes.find((node2) => !node2.parent);
     if (!root2)
       throw new Error("No root node found.");
-    const conversationChoices = getConversationChoice();
     const nodeMap = new Map(Object.entries(conversation.mapping));
     const tail = new LinkedListItem(root2);
     const queue = [tail];
@@ -3558,7 +3645,7 @@ var __publicField = (obj, key, value) => {
         continue;
       const _last = node2.children.length - 1;
       const choice = conversationChoices[index2++] ?? _last;
-      const childId = node2.children[choice];
+      const childId = node2.children[choice] ?? node2.children[_last];
       if (!childId)
         throw new Error("No child node found.");
       const child = nodeMap.get(childId);
@@ -3572,7 +3659,7 @@ var __publicField = (obj, key, value) => {
       id: conversation.id,
       title,
       createTime,
-      conversations: result
+      conversationNodes: result
     };
   }
   function toString(value, options2) {
@@ -14656,10 +14743,13 @@ var __publicField = (obj, key, value) => {
       alert("Please start a conversation first.");
       return false;
     }
+    const chatId = await getCurrentChatId();
+    const rawConversation = await fetchConversation(chatId);
+    const conversationChoices = getConversationChoice();
     const {
-      conversations
-    } = await getConversations();
-    const text2 = conversations.map((item) => {
+      conversationNodes
+    } = processConversation(rawConversation, conversationChoices);
+    const text2 = conversationNodes.map((item) => {
       var _a, _b;
       const author = ((_a = item.message) == null ? void 0 : _a.author.role) === "assistant" ? "ChatGPT" : "You";
       const content2 = ((_b = item.message) == null ? void 0 : _b.content.parts.join("\n")) ?? "";
@@ -14706,7 +14796,7 @@ ${message}`;
     return document.documentElement.style.getPropertyValue("color-scheme");
   }
   function downloadFile(filename, type, content2) {
-    const blob = new Blob([content2], {
+    const blob = content2 instanceof Blob ? content2 : new Blob([content2], {
       type
     });
     const url = URL.createObjectURL(blob);
@@ -14745,7 +14835,7 @@ ${message}`;
       return false;
     Array.from(thread.children).forEach((el) => {
       const text2 = el.textContent;
-      if (text2 === "Model: Default" || text2 === "Model: Legacy") {
+      if (text2 === "Model: Default" || text2 === "Model: Legacy" || text2 === "Model: GPT-4") {
         el.classList.add("hidden");
       }
     });
@@ -14791,11 +14881,41 @@ ${message}`;
       alert("Please start a conversation first.");
       return false;
     }
+    const chatId = await getCurrentChatId();
+    const rawConversation = await fetchConversation(chatId);
+    const conversationChoices = getConversationChoice();
+    const conversation = processConversation(rawConversation, conversationChoices);
+    const markdown = conversationToMarkdown(conversation);
+    const fileName = getFileNameWithFormat(fileNameFormat, "md", {
+      title: conversation.title
+    });
+    downloadFile(fileName, "text/markdown", standardizeLineBreaks(markdown));
+    return true;
+  }
+  async function exportAllToMarkdown(fileNameFormat, conversationIds) {
+    const conversations = await Promise.all(conversationIds.map(async (id) => {
+      const rawConversation = await fetchConversation(id);
+      return processConversation(rawConversation);
+    }));
+    const zip = new JSZip();
+    conversations.forEach((conversation) => {
+      const fileName = getFileNameWithFormat(fileNameFormat, "md", {
+        title: conversation.title
+      });
+      const content2 = conversationToMarkdown(conversation);
+      zip.file(fileName, content2);
+    });
+    const blob = await zip.generateAsync({
+      type: "blob"
+    });
+    downloadFile("chatgpt-export.zip", "application/zip", blob);
+    return true;
+  }
+  function conversationToMarkdown(conversation) {
     const {
-      title,
-      conversations
-    } = await getConversations();
-    const content2 = conversations.map((item) => {
+      conversationNodes
+    } = conversation;
+    const content2 = conversationNodes.map((item) => {
       var _a, _b;
       const author = ((_a = item.message) == null ? void 0 : _a.author.role) === "assistant" ? "ChatGPT" : "You";
       const content22 = ((_b = item.message) == null ? void 0 : _b.content.parts.join("\n")) ?? "";
@@ -14808,11 +14928,7 @@ ${message}`;
 ${message}`;
     }).join("\n\n");
     const markdown = content2;
-    const fileName = getFileNameWithFormat(fileNameFormat, "md", {
-      title
-    });
-    downloadFile(fileName, "text/markdown", standardizeLineBreaks(markdown));
-    return true;
+    return markdown;
   }
   const templateHtml = `<!DOCTYPE html>
 <html lang="{{lang}}" data-theme="{{theme}}">
@@ -15289,13 +15405,45 @@ ${message}`;
       alert("Please start a conversation first.");
       return false;
     }
+    const userAvatar = await getUserAvatar();
+    const chatId = await getCurrentChatId();
+    const rawConversation = await fetchConversation(chatId);
+    const conversationChoices = getConversationChoice();
+    const conversation = processConversation(rawConversation, conversationChoices);
+    const html2 = conversationToHtml(conversation, userAvatar);
+    const fileName = getFileNameWithFormat(fileNameFormat, "html", {
+      title: conversation.title
+    });
+    downloadFile(fileName, "text/html", standardizeLineBreaks(html2));
+    return true;
+  }
+  async function exportAllToHtml(fileNameFormat, conversationIds) {
+    const conversations = await Promise.all(conversationIds.map(async (id) => {
+      const rawConversation = await fetchConversation(id);
+      return processConversation(rawConversation);
+    }));
+    const userAvatar = await getUserAvatar();
+    const zip = new JSZip();
+    conversations.forEach((conversation) => {
+      const fileName = getFileNameWithFormat(fileNameFormat, "html", {
+        title: conversation.title
+      });
+      const content2 = conversationToHtml(conversation, userAvatar);
+      zip.file(fileName, content2);
+    });
+    const blob = await zip.generateAsync({
+      type: "blob"
+    });
+    downloadFile("chatgpt-export.zip", "application/zip", blob);
+    return true;
+  }
+  function conversationToHtml(conversation, avatar) {
     const {
       id,
       title,
-      conversations
-    } = await getConversations();
-    const userAvatar = await getUserAvatar();
-    const conversationHtml = conversations.map((item) => {
+      conversationNodes
+    } = conversation;
+    const conversationHtml = conversationNodes.map((item) => {
       var _a, _b, _c;
       const author = ((_a = item.message) == null ? void 0 : _a.author.role) === "assistant" ? "ChatGPT" : "You";
       const avatarEl = author === "ChatGPT" ? '<svg width="41" height="41"><use xlink:href="#chatgpt" /></svg>' : `<img alt="${author}" />`;
@@ -15335,12 +15483,53 @@ ${message}`;
     const source = `${baseUrl}/chat/${id}`;
     const lang = document.documentElement.lang ?? "en";
     const theme = getColorScheme();
-    const html2 = templateHtml.replaceAll("{{title}}", title).replaceAll("{{date}}", date).replaceAll("{{time}}", time).replaceAll("{{source}}", source).replaceAll("{{lang}}", lang).replaceAll("{{theme}}", theme).replaceAll("{{avatar}}", userAvatar).replaceAll("{{content}}", conversationHtml);
-    const fileName = getFileNameWithFormat(fileNameFormat, "html", {
-      title
+    const html2 = templateHtml.replaceAll("{{title}}", title).replaceAll("{{date}}", date).replaceAll("{{time}}", time).replaceAll("{{source}}", source).replaceAll("{{lang}}", lang).replaceAll("{{theme}}", theme).replaceAll("{{avatar}}", avatar).replaceAll("{{content}}", conversationHtml);
+    return html2;
+  }
+  async function exportToJson(fileNameFormat) {
+    if (!checkIfConversationStarted()) {
+      alert("Please start a conversation first.");
+      return false;
+    }
+    const chatId = await getCurrentChatId();
+    const rawConversation = await fetchConversation(chatId);
+    const conversationChoices = getConversationChoice();
+    const conversation = processConversation(rawConversation, conversationChoices);
+    const fileName = getFileNameWithFormat(fileNameFormat, "json", {
+      title: conversation.title
     });
-    downloadFile(fileName, "text/html", standardizeLineBreaks(html2));
+    const content2 = conversationToJson(rawConversation);
+    downloadFile(fileName, "application/json", content2);
     return true;
+  }
+  async function exportAllToJson(fileNameFormat, conversationIds) {
+    const conversations = await Promise.all(conversationIds.map(async (id) => {
+      const rawConversation = await fetchConversation(id);
+      const conversation = processConversation(rawConversation);
+      return {
+        conversation,
+        rawConversation
+      };
+    }));
+    const zip = new JSZip();
+    conversations.forEach(({
+      conversation,
+      rawConversation
+    }) => {
+      const fileName = getFileNameWithFormat(fileNameFormat, "json", {
+        title: conversation.title
+      });
+      const content2 = conversationToJson(rawConversation);
+      zip.file(fileName, content2);
+    });
+    const blob = await zip.generateAsync({
+      type: "blob"
+    });
+    downloadFile("chatgpt-export.zip", "application/zip", blob);
+    return true;
+  }
+  function conversationToJson(conversation) {
+    return JSON.stringify(conversation);
   }
   function useGMStorage(key2, initialValue) {
     const [storedValue, setStoredValue] = p$1(() => {
@@ -15354,7 +15543,7 @@ ${message}`;
           const item = window.localStorage.getItem(key2);
           return item ?? initialValue;
         } catch (error2) {
-          console.log(error2);
+          console.error(error2);
           return initialValue;
         }
       }
@@ -15369,7 +15558,7 @@ ${message}`;
             window.localStorage.setItem(key2, JSON.stringify(value));
           }
         } catch (error2) {
-          console.log(error2);
+          console.error(error2);
         }
       }
     };
@@ -15386,6 +15575,21 @@ ${message}`;
         void 0 === a2[u2] && (a2[u2] = s2[u2]);
     return l$1.vnode && l$1.vnode(i2), i2;
   }
+  const Divider = () => o("div", {
+    className: "border-b border-white/20"
+  });
+  const Dropdown = ({
+    children
+  }) => {
+    return o(_$2, {
+      children: [o("div", {
+        className: "dropdown-backdrop"
+      }), o("div", {
+        className: "dropdown-menu bg-gray-900",
+        children
+      })]
+    });
+  };
   function FileCode() {
     return o("svg", {
       xmlns: "http://www.w3.org/2000/svg",
@@ -15442,11 +15646,90 @@ ${message}`;
     });
   }
   function IconSetting() {
-    return o(GearIcon, {
-      width: "1rem",
-      height: "1rem",
+    return o("svg", {
+      xmlns: "http://www.w3.org/2000/svg",
+      viewBox: "0 0 15 15",
+      className: "w-4 h-4",
       stroke: "currentColor",
-      "stroke-width": "0.5"
+      "stroke-width": "0.5",
+      children: o("path", {
+        d: "M7.07095 0.650238C6.67391 0.650238 6.32977 0.925096 6.24198 1.31231L6.0039 2.36247C5.6249 2.47269 5.26335 2.62363 4.92436 2.81013L4.01335 2.23585C3.67748 2.02413 3.23978 2.07312 2.95903 2.35386L2.35294 2.95996C2.0722 3.2407 2.0232 3.6784 2.23493 4.01427L2.80942 4.92561C2.62307 5.2645 2.47227 5.62594 2.36216 6.00481L1.31209 6.24287C0.924883 6.33065 0.650024 6.6748 0.650024 7.07183V7.92897C0.650024 8.32601 0.924883 8.67015 1.31209 8.75794L2.36228 8.99603C2.47246 9.375 2.62335 9.73652 2.80979 10.0755L2.2354 10.9867C2.02367 11.3225 2.07267 11.7602 2.35341 12.041L2.95951 12.6471C3.24025 12.9278 3.67795 12.9768 4.01382 12.7651L4.92506 12.1907C5.26384 12.377 5.62516 12.5278 6.0039 12.6379L6.24198 13.6881C6.32977 14.0753 6.67391 14.3502 7.07095 14.3502H7.92809C8.32512 14.3502 8.66927 14.0753 8.75705 13.6881L8.99505 12.6383C9.37411 12.5282 9.73573 12.3773 10.0748 12.1909L10.986 12.7653C11.3218 12.977 11.7595 12.928 12.0403 12.6473L12.6464 12.0412C12.9271 11.7604 12.9761 11.3227 12.7644 10.9869L12.1902 10.076C12.3768 9.73688 12.5278 9.37515 12.638 8.99596L13.6879 8.75794C14.0751 8.67015 14.35 8.32601 14.35 7.92897V7.07183C14.35 6.6748 14.0751 6.33065 13.6879 6.24287L12.6381 6.00488C12.528 5.62578 12.3771 5.26414 12.1906 4.92507L12.7648 4.01407C12.9766 3.6782 12.9276 3.2405 12.6468 2.95975L12.0407 2.35366C11.76 2.07292 11.3223 2.02392 10.9864 2.23565L10.0755 2.80989C9.73622 2.62328 9.37437 2.47229 8.99505 2.36209L8.75705 1.31231C8.66927 0.925096 8.32512 0.650238 7.92809 0.650238H7.07095ZM4.92053 3.81251C5.44724 3.44339 6.05665 3.18424 6.71543 3.06839L7.07095 1.50024H7.92809L8.28355 3.06816C8.94267 3.18387 9.5524 3.44302 10.0794 3.81224L11.4397 2.9547L12.0458 3.56079L11.1882 4.92117C11.5573 5.44798 11.8164 6.0575 11.9321 6.71638L13.5 7.07183V7.92897L11.932 8.28444C11.8162 8.94342 11.557 9.55301 11.1878 10.0798L12.0453 11.4402L11.4392 12.0462L10.0787 11.1886C9.55192 11.5576 8.94241 11.8166 8.28355 11.9323L7.92809 13.5002H7.07095L6.71543 11.932C6.0569 11.8162 5.44772 11.5572 4.92116 11.1883L3.56055 12.046L2.95445 11.4399L3.81213 10.0794C3.4431 9.55266 3.18403 8.94326 3.06825 8.2845L1.50002 7.92897V7.07183L3.06818 6.71632C3.18388 6.05765 3.44283 5.44833 3.81171 4.92165L2.95398 3.561L3.56008 2.95491L4.92053 3.81251ZM9.02496 7.50008C9.02496 8.34226 8.34223 9.02499 7.50005 9.02499C6.65786 9.02499 5.97513 8.34226 5.97513 7.50008C5.97513 6.65789 6.65786 5.97516 7.50005 5.97516C8.34223 5.97516 9.02496 6.65789 9.02496 7.50008ZM9.92496 7.50008C9.92496 8.83932 8.83929 9.92499 7.50005 9.92499C6.1608 9.92499 5.07513 8.83932 5.07513 7.50008C5.07513 6.16084 6.1608 5.07516 7.50005 5.07516C8.83929 5.07516 9.92496 6.16084 9.92496 7.50008Z",
+        fill: "currentColor",
+        fillRule: "evenodd",
+        clipRule: "evenodd"
+      })
+    });
+  }
+  function IconCross() {
+    return o("svg", {
+      xmlns: "http://www.w3.org/2000/svg",
+      viewBox: "0 0 15 15",
+      width: "15",
+      height: "15",
+      children: o("path", {
+        d: "M11.7816 4.03157C12.0062 3.80702 12.0062 3.44295 11.7816 3.2184C11.5571 2.99385 11.193 2.99385 10.9685 3.2184L7.50005 6.68682L4.03164 3.2184C3.80708 2.99385 3.44301 2.99385 3.21846 3.2184C2.99391 3.44295 2.99391 3.80702 3.21846 4.03157L6.68688 7.49999L3.21846 10.9684C2.99391 11.193 2.99391 11.557 3.21846 11.7816C3.44301 12.0061 3.80708 12.0061 4.03164 11.7816L7.50005 8.31316L10.9685 11.7816C11.193 12.0061 11.5571 12.0061 11.7816 11.7816C12.0062 11.557 12.0062 11.193 11.7816 10.9684L8.31322 7.49999L11.7816 4.03157Z",
+        fill: "currentColor",
+        fillRule: "evenodd",
+        clipRule: "evenodd"
+      })
+    });
+  }
+  function IconJSON() {
+    return o("svg", {
+      xmlns: "http://www.w3.org/2000/svg",
+      viewBox: "0 0 24 24",
+      className: "w-4 h-4",
+      "stroke-width": "2",
+      stroke: "currentColor",
+      fill: "none",
+      strokeLinecap: "round",
+      strokeLinejoin: "round",
+      children: [o("path", {
+        stroke: "none",
+        d: "M0 0h24v24H0z",
+        fill: "none"
+      }), o("path", {
+        d: "M20 16v-8l3 8v-8"
+      }), o("path", {
+        d: "M15 8a2 2 0 0 1 2 2v4a2 2 0 1 1 -4 0v-4a2 2 0 0 1 2 -2z"
+      }), o("path", {
+        d: "M1 8h3v6.5a1.5 1.5 0 0 1 -3 0v-.5"
+      }), o("path", {
+        d: "M7 15a1 1 0 0 0 1 1h1a1 1 0 0 0 1 -1v-2a1 1 0 0 0 -1 -1h-1a1 1 0 0 1 -1 -1v-2a1 1 0 0 1 1 -1h1a1 1 0 0 1 1 1"
+      })]
+    });
+  }
+  function IconZip() {
+    return o("svg", {
+      xmlns: "http://www.w3.org/2000/svg",
+      viewBox: "0 0 24 24",
+      className: "w-4 h-4",
+      "stroke-width": "2",
+      stroke: "currentColor",
+      fill: "none",
+      strokeLinecap: "round",
+      strokeLinejoin: "round",
+      children: [o("path", {
+        stroke: "none",
+        d: "M0 0h24v24H0z",
+        fill: "none"
+      }), o("path", {
+        d: "M6 20.735a2 2 0 0 1 -1 -1.735v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2h-1"
+      }), o("path", {
+        d: "M11 17a2 2 0 0 1 2 2v2a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-2a2 2 0 0 1 2 -2z"
+      }), o("path", {
+        d: "M11 5l-1 0"
+      }), o("path", {
+        d: "M13 7l-1 0"
+      }), o("path", {
+        d: "M11 9l-1 0"
+      }), o("path", {
+        d: "M13 11l-1 0"
+      }), o("path", {
+        d: "M11 13l-1 0"
+      }), o("path", {
+        d: "M13 15l-1 0"
+      })]
     });
   }
   function IconLoading() {
@@ -15475,13 +15758,39 @@ ${message}`;
       })
     });
   }
+  function IconCheckBox() {
+    return o("svg", {
+      xmlns: "http://www.w3.org/2000/svg",
+      viewBox: "0 0 24 24",
+      style: "width: 1em; height: 1em; display: inline-block",
+      fill: "currentColor",
+      children: o("path", {
+        d: "M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
+      })
+    });
+  }
+  function IconCheckBoxChecked({
+    className
+  }) {
+    return o("svg", {
+      xmlns: "http://www.w3.org/2000/svg",
+      viewBox: "0 0 24 24",
+      className,
+      style: "width: 1em; height: 1em; display: inline-block",
+      fill: "currentColor",
+      children: o("path", {
+        d: "M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+      })
+    });
+  }
   const TIMEOUT = 2500;
   const MenuItem = ({
     text: text2,
     successText,
     disabled = false,
     icon: Icon,
-    onClick
+    onClick,
+    className
   }) => {
     const [loading, setLoading] = p$1(false);
     const [succeed, setSucceed] = p$1(false);
@@ -15500,7 +15809,7 @@ ${message}`;
       }
     } : void 0;
     return o("div", {
-      className: "menu-item flex py-3 px-3 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm mb-2 flex-shrink-0 border border-white/20",
+      className: `menu-item flex py-3 px-3 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm mb-2 flex-shrink-0 border border-white/20 ${className}`,
       onClick: handleClick,
       disabled,
       children: loading ? o("div", {
@@ -15509,21 +15818,6 @@ ${message}`;
       }) : o(_$2, {
         children: [Icon && o(Icon, {}), succeed && successText ? successText : text2]
       })
-    });
-  };
-  const Divider = () => o("div", {
-    className: "border-b border-white/20"
-  });
-  const Dropdown = ({
-    children
-  }) => {
-    return o(_$2, {
-      children: [o("div", {
-        className: "dropdown-backdrop"
-      }), o("div", {
-        className: "dropdown-menu bg-gray-900",
-        children
-      })]
     });
   };
   function useTitle() {
@@ -15546,6 +15840,32 @@ ${message}`;
   function getSnapshot() {
     return document.title;
   }
+  const CheckBox$1 = "";
+  const CheckBox = ({
+    checked,
+    label,
+    onCheckedChange
+  }) => {
+    const onChange = (e2) => {
+      onCheckedChange(e2.currentTarget.checked);
+    };
+    return o("label", {
+      className: "CheckBoxLabel",
+      children: [o("span", {
+        className: "IconWrapper",
+        children: [o("input", {
+          type: "checkbox",
+          checked,
+          onChange
+        }), checked ? o(IconCheckBoxChecked, {
+          className: "Checked"
+        }) : o(IconCheckBox, {})]
+      }), o("span", {
+        className: "LabelText",
+        children: label
+      })]
+    });
+  };
   const style = "";
   const dialog = "";
   const KEY = "exporter-format";
@@ -15629,7 +15949,111 @@ ${message}`;
             children: o("button", {
               className: "IconButton",
               "aria-label": "Close",
-              children: o(Cross2Icon, {})
+              children: o(IconCross, {})
+            })
+          })]
+        })]
+      })]
+    });
+  };
+  const exportAllOptions = [{
+    label: "Markdown",
+    callback: exportAllToMarkdown
+  }, {
+    label: "JSON",
+    callback: exportAllToJson
+  }, {
+    label: "HTML",
+    callback: exportAllToHtml
+  }];
+  const ExportDialog = ({
+    format,
+    children
+  }) => {
+    const [conversations, setConversations] = p$1([]);
+    const [loading, setLoading] = p$1(false);
+    const [error, setError] = p$1("");
+    const [selected, setSelected] = p$1([]);
+    const [exportType, setExportType] = p$1(exportAllOptions[0].label);
+    const disabled = loading || !!error || selected.length === 0;
+    const exportAll = T$1(() => {
+      var _a;
+      if (disabled)
+        return;
+      const callback = (_a = exportAllOptions.find((o2) => o2.label === exportType)) == null ? void 0 : _a.callback;
+      if (callback)
+        callback(format, selected);
+    }, [disabled, exportType, format, selected]);
+    h(() => {
+      setLoading(true);
+      fetchAllConversations().then(setConversations).catch(setError).finally(() => setLoading(false));
+    }, []);
+    return o($5d3850c4d0b4e6c7$export$be92b6f5f03c0fe9, {
+      children: [o($5d3850c4d0b4e6c7$export$41fb9f06171c75f4, {
+        asChild: true,
+        children
+      }), o($5d3850c4d0b4e6c7$export$602eac185826482c, {
+        children: [o($5d3850c4d0b4e6c7$export$c6fdb837b070b4ff, {
+          className: "DialogOverlay"
+        }), o($5d3850c4d0b4e6c7$export$7c6e2c02157bb7d2, {
+          className: "DialogContent",
+          children: [o($5d3850c4d0b4e6c7$export$f99233281efd08a0, {
+            className: "DialogTitle",
+            children: "Export Conversations"
+          }), o("div", {
+            className: "SelectToolbar",
+            children: o(CheckBox, {
+              label: "Select All",
+              checked: selected.length === conversations.length,
+              onCheckedChange: (checked) => {
+                setSelected(checked ? conversations.map((c2) => c2.id) : []);
+              }
+            })
+          }), o("ul", {
+            className: "SelectList",
+            children: [loading && o("li", {
+              className: "SelectItem",
+              children: "Loading..."
+            }), error && o("li", {
+              className: "SelectItem",
+              children: ["Error: ", error]
+            }), conversations.map((c2) => o("li", {
+              className: "SelectItem",
+              children: o(CheckBox, {
+                label: c2.title,
+                checked: selected.includes(c2.id),
+                onCheckedChange: (checked) => {
+                  setSelected(checked ? [...selected, c2.id] : selected.filter((id) => id !== c2.id));
+                }
+              })
+            }, c2.id))]
+          }), o("div", {
+            className: "flex mt-6",
+            style: {
+              justifyContent: "space-between"
+            },
+            children: [o("select", {
+              className: "Select",
+              value: exportType,
+              onChange: (e2) => setExportType(e2.currentTarget.value),
+              children: exportAllOptions.map(({
+                label
+              }) => o("option", {
+                value: label,
+                children: label
+              }, label))
+            }), o("button", {
+              className: "Button green",
+              disabled,
+              onClick: exportAll,
+              children: "Export"
+            })]
+          }), o($5d3850c4d0b4e6c7$export$f39c2d165cd861fe, {
+            asChild: true,
+            children: o("button", {
+              className: "IconButton",
+              "aria-label": "Close",
+              children: o(IconCross, {})
             })
           })]
         })]
@@ -15645,6 +16069,7 @@ ${message}`;
     const onClickPng = T$1(() => exportToPng(format), [format]);
     const onClickMarkdown = T$1(() => exportToMarkdown(format), [format]);
     const onClickHtml = T$1(() => exportToHtml(format), [format]);
+    const onClickJSON = T$1(() => exportToJson(format), [format]);
     return o("div", {
       id: "exporter-menu",
       className: "pt-1 relative",
@@ -15659,6 +16084,7 @@ ${message}`;
           format,
           setFormat,
           children: o("div", {
+            className: "row-full",
             children: o(MenuItem, {
               text: "Setting",
               icon: IconSetting
@@ -15668,19 +16094,38 @@ ${message}`;
           text: "Copy Text",
           successText: "Copied!",
           icon: IconCopy,
+          className: "row-full",
           onClick: onClickText
         }), o(MenuItem, {
           text: "Screenshot",
           icon: IconCamera,
+          className: "row-half",
           onClick: onClickPng
         }), o(MenuItem, {
           text: "Markdown",
           icon: IconMarkdown,
+          className: "row-half",
           onClick: onClickMarkdown
         }), o(MenuItem, {
-          text: "WebPage (HTML)",
+          text: "HTML",
           icon: FileCode,
+          className: "row-half",
           onClick: onClickHtml
+        }), o(MenuItem, {
+          text: "JSON",
+          icon: IconJSON,
+          className: "row-half",
+          onClick: onClickJSON
+        }), o(ExportDialog, {
+          format,
+          children: o("div", {
+            className: "row-full",
+            children: o(MenuItem, {
+              text: "Export All",
+              icon: IconZip,
+              className: "row-full"
+            })
+          })
         })]
       }), o(Divider, {})]
     });
@@ -15721,4 +16166,4 @@ ${message}`;
       });
     });
   }
-})(html2canvas);
+})(html2canvas, jszip);
