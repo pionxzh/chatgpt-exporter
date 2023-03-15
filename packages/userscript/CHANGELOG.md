@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.2.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.1.2...userscript-v2.2.0) (2023-03-15)
+
+
+### Features
+
+* support JSON export and export All ([ce0d895](https://github.com/pionxzh/chatgpt-exporter/commit/ce0d895bacb269f00f757dbab7a165123ba6a239))
+
+
+### Bug Fixes
+
+* error handling for avatar fetching ([d8af0ec](https://github.com/pionxzh/chatgpt-exporter/commit/d8af0ecbba3ee6666d5a000853e0779c69bab135)), closes [#73](https://github.com/pionxzh/chatgpt-exporter/issues/73)
+* hide GPT-4 model text ([796899e](https://github.com/pionxzh/chatgpt-exporter/commit/796899e0a811044bbbb65031246b26210aed506f))
+
 ## [2.1.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.1.0...userscript-v2.1.2) (2023-03-10)
 
 
