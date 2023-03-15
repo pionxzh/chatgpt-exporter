@@ -1,5 +1,5 @@
 import { unsafeWindow } from 'vite-plugin-monkey/dist/client'
-import { getBase64FromImageUrl } from './utils/dom'
+import { getBase64FromImageUrl, getBase64FromImg } from './utils/dom'
 
 declare global {
     interface Window {
@@ -55,13 +55,23 @@ export function getConversationChoice() {
 
 const defaultAvatar = 'data:image/svg+xml,%3csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20version=%271.1%27%20width=%2730%27%20height=%2730%27/%3e'
 export async function getUserAvatar(): Promise<string> {
-    // const avatars = Array.from(document.querySelectorAll<HTMLImageElement>('img[alt]:not([aria-hidden])'))
-    // // starts with data: means it's not (lazy)loaded yet
-    // const avatar = avatars.find(avatar => !avatar.src.startsWith('data:'))
-    // if (avatar) return getBase64FromImg(avatar)
+    try {
+        const { picture } = getUserProfile()
+        if (picture) return await getBase64FromImageUrl(picture)
+    }
+    catch (e) {
+        console.error(e)
+    }
 
-    const { picture } = getUserProfile()
-    if (picture) return getBase64FromImageUrl(picture)
+    try {
+        const avatars = Array.from(document.querySelectorAll<HTMLImageElement>('img[alt]:not([aria-hidden])'))
+        // starts with data: means it's not (lazy)loaded yet
+        const avatar = avatars.find(avatar => !avatar.src.startsWith('data:'))
+        if (avatar) return getBase64FromImg(avatar)
+    }
+    catch (e) {
+        console.error(e)
+    }
 
     return defaultAvatar
 }
