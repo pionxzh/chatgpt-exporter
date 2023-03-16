@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.2.0
+// @version            2.2.1
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -12,7 +12,7 @@
 // @icon               https://chat.openai.com/favicon.ico
 // @match              https://chat.openai.com/chat
 // @match              https://chat.openai.com/chat/*
-// @require            https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js
+// @require            https://cdn.jsdelivr.net/npm/jszip@3.9.1/dist/jszip.min.js
 // @require            https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js
 // @grant              GM_getValue
 // @grant              GM_setValue
@@ -481,7 +481,7 @@ var __publicField = (obj, key, value) => {
   __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
 };
-(function(html2canvas2, JSZip) {
+(function(html2canvas2, JSZip2) {
   "use strict";
   var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
   var sentinel_umdExports = {};
@@ -14897,7 +14897,7 @@ ${message}`;
       const rawConversation = await fetchConversation(id);
       return processConversation(rawConversation);
     }));
-    const zip = new JSZip();
+    const zip = new JSZip2();
     conversations.forEach((conversation) => {
       const fileName = getFileNameWithFormat(fileNameFormat, "md", {
         title: conversation.title
@@ -15423,7 +15423,7 @@ ${message}`;
       return processConversation(rawConversation);
     }));
     const userAvatar = await getUserAvatar();
-    const zip = new JSZip();
+    const zip = new JSZip2();
     conversations.forEach((conversation) => {
       const fileName = getFileNameWithFormat(fileNameFormat, "html", {
         title: conversation.title
@@ -15511,7 +15511,7 @@ ${message}`;
         rawConversation
       };
     }));
-    const zip = new JSZip();
+    const zip = new JSZip2();
     conversations.forEach(({
       conversation,
       rawConversation
@@ -16166,4 +16166,4 @@ ${message}`;
       });
     });
   }
-})(html2canvas, jszip);
+})(html2canvas, JSZip);
