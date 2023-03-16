@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.2.0...userscript-v2.2.1) (2023-03-16)
+
+
+### Bug Fixes
+
+* jszip is not defined in prod build ([8b57e16](https://github.com/pionxzh/chatgpt-exporter/commit/8b57e164eab9fef1ae8bea1610ff639ece680f37)), closes [#75](https://github.com/pionxzh/chatgpt-exporter/issues/75)
+
 ## [2.2.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.1.2...userscript-v2.2.0) (2023-03-15)
 
 
