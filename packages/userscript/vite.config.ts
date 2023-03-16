@@ -38,7 +38,7 @@ export default defineConfig({
                 fileName: 'chatgpt.user.js',
                 minifyCss: false,
                 externalGlobals: [
-                    ['jszip', cdn.jsdelivr('jszip', 'dist/jszip.min.js')],
+                    ['jszip', cdn.jsdelivr('JSZip', 'dist/jszip.min.js')],
                     ['html2canvas', cdn.jsdelivr('html2canvas', 'dist/html2canvas.min.js')],
                 ],
             },
