@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.3.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.2.1...userscript-v2.3.0) (2023-03-18)
+
+
+### Features
+
+* support copy text of single response from ChatGPT ([0a78d2e](https://github.com/pionxzh/chatgpt-exporter/commit/0a78d2e17ae96a9182e289cbb7b9ade465f740b9)), closes [#63](https://github.com/pionxzh/chatgpt-exporter/issues/63)
+* support GPT-4 avatar in HTML export ([890f10d](https://github.com/pionxzh/chatgpt-exporter/commit/890f10d56ac0b8df15e6b5bad48f5e56a73c142a)), closes [#81](https://github.com/pionxzh/chatgpt-exporter/issues/81)
+
 ## [2.2.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.2.0...userscript-v2.2.1) (2023-03-16)
 
 
