@@ -2,6 +2,7 @@ import sentinel from 'sentinel-js'
 import { render } from 'preact'
 import { Menu } from './ui/menu'
 import { onloadSafe } from './utils/utils'
+import { SecondaryToolbar } from './ui/SecondayToolbar'
 
 main()
 
@@ -45,6 +46,17 @@ function main() {
                 }
                 xhr.send()
             }
+        })
+
+        sentinel.on('.flex.justify-between', (node) => {
+            if (!node.querySelector('button')) return
+
+            const secondaryToolbar = document.createElement('div')
+            secondaryToolbar.className = 'w-full'
+            const threads = Array.from(document.querySelectorAll('main .group'))
+            const index = threads.indexOf(node.closest('.group')!)
+            render(<SecondaryToolbar index={index} />, secondaryToolbar)
+            node.append(secondaryToolbar)
         })
     })
 }

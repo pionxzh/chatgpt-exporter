@@ -45,7 +45,7 @@ export const MenuItem: FC<MenuItemProps> = ({ text, successText, disabled = fals
             {loading
                 ? (
                 <div className="flex justify-center items-center w-full h-full">
-                    <IconLoading />
+                    <IconLoading className="w-4 h-4"/>
                 </div>
                     )
                 : (

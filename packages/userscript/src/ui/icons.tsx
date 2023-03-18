@@ -64,14 +64,14 @@ export function IconZip() {
 }
 
 // source: mui
-export function IconLoading() {
+export function IconLoading({ className, style }: { className?: string; style?: React.CSSProperties }) {
     return (
         <span style={{ animation: '1.4s linear 0s infinite normal none running rotate' }}>
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="22 22 44 44"
-                className="w-4 h-4"
-                style={{ animation: '1.4s ease-in-out 0s infinite normal none running circularDash' }}
+                className={className}
+                style={{ animation: '1.4s ease-in-out 0s infinite normal none running circularDash', ...style }}
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
@@ -103,6 +103,15 @@ export function IconCheckBoxChecked({ className }: { className?: string }) {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className} style="width: 1em; height: 1em; display: inline-block" fill="currentColor">
             <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path>
+        </svg>
+    )
+}
+
+export function IconCheck({ className, style }: { className?: string; style?: React.CSSProperties }) {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className} style={style} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M5 12l5 5l10 -10"></path>
         </svg>
     )
 }

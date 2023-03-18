@@ -20,6 +20,7 @@ import { FileCode, IconArrowRightFromBracket, IconCamera, IconCopy, IconCross, I
 import { useTitle } from './useTitle'
 import { CheckBox } from './CheckBox'
 
+import './missing-tailwind.css'
 import '../style.css'
 import './dialog.css'
 

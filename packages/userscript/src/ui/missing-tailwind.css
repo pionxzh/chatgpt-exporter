@@ -1,0 +1,21 @@
+.cursor-help {
+    cursor: help;
+}
+
+.select-all {
+    user-select: all!important;
+}
+
+@media (min-width:768px) {
+    /* md */
+}
+
+@media (min-width:1024px) {
+    .lg\:mt-0 {
+        margin-top: 0;
+    }
+
+    .lg\:top-8 {
+        top: 2rem;
+    }
+}

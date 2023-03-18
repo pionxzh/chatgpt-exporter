@@ -40,3 +40,20 @@ export async function exportToText() {
 
     return true
 }
+
+export async function exportToTextFromIndex(index: number) {
+    if (!checkIfConversationStarted()) {
+        alert('Please start a conversation first.')
+        return false
+    }
+
+    const chatId = await getCurrentChatId()
+    const rawConversation = await fetchConversation(chatId)
+    const conversationChoices = getConversationChoice()
+    const { conversationNodes } = processConversation(rawConversation, conversationChoices)
+
+    const text = conversationNodes[index].message?.content.parts.join('\n') ?? ''
+
+    copyToClipboard(standardizeLineBreaks(text))
+    return true
+}
