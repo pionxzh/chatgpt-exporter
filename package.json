@@ -25,17 +25,17 @@
     "prepare": "husky install"
   },
   "devDependencies": {
-    "@commitlint/cli": "^17.4.3",
-    "@commitlint/config-conventional": "^17.4.3",
+    "@commitlint/cli": "^17.4.4",
+    "@commitlint/config-conventional": "^17.4.4",
     "@pionxzh/eslint-config-react": "^0.2.0",
-    "@types/node": "^18.13.0",
+    "@types/node": "^18.15.3",
     "cpy-cli": "^4.2.0",
-    "eslint": "^8.34.0",
+    "eslint": "^8.36.0",
     "husky": "^8.0.3",
-    "lint-staged": "^13.1.2",
-    "rimraf": "^4.1.2",
-    "turbo": "^1.7.4",
-    "typescript": "5.0.0-beta"
+    "lint-staged": "^13.2.0",
+    "rimraf": "^4.4.0",
+    "turbo": "^1.8.3",
+    "typescript": "5.0.2"
   },
   "pnpm": {
     "patchedDependencies": {
