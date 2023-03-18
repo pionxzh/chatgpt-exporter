@@ -55,6 +55,8 @@ function conversationToHtml(conversation: ConversationResult, avatar: string) {
 
     const conversationHtml = conversationNodes.map((item) => {
         const author = item.message?.author.role === 'assistant' ? 'ChatGPT' : 'You'
+        const model = item.message?.metadata?.model_slug === 'gpt-4' ? 'GPT-4' : 'GPT-3'
+        const authorType = author === 'ChatGPT' ? model : 'user'
         const avatarEl = author === 'ChatGPT'
             ? '<svg width="41" height="41"><use xlink:href="#chatgpt" /></svg>'
             : `<img alt="${author}" />`
@@ -82,7 +84,7 @@ function conversationToHtml(conversation: ConversationResult, avatar: string) {
 
         return `
 <div class="conversation-item">
-    <div class="author">
+    <div class="author ${authorType}">
         ${avatarEl}
     </div>
     <div class="conversation-content-wrapper">

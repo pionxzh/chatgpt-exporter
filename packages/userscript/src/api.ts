@@ -14,6 +14,15 @@ interface ApiSession {
     }
 }
 
+interface MessageMeta {
+    finish_details?: {
+        stop: string
+        type: string
+    }
+    model_slug?: 'text-davinci-002-render-sha' | 'text-davinci-002-render-paid' | 'gpt-4' & (string & {})
+    timestamp_: 'absolute' & (string & {})
+}
+
 interface ConversationNode {
     children: string[]
     id: string
@@ -29,7 +38,7 @@ interface ConversationNode {
         create_time: number
         end_turn: boolean
         id: string
-        metadata: unknown
+        metadata?: MessageMeta
         recipient: 'all' & (string & {})
         update_time: string | null
         weight: number

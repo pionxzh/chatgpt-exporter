@@ -20,6 +20,7 @@
   "prettier.enable": false,
   "cSpell.words": [
     "chatgpt",
+    "davinci",
     "mdast",
     "micromark",
     "preact",
