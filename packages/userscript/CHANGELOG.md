@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.3.0...userscript-v2.3.1) (2023-03-21)
+
+
+### Bug Fixes
+
+* copy button shows in code block incorrectly ([b43dbc8](https://github.com/pionxzh/chatgpt-exporter/commit/b43dbc88727a7d2ba66ac5ce1c4e8f19306819eb)), closes [#83](https://github.com/pionxzh/chatgpt-exporter/issues/83)
+
 ## [2.3.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.2.1...userscript-v2.3.0) (2023-03-18)
 
 
