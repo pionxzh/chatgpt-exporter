@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.3.0
+// @version            2.3.1
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -485,6 +485,9 @@ p > img[src*="https://images.unsplash.com/"] {
         opacity: 1;
         transform: translate(-50%, -50%) scale(1);
     }
+}
+.invisible + .secondary-toolbar {
+    display: none;
 }
  `);
 
@@ -16204,6 +16207,7 @@ ${message}`;
       }), o(Divider, {})]
     });
   }
+  const SecondaryToolbar$1 = "";
   const TIMEOUT = 2500;
   const SecondaryToolbar = ({
     index: index2
@@ -16280,8 +16284,10 @@ ${message}`;
       sentinel.on(".flex.justify-between", (node2) => {
         if (!node2.querySelector("button"))
           return;
+        if (node2.closest("pre"))
+          return;
         const secondaryToolbar = document.createElement("div");
-        secondaryToolbar.className = "w-full";
+        secondaryToolbar.className = "w-full secondary-toolbar";
         const threads = Array.from(document.querySelectorAll("main .group"));
         const index2 = threads.indexOf(node2.closest(".group"));
         B$2(o(SecondaryToolbar, {
