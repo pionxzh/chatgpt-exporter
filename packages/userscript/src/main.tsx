@@ -2,7 +2,7 @@ import sentinel from 'sentinel-js'
 import { render } from 'preact'
 import { Menu } from './ui/menu'
 import { onloadSafe } from './utils/utils'
-import { SecondaryToolbar } from './ui/SecondayToolbar'
+import { SecondaryToolbar } from './ui/SecondaryToolbar'
 
 main()
 
@@ -50,9 +50,11 @@ function main() {
 
         sentinel.on('.flex.justify-between', (node) => {
             if (!node.querySelector('button')) return
+            // ignore codeblock
+            if (node.closest('pre')) return
 
             const secondaryToolbar = document.createElement('div')
-            secondaryToolbar.className = 'w-full'
+            secondaryToolbar.className = 'w-full secondary-toolbar'
             const threads = Array.from(document.querySelectorAll('main .group'))
             const index = threads.indexOf(node.closest('.group')!)
             render(<SecondaryToolbar index={index} />, secondaryToolbar)

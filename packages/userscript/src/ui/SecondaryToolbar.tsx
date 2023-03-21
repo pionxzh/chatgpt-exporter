@@ -2,6 +2,8 @@ import { useState } from 'preact/hooks'
 import { exportToTextFromIndex } from '../exporter/text'
 import { IconCheck, IconCopy, IconLoading } from './icons'
 
+import './SecondaryToolbar.css'
+
 const TIMEOUT = 2500
 
 export const SecondaryToolbar = ({ index }: { index: number }) => {
