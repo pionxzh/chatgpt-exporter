@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.3.1
+// @version            2.3.2
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -3593,12 +3593,12 @@ var __publicField = (obj, key, value) => {
   }
   async function fetchAllConversations() {
     const conversations = [];
-    let offset = 0;
     const limit = 20;
+    let offset = 0;
     while (true) {
       const result = await fetchConversations(offset, limit);
       conversations.push(...result.items);
-      if (result.items.length < limit)
+      if (offset + limit >= result.total)
         break;
       offset += limit;
     }
