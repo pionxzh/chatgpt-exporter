@@ -108,12 +108,12 @@ export async function fetchConversations(offset = 0, limit = 20): Promise<ApiCon
 
 export async function fetchAllConversations(): Promise<ApiConversationItem[]> {
     const conversations: ApiConversationItem[] = []
-    let offset = 0
     const limit = 20
+    let offset = 0
     while (true) {
         const result = await fetchConversations(offset, limit)
         conversations.push(...result.items)
-        if (result.items.length < limit) break
+        if (offset + limit >= result.total) break
         offset += limit
     }
     return conversations
