@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.3.1...userscript-v2.3.2) (2023-03-24)
+
+
+### Bug Fixes
+
+* export all should load all of chats ([770f129](https://github.com/pionxzh/chatgpt-exporter/commit/770f1299818309df46a85593ac5789b167977b72)), closes [#86](https://github.com/pionxzh/chatgpt-exporter/issues/86)
+
 ## [2.3.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.3.0...userscript-v2.3.1) (2023-03-21)
 
 
