@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.3.2
+// @version            2.3.3
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -31,6 +31,14 @@
     cursor: pointer;
 }
 
+.CheckBoxLabel[disabled] {
+    opacity: 0.7;
+}
+
+.CheckBoxLabel[disabled] * {
+    cursor: not-allowed;
+}
+
 .CheckBoxLabel input {
     position: absolute;
     opacity: 0;
@@ -50,11 +58,11 @@
     font-size: 1.5rem;
 }
 
-.CheckBoxLabel .Checked {
+.CheckBoxLabel input:checked ~ svg {
     color: rgb(118 194 255);
 }
 
-.dark .CheckBoxLabel .Checked {
+.dark .CheckBoxLabel input:checked ~ svg {
     color: rgb(144, 202, 249);
 }
 
@@ -63,12 +71,36 @@
     font-size: 1rem;
     line-height: 1.5;
 }
+.bg-gray-200 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(229 231 235/var(--tw-bg-opacity));
+}
+
+.bg-blue-600 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(28 100 242/var(--tw-bg-opacity));
+}
+
 .cursor-help {
     cursor: help;
 }
 
+.h-2\\.5 {
+    height: 0.625rem;
+}
+
+.mr-8 {
+    margin-right: 2rem;
+}
+
 .select-all {
     user-select: all!important;
+}
+
+.truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 @media (min-width:768px) {
@@ -1098,2291 +1130,6 @@ var __publicField = (obj, key, value) => {
   function B$1(n2, t2) {
     return "function" == typeof t2 ? t2(n2) : t2;
   }
-  function _extends() {
-    _extends = Object.assign ? Object.assign.bind() : function(target) {
-      for (var i2 = 1; i2 < arguments.length; i2++) {
-        var source = arguments[i2];
-        for (var key2 in source) {
-          if (Object.prototype.hasOwnProperty.call(source, key2)) {
-            target[key2] = source[key2];
-          }
-        }
-      }
-      return target;
-    };
-    return _extends.apply(this, arguments);
-  }
-  function g(n2, t2) {
-    for (var e2 in t2)
-      n2[e2] = t2[e2];
-    return n2;
-  }
-  function C(n2, t2) {
-    for (var e2 in n2)
-      if ("__source" !== e2 && !(e2 in t2))
-        return true;
-    for (var r2 in t2)
-      if ("__source" !== r2 && n2[r2] !== t2[r2])
-        return true;
-    return false;
-  }
-  function E(n2, t2) {
-    return n2 === t2 && (0 !== n2 || 1 / n2 == 1 / t2) || n2 != n2 && t2 != t2;
-  }
-  function w(n2) {
-    this.props = n2;
-  }
-  function x(n2, e2) {
-    function r2(n3) {
-      var t2 = this.props.ref, r3 = t2 == n3.ref;
-      return !r3 && t2 && (t2.call ? t2(null) : t2.current = null), e2 ? !e2(this.props, n3) || !r3 : C(this.props, n3);
-    }
-    function u2(e3) {
-      return this.shouldComponentUpdate = r2, y$1(n2, e3);
-    }
-    return u2.displayName = "Memo(" + (n2.displayName || n2.name) + ")", u2.prototype.isReactComponent = true, u2.__f = true, u2;
-  }
-  (w.prototype = new k$2()).isPureReactComponent = true, w.prototype.shouldComponentUpdate = function(n2, t2) {
-    return C(this.props, n2) || C(this.state, t2);
-  };
-  var R = l$1.__b;
-  l$1.__b = function(n2) {
-    n2.type && n2.type.__f && n2.ref && (n2.props.ref = n2.ref, n2.ref = null), R && R(n2);
-  };
-  var N = "undefined" != typeof Symbol && Symbol.for && Symbol.for("react.forward_ref") || 3911;
-  function k(n2) {
-    function t2(t3) {
-      var e2 = g({}, t3);
-      return delete e2.ref, n2(e2, t3.ref || null);
-    }
-    return t2.$$typeof = N, t2.render = t2, t2.prototype.isReactComponent = t2.__f = true, t2.displayName = "ForwardRef(" + (n2.displayName || n2.name) + ")", t2;
-  }
-  var A = function(n2, t2) {
-    return null == n2 ? null : P$2(P$2(n2).map(t2));
-  }, O = { map: A, forEach: A, count: function(n2) {
-    return n2 ? P$2(n2).length : 0;
-  }, only: function(n2) {
-    var t2 = P$2(n2);
-    if (1 !== t2.length)
-      throw "Children.only";
-    return t2[0];
-  }, toArray: P$2 }, T = l$1.__e;
-  l$1.__e = function(n2, t2, e2, r2) {
-    if (n2.then) {
-      for (var u2, o2 = t2; o2 = o2.__; )
-        if ((u2 = o2.__c) && u2.__c)
-          return null == t2.__e && (t2.__e = e2.__e, t2.__k = e2.__k), u2.__c(n2, t2);
-    }
-    T(n2, t2, e2, r2);
-  };
-  var I = l$1.unmount;
-  function L(n2, t2, e2) {
-    return n2 && (n2.__c && n2.__c.__H && (n2.__c.__H.__.forEach(function(n3) {
-      "function" == typeof n3.__c && n3.__c();
-    }), n2.__c.__H = null), null != (n2 = g({}, n2)).__c && (n2.__c.__P === e2 && (n2.__c.__P = t2), n2.__c = null), n2.__k = n2.__k && n2.__k.map(function(n3) {
-      return L(n3, t2, e2);
-    })), n2;
-  }
-  function U(n2, t2, e2) {
-    return n2 && (n2.__v = null, n2.__k = n2.__k && n2.__k.map(function(n3) {
-      return U(n3, t2, e2);
-    }), n2.__c && n2.__c.__P === t2 && (n2.__e && e2.insertBefore(n2.__e, n2.__d), n2.__c.__e = true, n2.__c.__P = e2)), n2;
-  }
-  function D() {
-    this.__u = 0, this.t = null, this.__b = null;
-  }
-  function F(n2) {
-    var t2 = n2.__.__c;
-    return t2 && t2.__a && t2.__a(n2);
-  }
-  function M(n2) {
-    var e2, r2, u2;
-    function o2(o3) {
-      if (e2 || (e2 = n2()).then(function(n3) {
-        r2 = n3.default || n3;
-      }, function(n3) {
-        u2 = n3;
-      }), u2)
-        throw u2;
-      if (!r2)
-        throw e2;
-      return y$1(r2, o3);
-    }
-    return o2.displayName = "Lazy", o2.__f = true, o2;
-  }
-  function V() {
-    this.u = null, this.o = null;
-  }
-  l$1.unmount = function(n2) {
-    var t2 = n2.__c;
-    t2 && t2.__R && t2.__R(), t2 && true === n2.__h && (n2.type = null), I && I(n2);
-  }, (D.prototype = new k$2()).__c = function(n2, t2) {
-    var e2 = t2.__c, r2 = this;
-    null == r2.t && (r2.t = []), r2.t.push(e2);
-    var u2 = F(r2.__v), o2 = false, i2 = function() {
-      o2 || (o2 = true, e2.__R = null, u2 ? u2(l2) : l2());
-    };
-    e2.__R = i2;
-    var l2 = function() {
-      if (!--r2.__u) {
-        if (r2.state.__a) {
-          var n3 = r2.state.__a;
-          r2.__v.__k[0] = U(n3, n3.__c.__P, n3.__c.__O);
-        }
-        var t3;
-        for (r2.setState({ __a: r2.__b = null }); t3 = r2.t.pop(); )
-          t3.forceUpdate();
-      }
-    }, c2 = true === t2.__h;
-    r2.__u++ || c2 || r2.setState({ __a: r2.__b = r2.__v.__k[0] }), n2.then(i2, i2);
-  }, D.prototype.componentWillUnmount = function() {
-    this.t = [];
-  }, D.prototype.render = function(n2, e2) {
-    if (this.__b) {
-      if (this.__v.__k) {
-        var r2 = document.createElement("div"), o2 = this.__v.__k[0].__c;
-        this.__v.__k[0] = L(this.__b, r2, o2.__O = o2.__P);
-      }
-      this.__b = null;
-    }
-    var i2 = e2.__a && y$1(_$2, null, n2.fallback);
-    return i2 && (i2.__h = null), [y$1(_$2, null, e2.__a ? null : n2.children), i2];
-  };
-  var W = function(n2, t2, e2) {
-    if (++e2[1] === e2[0] && n2.o.delete(t2), n2.props.revealOrder && ("t" !== n2.props.revealOrder[0] || !n2.o.size))
-      for (e2 = n2.u; e2; ) {
-        for (; e2.length > 3; )
-          e2.pop()();
-        if (e2[1] < e2[0])
-          break;
-        n2.u = e2 = e2[2];
-      }
-  };
-  function P(n2) {
-    return this.getChildContext = function() {
-      return n2.context;
-    }, n2.children;
-  }
-  function j(n2) {
-    var e2 = this, r2 = n2.i;
-    e2.componentWillUnmount = function() {
-      B$2(null, e2.l), e2.l = null, e2.i = null;
-    }, e2.i && e2.i !== r2 && e2.componentWillUnmount(), n2.__v ? (e2.l || (e2.i = r2, e2.l = { nodeType: 1, parentNode: r2, childNodes: [], appendChild: function(n3) {
-      this.childNodes.push(n3), e2.i.appendChild(n3);
-    }, insertBefore: function(n3, t2) {
-      this.childNodes.push(n3), e2.i.appendChild(n3);
-    }, removeChild: function(n3) {
-      this.childNodes.splice(this.childNodes.indexOf(n3) >>> 1, 1), e2.i.removeChild(n3);
-    } }), B$2(y$1(P, { context: e2.context }, n2.__v), e2.l)) : e2.l && e2.componentWillUnmount();
-  }
-  function z(n2, e2) {
-    var r2 = y$1(j, { __v: n2, i: e2 });
-    return r2.containerInfo = e2, r2;
-  }
-  (V.prototype = new k$2()).__a = function(n2) {
-    var t2 = this, e2 = F(t2.__v), r2 = t2.o.get(n2);
-    return r2[0]++, function(u2) {
-      var o2 = function() {
-        t2.props.revealOrder ? (r2.push(u2), W(t2, n2, r2)) : u2();
-      };
-      e2 ? e2(o2) : o2();
-    };
-  }, V.prototype.render = function(n2) {
-    this.u = null, this.o = /* @__PURE__ */ new Map();
-    var t2 = P$2(n2.children);
-    n2.revealOrder && "b" === n2.revealOrder[0] && t2.reverse();
-    for (var e2 = t2.length; e2--; )
-      this.o.set(t2[e2], this.u = [1, 0, this.u]);
-    return n2.children;
-  }, V.prototype.componentDidUpdate = V.prototype.componentDidMount = function() {
-    var n2 = this;
-    this.o.forEach(function(t2, e2) {
-      W(n2, e2, t2);
-    });
-  };
-  var B = "undefined" != typeof Symbol && Symbol.for && Symbol.for("react.element") || 60103, H = /^(?:accent|alignment|arabic|baseline|cap|clip(?!PathU)|color|dominant|fill|flood|font|glyph(?!R)|horiz|image|letter|lighting|marker(?!H|W|U)|overline|paint|pointer|shape|stop|strikethrough|stroke|text(?!L)|transform|underline|unicode|units|v|vector|vert|word|writing|x(?!C))[A-Z]/, Z = /^on(Ani|Tra|Tou|BeforeInp|Compo)/, Y = /[A-Z0-9]/g, $ = "undefined" != typeof document, q = function(n2) {
-    return ("undefined" != typeof Symbol && "symbol" == typeof Symbol() ? /fil|che|rad/ : /fil|che|ra/).test(n2);
-  };
-  function G(n2, t2, e2) {
-    return null == t2.__k && (t2.textContent = ""), B$2(n2, t2), "function" == typeof e2 && e2(), n2 ? n2.__c : null;
-  }
-  function J(n2, t2, e2) {
-    return D$1(n2, t2), "function" == typeof e2 && e2(), n2 ? n2.__c : null;
-  }
-  k$2.prototype.isReactComponent = {}, ["componentWillMount", "componentWillReceiveProps", "componentWillUpdate"].forEach(function(t2) {
-    Object.defineProperty(k$2.prototype, t2, { configurable: true, get: function() {
-      return this["UNSAFE_" + t2];
-    }, set: function(n2) {
-      Object.defineProperty(this, t2, { configurable: true, writable: true, value: n2 });
-    } });
-  });
-  var K = l$1.event;
-  function Q() {
-  }
-  function X() {
-    return this.cancelBubble;
-  }
-  function nn() {
-    return this.defaultPrevented;
-  }
-  l$1.event = function(n2) {
-    return K && (n2 = K(n2)), n2.persist = Q, n2.isPropagationStopped = X, n2.isDefaultPrevented = nn, n2.nativeEvent = n2;
-  };
-  var tn, en = { configurable: true, get: function() {
-    return this.class;
-  } }, rn = l$1.vnode;
-  l$1.vnode = function(n2) {
-    var t2 = n2.type, e2 = n2.props, u2 = e2;
-    if ("string" == typeof t2) {
-      for (var o2 in u2 = {}, e2) {
-        var i2 = e2[o2];
-        if (!("value" === o2 && "defaultValue" in e2 && null == i2 || $ && "children" === o2 && "noscript" === t2)) {
-          var l2 = o2.toLowerCase();
-          "defaultValue" === o2 && "value" in e2 && null == e2.value ? o2 = "value" : "download" === o2 && true === i2 ? i2 = "" : "ondoubleclick" === l2 ? o2 = "ondblclick" : "onchange" !== l2 || "input" !== t2 && "textarea" !== t2 || q(e2.type) ? "onfocus" === l2 ? o2 = "onfocusin" : "onblur" === l2 ? o2 = "onfocusout" : Z.test(o2) ? o2 = l2 : -1 === t2.indexOf("-") && H.test(o2) ? o2 = o2.replace(Y, "-$&").toLowerCase() : null === i2 && (i2 = void 0) : l2 = o2 = "oninput", "oninput" === l2 && u2[o2 = l2] && (o2 = "oninputCapture"), u2[o2] = i2;
-        }
-      }
-      "select" == t2 && u2.multiple && Array.isArray(u2.value) && (u2.value = P$2(e2.children).forEach(function(n3) {
-        n3.props.selected = -1 != u2.value.indexOf(n3.props.value);
-      })), "select" == t2 && null != u2.defaultValue && (u2.value = P$2(e2.children).forEach(function(n3) {
-        n3.props.selected = u2.multiple ? -1 != u2.defaultValue.indexOf(n3.props.value) : u2.defaultValue == n3.props.value;
-      })), n2.props = u2, e2.class != e2.className && (en.enumerable = "className" in e2, null != e2.className && (u2.class = e2.className), Object.defineProperty(u2, "className", en));
-    }
-    n2.$$typeof = B, rn && rn(n2);
-  };
-  var un = l$1.__r;
-  l$1.__r = function(n2) {
-    un && un(n2), tn = n2.__c;
-  };
-  var on = l$1.diffed;
-  l$1.diffed = function(n2) {
-    on && on(n2);
-    var t2 = n2.props, e2 = n2.__e;
-    null != e2 && "textarea" === n2.type && "value" in t2 && t2.value !== e2.value && (e2.value = null == t2.value ? "" : t2.value), tn = null;
-  };
-  var ln = { ReactCurrentDispatcher: { current: { readContext: function(n2) {
-    return tn.__n[n2.__c].props.value;
-  } } } }, cn = "17.0.2";
-  function fn(n2) {
-    return y$1.bind(null, n2);
-  }
-  function an(n2) {
-    return !!n2 && n2.$$typeof === B;
-  }
-  function sn(n2) {
-    return an(n2) ? E$1.apply(null, arguments) : n2;
-  }
-  function hn(n2) {
-    return !!n2.__k && (B$2(null, n2), true);
-  }
-  function vn(n2) {
-    return n2 && (n2.base || 1 === n2.nodeType && n2) || null;
-  }
-  var dn = function(n2, t2) {
-    return n2(t2);
-  }, pn = function(n2, t2) {
-    return n2(t2);
-  }, mn = _$2;
-  function yn(n2) {
-    n2();
-  }
-  function _n(n2) {
-    return n2;
-  }
-  function bn() {
-    return [false, yn];
-  }
-  var Sn = y;
-  function gn(n2, t2) {
-    var e2 = t2(), r2 = h({ h: { __: e2, v: t2 } }), u2 = r2[0].h, o2 = r2[1];
-    return y(function() {
-      u2.__ = e2, u2.v = t2, E(u2.__, t2()) || o2({ h: u2 });
-    }, [n2, e2, t2]), p$1(function() {
-      return E(u2.__, u2.v()) || o2({ h: u2 }), n2(function() {
-        E(u2.__, u2.v()) || o2({ h: u2 });
-      });
-    }, [n2]), e2;
-  }
-  var Cn = { useState: h, useId: V$1, useReducer: s, useEffect: p$1, useLayoutEffect: y, useInsertionEffect: Sn, useTransition: bn, useDeferredValue: _n, useSyncExternalStore: gn, startTransition: yn, useRef: _$1, useImperativeHandle: A$1, useMemo: F$1, useCallback: T$1, useContext: q$1, useDebugValue: x$1, version: "17.0.2", Children: O, render: G, hydrate: J, unmountComponentAtNode: hn, createPortal: z, createElement: y$1, createContext: F$2, createFactory: fn, cloneElement: sn, createRef: d$1, Fragment: _$2, isValidElement: an, findDOMNode: vn, Component: k$2, PureComponent: w, memo: x, forwardRef: k, flushSync: pn, unstable_batchedUpdates: dn, StrictMode: mn, Suspense: D, SuspenseList: V, lazy: M, __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: ln };
-  const $2AODx$react = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
-    __proto__: null,
-    Children: O,
-    Component: k$2,
-    Fragment: _$2,
-    PureComponent: w,
-    StrictMode: mn,
-    Suspense: D,
-    SuspenseList: V,
-    __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: ln,
-    cloneElement: sn,
-    createContext: F$2,
-    createElement: y$1,
-    createFactory: fn,
-    createPortal: z,
-    createRef: d$1,
-    default: Cn,
-    findDOMNode: vn,
-    flushSync: pn,
-    forwardRef: k,
-    hydrate: J,
-    isValidElement: an,
-    lazy: M,
-    memo: x,
-    render: G,
-    startTransition: yn,
-    unmountComponentAtNode: hn,
-    unstable_batchedUpdates: dn,
-    useCallback: T$1,
-    useContext: q$1,
-    useDebugValue: x$1,
-    useDeferredValue: _n,
-    useEffect: p$1,
-    useErrorBoundary: P$1,
-    useId: V$1,
-    useImperativeHandle: A$1,
-    useInsertionEffect: Sn,
-    useLayoutEffect: y,
-    useMemo: F$1,
-    useReducer: s,
-    useRef: _$1,
-    useState: h,
-    useSyncExternalStore: gn,
-    useTransition: bn,
-    version: cn
-  }, Symbol.toStringTag, { value: "Module" }));
-  function $e42e1063c40fb3ef$export$b9ecd428b558ff10(originalEventHandler, ourEventHandler, { checkForDefaultPrevented = true } = {}) {
-    return function handleEvent(event) {
-      originalEventHandler === null || originalEventHandler === void 0 || originalEventHandler(event);
-      if (checkForDefaultPrevented === false || !event.defaultPrevented)
-        return ourEventHandler === null || ourEventHandler === void 0 ? void 0 : ourEventHandler(event);
-    };
-  }
-  function $6ed0406888f73fc4$var$setRef(ref, value) {
-    if (typeof ref === "function")
-      ref(value);
-    else if (ref !== null && ref !== void 0)
-      ref.current = value;
-  }
-  function $6ed0406888f73fc4$export$43e446d32b3d21af(...refs) {
-    return (node2) => refs.forEach(
-      (ref) => $6ed0406888f73fc4$var$setRef(ref, node2)
-    );
-  }
-  function $6ed0406888f73fc4$export$c7b2cbe3552a0d05(...refs) {
-    return T$1($6ed0406888f73fc4$export$43e446d32b3d21af(...refs), refs);
-  }
-  function $c512c27ab02ef895$export$50c7b4e9d9f19c1(scopeName, createContextScopeDeps = []) {
-    let defaultContexts = [];
-    function $c512c27ab02ef895$export$fd42f52fd3ae1109(rootComponentName, defaultContext) {
-      const BaseContext = /* @__PURE__ */ F$2(defaultContext);
-      const index2 = defaultContexts.length;
-      defaultContexts = [
-        ...defaultContexts,
-        defaultContext
-      ];
-      function Provider(props) {
-        const { scope, children, ...context } = props;
-        const Context = (scope === null || scope === void 0 ? void 0 : scope[scopeName][index2]) || BaseContext;
-        const value = F$1(
-          () => context,
-          Object.values(context)
-        );
-        return /* @__PURE__ */ y$1(Context.Provider, {
-          value
-        }, children);
-      }
-      function useContext(consumerName, scope) {
-        const Context = (scope === null || scope === void 0 ? void 0 : scope[scopeName][index2]) || BaseContext;
-        const context = q$1(Context);
-        if (context)
-          return context;
-        if (defaultContext !== void 0)
-          return defaultContext;
-        throw new Error(`\`${consumerName}\` must be used within \`${rootComponentName}\``);
-      }
-      Provider.displayName = rootComponentName + "Provider";
-      return [
-        Provider,
-        useContext
-      ];
-    }
-    const createScope = () => {
-      const scopeContexts = defaultContexts.map((defaultContext) => {
-        return /* @__PURE__ */ F$2(defaultContext);
-      });
-      return function useScope(scope) {
-        const contexts = (scope === null || scope === void 0 ? void 0 : scope[scopeName]) || scopeContexts;
-        return F$1(
-          () => ({
-            [`__scope${scopeName}`]: {
-              ...scope,
-              [scopeName]: contexts
-            }
-          }),
-          [
-            scope,
-            contexts
-          ]
-        );
-      };
-    };
-    createScope.scopeName = scopeName;
-    return [
-      $c512c27ab02ef895$export$fd42f52fd3ae1109,
-      $c512c27ab02ef895$var$composeContextScopes(createScope, ...createContextScopeDeps)
-    ];
-  }
-  function $c512c27ab02ef895$var$composeContextScopes(...scopes) {
-    const baseScope = scopes[0];
-    if (scopes.length === 1)
-      return baseScope;
-    const createScope1 = () => {
-      const scopeHooks = scopes.map(
-        (createScope) => ({
-          useScope: createScope(),
-          scopeName: createScope.scopeName
-        })
-      );
-      return function useComposedScopes(overrideScopes) {
-        const nextScopes1 = scopeHooks.reduce((nextScopes, { useScope, scopeName }) => {
-          const scopeProps = useScope(overrideScopes);
-          const currentScope = scopeProps[`__scope${scopeName}`];
-          return {
-            ...nextScopes,
-            ...currentScope
-          };
-        }, {});
-        return F$1(
-          () => ({
-            [`__scope${baseScope.scopeName}`]: nextScopes1
-          }),
-          [
-            nextScopes1
-          ]
-        );
-      };
-    };
-    createScope1.scopeName = baseScope.scopeName;
-    return createScope1;
-  }
-  const $9f79659886946c16$export$e5c5a5f917a5871c = Boolean(globalThis === null || globalThis === void 0 ? void 0 : globalThis.document) ? y : () => {
-  };
-  const $1746a345f3d73bb7$var$useReactId = $2AODx$react["useId".toString()] || (() => void 0);
-  let $1746a345f3d73bb7$var$count = 0;
-  function $1746a345f3d73bb7$export$f680877a34711e37(deterministicId) {
-    const [id, setId] = h($1746a345f3d73bb7$var$useReactId());
-    $9f79659886946c16$export$e5c5a5f917a5871c(() => {
-      if (!deterministicId)
-        setId(
-          (reactId) => reactId !== null && reactId !== void 0 ? reactId : String($1746a345f3d73bb7$var$count++)
-        );
-    }, [
-      deterministicId
-    ]);
-    return deterministicId || (id ? `radix-${id}` : "");
-  }
-  function $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(callback) {
-    const callbackRef = _$1(callback);
-    p$1(() => {
-      callbackRef.current = callback;
-    });
-    return F$1(
-      () => (...args) => {
-        var _callbackRef$current;
-        return (_callbackRef$current = callbackRef.current) === null || _callbackRef$current === void 0 ? void 0 : _callbackRef$current.call(callbackRef, ...args);
-      },
-      []
-    );
-  }
-  function $71cd76cc60e0454e$export$6f32135080cb4c3({ prop, defaultProp, onChange = () => {
-  } }) {
-    const [uncontrolledProp, setUncontrolledProp] = $71cd76cc60e0454e$var$useUncontrolledState({
-      defaultProp,
-      onChange
-    });
-    const isControlled = prop !== void 0;
-    const value1 = isControlled ? prop : uncontrolledProp;
-    const handleChange = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onChange);
-    const setValue = T$1((nextValue) => {
-      if (isControlled) {
-        const setter = nextValue;
-        const value = typeof nextValue === "function" ? setter(prop) : nextValue;
-        if (value !== prop)
-          handleChange(value);
-      } else
-        setUncontrolledProp(nextValue);
-    }, [
-      isControlled,
-      prop,
-      setUncontrolledProp,
-      handleChange
-    ]);
-    return [
-      value1,
-      setValue
-    ];
-  }
-  function $71cd76cc60e0454e$var$useUncontrolledState({ defaultProp, onChange }) {
-    const uncontrolledState = h(defaultProp);
-    const [value] = uncontrolledState;
-    const prevValueRef = _$1(value);
-    const handleChange = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onChange);
-    p$1(() => {
-      if (prevValueRef.current !== value) {
-        handleChange(value);
-        prevValueRef.current = value;
-      }
-    }, [
-      value,
-      prevValueRef,
-      handleChange
-    ]);
-    return uncontrolledState;
-  }
-  const $5e63c961fc1ce211$export$8c6ed5c666ac1360 = /* @__PURE__ */ k((props, forwardedRef) => {
-    const { children, ...slotProps } = props;
-    const childrenArray = O.toArray(children);
-    const slottable = childrenArray.find($5e63c961fc1ce211$var$isSlottable);
-    if (slottable) {
-      const newElement = slottable.props.children;
-      const newChildren = childrenArray.map((child) => {
-        if (child === slottable) {
-          if (O.count(newElement) > 1)
-            return O.only(null);
-          return /* @__PURE__ */ an(newElement) ? newElement.props.children : null;
-        } else
-          return child;
-      });
-      return /* @__PURE__ */ y$1($5e63c961fc1ce211$var$SlotClone, _extends({}, slotProps, {
-        ref: forwardedRef
-      }), /* @__PURE__ */ an(newElement) ? /* @__PURE__ */ sn(newElement, void 0, newChildren) : null);
-    }
-    return /* @__PURE__ */ y$1($5e63c961fc1ce211$var$SlotClone, _extends({}, slotProps, {
-      ref: forwardedRef
-    }), children);
-  });
-  $5e63c961fc1ce211$export$8c6ed5c666ac1360.displayName = "Slot";
-  const $5e63c961fc1ce211$var$SlotClone = /* @__PURE__ */ k((props, forwardedRef) => {
-    const { children, ...slotProps } = props;
-    if (/* @__PURE__ */ an(children))
-      return /* @__PURE__ */ sn(children, {
-        ...$5e63c961fc1ce211$var$mergeProps(slotProps, children.props),
-        ref: $6ed0406888f73fc4$export$43e446d32b3d21af(forwardedRef, children.ref)
-      });
-    return O.count(children) > 1 ? O.only(null) : null;
-  });
-  $5e63c961fc1ce211$var$SlotClone.displayName = "SlotClone";
-  const $5e63c961fc1ce211$export$d9f1ccf0bdb05d45 = ({ children }) => {
-    return /* @__PURE__ */ y$1(_$2, null, children);
-  };
-  function $5e63c961fc1ce211$var$isSlottable(child) {
-    return /* @__PURE__ */ an(child) && child.type === $5e63c961fc1ce211$export$d9f1ccf0bdb05d45;
-  }
-  function $5e63c961fc1ce211$var$mergeProps(slotProps, childProps) {
-    const overrideProps = {
-      ...childProps
-    };
-    for (const propName in childProps) {
-      const slotPropValue = slotProps[propName];
-      const childPropValue = childProps[propName];
-      const isHandler = /^on[A-Z]/.test(propName);
-      if (isHandler) {
-        if (slotPropValue && childPropValue)
-          overrideProps[propName] = (...args) => {
-            childPropValue(...args);
-            slotPropValue(...args);
-          };
-        else if (slotPropValue)
-          overrideProps[propName] = slotPropValue;
-      } else if (propName === "style")
-        overrideProps[propName] = {
-          ...slotPropValue,
-          ...childPropValue
-        };
-      else if (propName === "className")
-        overrideProps[propName] = [
-          slotPropValue,
-          childPropValue
-        ].filter(Boolean).join(" ");
-    }
-    return {
-      ...slotProps,
-      ...overrideProps
-    };
-  }
-  const $8927f6f2acc4f386$var$NODES = [
-    "a",
-    "button",
-    "div",
-    "form",
-    "h2",
-    "h3",
-    "img",
-    "input",
-    "label",
-    "li",
-    "nav",
-    "ol",
-    "p",
-    "span",
-    "svg",
-    "ul"
-  ];
-  const $8927f6f2acc4f386$export$250ffa63cdc0d034 = $8927f6f2acc4f386$var$NODES.reduce((primitive, node2) => {
-    const Node = /* @__PURE__ */ k((props, forwardedRef) => {
-      const { asChild, ...primitiveProps } = props;
-      const Comp = asChild ? $5e63c961fc1ce211$export$8c6ed5c666ac1360 : node2;
-      p$1(() => {
-        window[Symbol.for("radix-ui")] = true;
-      }, []);
-      return /* @__PURE__ */ y$1(Comp, _extends({}, primitiveProps, {
-        ref: forwardedRef
-      }));
-    });
-    Node.displayName = `Primitive.${node2}`;
-    return {
-      ...primitive,
-      [node2]: Node
-    };
-  }, {});
-  function $8927f6f2acc4f386$export$6d1a0317bde7de7f(target, event) {
-    if (target)
-      pn(
-        () => target.dispatchEvent(event)
-      );
-  }
-  function $addc16e1bbe58fd0$export$3a72a57244d6e765(onEscapeKeyDownProp, ownerDocument = globalThis === null || globalThis === void 0 ? void 0 : globalThis.document) {
-    const onEscapeKeyDown = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onEscapeKeyDownProp);
-    p$1(() => {
-      const handleKeyDown = (event) => {
-        if (event.key === "Escape")
-          onEscapeKeyDown(event);
-      };
-      ownerDocument.addEventListener("keydown", handleKeyDown);
-      return () => ownerDocument.removeEventListener("keydown", handleKeyDown);
-    }, [
-      onEscapeKeyDown,
-      ownerDocument
-    ]);
-  }
-  const $5cb92bef7577960e$var$CONTEXT_UPDATE = "dismissableLayer.update";
-  const $5cb92bef7577960e$var$POINTER_DOWN_OUTSIDE = "dismissableLayer.pointerDownOutside";
-  const $5cb92bef7577960e$var$FOCUS_OUTSIDE = "dismissableLayer.focusOutside";
-  let $5cb92bef7577960e$var$originalBodyPointerEvents;
-  const $5cb92bef7577960e$var$DismissableLayerContext = /* @__PURE__ */ F$2({
-    layers: /* @__PURE__ */ new Set(),
-    layersWithOutsidePointerEventsDisabled: /* @__PURE__ */ new Set(),
-    branches: /* @__PURE__ */ new Set()
-  });
-  const $5cb92bef7577960e$export$177fb62ff3ec1f22 = /* @__PURE__ */ k((props, forwardedRef) => {
-    var _node$ownerDocument;
-    const { disableOutsidePointerEvents = false, onEscapeKeyDown, onPointerDownOutside, onFocusOutside, onInteractOutside, onDismiss, ...layerProps } = props;
-    const context = q$1($5cb92bef7577960e$var$DismissableLayerContext);
-    const [node1, setNode] = h(null);
-    const ownerDocument = (_node$ownerDocument = node1 === null || node1 === void 0 ? void 0 : node1.ownerDocument) !== null && _node$ownerDocument !== void 0 ? _node$ownerDocument : globalThis === null || globalThis === void 0 ? void 0 : globalThis.document;
-    const [, force] = h({});
-    const composedRefs = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(
-      forwardedRef,
-      (node2) => setNode(node2)
-    );
-    const layers = Array.from(context.layers);
-    const [highestLayerWithOutsidePointerEventsDisabled] = [
-      ...context.layersWithOutsidePointerEventsDisabled
-    ].slice(-1);
-    const highestLayerWithOutsidePointerEventsDisabledIndex = layers.indexOf(highestLayerWithOutsidePointerEventsDisabled);
-    const index2 = node1 ? layers.indexOf(node1) : -1;
-    const isBodyPointerEventsDisabled = context.layersWithOutsidePointerEventsDisabled.size > 0;
-    const isPointerEventsEnabled = index2 >= highestLayerWithOutsidePointerEventsDisabledIndex;
-    const pointerDownOutside = $5cb92bef7577960e$var$usePointerDownOutside((event) => {
-      const target = event.target;
-      const isPointerDownOnBranch = [
-        ...context.branches
-      ].some(
-        (branch) => branch.contains(target)
-      );
-      if (!isPointerEventsEnabled || isPointerDownOnBranch)
-        return;
-      onPointerDownOutside === null || onPointerDownOutside === void 0 || onPointerDownOutside(event);
-      onInteractOutside === null || onInteractOutside === void 0 || onInteractOutside(event);
-      if (!event.defaultPrevented)
-        onDismiss === null || onDismiss === void 0 || onDismiss();
-    }, ownerDocument);
-    const focusOutside = $5cb92bef7577960e$var$useFocusOutside((event) => {
-      const target = event.target;
-      const isFocusInBranch = [
-        ...context.branches
-      ].some(
-        (branch) => branch.contains(target)
-      );
-      if (isFocusInBranch)
-        return;
-      onFocusOutside === null || onFocusOutside === void 0 || onFocusOutside(event);
-      onInteractOutside === null || onInteractOutside === void 0 || onInteractOutside(event);
-      if (!event.defaultPrevented)
-        onDismiss === null || onDismiss === void 0 || onDismiss();
-    }, ownerDocument);
-    $addc16e1bbe58fd0$export$3a72a57244d6e765((event) => {
-      const isHighestLayer = index2 === context.layers.size - 1;
-      if (!isHighestLayer)
-        return;
-      onEscapeKeyDown === null || onEscapeKeyDown === void 0 || onEscapeKeyDown(event);
-      if (!event.defaultPrevented && onDismiss) {
-        event.preventDefault();
-        onDismiss();
-      }
-    }, ownerDocument);
-    p$1(() => {
-      if (!node1)
-        return;
-      if (disableOutsidePointerEvents) {
-        if (context.layersWithOutsidePointerEventsDisabled.size === 0) {
-          $5cb92bef7577960e$var$originalBodyPointerEvents = ownerDocument.body.style.pointerEvents;
-          ownerDocument.body.style.pointerEvents = "none";
-        }
-        context.layersWithOutsidePointerEventsDisabled.add(node1);
-      }
-      context.layers.add(node1);
-      $5cb92bef7577960e$var$dispatchUpdate();
-      return () => {
-        if (disableOutsidePointerEvents && context.layersWithOutsidePointerEventsDisabled.size === 1)
-          ownerDocument.body.style.pointerEvents = $5cb92bef7577960e$var$originalBodyPointerEvents;
-      };
-    }, [
-      node1,
-      ownerDocument,
-      disableOutsidePointerEvents,
-      context
-    ]);
-    p$1(() => {
-      return () => {
-        if (!node1)
-          return;
-        context.layers.delete(node1);
-        context.layersWithOutsidePointerEventsDisabled.delete(node1);
-        $5cb92bef7577960e$var$dispatchUpdate();
-      };
-    }, [
-      node1,
-      context
-    ]);
-    p$1(() => {
-      const handleUpdate = () => force({});
-      document.addEventListener($5cb92bef7577960e$var$CONTEXT_UPDATE, handleUpdate);
-      return () => document.removeEventListener($5cb92bef7577960e$var$CONTEXT_UPDATE, handleUpdate);
-    }, []);
-    return /* @__PURE__ */ y$1($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({}, layerProps, {
-      ref: composedRefs,
-      style: {
-        pointerEvents: isBodyPointerEventsDisabled ? isPointerEventsEnabled ? "auto" : "none" : void 0,
-        ...props.style
-      },
-      onFocusCapture: $e42e1063c40fb3ef$export$b9ecd428b558ff10(props.onFocusCapture, focusOutside.onFocusCapture),
-      onBlurCapture: $e42e1063c40fb3ef$export$b9ecd428b558ff10(props.onBlurCapture, focusOutside.onBlurCapture),
-      onPointerDownCapture: $e42e1063c40fb3ef$export$b9ecd428b558ff10(props.onPointerDownCapture, pointerDownOutside.onPointerDownCapture)
-    }));
-  });
-  function $5cb92bef7577960e$var$usePointerDownOutside(onPointerDownOutside, ownerDocument = globalThis === null || globalThis === void 0 ? void 0 : globalThis.document) {
-    const handlePointerDownOutside = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onPointerDownOutside);
-    const isPointerInsideReactTreeRef = _$1(false);
-    const handleClickRef = _$1(() => {
-    });
-    p$1(() => {
-      const handlePointerDown = (event) => {
-        if (event.target && !isPointerInsideReactTreeRef.current) {
-          let handleAndDispatchPointerDownOutsideEvent = function() {
-            $5cb92bef7577960e$var$handleAndDispatchCustomEvent($5cb92bef7577960e$var$POINTER_DOWN_OUTSIDE, handlePointerDownOutside, eventDetail, {
-              discrete: true
-            });
-          };
-          const eventDetail = {
-            originalEvent: event
-          };
-          if (event.pointerType === "touch") {
-            ownerDocument.removeEventListener("click", handleClickRef.current);
-            handleClickRef.current = handleAndDispatchPointerDownOutsideEvent;
-            ownerDocument.addEventListener("click", handleClickRef.current, {
-              once: true
-            });
-          } else
-            handleAndDispatchPointerDownOutsideEvent();
-        }
-        isPointerInsideReactTreeRef.current = false;
-      };
-      const timerId = window.setTimeout(() => {
-        ownerDocument.addEventListener("pointerdown", handlePointerDown);
-      }, 0);
-      return () => {
-        window.clearTimeout(timerId);
-        ownerDocument.removeEventListener("pointerdown", handlePointerDown);
-        ownerDocument.removeEventListener("click", handleClickRef.current);
-      };
-    }, [
-      ownerDocument,
-      handlePointerDownOutside
-    ]);
-    return {
-      // ensures we check React component tree (not just DOM tree)
-      onPointerDownCapture: () => isPointerInsideReactTreeRef.current = true
-    };
-  }
-  function $5cb92bef7577960e$var$useFocusOutside(onFocusOutside, ownerDocument = globalThis === null || globalThis === void 0 ? void 0 : globalThis.document) {
-    const handleFocusOutside = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onFocusOutside);
-    const isFocusInsideReactTreeRef = _$1(false);
-    p$1(() => {
-      const handleFocus = (event) => {
-        if (event.target && !isFocusInsideReactTreeRef.current) {
-          const eventDetail = {
-            originalEvent: event
-          };
-          $5cb92bef7577960e$var$handleAndDispatchCustomEvent($5cb92bef7577960e$var$FOCUS_OUTSIDE, handleFocusOutside, eventDetail, {
-            discrete: false
-          });
-        }
-      };
-      ownerDocument.addEventListener("focusin", handleFocus);
-      return () => ownerDocument.removeEventListener("focusin", handleFocus);
-    }, [
-      ownerDocument,
-      handleFocusOutside
-    ]);
-    return {
-      onFocusCapture: () => isFocusInsideReactTreeRef.current = true,
-      onBlurCapture: () => isFocusInsideReactTreeRef.current = false
-    };
-  }
-  function $5cb92bef7577960e$var$dispatchUpdate() {
-    const event = new CustomEvent($5cb92bef7577960e$var$CONTEXT_UPDATE);
-    document.dispatchEvent(event);
-  }
-  function $5cb92bef7577960e$var$handleAndDispatchCustomEvent(name, handler, detail, { discrete }) {
-    const target = detail.originalEvent.target;
-    const event = new CustomEvent(name, {
-      bubbles: false,
-      cancelable: true,
-      detail
-    });
-    if (handler)
-      target.addEventListener(name, handler, {
-        once: true
-      });
-    if (discrete)
-      $8927f6f2acc4f386$export$6d1a0317bde7de7f(target, event);
-    else
-      target.dispatchEvent(event);
-  }
-  const $d3863c46a17e8a28$var$AUTOFOCUS_ON_MOUNT = "focusScope.autoFocusOnMount";
-  const $d3863c46a17e8a28$var$AUTOFOCUS_ON_UNMOUNT = "focusScope.autoFocusOnUnmount";
-  const $d3863c46a17e8a28$var$EVENT_OPTIONS = {
-    bubbles: false,
-    cancelable: true
-  };
-  const $d3863c46a17e8a28$export$20e40289641fbbb6 = /* @__PURE__ */ k((props, forwardedRef) => {
-    const { loop = false, trapped = false, onMountAutoFocus: onMountAutoFocusProp, onUnmountAutoFocus: onUnmountAutoFocusProp, ...scopeProps } = props;
-    const [container1, setContainer] = h(null);
-    const onMountAutoFocus = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onMountAutoFocusProp);
-    const onUnmountAutoFocus = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onUnmountAutoFocusProp);
-    const lastFocusedElementRef = _$1(null);
-    const composedRefs = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(
-      forwardedRef,
-      (node2) => setContainer(node2)
-    );
-    const focusScope = _$1({
-      paused: false,
-      pause() {
-        this.paused = true;
-      },
-      resume() {
-        this.paused = false;
-      }
-    }).current;
-    p$1(() => {
-      if (trapped) {
-        let handleFocusIn = function(event) {
-          if (focusScope.paused || !container1)
-            return;
-          const target = event.target;
-          if (container1.contains(target))
-            lastFocusedElementRef.current = target;
-          else
-            $d3863c46a17e8a28$var$focus(lastFocusedElementRef.current, {
-              select: true
-            });
-        }, handleFocusOut = function(event) {
-          if (focusScope.paused || !container1)
-            return;
-          if (!container1.contains(event.relatedTarget))
-            $d3863c46a17e8a28$var$focus(lastFocusedElementRef.current, {
-              select: true
-            });
-        };
-        document.addEventListener("focusin", handleFocusIn);
-        document.addEventListener("focusout", handleFocusOut);
-        return () => {
-          document.removeEventListener("focusin", handleFocusIn);
-          document.removeEventListener("focusout", handleFocusOut);
-        };
-      }
-    }, [
-      trapped,
-      container1,
-      focusScope.paused
-    ]);
-    p$1(() => {
-      if (container1) {
-        $d3863c46a17e8a28$var$focusScopesStack.add(focusScope);
-        const previouslyFocusedElement = document.activeElement;
-        const hasFocusedCandidate = container1.contains(previouslyFocusedElement);
-        if (!hasFocusedCandidate) {
-          const mountEvent = new CustomEvent($d3863c46a17e8a28$var$AUTOFOCUS_ON_MOUNT, $d3863c46a17e8a28$var$EVENT_OPTIONS);
-          container1.addEventListener($d3863c46a17e8a28$var$AUTOFOCUS_ON_MOUNT, onMountAutoFocus);
-          container1.dispatchEvent(mountEvent);
-          if (!mountEvent.defaultPrevented) {
-            $d3863c46a17e8a28$var$focusFirst($d3863c46a17e8a28$var$removeLinks($d3863c46a17e8a28$var$getTabbableCandidates(container1)), {
-              select: true
-            });
-            if (document.activeElement === previouslyFocusedElement)
-              $d3863c46a17e8a28$var$focus(container1);
-          }
-        }
-        return () => {
-          container1.removeEventListener($d3863c46a17e8a28$var$AUTOFOCUS_ON_MOUNT, onMountAutoFocus);
-          setTimeout(() => {
-            const unmountEvent = new CustomEvent($d3863c46a17e8a28$var$AUTOFOCUS_ON_UNMOUNT, $d3863c46a17e8a28$var$EVENT_OPTIONS);
-            container1.addEventListener($d3863c46a17e8a28$var$AUTOFOCUS_ON_UNMOUNT, onUnmountAutoFocus);
-            container1.dispatchEvent(unmountEvent);
-            if (!unmountEvent.defaultPrevented)
-              $d3863c46a17e8a28$var$focus(previouslyFocusedElement !== null && previouslyFocusedElement !== void 0 ? previouslyFocusedElement : document.body, {
-                select: true
-              });
-            container1.removeEventListener($d3863c46a17e8a28$var$AUTOFOCUS_ON_UNMOUNT, onUnmountAutoFocus);
-            $d3863c46a17e8a28$var$focusScopesStack.remove(focusScope);
-          }, 0);
-        };
-      }
-    }, [
-      container1,
-      onMountAutoFocus,
-      onUnmountAutoFocus,
-      focusScope
-    ]);
-    const handleKeyDown = T$1((event) => {
-      if (!loop && !trapped)
-        return;
-      if (focusScope.paused)
-        return;
-      const isTabKey = event.key === "Tab" && !event.altKey && !event.ctrlKey && !event.metaKey;
-      const focusedElement = document.activeElement;
-      if (isTabKey && focusedElement) {
-        const container = event.currentTarget;
-        const [first, last] = $d3863c46a17e8a28$var$getTabbableEdges(container);
-        const hasTabbableElementsInside = first && last;
-        if (!hasTabbableElementsInside) {
-          if (focusedElement === container)
-            event.preventDefault();
-        } else {
-          if (!event.shiftKey && focusedElement === last) {
-            event.preventDefault();
-            if (loop)
-              $d3863c46a17e8a28$var$focus(first, {
-                select: true
-              });
-          } else if (event.shiftKey && focusedElement === first) {
-            event.preventDefault();
-            if (loop)
-              $d3863c46a17e8a28$var$focus(last, {
-                select: true
-              });
-          }
-        }
-      }
-    }, [
-      loop,
-      trapped,
-      focusScope.paused
-    ]);
-    return /* @__PURE__ */ y$1($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({
-      tabIndex: -1
-    }, scopeProps, {
-      ref: composedRefs,
-      onKeyDown: handleKeyDown
-    }));
-  });
-  function $d3863c46a17e8a28$var$focusFirst(candidates, { select = false } = {}) {
-    const previouslyFocusedElement = document.activeElement;
-    for (const candidate of candidates) {
-      $d3863c46a17e8a28$var$focus(candidate, {
-        select
-      });
-      if (document.activeElement !== previouslyFocusedElement)
-        return;
-    }
-  }
-  function $d3863c46a17e8a28$var$getTabbableEdges(container) {
-    const candidates = $d3863c46a17e8a28$var$getTabbableCandidates(container);
-    const first = $d3863c46a17e8a28$var$findVisible(candidates, container);
-    const last = $d3863c46a17e8a28$var$findVisible(candidates.reverse(), container);
-    return [
-      first,
-      last
-    ];
-  }
-  function $d3863c46a17e8a28$var$getTabbableCandidates(container) {
-    const nodes = [];
-    const walker = document.createTreeWalker(container, NodeFilter.SHOW_ELEMENT, {
-      acceptNode: (node2) => {
-        const isHiddenInput = node2.tagName === "INPUT" && node2.type === "hidden";
-        if (node2.disabled || node2.hidden || isHiddenInput)
-          return NodeFilter.FILTER_SKIP;
-        return node2.tabIndex >= 0 ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
-      }
-    });
-    while (walker.nextNode())
-      nodes.push(walker.currentNode);
-    return nodes;
-  }
-  function $d3863c46a17e8a28$var$findVisible(elements, container) {
-    for (const element2 of elements) {
-      if (!$d3863c46a17e8a28$var$isHidden(element2, {
-        upTo: container
-      }))
-        return element2;
-    }
-  }
-  function $d3863c46a17e8a28$var$isHidden(node2, { upTo }) {
-    if (getComputedStyle(node2).visibility === "hidden")
-      return true;
-    while (node2) {
-      if (upTo !== void 0 && node2 === upTo)
-        return false;
-      if (getComputedStyle(node2).display === "none")
-        return true;
-      node2 = node2.parentElement;
-    }
-    return false;
-  }
-  function $d3863c46a17e8a28$var$isSelectableInput(element2) {
-    return element2 instanceof HTMLInputElement && "select" in element2;
-  }
-  function $d3863c46a17e8a28$var$focus(element2, { select = false } = {}) {
-    if (element2 && element2.focus) {
-      const previouslyFocusedElement = document.activeElement;
-      element2.focus({
-        preventScroll: true
-      });
-      if (element2 !== previouslyFocusedElement && $d3863c46a17e8a28$var$isSelectableInput(element2) && select)
-        element2.select();
-    }
-  }
-  const $d3863c46a17e8a28$var$focusScopesStack = $d3863c46a17e8a28$var$createFocusScopesStack();
-  function $d3863c46a17e8a28$var$createFocusScopesStack() {
-    let stack = [];
-    return {
-      add(focusScope) {
-        const activeFocusScope = stack[0];
-        if (focusScope !== activeFocusScope)
-          activeFocusScope === null || activeFocusScope === void 0 || activeFocusScope.pause();
-        stack = $d3863c46a17e8a28$var$arrayRemove(stack, focusScope);
-        stack.unshift(focusScope);
-      },
-      remove(focusScope) {
-        var _stack$;
-        stack = $d3863c46a17e8a28$var$arrayRemove(stack, focusScope);
-        (_stack$ = stack[0]) === null || _stack$ === void 0 || _stack$.resume();
-      }
-    };
-  }
-  function $d3863c46a17e8a28$var$arrayRemove(array, item) {
-    const updatedArray = [
-      ...array
-    ];
-    const index2 = updatedArray.indexOf(item);
-    if (index2 !== -1)
-      updatedArray.splice(index2, 1);
-    return updatedArray;
-  }
-  function $d3863c46a17e8a28$var$removeLinks(items) {
-    return items.filter(
-      (item) => item.tagName !== "A"
-    );
-  }
-  const $f1701beae083dbae$export$602eac185826482c = /* @__PURE__ */ k((props, forwardedRef) => {
-    var _globalThis$document;
-    const { container = globalThis === null || globalThis === void 0 ? void 0 : (_globalThis$document = globalThis.document) === null || _globalThis$document === void 0 ? void 0 : _globalThis$document.body, ...portalProps } = props;
-    return container ? /* @__PURE__ */ Cn.createPortal(/* @__PURE__ */ y$1($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({}, portalProps, {
-      ref: forwardedRef
-    })), container) : null;
-  });
-  function $fe963b355347cc68$export$3e6543de14f8614f(initialState, machine) {
-    return s((state, event) => {
-      const nextState = machine[state][event];
-      return nextState !== null && nextState !== void 0 ? nextState : state;
-    }, initialState);
-  }
-  const $921a889cee6df7e8$export$99c2b779aa4e8b8b = (props) => {
-    const { present, children } = props;
-    const presence = $921a889cee6df7e8$var$usePresence(present);
-    const child = typeof children === "function" ? children({
-      present: presence.isPresent
-    }) : O.only(children);
-    const ref = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(presence.ref, child.ref);
-    const forceMount = typeof children === "function";
-    return forceMount || presence.isPresent ? /* @__PURE__ */ sn(child, {
-      ref
-    }) : null;
-  };
-  $921a889cee6df7e8$export$99c2b779aa4e8b8b.displayName = "Presence";
-  function $921a889cee6df7e8$var$usePresence(present) {
-    const [node1, setNode] = h();
-    const stylesRef = _$1({});
-    const prevPresentRef = _$1(present);
-    const prevAnimationNameRef = _$1("none");
-    const initialState = present ? "mounted" : "unmounted";
-    const [state, send] = $fe963b355347cc68$export$3e6543de14f8614f(initialState, {
-      mounted: {
-        UNMOUNT: "unmounted",
-        ANIMATION_OUT: "unmountSuspended"
-      },
-      unmountSuspended: {
-        MOUNT: "mounted",
-        ANIMATION_END: "unmounted"
-      },
-      unmounted: {
-        MOUNT: "mounted"
-      }
-    });
-    p$1(() => {
-      const currentAnimationName = $921a889cee6df7e8$var$getAnimationName(stylesRef.current);
-      prevAnimationNameRef.current = state === "mounted" ? currentAnimationName : "none";
-    }, [
-      state
-    ]);
-    $9f79659886946c16$export$e5c5a5f917a5871c(() => {
-      const styles = stylesRef.current;
-      const wasPresent = prevPresentRef.current;
-      const hasPresentChanged = wasPresent !== present;
-      if (hasPresentChanged) {
-        const prevAnimationName = prevAnimationNameRef.current;
-        const currentAnimationName = $921a889cee6df7e8$var$getAnimationName(styles);
-        if (present)
-          send("MOUNT");
-        else if (currentAnimationName === "none" || (styles === null || styles === void 0 ? void 0 : styles.display) === "none")
-          send("UNMOUNT");
-        else {
-          const isAnimating = prevAnimationName !== currentAnimationName;
-          if (wasPresent && isAnimating)
-            send("ANIMATION_OUT");
-          else
-            send("UNMOUNT");
-        }
-        prevPresentRef.current = present;
-      }
-    }, [
-      present,
-      send
-    ]);
-    $9f79659886946c16$export$e5c5a5f917a5871c(() => {
-      if (node1) {
-        const handleAnimationEnd = (event) => {
-          const currentAnimationName = $921a889cee6df7e8$var$getAnimationName(stylesRef.current);
-          const isCurrentAnimation = currentAnimationName.includes(event.animationName);
-          if (event.target === node1 && isCurrentAnimation)
-            pn(
-              () => send("ANIMATION_END")
-            );
-        };
-        const handleAnimationStart = (event) => {
-          if (event.target === node1)
-            prevAnimationNameRef.current = $921a889cee6df7e8$var$getAnimationName(stylesRef.current);
-        };
-        node1.addEventListener("animationstart", handleAnimationStart);
-        node1.addEventListener("animationcancel", handleAnimationEnd);
-        node1.addEventListener("animationend", handleAnimationEnd);
-        return () => {
-          node1.removeEventListener("animationstart", handleAnimationStart);
-          node1.removeEventListener("animationcancel", handleAnimationEnd);
-          node1.removeEventListener("animationend", handleAnimationEnd);
-        };
-      } else
-        send("ANIMATION_END");
-    }, [
-      node1,
-      send
-    ]);
-    return {
-      isPresent: [
-        "mounted",
-        "unmountSuspended"
-      ].includes(state),
-      ref: T$1((node2) => {
-        if (node2)
-          stylesRef.current = getComputedStyle(node2);
-        setNode(node2);
-      }, [])
-    };
-  }
-  function $921a889cee6df7e8$var$getAnimationName(styles) {
-    return (styles === null || styles === void 0 ? void 0 : styles.animationName) || "none";
-  }
-  let $3db38b7d1fb3fe6a$var$count = 0;
-  function $3db38b7d1fb3fe6a$export$b7ece24a22aeda8c() {
-    p$1(() => {
-      var _edgeGuards$, _edgeGuards$2;
-      const edgeGuards = document.querySelectorAll("[data-radix-focus-guard]");
-      document.body.insertAdjacentElement("afterbegin", (_edgeGuards$ = edgeGuards[0]) !== null && _edgeGuards$ !== void 0 ? _edgeGuards$ : $3db38b7d1fb3fe6a$var$createFocusGuard());
-      document.body.insertAdjacentElement("beforeend", (_edgeGuards$2 = edgeGuards[1]) !== null && _edgeGuards$2 !== void 0 ? _edgeGuards$2 : $3db38b7d1fb3fe6a$var$createFocusGuard());
-      $3db38b7d1fb3fe6a$var$count++;
-      return () => {
-        if ($3db38b7d1fb3fe6a$var$count === 1)
-          document.querySelectorAll("[data-radix-focus-guard]").forEach(
-            (node2) => node2.remove()
-          );
-        $3db38b7d1fb3fe6a$var$count--;
-      };
-    }, []);
-  }
-  function $3db38b7d1fb3fe6a$var$createFocusGuard() {
-    const element2 = document.createElement("span");
-    element2.setAttribute("data-radix-focus-guard", "");
-    element2.tabIndex = 0;
-    element2.style.cssText = "outline: none; opacity: 0; position: fixed; pointer-events: none";
-    return element2;
-  }
-  var __assign$1 = function() {
-    __assign$1 = Object.assign || function __assign2(t2) {
-      for (var s2, i2 = 1, n2 = arguments.length; i2 < n2; i2++) {
-        s2 = arguments[i2];
-        for (var p2 in s2)
-          if (Object.prototype.hasOwnProperty.call(s2, p2))
-            t2[p2] = s2[p2];
-      }
-      return t2;
-    };
-    return __assign$1.apply(this, arguments);
-  };
-  function __rest(s2, e2) {
-    var t2 = {};
-    for (var p2 in s2)
-      if (Object.prototype.hasOwnProperty.call(s2, p2) && e2.indexOf(p2) < 0)
-        t2[p2] = s2[p2];
-    if (s2 != null && typeof Object.getOwnPropertySymbols === "function")
-      for (var i2 = 0, p2 = Object.getOwnPropertySymbols(s2); i2 < p2.length; i2++) {
-        if (e2.indexOf(p2[i2]) < 0 && Object.prototype.propertyIsEnumerable.call(s2, p2[i2]))
-          t2[p2[i2]] = s2[p2[i2]];
-      }
-    return t2;
-  }
-  function __spreadArray(to, from, pack) {
-    if (pack || arguments.length === 2)
-      for (var i2 = 0, l2 = from.length, ar; i2 < l2; i2++) {
-        if (ar || !(i2 in from)) {
-          if (!ar)
-            ar = Array.prototype.slice.call(from, 0, i2);
-          ar[i2] = from[i2];
-        }
-      }
-    return to.concat(ar || Array.prototype.slice.call(from));
-  }
-  var zeroRightClassName = "right-scroll-bar-position";
-  var fullWidthClassName = "width-before-scroll-bar";
-  var noScrollbarsClassName = "with-scroll-bars-hidden";
-  var removedBarSizeVariable = "--removed-body-scroll-bar-size";
-  function assignRef(ref, value) {
-    if (typeof ref === "function") {
-      ref(value);
-    } else if (ref) {
-      ref.current = value;
-    }
-    return ref;
-  }
-  function useCallbackRef(initialValue, callback) {
-    var ref = h(function() {
-      return {
-        // value
-        value: initialValue,
-        // last callback
-        callback,
-        // "memoized" public interface
-        facade: {
-          get current() {
-            return ref.value;
-          },
-          set current(value) {
-            var last = ref.value;
-            if (last !== value) {
-              ref.value = value;
-              ref.callback(value, last);
-            }
-          }
-        }
-      };
-    })[0];
-    ref.callback = callback;
-    return ref.facade;
-  }
-  function useMergeRefs(refs, defaultValue) {
-    return useCallbackRef(defaultValue || null, function(newValue) {
-      return refs.forEach(function(ref) {
-        return assignRef(ref, newValue);
-      });
-    });
-  }
-  function ItoI(a2) {
-    return a2;
-  }
-  function innerCreateMedium(defaults, middleware) {
-    if (middleware === void 0) {
-      middleware = ItoI;
-    }
-    var buffer = [];
-    var assigned = false;
-    var medium = {
-      read: function() {
-        if (assigned) {
-          throw new Error("Sidecar: could not `read` from an `assigned` medium. `read` could be used only with `useMedium`.");
-        }
-        if (buffer.length) {
-          return buffer[buffer.length - 1];
-        }
-        return defaults;
-      },
-      useMedium: function(data) {
-        var item = middleware(data, assigned);
-        buffer.push(item);
-        return function() {
-          buffer = buffer.filter(function(x2) {
-            return x2 !== item;
-          });
-        };
-      },
-      assignSyncMedium: function(cb) {
-        assigned = true;
-        while (buffer.length) {
-          var cbs = buffer;
-          buffer = [];
-          cbs.forEach(cb);
-        }
-        buffer = {
-          push: function(x2) {
-            return cb(x2);
-          },
-          filter: function() {
-            return buffer;
-          }
-        };
-      },
-      assignMedium: function(cb) {
-        assigned = true;
-        var pendingQueue = [];
-        if (buffer.length) {
-          var cbs = buffer;
-          buffer = [];
-          cbs.forEach(cb);
-          pendingQueue = buffer;
-        }
-        var executeQueue = function() {
-          var cbs2 = pendingQueue;
-          pendingQueue = [];
-          cbs2.forEach(cb);
-        };
-        var cycle = function() {
-          return Promise.resolve().then(executeQueue);
-        };
-        cycle();
-        buffer = {
-          push: function(x2) {
-            pendingQueue.push(x2);
-            cycle();
-          },
-          filter: function(filter) {
-            pendingQueue = pendingQueue.filter(filter);
-            return buffer;
-          }
-        };
-      }
-    };
-    return medium;
-  }
-  function createSidecarMedium(options2) {
-    if (options2 === void 0) {
-      options2 = {};
-    }
-    var medium = innerCreateMedium(null);
-    medium.options = __assign$1({ async: true, ssr: false }, options2);
-    return medium;
-  }
-  var SideCar$1 = function(_a) {
-    var sideCar = _a.sideCar, rest = __rest(_a, ["sideCar"]);
-    if (!sideCar) {
-      throw new Error("Sidecar: please provide `sideCar` property to import the right car");
-    }
-    var Target = sideCar.read();
-    if (!Target) {
-      throw new Error("Sidecar medium not found");
-    }
-    return y$1(Target, __assign$1({}, rest));
-  };
-  SideCar$1.isSideCarExport = true;
-  function exportSidecar(medium, exported) {
-    medium.useMedium(exported);
-    return SideCar$1;
-  }
-  var effectCar = createSidecarMedium();
-  var nothing = function() {
-    return;
-  };
-  var RemoveScroll = k(function(props, parentRef) {
-    var ref = _$1(null);
-    var _a = h({
-      onScrollCapture: nothing,
-      onWheelCapture: nothing,
-      onTouchMoveCapture: nothing
-    }), callbacks = _a[0], setCallbacks = _a[1];
-    var forwardProps = props.forwardProps, children = props.children, className = props.className, removeScrollBar = props.removeScrollBar, enabled = props.enabled, shards = props.shards, sideCar = props.sideCar, noIsolation = props.noIsolation, inert = props.inert, allowPinchZoom = props.allowPinchZoom, _b = props.as, Container = _b === void 0 ? "div" : _b, rest = __rest(props, ["forwardProps", "children", "className", "removeScrollBar", "enabled", "shards", "sideCar", "noIsolation", "inert", "allowPinchZoom", "as"]);
-    var SideCar2 = sideCar;
-    var containerRef = useMergeRefs([ref, parentRef]);
-    var containerProps = __assign$1(__assign$1({}, rest), callbacks);
-    return y$1(
-      _$2,
-      null,
-      enabled && y$1(SideCar2, { sideCar: effectCar, removeScrollBar, shards, noIsolation, inert, setCallbacks, allowPinchZoom: !!allowPinchZoom, lockRef: ref }),
-      forwardProps ? sn(O.only(children), __assign$1(__assign$1({}, containerProps), { ref: containerRef })) : y$1(Container, __assign$1({}, containerProps, { className, ref: containerRef }), children)
-    );
-  });
-  RemoveScroll.defaultProps = {
-    enabled: true,
-    removeScrollBar: true,
-    inert: false
-  };
-  RemoveScroll.classNames = {
-    fullWidth: fullWidthClassName,
-    zeroRight: zeroRightClassName
-  };
-  var currentNonce;
-  var getNonce = function() {
-    if (currentNonce) {
-      return currentNonce;
-    }
-    if (typeof __webpack_nonce__ !== "undefined") {
-      return __webpack_nonce__;
-    }
-    return void 0;
-  };
-  function makeStyleTag() {
-    if (!document)
-      return null;
-    var tag = document.createElement("style");
-    tag.type = "text/css";
-    var nonce = getNonce();
-    if (nonce) {
-      tag.setAttribute("nonce", nonce);
-    }
-    return tag;
-  }
-  function injectStyles(tag, css) {
-    if (tag.styleSheet) {
-      tag.styleSheet.cssText = css;
-    } else {
-      tag.appendChild(document.createTextNode(css));
-    }
-  }
-  function insertStyleTag(tag) {
-    var head2 = document.head || document.getElementsByTagName("head")[0];
-    head2.appendChild(tag);
-  }
-  var stylesheetSingleton = function() {
-    var counter = 0;
-    var stylesheet = null;
-    return {
-      add: function(style2) {
-        if (counter == 0) {
-          if (stylesheet = makeStyleTag()) {
-            injectStyles(stylesheet, style2);
-            insertStyleTag(stylesheet);
-          }
-        }
-        counter++;
-      },
-      remove: function() {
-        counter--;
-        if (!counter && stylesheet) {
-          stylesheet.parentNode && stylesheet.parentNode.removeChild(stylesheet);
-          stylesheet = null;
-        }
-      }
-    };
-  };
-  var styleHookSingleton = function() {
-    var sheet = stylesheetSingleton();
-    return function(styles, isDynamic) {
-      p$1(function() {
-        sheet.add(styles);
-        return function() {
-          sheet.remove();
-        };
-      }, [styles && isDynamic]);
-    };
-  };
-  var styleSingleton = function() {
-    var useStyle = styleHookSingleton();
-    var Sheet = function(_a) {
-      var styles = _a.styles, dynamic = _a.dynamic;
-      useStyle(styles, dynamic);
-      return null;
-    };
-    return Sheet;
-  };
-  var zeroGap = {
-    left: 0,
-    top: 0,
-    right: 0,
-    gap: 0
-  };
-  var parse$1 = function(x2) {
-    return parseInt(x2 || "", 10) || 0;
-  };
-  var getOffset = function(gapMode) {
-    var cs = window.getComputedStyle(document.body);
-    var left = cs[gapMode === "padding" ? "paddingLeft" : "marginLeft"];
-    var top = cs[gapMode === "padding" ? "paddingTop" : "marginTop"];
-    var right = cs[gapMode === "padding" ? "paddingRight" : "marginRight"];
-    return [parse$1(left), parse$1(top), parse$1(right)];
-  };
-  var getGapWidth = function(gapMode) {
-    if (gapMode === void 0) {
-      gapMode = "margin";
-    }
-    if (typeof window === "undefined") {
-      return zeroGap;
-    }
-    var offsets = getOffset(gapMode);
-    var documentWidth = document.documentElement.clientWidth;
-    var windowWidth = window.innerWidth;
-    return {
-      left: offsets[0],
-      top: offsets[1],
-      right: offsets[2],
-      gap: Math.max(0, windowWidth - documentWidth + offsets[2] - offsets[0])
-    };
-  };
-  var Style = styleSingleton();
-  var getStyles = function(_a, allowRelative, gapMode, important) {
-    var left = _a.left, top = _a.top, right = _a.right, gap = _a.gap;
-    if (gapMode === void 0) {
-      gapMode = "margin";
-    }
-    return "\n  .".concat(noScrollbarsClassName, " {\n   overflow: hidden ").concat(important, ";\n   padding-right: ").concat(gap, "px ").concat(important, ";\n  }\n  body {\n    overflow: hidden ").concat(important, ";\n    overscroll-behavior: contain;\n    ").concat([
-      allowRelative && "position: relative ".concat(important, ";"),
-      gapMode === "margin" && "\n    padding-left: ".concat(left, "px;\n    padding-top: ").concat(top, "px;\n    padding-right: ").concat(right, "px;\n    margin-left:0;\n    margin-top:0;\n    margin-right: ").concat(gap, "px ").concat(important, ";\n    "),
-      gapMode === "padding" && "padding-right: ".concat(gap, "px ").concat(important, ";")
-    ].filter(Boolean).join(""), "\n  }\n  \n  .").concat(zeroRightClassName, " {\n    right: ").concat(gap, "px ").concat(important, ";\n  }\n  \n  .").concat(fullWidthClassName, " {\n    margin-right: ").concat(gap, "px ").concat(important, ";\n  }\n  \n  .").concat(zeroRightClassName, " .").concat(zeroRightClassName, " {\n    right: 0 ").concat(important, ";\n  }\n  \n  .").concat(fullWidthClassName, " .").concat(fullWidthClassName, " {\n    margin-right: 0 ").concat(important, ";\n  }\n  \n  body {\n    ").concat(removedBarSizeVariable, ": ").concat(gap, "px;\n  }\n");
-  };
-  var RemoveScrollBar = function(props) {
-    var noRelative = props.noRelative, noImportant = props.noImportant, _a = props.gapMode, gapMode = _a === void 0 ? "margin" : _a;
-    var gap = F$1(function() {
-      return getGapWidth(gapMode);
-    }, [gapMode]);
-    return y$1(Style, { styles: getStyles(gap, !noRelative, gapMode, !noImportant ? "!important" : "") });
-  };
-  var passiveSupported = false;
-  if (typeof window !== "undefined") {
-    try {
-      var options = Object.defineProperty({}, "passive", {
-        get: function() {
-          passiveSupported = true;
-          return true;
-        }
-      });
-      window.addEventListener("test", options, options);
-      window.removeEventListener("test", options, options);
-    } catch (err) {
-      passiveSupported = false;
-    }
-  }
-  var nonPassive = passiveSupported ? { passive: false } : false;
-  var alwaysContainsScroll = function(node2) {
-    return node2.tagName === "TEXTAREA";
-  };
-  var elementCanBeScrolled = function(node2, overflow) {
-    var styles = window.getComputedStyle(node2);
-    return (
-      // not-not-scrollable
-      styles[overflow] !== "hidden" && // contains scroll inside self
-      !(styles.overflowY === styles.overflowX && !alwaysContainsScroll(node2) && styles[overflow] === "visible")
-    );
-  };
-  var elementCouldBeVScrolled = function(node2) {
-    return elementCanBeScrolled(node2, "overflowY");
-  };
-  var elementCouldBeHScrolled = function(node2) {
-    return elementCanBeScrolled(node2, "overflowX");
-  };
-  var locationCouldBeScrolled = function(axis, node2) {
-    var current = node2;
-    do {
-      if (typeof ShadowRoot !== "undefined" && current instanceof ShadowRoot) {
-        current = current.host;
-      }
-      var isScrollable = elementCouldBeScrolled(axis, current);
-      if (isScrollable) {
-        var _a = getScrollVariables(axis, current), s2 = _a[1], d2 = _a[2];
-        if (s2 > d2) {
-          return true;
-        }
-      }
-      current = current.parentNode;
-    } while (current && current !== document.body);
-    return false;
-  };
-  var getVScrollVariables = function(_a) {
-    var scrollTop = _a.scrollTop, scrollHeight = _a.scrollHeight, clientHeight = _a.clientHeight;
-    return [
-      scrollTop,
-      scrollHeight,
-      clientHeight
-    ];
-  };
-  var getHScrollVariables = function(_a) {
-    var scrollLeft = _a.scrollLeft, scrollWidth = _a.scrollWidth, clientWidth = _a.clientWidth;
-    return [
-      scrollLeft,
-      scrollWidth,
-      clientWidth
-    ];
-  };
-  var elementCouldBeScrolled = function(axis, node2) {
-    return axis === "v" ? elementCouldBeVScrolled(node2) : elementCouldBeHScrolled(node2);
-  };
-  var getScrollVariables = function(axis, node2) {
-    return axis === "v" ? getVScrollVariables(node2) : getHScrollVariables(node2);
-  };
-  var getDirectionFactor = function(axis, direction) {
-    return axis === "h" && direction === "rtl" ? -1 : 1;
-  };
-  var handleScroll = function(axis, endTarget, event, sourceDelta, noOverscroll) {
-    var directionFactor = getDirectionFactor(axis, window.getComputedStyle(endTarget).direction);
-    var delta = directionFactor * sourceDelta;
-    var target = event.target;
-    var targetInLock = endTarget.contains(target);
-    var shouldCancelScroll = false;
-    var isDeltaPositive = delta > 0;
-    var availableScroll = 0;
-    var availableScrollTop = 0;
-    do {
-      var _a = getScrollVariables(axis, target), position2 = _a[0], scroll_1 = _a[1], capacity = _a[2];
-      var elementScroll = scroll_1 - capacity - directionFactor * position2;
-      if (position2 || elementScroll) {
-        if (elementCouldBeScrolled(axis, target)) {
-          availableScroll += elementScroll;
-          availableScrollTop += position2;
-        }
-      }
-      target = target.parentNode;
-    } while (
-      // portaled content
-      !targetInLock && target !== document.body || // self content
-      targetInLock && (endTarget.contains(target) || endTarget === target)
-    );
-    if (isDeltaPositive && (noOverscroll && availableScroll === 0 || !noOverscroll && delta > availableScroll)) {
-      shouldCancelScroll = true;
-    } else if (!isDeltaPositive && (noOverscroll && availableScrollTop === 0 || !noOverscroll && -delta > availableScrollTop)) {
-      shouldCancelScroll = true;
-    }
-    return shouldCancelScroll;
-  };
-  var getTouchXY = function(event) {
-    return "changedTouches" in event ? [event.changedTouches[0].clientX, event.changedTouches[0].clientY] : [0, 0];
-  };
-  var getDeltaXY = function(event) {
-    return [event.deltaX, event.deltaY];
-  };
-  var extractRef = function(ref) {
-    return ref && "current" in ref ? ref.current : ref;
-  };
-  var deltaCompare = function(x2, y2) {
-    return x2[0] === y2[0] && x2[1] === y2[1];
-  };
-  var generateStyle = function(id) {
-    return "\n  .block-interactivity-".concat(id, " {pointer-events: none;}\n  .allow-interactivity-").concat(id, " {pointer-events: all;}\n");
-  };
-  var idCounter = 0;
-  var lockStack = [];
-  function RemoveScrollSideCar(props) {
-    var shouldPreventQueue = _$1([]);
-    var touchStartRef = _$1([0, 0]);
-    var activeAxis = _$1();
-    var id = h(idCounter++)[0];
-    var Style2 = h(function() {
-      return styleSingleton();
-    })[0];
-    var lastProps = _$1(props);
-    p$1(function() {
-      lastProps.current = props;
-    }, [props]);
-    p$1(function() {
-      if (props.inert) {
-        document.body.classList.add("block-interactivity-".concat(id));
-        var allow_1 = __spreadArray([props.lockRef.current], (props.shards || []).map(extractRef), true).filter(Boolean);
-        allow_1.forEach(function(el) {
-          return el.classList.add("allow-interactivity-".concat(id));
-        });
-        return function() {
-          document.body.classList.remove("block-interactivity-".concat(id));
-          allow_1.forEach(function(el) {
-            return el.classList.remove("allow-interactivity-".concat(id));
-          });
-        };
-      }
-      return;
-    }, [props.inert, props.lockRef.current, props.shards]);
-    var shouldCancelEvent = T$1(function(event, parent) {
-      if ("touches" in event && event.touches.length === 2) {
-        return !lastProps.current.allowPinchZoom;
-      }
-      var touch = getTouchXY(event);
-      var touchStart = touchStartRef.current;
-      var deltaX = "deltaX" in event ? event.deltaX : touchStart[0] - touch[0];
-      var deltaY = "deltaY" in event ? event.deltaY : touchStart[1] - touch[1];
-      var currentAxis;
-      var target = event.target;
-      var moveDirection = Math.abs(deltaX) > Math.abs(deltaY) ? "h" : "v";
-      if ("touches" in event && moveDirection === "h" && target.type === "range") {
-        return false;
-      }
-      var canBeScrolledInMainDirection = locationCouldBeScrolled(moveDirection, target);
-      if (!canBeScrolledInMainDirection) {
-        return true;
-      }
-      if (canBeScrolledInMainDirection) {
-        currentAxis = moveDirection;
-      } else {
-        currentAxis = moveDirection === "v" ? "h" : "v";
-        canBeScrolledInMainDirection = locationCouldBeScrolled(moveDirection, target);
-      }
-      if (!canBeScrolledInMainDirection) {
-        return false;
-      }
-      if (!activeAxis.current && "changedTouches" in event && (deltaX || deltaY)) {
-        activeAxis.current = currentAxis;
-      }
-      if (!currentAxis) {
-        return true;
-      }
-      var cancelingAxis = activeAxis.current || currentAxis;
-      return handleScroll(cancelingAxis, parent, event, cancelingAxis === "h" ? deltaX : deltaY, true);
-    }, []);
-    var shouldPrevent = T$1(function(_event) {
-      var event = _event;
-      if (!lockStack.length || lockStack[lockStack.length - 1] !== Style2) {
-        return;
-      }
-      var delta = "deltaY" in event ? getDeltaXY(event) : getTouchXY(event);
-      var sourceEvent = shouldPreventQueue.current.filter(function(e2) {
-        return e2.name === event.type && e2.target === event.target && deltaCompare(e2.delta, delta);
-      })[0];
-      if (sourceEvent && sourceEvent.should) {
-        if (event.cancelable) {
-          event.preventDefault();
-        }
-        return;
-      }
-      if (!sourceEvent) {
-        var shardNodes = (lastProps.current.shards || []).map(extractRef).filter(Boolean).filter(function(node2) {
-          return node2.contains(event.target);
-        });
-        var shouldStop = shardNodes.length > 0 ? shouldCancelEvent(event, shardNodes[0]) : !lastProps.current.noIsolation;
-        if (shouldStop) {
-          if (event.cancelable) {
-            event.preventDefault();
-          }
-        }
-      }
-    }, []);
-    var shouldCancel = T$1(function(name, delta, target, should) {
-      var event = { name, delta, target, should };
-      shouldPreventQueue.current.push(event);
-      setTimeout(function() {
-        shouldPreventQueue.current = shouldPreventQueue.current.filter(function(e2) {
-          return e2 !== event;
-        });
-      }, 1);
-    }, []);
-    var scrollTouchStart = T$1(function(event) {
-      touchStartRef.current = getTouchXY(event);
-      activeAxis.current = void 0;
-    }, []);
-    var scrollWheel = T$1(function(event) {
-      shouldCancel(event.type, getDeltaXY(event), event.target, shouldCancelEvent(event, props.lockRef.current));
-    }, []);
-    var scrollTouchMove = T$1(function(event) {
-      shouldCancel(event.type, getTouchXY(event), event.target, shouldCancelEvent(event, props.lockRef.current));
-    }, []);
-    p$1(function() {
-      lockStack.push(Style2);
-      props.setCallbacks({
-        onScrollCapture: scrollWheel,
-        onWheelCapture: scrollWheel,
-        onTouchMoveCapture: scrollTouchMove
-      });
-      document.addEventListener("wheel", shouldPrevent, nonPassive);
-      document.addEventListener("touchmove", shouldPrevent, nonPassive);
-      document.addEventListener("touchstart", scrollTouchStart, nonPassive);
-      return function() {
-        lockStack = lockStack.filter(function(inst) {
-          return inst !== Style2;
-        });
-        document.removeEventListener("wheel", shouldPrevent, nonPassive);
-        document.removeEventListener("touchmove", shouldPrevent, nonPassive);
-        document.removeEventListener("touchstart", scrollTouchStart, nonPassive);
-      };
-    }, []);
-    var removeScrollBar = props.removeScrollBar, inert = props.inert;
-    return y$1(
-      _$2,
-      null,
-      inert ? y$1(Style2, { styles: generateStyle(id) }) : null,
-      removeScrollBar ? y$1(RemoveScrollBar, { gapMode: "margin" }) : null
-    );
-  }
-  const SideCar = exportSidecar(effectCar, RemoveScrollSideCar);
-  var ReactRemoveScroll = k(function(props, ref) {
-    return y$1(RemoveScroll, __assign$1({}, props, { ref, sideCar: SideCar }));
-  });
-  ReactRemoveScroll.classNames = RemoveScroll.classNames;
-  const $67UHm$RemoveScroll = ReactRemoveScroll;
-  var getDefaultParent = function(originalTarget) {
-    if (typeof document === "undefined") {
-      return null;
-    }
-    var sampleTarget = Array.isArray(originalTarget) ? originalTarget[0] : originalTarget;
-    return sampleTarget.ownerDocument.body;
-  };
-  var counterMap = /* @__PURE__ */ new WeakMap();
-  var uncontrolledNodes = /* @__PURE__ */ new WeakMap();
-  var markerMap = {};
-  var lockCount = 0;
-  var unwrapHost = function(node2) {
-    return node2 && (node2.host || unwrapHost(node2.parentNode));
-  };
-  var correctTargets = function(parent, targets) {
-    return targets.map(function(target) {
-      if (parent.contains(target)) {
-        return target;
-      }
-      var correctedTarget = unwrapHost(target);
-      if (correctedTarget && parent.contains(correctedTarget)) {
-        return correctedTarget;
-      }
-      console.error("aria-hidden", target, "in not contained inside", parent, ". Doing nothing");
-      return null;
-    }).filter(function(x2) {
-      return Boolean(x2);
-    });
-  };
-  var applyAttributeToOthers = function(originalTarget, parentNode, markerName, controlAttribute) {
-    var targets = correctTargets(parentNode, Array.isArray(originalTarget) ? originalTarget : [originalTarget]);
-    if (!markerMap[markerName]) {
-      markerMap[markerName] = /* @__PURE__ */ new WeakMap();
-    }
-    var markerCounter = markerMap[markerName];
-    var hiddenNodes = [];
-    var elementsToKeep = /* @__PURE__ */ new Set();
-    var elementsToStop = new Set(targets);
-    var keep = function(el) {
-      if (!el || elementsToKeep.has(el)) {
-        return;
-      }
-      elementsToKeep.add(el);
-      keep(el.parentNode);
-    };
-    targets.forEach(keep);
-    var deep = function(parent) {
-      if (!parent || elementsToStop.has(parent)) {
-        return;
-      }
-      Array.prototype.forEach.call(parent.children, function(node2) {
-        if (elementsToKeep.has(node2)) {
-          deep(node2);
-        } else {
-          var attr = node2.getAttribute(controlAttribute);
-          var alreadyHidden = attr !== null && attr !== "false";
-          var counterValue = (counterMap.get(node2) || 0) + 1;
-          var markerValue = (markerCounter.get(node2) || 0) + 1;
-          counterMap.set(node2, counterValue);
-          markerCounter.set(node2, markerValue);
-          hiddenNodes.push(node2);
-          if (counterValue === 1 && alreadyHidden) {
-            uncontrolledNodes.set(node2, true);
-          }
-          if (markerValue === 1) {
-            node2.setAttribute(markerName, "true");
-          }
-          if (!alreadyHidden) {
-            node2.setAttribute(controlAttribute, "true");
-          }
-        }
-      });
-    };
-    deep(parentNode);
-    elementsToKeep.clear();
-    lockCount++;
-    return function() {
-      hiddenNodes.forEach(function(node2) {
-        var counterValue = counterMap.get(node2) - 1;
-        var markerValue = markerCounter.get(node2) - 1;
-        counterMap.set(node2, counterValue);
-        markerCounter.set(node2, markerValue);
-        if (!counterValue) {
-          if (!uncontrolledNodes.has(node2)) {
-            node2.removeAttribute(controlAttribute);
-          }
-          uncontrolledNodes.delete(node2);
-        }
-        if (!markerValue) {
-          node2.removeAttribute(markerName);
-        }
-      });
-      lockCount--;
-      if (!lockCount) {
-        counterMap = /* @__PURE__ */ new WeakMap();
-        counterMap = /* @__PURE__ */ new WeakMap();
-        uncontrolledNodes = /* @__PURE__ */ new WeakMap();
-        markerMap = {};
-      }
-    };
-  };
-  var hideOthers = function(originalTarget, parentNode, markerName) {
-    if (markerName === void 0) {
-      markerName = "data-aria-hidden";
-    }
-    var targets = Array.from(Array.isArray(originalTarget) ? originalTarget : [originalTarget]);
-    var activeParentNode = parentNode || getDefaultParent(originalTarget);
-    if (!activeParentNode) {
-      return function() {
-        return null;
-      };
-    }
-    targets.push.apply(targets, Array.from(activeParentNode.querySelectorAll("[aria-live]")));
-    return applyAttributeToOthers(targets, activeParentNode, markerName, "aria-hidden");
-  };
-  const $5d3850c4d0b4e6c7$var$DIALOG_NAME = "Dialog";
-  const [$5d3850c4d0b4e6c7$var$createDialogContext, $5d3850c4d0b4e6c7$export$cc702773b8ea3e41] = $c512c27ab02ef895$export$50c7b4e9d9f19c1($5d3850c4d0b4e6c7$var$DIALOG_NAME);
-  const [$5d3850c4d0b4e6c7$var$DialogProvider, $5d3850c4d0b4e6c7$var$useDialogContext] = $5d3850c4d0b4e6c7$var$createDialogContext($5d3850c4d0b4e6c7$var$DIALOG_NAME);
-  const $5d3850c4d0b4e6c7$export$3ddf2d174ce01153 = (props) => {
-    const { __scopeDialog, children, open: openProp, defaultOpen, onOpenChange, modal = true } = props;
-    const triggerRef = _$1(null);
-    const contentRef = _$1(null);
-    const [open = false, setOpen] = $71cd76cc60e0454e$export$6f32135080cb4c3({
-      prop: openProp,
-      defaultProp: defaultOpen,
-      onChange: onOpenChange
-    });
-    return /* @__PURE__ */ y$1($5d3850c4d0b4e6c7$var$DialogProvider, {
-      scope: __scopeDialog,
-      triggerRef,
-      contentRef,
-      contentId: $1746a345f3d73bb7$export$f680877a34711e37(),
-      titleId: $1746a345f3d73bb7$export$f680877a34711e37(),
-      descriptionId: $1746a345f3d73bb7$export$f680877a34711e37(),
-      open,
-      onOpenChange: setOpen,
-      onOpenToggle: T$1(
-        () => setOpen(
-          (prevOpen) => !prevOpen
-        ),
-        [
-          setOpen
-        ]
-      ),
-      modal
-    }, children);
-  };
-  const $5d3850c4d0b4e6c7$var$TRIGGER_NAME = "DialogTrigger";
-  const $5d3850c4d0b4e6c7$export$2e1e1122cf0cba88 = /* @__PURE__ */ k((props, forwardedRef) => {
-    const { __scopeDialog, ...triggerProps } = props;
-    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$TRIGGER_NAME, __scopeDialog);
-    const composedTriggerRef = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(forwardedRef, context.triggerRef);
-    return /* @__PURE__ */ y$1($8927f6f2acc4f386$export$250ffa63cdc0d034.button, _extends({
-      type: "button",
-      "aria-haspopup": "dialog",
-      "aria-expanded": context.open,
-      "aria-controls": context.contentId,
-      "data-state": $5d3850c4d0b4e6c7$var$getState(context.open)
-    }, triggerProps, {
-      ref: composedTriggerRef,
-      onClick: $e42e1063c40fb3ef$export$b9ecd428b558ff10(props.onClick, context.onOpenToggle)
-    }));
-  });
-  const $5d3850c4d0b4e6c7$var$PORTAL_NAME = "DialogPortal";
-  const [$5d3850c4d0b4e6c7$var$PortalProvider, $5d3850c4d0b4e6c7$var$usePortalContext] = $5d3850c4d0b4e6c7$var$createDialogContext($5d3850c4d0b4e6c7$var$PORTAL_NAME, {
-    forceMount: void 0
-  });
-  const $5d3850c4d0b4e6c7$export$dad7c95542bacce0 = (props) => {
-    const { __scopeDialog, forceMount, children, container } = props;
-    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$PORTAL_NAME, __scopeDialog);
-    return /* @__PURE__ */ y$1($5d3850c4d0b4e6c7$var$PortalProvider, {
-      scope: __scopeDialog,
-      forceMount
-    }, O.map(
-      children,
-      (child) => /* @__PURE__ */ y$1($921a889cee6df7e8$export$99c2b779aa4e8b8b, {
-        present: forceMount || context.open
-      }, /* @__PURE__ */ y$1($f1701beae083dbae$export$602eac185826482c, {
-        asChild: true,
-        container
-      }, child))
-    ));
-  };
-  const $5d3850c4d0b4e6c7$var$OVERLAY_NAME = "DialogOverlay";
-  const $5d3850c4d0b4e6c7$export$bd1d06c79be19e17 = /* @__PURE__ */ k((props, forwardedRef) => {
-    const portalContext = $5d3850c4d0b4e6c7$var$usePortalContext($5d3850c4d0b4e6c7$var$OVERLAY_NAME, props.__scopeDialog);
-    const { forceMount = portalContext.forceMount, ...overlayProps } = props;
-    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$OVERLAY_NAME, props.__scopeDialog);
-    return context.modal ? /* @__PURE__ */ y$1($921a889cee6df7e8$export$99c2b779aa4e8b8b, {
-      present: forceMount || context.open
-    }, /* @__PURE__ */ y$1($5d3850c4d0b4e6c7$var$DialogOverlayImpl, _extends({}, overlayProps, {
-      ref: forwardedRef
-    }))) : null;
-  });
-  const $5d3850c4d0b4e6c7$var$DialogOverlayImpl = /* @__PURE__ */ k((props, forwardedRef) => {
-    const { __scopeDialog, ...overlayProps } = props;
-    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$OVERLAY_NAME, __scopeDialog);
-    return (
-      // Make sure `Content` is scrollable even when it doesn't live inside `RemoveScroll`
-      // ie. when `Overlay` and `Content` are siblings
-      /* @__PURE__ */ y$1($67UHm$RemoveScroll, {
-        as: $5e63c961fc1ce211$export$8c6ed5c666ac1360,
-        allowPinchZoom: true,
-        shards: [
-          context.contentRef
-        ]
-      }, /* @__PURE__ */ y$1($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({
-        "data-state": $5d3850c4d0b4e6c7$var$getState(context.open)
-      }, overlayProps, {
-        ref: forwardedRef,
-        style: {
-          pointerEvents: "auto",
-          ...overlayProps.style
-        }
-      })))
-    );
-  });
-  const $5d3850c4d0b4e6c7$var$CONTENT_NAME = "DialogContent";
-  const $5d3850c4d0b4e6c7$export$b6d9565de1e068cf = /* @__PURE__ */ k((props, forwardedRef) => {
-    const portalContext = $5d3850c4d0b4e6c7$var$usePortalContext($5d3850c4d0b4e6c7$var$CONTENT_NAME, props.__scopeDialog);
-    const { forceMount = portalContext.forceMount, ...contentProps } = props;
-    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$CONTENT_NAME, props.__scopeDialog);
-    return /* @__PURE__ */ y$1($921a889cee6df7e8$export$99c2b779aa4e8b8b, {
-      present: forceMount || context.open
-    }, context.modal ? /* @__PURE__ */ y$1($5d3850c4d0b4e6c7$var$DialogContentModal, _extends({}, contentProps, {
-      ref: forwardedRef
-    })) : /* @__PURE__ */ y$1($5d3850c4d0b4e6c7$var$DialogContentNonModal, _extends({}, contentProps, {
-      ref: forwardedRef
-    })));
-  });
-  const $5d3850c4d0b4e6c7$var$DialogContentModal = /* @__PURE__ */ k((props, forwardedRef) => {
-    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$CONTENT_NAME, props.__scopeDialog);
-    const contentRef = _$1(null);
-    const composedRefs = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(forwardedRef, context.contentRef, contentRef);
-    p$1(() => {
-      const content2 = contentRef.current;
-      if (content2)
-        return hideOthers(content2);
-    }, []);
-    return /* @__PURE__ */ y$1($5d3850c4d0b4e6c7$var$DialogContentImpl, _extends({}, props, {
-      ref: composedRefs,
-      trapFocus: context.open,
-      disableOutsidePointerEvents: true,
-      onCloseAutoFocus: $e42e1063c40fb3ef$export$b9ecd428b558ff10(props.onCloseAutoFocus, (event) => {
-        var _context$triggerRef$c;
-        event.preventDefault();
-        (_context$triggerRef$c = context.triggerRef.current) === null || _context$triggerRef$c === void 0 || _context$triggerRef$c.focus();
-      }),
-      onPointerDownOutside: $e42e1063c40fb3ef$export$b9ecd428b558ff10(props.onPointerDownOutside, (event) => {
-        const originalEvent = event.detail.originalEvent;
-        const ctrlLeftClick = originalEvent.button === 0 && originalEvent.ctrlKey === true;
-        const isRightClick = originalEvent.button === 2 || ctrlLeftClick;
-        if (isRightClick)
-          event.preventDefault();
-      }),
-      onFocusOutside: $e42e1063c40fb3ef$export$b9ecd428b558ff10(
-        props.onFocusOutside,
-        (event) => event.preventDefault()
-      )
-    }));
-  });
-  const $5d3850c4d0b4e6c7$var$DialogContentNonModal = /* @__PURE__ */ k((props, forwardedRef) => {
-    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$CONTENT_NAME, props.__scopeDialog);
-    const hasInteractedOutsideRef = _$1(false);
-    return /* @__PURE__ */ y$1($5d3850c4d0b4e6c7$var$DialogContentImpl, _extends({}, props, {
-      ref: forwardedRef,
-      trapFocus: false,
-      disableOutsidePointerEvents: false,
-      onCloseAutoFocus: (event) => {
-        var _props$onCloseAutoFoc;
-        (_props$onCloseAutoFoc = props.onCloseAutoFocus) === null || _props$onCloseAutoFoc === void 0 || _props$onCloseAutoFoc.call(props, event);
-        if (!event.defaultPrevented) {
-          var _context$triggerRef$c2;
-          if (!hasInteractedOutsideRef.current)
-            (_context$triggerRef$c2 = context.triggerRef.current) === null || _context$triggerRef$c2 === void 0 || _context$triggerRef$c2.focus();
-          event.preventDefault();
-        }
-        hasInteractedOutsideRef.current = false;
-      },
-      onInteractOutside: (event) => {
-        var _props$onInteractOuts, _context$triggerRef$c3;
-        (_props$onInteractOuts = props.onInteractOutside) === null || _props$onInteractOuts === void 0 || _props$onInteractOuts.call(props, event);
-        if (!event.defaultPrevented)
-          hasInteractedOutsideRef.current = true;
-        const target = event.target;
-        const targetIsTrigger = (_context$triggerRef$c3 = context.triggerRef.current) === null || _context$triggerRef$c3 === void 0 ? void 0 : _context$triggerRef$c3.contains(target);
-        if (targetIsTrigger)
-          event.preventDefault();
-      }
-    }));
-  });
-  const $5d3850c4d0b4e6c7$var$DialogContentImpl = /* @__PURE__ */ k((props, forwardedRef) => {
-    const { __scopeDialog, trapFocus, onOpenAutoFocus, onCloseAutoFocus, ...contentProps } = props;
-    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$CONTENT_NAME, __scopeDialog);
-    const contentRef = _$1(null);
-    const composedRefs = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(forwardedRef, contentRef);
-    $3db38b7d1fb3fe6a$export$b7ece24a22aeda8c();
-    return /* @__PURE__ */ y$1(_$2, null, /* @__PURE__ */ y$1($d3863c46a17e8a28$export$20e40289641fbbb6, {
-      asChild: true,
-      loop: true,
-      trapped: trapFocus,
-      onMountAutoFocus: onOpenAutoFocus,
-      onUnmountAutoFocus: onCloseAutoFocus
-    }, /* @__PURE__ */ y$1($5cb92bef7577960e$export$177fb62ff3ec1f22, _extends({
-      role: "dialog",
-      id: context.contentId,
-      "aria-describedby": context.descriptionId,
-      "aria-labelledby": context.titleId,
-      "data-state": $5d3850c4d0b4e6c7$var$getState(context.open)
-    }, contentProps, {
-      ref: composedRefs,
-      onDismiss: () => context.onOpenChange(false)
-    }))), false);
-  });
-  const $5d3850c4d0b4e6c7$var$TITLE_NAME = "DialogTitle";
-  const $5d3850c4d0b4e6c7$export$16f7638e4a34b909 = /* @__PURE__ */ k((props, forwardedRef) => {
-    const { __scopeDialog, ...titleProps } = props;
-    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$TITLE_NAME, __scopeDialog);
-    return /* @__PURE__ */ y$1($8927f6f2acc4f386$export$250ffa63cdc0d034.h2, _extends({
-      id: context.titleId
-    }, titleProps, {
-      ref: forwardedRef
-    }));
-  });
-  const $5d3850c4d0b4e6c7$var$CLOSE_NAME = "DialogClose";
-  const $5d3850c4d0b4e6c7$export$fba2fb7cd781b7ac = /* @__PURE__ */ k((props, forwardedRef) => {
-    const { __scopeDialog, ...closeProps } = props;
-    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$CLOSE_NAME, __scopeDialog);
-    return /* @__PURE__ */ y$1($8927f6f2acc4f386$export$250ffa63cdc0d034.button, _extends({
-      type: "button"
-    }, closeProps, {
-      ref: forwardedRef,
-      onClick: $e42e1063c40fb3ef$export$b9ecd428b558ff10(
-        props.onClick,
-        () => context.onOpenChange(false)
-      )
-    }));
-  });
-  function $5d3850c4d0b4e6c7$var$getState(open) {
-    return open ? "open" : "closed";
-  }
-  const $5d3850c4d0b4e6c7$export$be92b6f5f03c0fe9 = $5d3850c4d0b4e6c7$export$3ddf2d174ce01153;
-  const $5d3850c4d0b4e6c7$export$41fb9f06171c75f4 = $5d3850c4d0b4e6c7$export$2e1e1122cf0cba88;
-  const $5d3850c4d0b4e6c7$export$602eac185826482c = $5d3850c4d0b4e6c7$export$dad7c95542bacce0;
-  const $5d3850c4d0b4e6c7$export$c6fdb837b070b4ff = $5d3850c4d0b4e6c7$export$bd1d06c79be19e17;
-  const $5d3850c4d0b4e6c7$export$7c6e2c02157bb7d2 = $5d3850c4d0b4e6c7$export$b6d9565de1e068cf;
-  const $5d3850c4d0b4e6c7$export$f99233281efd08a0 = $5d3850c4d0b4e6c7$export$16f7638e4a34b909;
-  const $5d3850c4d0b4e6c7$export$f39c2d165cd861fe = $5d3850c4d0b4e6c7$export$fba2fb7cd781b7ac;
-  function isHighSurrogate$1(codePoint) {
-    return codePoint >= 55296 && codePoint <= 56319;
-  }
-  function isLowSurrogate$1(codePoint) {
-    return codePoint >= 56320 && codePoint <= 57343;
-  }
-  var truncate$2 = function truncate2(getLength2, string2, byteLength) {
-    if (typeof string2 !== "string") {
-      throw new Error("Input must be string");
-    }
-    var charLength = string2.length;
-    var curByteLength = 0;
-    var codePoint;
-    var segment;
-    for (var i2 = 0; i2 < charLength; i2 += 1) {
-      codePoint = string2.charCodeAt(i2);
-      segment = string2[i2];
-      if (isHighSurrogate$1(codePoint) && isLowSurrogate$1(string2.charCodeAt(i2 + 1))) {
-        i2 += 1;
-        segment += string2[i2];
-      }
-      curByteLength += getLength2(segment);
-      if (curByteLength === byteLength) {
-        return string2.slice(0, i2 + 1);
-      } else if (curByteLength > byteLength) {
-        return string2.slice(0, i2 - segment.length + 1);
-      }
-    }
-    return string2;
-  };
-  function isHighSurrogate(codePoint) {
-    return codePoint >= 55296 && codePoint <= 56319;
-  }
-  function isLowSurrogate(codePoint) {
-    return codePoint >= 56320 && codePoint <= 57343;
-  }
-  var browser$1 = function getByteLength(string2) {
-    if (typeof string2 !== "string") {
-      throw new Error("Input must be string");
-    }
-    var charLength = string2.length;
-    var byteLength = 0;
-    var codePoint = null;
-    var prevCodePoint = null;
-    for (var i2 = 0; i2 < charLength; i2++) {
-      codePoint = string2.charCodeAt(i2);
-      if (isLowSurrogate(codePoint)) {
-        if (prevCodePoint != null && isHighSurrogate(prevCodePoint)) {
-          byteLength += 1;
-        } else {
-          byteLength += 3;
-        }
-      } else if (codePoint <= 127) {
-        byteLength += 1;
-      } else if (codePoint >= 128 && codePoint <= 2047) {
-        byteLength += 2;
-      } else if (codePoint >= 2048 && codePoint <= 65535) {
-        byteLength += 3;
-      }
-      prevCodePoint = codePoint;
-    }
-    return byteLength;
-  };
-  var truncate$1 = truncate$2;
-  var getLength = browser$1;
-  var browser = truncate$1.bind(null, getLength);
-  var truncate = browser;
-  var illegalRe = /[\/\?<>\\:\*\|"]/g;
-  var controlRe = /[\x00-\x1f\x80-\x9f]/g;
-  var reservedRe = /^\.+$/;
-  var windowsReservedRe = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i;
-  var windowsTrailingRe = /[\. ]+$/;
-  function sanitize(input, replacement) {
-    if (typeof input !== "string") {
-      throw new Error("Input must be string");
-    }
-    var sanitized = input.replace(illegalRe, replacement).replace(controlRe, replacement).replace(reservedRe, replacement).replace(windowsReservedRe, replacement).replace(windowsTrailingRe, replacement);
-    return truncate(sanitized, 255);
-  }
-  var sanitizeFilename = function(input, options2) {
-    var replacement = options2 && options2.replacement || "";
-    var output = sanitize(input, replacement);
-    if (replacement === "") {
-      return output;
-    }
-    return sanitize(output, "");
-  };
   function copyToClipboard(text2) {
     try {
       navigator.clipboard.writeText(text2);
@@ -3399,8 +1146,8 @@ var __publicField = (obj, key, value) => {
     return text2.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
   }
   var dist = {};
-  var __assign = commonjsGlobal && commonjsGlobal.__assign || function() {
-    __assign = Object.assign || function(t2) {
+  var __assign$1 = commonjsGlobal && commonjsGlobal.__assign || function() {
+    __assign$1 = Object.assign || function(t2) {
       for (var s2, i2 = 1, n2 = arguments.length; i2 < n2; i2++) {
         s2 = arguments[i2];
         for (var p2 in s2)
@@ -3409,7 +1156,7 @@ var __publicField = (obj, key, value) => {
       }
       return t2;
     };
-    return __assign.apply(this, arguments);
+    return __assign$1.apply(this, arguments);
   };
   Object.defineProperty(dist, "__esModule", { value: true });
   dist.join = dist.subst = dist.query = void 0;
@@ -3446,7 +1193,7 @@ var __publicField = (obj, key, value) => {
   }
   dist.subst = subst;
   function path$1(template, params) {
-    var remainingParams = __assign({}, params);
+    var remainingParams = __assign$1({}, params);
     var allowedTypes = ["boolean", "string", "number"];
     var renderedPath = template.replace(/:\w+/g, function(p2) {
       var key2 = p2.slice(1);
@@ -7353,7 +5100,7 @@ var __publicField = (obj, key, value) => {
     string,
     text: text$4
   }, Symbol.toStringTag, { value: "Module" }));
-  function parse(options2 = {}) {
+  function parse$1(options2 = {}) {
     const constructs2 = combineExtensions(
       // @ts-expect-error Same as above.
       [defaultConstructs].concat(options2.extensions || [])
@@ -7537,7 +5284,7 @@ var __publicField = (obj, key, value) => {
       return compiler(options2)(
         postprocess(
           // @ts-expect-error: micromark types need to accept `null`.
-          parse(options2).document().write(preprocess()(value, encoding, true))
+          parse$1(options2).document().write(preprocess()(value, encoding, true))
         )
       );
     }
@@ -14809,6 +12556,93 @@ ${message}`;
     copyToClipboard(standardizeLineBreaks(text2));
     return true;
   }
+  function isHighSurrogate$1(codePoint) {
+    return codePoint >= 55296 && codePoint <= 56319;
+  }
+  function isLowSurrogate$1(codePoint) {
+    return codePoint >= 56320 && codePoint <= 57343;
+  }
+  var truncate$2 = function truncate2(getLength2, string2, byteLength) {
+    if (typeof string2 !== "string") {
+      throw new Error("Input must be string");
+    }
+    var charLength = string2.length;
+    var curByteLength = 0;
+    var codePoint;
+    var segment;
+    for (var i2 = 0; i2 < charLength; i2 += 1) {
+      codePoint = string2.charCodeAt(i2);
+      segment = string2[i2];
+      if (isHighSurrogate$1(codePoint) && isLowSurrogate$1(string2.charCodeAt(i2 + 1))) {
+        i2 += 1;
+        segment += string2[i2];
+      }
+      curByteLength += getLength2(segment);
+      if (curByteLength === byteLength) {
+        return string2.slice(0, i2 + 1);
+      } else if (curByteLength > byteLength) {
+        return string2.slice(0, i2 - segment.length + 1);
+      }
+    }
+    return string2;
+  };
+  function isHighSurrogate(codePoint) {
+    return codePoint >= 55296 && codePoint <= 56319;
+  }
+  function isLowSurrogate(codePoint) {
+    return codePoint >= 56320 && codePoint <= 57343;
+  }
+  var browser$1 = function getByteLength(string2) {
+    if (typeof string2 !== "string") {
+      throw new Error("Input must be string");
+    }
+    var charLength = string2.length;
+    var byteLength = 0;
+    var codePoint = null;
+    var prevCodePoint = null;
+    for (var i2 = 0; i2 < charLength; i2++) {
+      codePoint = string2.charCodeAt(i2);
+      if (isLowSurrogate(codePoint)) {
+        if (prevCodePoint != null && isHighSurrogate(prevCodePoint)) {
+          byteLength += 1;
+        } else {
+          byteLength += 3;
+        }
+      } else if (codePoint <= 127) {
+        byteLength += 1;
+      } else if (codePoint >= 128 && codePoint <= 2047) {
+        byteLength += 2;
+      } else if (codePoint >= 2048 && codePoint <= 65535) {
+        byteLength += 3;
+      }
+      prevCodePoint = codePoint;
+    }
+    return byteLength;
+  };
+  var truncate$1 = truncate$2;
+  var getLength = browser$1;
+  var browser = truncate$1.bind(null, getLength);
+  var truncate = browser;
+  var illegalRe = /[\/\?<>\\:\*\|"]/g;
+  var controlRe = /[\x00-\x1f\x80-\x9f]/g;
+  var reservedRe = /^\.+$/;
+  var windowsReservedRe = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i;
+  var windowsTrailingRe = /[\. ]+$/;
+  function sanitize(input, replacement) {
+    if (typeof input !== "string") {
+      throw new Error("Input must be string");
+    }
+    var sanitized = input.replace(illegalRe, replacement).replace(controlRe, replacement).replace(reservedRe, replacement).replace(windowsReservedRe, replacement).replace(windowsTrailingRe, replacement);
+    return truncate(sanitized, 255);
+  }
+  var sanitizeFilename = function(input, options2) {
+    var replacement = options2 && options2.replacement || "";
+    var output = sanitize(input, replacement);
+    if (replacement === "") {
+      return output;
+    }
+    return sanitize(output, "");
+  };
   const noop = () => {
   };
   function onloadSafe(fn2) {
@@ -14930,12 +12764,9 @@ ${message}`;
     downloadFile(fileName, "text/markdown", standardizeLineBreaks(markdown));
     return true;
   }
-  async function exportAllToMarkdown(fileNameFormat, conversationIds) {
-    const conversations = await Promise.all(conversationIds.map(async (id) => {
-      const rawConversation = await fetchConversation(id);
-      return processConversation(rawConversation);
-    }));
+  async function exportAllToMarkdown(fileNameFormat, apiConversations) {
     const zip = new JSZip2();
+    const conversations = apiConversations.map((x2) => processConversation(x2));
     conversations.forEach((conversation) => {
       const fileName = getFileNameWithFormat(fileNameFormat, "md", {
         title: conversation.title
@@ -15462,13 +13293,10 @@ ${message}`;
     downloadFile(fileName, "text/html", standardizeLineBreaks(html2));
     return true;
   }
-  async function exportAllToHtml(fileNameFormat, conversationIds) {
-    const conversations = await Promise.all(conversationIds.map(async (id) => {
-      const rawConversation = await fetchConversation(id);
-      return processConversation(rawConversation);
-    }));
+  async function exportAllToHtml(fileNameFormat, apiConversations) {
     const userAvatar = await getUserAvatar();
     const zip = new JSZip2();
+    const conversations = apiConversations.map((x2) => processConversation(x2));
     conversations.forEach((conversation) => {
       const fileName = getFileNameWithFormat(fileNameFormat, "html", {
         title: conversation.title
@@ -15549,16 +13377,12 @@ ${message}`;
     downloadFile(fileName, "application/json", content2);
     return true;
   }
-  async function exportAllToJson(fileNameFormat, conversationIds) {
-    const conversations = await Promise.all(conversationIds.map(async (id) => {
-      const rawConversation = await fetchConversation(id);
-      const conversation = processConversation(rawConversation);
-      return {
-        conversation,
-        rawConversation
-      };
-    }));
+  async function exportAllToJson(fileNameFormat, apiConversations) {
     const zip = new JSZip2();
+    const conversations = apiConversations.map((x2) => ({
+      conversation: processConversation(x2),
+      rawConversation: x2
+    }));
     conversations.forEach(({
       conversation,
       rawConversation
@@ -15896,6 +13720,2683 @@ ${message}`;
       })
     });
   };
+  function _extends() {
+    _extends = Object.assign ? Object.assign.bind() : function(target) {
+      for (var i2 = 1; i2 < arguments.length; i2++) {
+        var source = arguments[i2];
+        for (var key2 in source) {
+          if (Object.prototype.hasOwnProperty.call(source, key2)) {
+            target[key2] = source[key2];
+          }
+        }
+      }
+      return target;
+    };
+    return _extends.apply(this, arguments);
+  }
+  function g(n2, t2) {
+    for (var e2 in t2)
+      n2[e2] = t2[e2];
+    return n2;
+  }
+  function C(n2, t2) {
+    for (var e2 in n2)
+      if ("__source" !== e2 && !(e2 in t2))
+        return true;
+    for (var r2 in t2)
+      if ("__source" !== r2 && n2[r2] !== t2[r2])
+        return true;
+    return false;
+  }
+  function E(n2, t2) {
+    return n2 === t2 && (0 !== n2 || 1 / n2 == 1 / t2) || n2 != n2 && t2 != t2;
+  }
+  function w(n2) {
+    this.props = n2;
+  }
+  function x(n2, e2) {
+    function r2(n3) {
+      var t2 = this.props.ref, r3 = t2 == n3.ref;
+      return !r3 && t2 && (t2.call ? t2(null) : t2.current = null), e2 ? !e2(this.props, n3) || !r3 : C(this.props, n3);
+    }
+    function u2(e3) {
+      return this.shouldComponentUpdate = r2, y$1(n2, e3);
+    }
+    return u2.displayName = "Memo(" + (n2.displayName || n2.name) + ")", u2.prototype.isReactComponent = true, u2.__f = true, u2;
+  }
+  (w.prototype = new k$2()).isPureReactComponent = true, w.prototype.shouldComponentUpdate = function(n2, t2) {
+    return C(this.props, n2) || C(this.state, t2);
+  };
+  var R = l$1.__b;
+  l$1.__b = function(n2) {
+    n2.type && n2.type.__f && n2.ref && (n2.props.ref = n2.ref, n2.ref = null), R && R(n2);
+  };
+  var N = "undefined" != typeof Symbol && Symbol.for && Symbol.for("react.forward_ref") || 3911;
+  function k(n2) {
+    function t2(t3) {
+      var e2 = g({}, t3);
+      return delete e2.ref, n2(e2, t3.ref || null);
+    }
+    return t2.$$typeof = N, t2.render = t2, t2.prototype.isReactComponent = t2.__f = true, t2.displayName = "ForwardRef(" + (n2.displayName || n2.name) + ")", t2;
+  }
+  var A = function(n2, t2) {
+    return null == n2 ? null : P$2(P$2(n2).map(t2));
+  }, O = { map: A, forEach: A, count: function(n2) {
+    return n2 ? P$2(n2).length : 0;
+  }, only: function(n2) {
+    var t2 = P$2(n2);
+    if (1 !== t2.length)
+      throw "Children.only";
+    return t2[0];
+  }, toArray: P$2 }, T = l$1.__e;
+  l$1.__e = function(n2, t2, e2, r2) {
+    if (n2.then) {
+      for (var u2, o2 = t2; o2 = o2.__; )
+        if ((u2 = o2.__c) && u2.__c)
+          return null == t2.__e && (t2.__e = e2.__e, t2.__k = e2.__k), u2.__c(n2, t2);
+    }
+    T(n2, t2, e2, r2);
+  };
+  var I = l$1.unmount;
+  function L(n2, t2, e2) {
+    return n2 && (n2.__c && n2.__c.__H && (n2.__c.__H.__.forEach(function(n3) {
+      "function" == typeof n3.__c && n3.__c();
+    }), n2.__c.__H = null), null != (n2 = g({}, n2)).__c && (n2.__c.__P === e2 && (n2.__c.__P = t2), n2.__c = null), n2.__k = n2.__k && n2.__k.map(function(n3) {
+      return L(n3, t2, e2);
+    })), n2;
+  }
+  function U(n2, t2, e2) {
+    return n2 && (n2.__v = null, n2.__k = n2.__k && n2.__k.map(function(n3) {
+      return U(n3, t2, e2);
+    }), n2.__c && n2.__c.__P === t2 && (n2.__e && e2.insertBefore(n2.__e, n2.__d), n2.__c.__e = true, n2.__c.__P = e2)), n2;
+  }
+  function D() {
+    this.__u = 0, this.t = null, this.__b = null;
+  }
+  function F(n2) {
+    var t2 = n2.__.__c;
+    return t2 && t2.__a && t2.__a(n2);
+  }
+  function M(n2) {
+    var e2, r2, u2;
+    function o2(o3) {
+      if (e2 || (e2 = n2()).then(function(n3) {
+        r2 = n3.default || n3;
+      }, function(n3) {
+        u2 = n3;
+      }), u2)
+        throw u2;
+      if (!r2)
+        throw e2;
+      return y$1(r2, o3);
+    }
+    return o2.displayName = "Lazy", o2.__f = true, o2;
+  }
+  function V() {
+    this.u = null, this.o = null;
+  }
+  l$1.unmount = function(n2) {
+    var t2 = n2.__c;
+    t2 && t2.__R && t2.__R(), t2 && true === n2.__h && (n2.type = null), I && I(n2);
+  }, (D.prototype = new k$2()).__c = function(n2, t2) {
+    var e2 = t2.__c, r2 = this;
+    null == r2.t && (r2.t = []), r2.t.push(e2);
+    var u2 = F(r2.__v), o2 = false, i2 = function() {
+      o2 || (o2 = true, e2.__R = null, u2 ? u2(l2) : l2());
+    };
+    e2.__R = i2;
+    var l2 = function() {
+      if (!--r2.__u) {
+        if (r2.state.__a) {
+          var n3 = r2.state.__a;
+          r2.__v.__k[0] = U(n3, n3.__c.__P, n3.__c.__O);
+        }
+        var t3;
+        for (r2.setState({ __a: r2.__b = null }); t3 = r2.t.pop(); )
+          t3.forceUpdate();
+      }
+    }, c2 = true === t2.__h;
+    r2.__u++ || c2 || r2.setState({ __a: r2.__b = r2.__v.__k[0] }), n2.then(i2, i2);
+  }, D.prototype.componentWillUnmount = function() {
+    this.t = [];
+  }, D.prototype.render = function(n2, e2) {
+    if (this.__b) {
+      if (this.__v.__k) {
+        var r2 = document.createElement("div"), o2 = this.__v.__k[0].__c;
+        this.__v.__k[0] = L(this.__b, r2, o2.__O = o2.__P);
+      }
+      this.__b = null;
+    }
+    var i2 = e2.__a && y$1(_$2, null, n2.fallback);
+    return i2 && (i2.__h = null), [y$1(_$2, null, e2.__a ? null : n2.children), i2];
+  };
+  var W = function(n2, t2, e2) {
+    if (++e2[1] === e2[0] && n2.o.delete(t2), n2.props.revealOrder && ("t" !== n2.props.revealOrder[0] || !n2.o.size))
+      for (e2 = n2.u; e2; ) {
+        for (; e2.length > 3; )
+          e2.pop()();
+        if (e2[1] < e2[0])
+          break;
+        n2.u = e2 = e2[2];
+      }
+  };
+  function P(n2) {
+    return this.getChildContext = function() {
+      return n2.context;
+    }, n2.children;
+  }
+  function j(n2) {
+    var e2 = this, r2 = n2.i;
+    e2.componentWillUnmount = function() {
+      B$2(null, e2.l), e2.l = null, e2.i = null;
+    }, e2.i && e2.i !== r2 && e2.componentWillUnmount(), n2.__v ? (e2.l || (e2.i = r2, e2.l = { nodeType: 1, parentNode: r2, childNodes: [], appendChild: function(n3) {
+      this.childNodes.push(n3), e2.i.appendChild(n3);
+    }, insertBefore: function(n3, t2) {
+      this.childNodes.push(n3), e2.i.appendChild(n3);
+    }, removeChild: function(n3) {
+      this.childNodes.splice(this.childNodes.indexOf(n3) >>> 1, 1), e2.i.removeChild(n3);
+    } }), B$2(y$1(P, { context: e2.context }, n2.__v), e2.l)) : e2.l && e2.componentWillUnmount();
+  }
+  function z(n2, e2) {
+    var r2 = y$1(j, { __v: n2, i: e2 });
+    return r2.containerInfo = e2, r2;
+  }
+  (V.prototype = new k$2()).__a = function(n2) {
+    var t2 = this, e2 = F(t2.__v), r2 = t2.o.get(n2);
+    return r2[0]++, function(u2) {
+      var o2 = function() {
+        t2.props.revealOrder ? (r2.push(u2), W(t2, n2, r2)) : u2();
+      };
+      e2 ? e2(o2) : o2();
+    };
+  }, V.prototype.render = function(n2) {
+    this.u = null, this.o = /* @__PURE__ */ new Map();
+    var t2 = P$2(n2.children);
+    n2.revealOrder && "b" === n2.revealOrder[0] && t2.reverse();
+    for (var e2 = t2.length; e2--; )
+      this.o.set(t2[e2], this.u = [1, 0, this.u]);
+    return n2.children;
+  }, V.prototype.componentDidUpdate = V.prototype.componentDidMount = function() {
+    var n2 = this;
+    this.o.forEach(function(t2, e2) {
+      W(n2, e2, t2);
+    });
+  };
+  var B = "undefined" != typeof Symbol && Symbol.for && Symbol.for("react.element") || 60103, H = /^(?:accent|alignment|arabic|baseline|cap|clip(?!PathU)|color|dominant|fill|flood|font|glyph(?!R)|horiz|image|letter|lighting|marker(?!H|W|U)|overline|paint|pointer|shape|stop|strikethrough|stroke|text(?!L)|transform|underline|unicode|units|v|vector|vert|word|writing|x(?!C))[A-Z]/, Z = /^on(Ani|Tra|Tou|BeforeInp|Compo)/, Y = /[A-Z0-9]/g, $ = "undefined" != typeof document, q = function(n2) {
+    return ("undefined" != typeof Symbol && "symbol" == typeof Symbol() ? /fil|che|rad/ : /fil|che|ra/).test(n2);
+  };
+  function G(n2, t2, e2) {
+    return null == t2.__k && (t2.textContent = ""), B$2(n2, t2), "function" == typeof e2 && e2(), n2 ? n2.__c : null;
+  }
+  function J(n2, t2, e2) {
+    return D$1(n2, t2), "function" == typeof e2 && e2(), n2 ? n2.__c : null;
+  }
+  k$2.prototype.isReactComponent = {}, ["componentWillMount", "componentWillReceiveProps", "componentWillUpdate"].forEach(function(t2) {
+    Object.defineProperty(k$2.prototype, t2, { configurable: true, get: function() {
+      return this["UNSAFE_" + t2];
+    }, set: function(n2) {
+      Object.defineProperty(this, t2, { configurable: true, writable: true, value: n2 });
+    } });
+  });
+  var K = l$1.event;
+  function Q() {
+  }
+  function X() {
+    return this.cancelBubble;
+  }
+  function nn() {
+    return this.defaultPrevented;
+  }
+  l$1.event = function(n2) {
+    return K && (n2 = K(n2)), n2.persist = Q, n2.isPropagationStopped = X, n2.isDefaultPrevented = nn, n2.nativeEvent = n2;
+  };
+  var tn, en = { configurable: true, get: function() {
+    return this.class;
+  } }, rn = l$1.vnode;
+  l$1.vnode = function(n2) {
+    var t2 = n2.type, e2 = n2.props, u2 = e2;
+    if ("string" == typeof t2) {
+      for (var o2 in u2 = {}, e2) {
+        var i2 = e2[o2];
+        if (!("value" === o2 && "defaultValue" in e2 && null == i2 || $ && "children" === o2 && "noscript" === t2)) {
+          var l2 = o2.toLowerCase();
+          "defaultValue" === o2 && "value" in e2 && null == e2.value ? o2 = "value" : "download" === o2 && true === i2 ? i2 = "" : "ondoubleclick" === l2 ? o2 = "ondblclick" : "onchange" !== l2 || "input" !== t2 && "textarea" !== t2 || q(e2.type) ? "onfocus" === l2 ? o2 = "onfocusin" : "onblur" === l2 ? o2 = "onfocusout" : Z.test(o2) ? o2 = l2 : -1 === t2.indexOf("-") && H.test(o2) ? o2 = o2.replace(Y, "-$&").toLowerCase() : null === i2 && (i2 = void 0) : l2 = o2 = "oninput", "oninput" === l2 && u2[o2 = l2] && (o2 = "oninputCapture"), u2[o2] = i2;
+        }
+      }
+      "select" == t2 && u2.multiple && Array.isArray(u2.value) && (u2.value = P$2(e2.children).forEach(function(n3) {
+        n3.props.selected = -1 != u2.value.indexOf(n3.props.value);
+      })), "select" == t2 && null != u2.defaultValue && (u2.value = P$2(e2.children).forEach(function(n3) {
+        n3.props.selected = u2.multiple ? -1 != u2.defaultValue.indexOf(n3.props.value) : u2.defaultValue == n3.props.value;
+      })), n2.props = u2, e2.class != e2.className && (en.enumerable = "className" in e2, null != e2.className && (u2.class = e2.className), Object.defineProperty(u2, "className", en));
+    }
+    n2.$$typeof = B, rn && rn(n2);
+  };
+  var un = l$1.__r;
+  l$1.__r = function(n2) {
+    un && un(n2), tn = n2.__c;
+  };
+  var on = l$1.diffed;
+  l$1.diffed = function(n2) {
+    on && on(n2);
+    var t2 = n2.props, e2 = n2.__e;
+    null != e2 && "textarea" === n2.type && "value" in t2 && t2.value !== e2.value && (e2.value = null == t2.value ? "" : t2.value), tn = null;
+  };
+  var ln = { ReactCurrentDispatcher: { current: { readContext: function(n2) {
+    return tn.__n[n2.__c].props.value;
+  } } } }, cn = "17.0.2";
+  function fn(n2) {
+    return y$1.bind(null, n2);
+  }
+  function an(n2) {
+    return !!n2 && n2.$$typeof === B;
+  }
+  function sn(n2) {
+    return an(n2) ? E$1.apply(null, arguments) : n2;
+  }
+  function hn(n2) {
+    return !!n2.__k && (B$2(null, n2), true);
+  }
+  function vn(n2) {
+    return n2 && (n2.base || 1 === n2.nodeType && n2) || null;
+  }
+  var dn = function(n2, t2) {
+    return n2(t2);
+  }, pn = function(n2, t2) {
+    return n2(t2);
+  }, mn = _$2;
+  function yn(n2) {
+    n2();
+  }
+  function _n(n2) {
+    return n2;
+  }
+  function bn() {
+    return [false, yn];
+  }
+  var Sn = y;
+  function gn(n2, t2) {
+    var e2 = t2(), r2 = h({ h: { __: e2, v: t2 } }), u2 = r2[0].h, o2 = r2[1];
+    return y(function() {
+      u2.__ = e2, u2.v = t2, E(u2.__, t2()) || o2({ h: u2 });
+    }, [n2, e2, t2]), p$1(function() {
+      return E(u2.__, u2.v()) || o2({ h: u2 }), n2(function() {
+        E(u2.__, u2.v()) || o2({ h: u2 });
+      });
+    }, [n2]), e2;
+  }
+  var Cn = { useState: h, useId: V$1, useReducer: s, useEffect: p$1, useLayoutEffect: y, useInsertionEffect: Sn, useTransition: bn, useDeferredValue: _n, useSyncExternalStore: gn, startTransition: yn, useRef: _$1, useImperativeHandle: A$1, useMemo: F$1, useCallback: T$1, useContext: q$1, useDebugValue: x$1, version: "17.0.2", Children: O, render: G, hydrate: J, unmountComponentAtNode: hn, createPortal: z, createElement: y$1, createContext: F$2, createFactory: fn, cloneElement: sn, createRef: d$1, Fragment: _$2, isValidElement: an, findDOMNode: vn, Component: k$2, PureComponent: w, memo: x, forwardRef: k, flushSync: pn, unstable_batchedUpdates: dn, StrictMode: mn, Suspense: D, SuspenseList: V, lazy: M, __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: ln };
+  const $2AODx$react = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+    __proto__: null,
+    Children: O,
+    Component: k$2,
+    Fragment: _$2,
+    PureComponent: w,
+    StrictMode: mn,
+    Suspense: D,
+    SuspenseList: V,
+    __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: ln,
+    cloneElement: sn,
+    createContext: F$2,
+    createElement: y$1,
+    createFactory: fn,
+    createPortal: z,
+    createRef: d$1,
+    default: Cn,
+    findDOMNode: vn,
+    flushSync: pn,
+    forwardRef: k,
+    hydrate: J,
+    isValidElement: an,
+    lazy: M,
+    memo: x,
+    render: G,
+    startTransition: yn,
+    unmountComponentAtNode: hn,
+    unstable_batchedUpdates: dn,
+    useCallback: T$1,
+    useContext: q$1,
+    useDebugValue: x$1,
+    useDeferredValue: _n,
+    useEffect: p$1,
+    useErrorBoundary: P$1,
+    useId: V$1,
+    useImperativeHandle: A$1,
+    useInsertionEffect: Sn,
+    useLayoutEffect: y,
+    useMemo: F$1,
+    useReducer: s,
+    useRef: _$1,
+    useState: h,
+    useSyncExternalStore: gn,
+    useTransition: bn,
+    version: cn
+  }, Symbol.toStringTag, { value: "Module" }));
+  function $e42e1063c40fb3ef$export$b9ecd428b558ff10(originalEventHandler, ourEventHandler, { checkForDefaultPrevented = true } = {}) {
+    return function handleEvent(event) {
+      originalEventHandler === null || originalEventHandler === void 0 || originalEventHandler(event);
+      if (checkForDefaultPrevented === false || !event.defaultPrevented)
+        return ourEventHandler === null || ourEventHandler === void 0 ? void 0 : ourEventHandler(event);
+    };
+  }
+  function $6ed0406888f73fc4$var$setRef(ref, value) {
+    if (typeof ref === "function")
+      ref(value);
+    else if (ref !== null && ref !== void 0)
+      ref.current = value;
+  }
+  function $6ed0406888f73fc4$export$43e446d32b3d21af(...refs) {
+    return (node2) => refs.forEach(
+      (ref) => $6ed0406888f73fc4$var$setRef(ref, node2)
+    );
+  }
+  function $6ed0406888f73fc4$export$c7b2cbe3552a0d05(...refs) {
+    return T$1($6ed0406888f73fc4$export$43e446d32b3d21af(...refs), refs);
+  }
+  function $c512c27ab02ef895$export$50c7b4e9d9f19c1(scopeName, createContextScopeDeps = []) {
+    let defaultContexts = [];
+    function $c512c27ab02ef895$export$fd42f52fd3ae1109(rootComponentName, defaultContext) {
+      const BaseContext = /* @__PURE__ */ F$2(defaultContext);
+      const index2 = defaultContexts.length;
+      defaultContexts = [
+        ...defaultContexts,
+        defaultContext
+      ];
+      function Provider(props) {
+        const { scope, children, ...context } = props;
+        const Context = (scope === null || scope === void 0 ? void 0 : scope[scopeName][index2]) || BaseContext;
+        const value = F$1(
+          () => context,
+          Object.values(context)
+        );
+        return /* @__PURE__ */ y$1(Context.Provider, {
+          value
+        }, children);
+      }
+      function useContext(consumerName, scope) {
+        const Context = (scope === null || scope === void 0 ? void 0 : scope[scopeName][index2]) || BaseContext;
+        const context = q$1(Context);
+        if (context)
+          return context;
+        if (defaultContext !== void 0)
+          return defaultContext;
+        throw new Error(`\`${consumerName}\` must be used within \`${rootComponentName}\``);
+      }
+      Provider.displayName = rootComponentName + "Provider";
+      return [
+        Provider,
+        useContext
+      ];
+    }
+    const createScope = () => {
+      const scopeContexts = defaultContexts.map((defaultContext) => {
+        return /* @__PURE__ */ F$2(defaultContext);
+      });
+      return function useScope(scope) {
+        const contexts = (scope === null || scope === void 0 ? void 0 : scope[scopeName]) || scopeContexts;
+        return F$1(
+          () => ({
+            [`__scope${scopeName}`]: {
+              ...scope,
+              [scopeName]: contexts
+            }
+          }),
+          [
+            scope,
+            contexts
+          ]
+        );
+      };
+    };
+    createScope.scopeName = scopeName;
+    return [
+      $c512c27ab02ef895$export$fd42f52fd3ae1109,
+      $c512c27ab02ef895$var$composeContextScopes(createScope, ...createContextScopeDeps)
+    ];
+  }
+  function $c512c27ab02ef895$var$composeContextScopes(...scopes) {
+    const baseScope = scopes[0];
+    if (scopes.length === 1)
+      return baseScope;
+    const createScope1 = () => {
+      const scopeHooks = scopes.map(
+        (createScope) => ({
+          useScope: createScope(),
+          scopeName: createScope.scopeName
+        })
+      );
+      return function useComposedScopes(overrideScopes) {
+        const nextScopes1 = scopeHooks.reduce((nextScopes, { useScope, scopeName }) => {
+          const scopeProps = useScope(overrideScopes);
+          const currentScope = scopeProps[`__scope${scopeName}`];
+          return {
+            ...nextScopes,
+            ...currentScope
+          };
+        }, {});
+        return F$1(
+          () => ({
+            [`__scope${baseScope.scopeName}`]: nextScopes1
+          }),
+          [
+            nextScopes1
+          ]
+        );
+      };
+    };
+    createScope1.scopeName = baseScope.scopeName;
+    return createScope1;
+  }
+  const $9f79659886946c16$export$e5c5a5f917a5871c = Boolean(globalThis === null || globalThis === void 0 ? void 0 : globalThis.document) ? y : () => {
+  };
+  const $1746a345f3d73bb7$var$useReactId = $2AODx$react["useId".toString()] || (() => void 0);
+  let $1746a345f3d73bb7$var$count = 0;
+  function $1746a345f3d73bb7$export$f680877a34711e37(deterministicId) {
+    const [id, setId] = h($1746a345f3d73bb7$var$useReactId());
+    $9f79659886946c16$export$e5c5a5f917a5871c(() => {
+      if (!deterministicId)
+        setId(
+          (reactId) => reactId !== null && reactId !== void 0 ? reactId : String($1746a345f3d73bb7$var$count++)
+        );
+    }, [
+      deterministicId
+    ]);
+    return deterministicId || (id ? `radix-${id}` : "");
+  }
+  function $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(callback) {
+    const callbackRef = _$1(callback);
+    p$1(() => {
+      callbackRef.current = callback;
+    });
+    return F$1(
+      () => (...args) => {
+        var _callbackRef$current;
+        return (_callbackRef$current = callbackRef.current) === null || _callbackRef$current === void 0 ? void 0 : _callbackRef$current.call(callbackRef, ...args);
+      },
+      []
+    );
+  }
+  function $71cd76cc60e0454e$export$6f32135080cb4c3({ prop, defaultProp, onChange = () => {
+  } }) {
+    const [uncontrolledProp, setUncontrolledProp] = $71cd76cc60e0454e$var$useUncontrolledState({
+      defaultProp,
+      onChange
+    });
+    const isControlled = prop !== void 0;
+    const value1 = isControlled ? prop : uncontrolledProp;
+    const handleChange = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onChange);
+    const setValue = T$1((nextValue) => {
+      if (isControlled) {
+        const setter = nextValue;
+        const value = typeof nextValue === "function" ? setter(prop) : nextValue;
+        if (value !== prop)
+          handleChange(value);
+      } else
+        setUncontrolledProp(nextValue);
+    }, [
+      isControlled,
+      prop,
+      setUncontrolledProp,
+      handleChange
+    ]);
+    return [
+      value1,
+      setValue
+    ];
+  }
+  function $71cd76cc60e0454e$var$useUncontrolledState({ defaultProp, onChange }) {
+    const uncontrolledState = h(defaultProp);
+    const [value] = uncontrolledState;
+    const prevValueRef = _$1(value);
+    const handleChange = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onChange);
+    p$1(() => {
+      if (prevValueRef.current !== value) {
+        handleChange(value);
+        prevValueRef.current = value;
+      }
+    }, [
+      value,
+      prevValueRef,
+      handleChange
+    ]);
+    return uncontrolledState;
+  }
+  const $5e63c961fc1ce211$export$8c6ed5c666ac1360 = /* @__PURE__ */ k((props, forwardedRef) => {
+    const { children, ...slotProps } = props;
+    const childrenArray = O.toArray(children);
+    const slottable = childrenArray.find($5e63c961fc1ce211$var$isSlottable);
+    if (slottable) {
+      const newElement = slottable.props.children;
+      const newChildren = childrenArray.map((child) => {
+        if (child === slottable) {
+          if (O.count(newElement) > 1)
+            return O.only(null);
+          return /* @__PURE__ */ an(newElement) ? newElement.props.children : null;
+        } else
+          return child;
+      });
+      return /* @__PURE__ */ y$1($5e63c961fc1ce211$var$SlotClone, _extends({}, slotProps, {
+        ref: forwardedRef
+      }), /* @__PURE__ */ an(newElement) ? /* @__PURE__ */ sn(newElement, void 0, newChildren) : null);
+    }
+    return /* @__PURE__ */ y$1($5e63c961fc1ce211$var$SlotClone, _extends({}, slotProps, {
+      ref: forwardedRef
+    }), children);
+  });
+  $5e63c961fc1ce211$export$8c6ed5c666ac1360.displayName = "Slot";
+  const $5e63c961fc1ce211$var$SlotClone = /* @__PURE__ */ k((props, forwardedRef) => {
+    const { children, ...slotProps } = props;
+    if (/* @__PURE__ */ an(children))
+      return /* @__PURE__ */ sn(children, {
+        ...$5e63c961fc1ce211$var$mergeProps(slotProps, children.props),
+        ref: $6ed0406888f73fc4$export$43e446d32b3d21af(forwardedRef, children.ref)
+      });
+    return O.count(children) > 1 ? O.only(null) : null;
+  });
+  $5e63c961fc1ce211$var$SlotClone.displayName = "SlotClone";
+  const $5e63c961fc1ce211$export$d9f1ccf0bdb05d45 = ({ children }) => {
+    return /* @__PURE__ */ y$1(_$2, null, children);
+  };
+  function $5e63c961fc1ce211$var$isSlottable(child) {
+    return /* @__PURE__ */ an(child) && child.type === $5e63c961fc1ce211$export$d9f1ccf0bdb05d45;
+  }
+  function $5e63c961fc1ce211$var$mergeProps(slotProps, childProps) {
+    const overrideProps = {
+      ...childProps
+    };
+    for (const propName in childProps) {
+      const slotPropValue = slotProps[propName];
+      const childPropValue = childProps[propName];
+      const isHandler = /^on[A-Z]/.test(propName);
+      if (isHandler) {
+        if (slotPropValue && childPropValue)
+          overrideProps[propName] = (...args) => {
+            childPropValue(...args);
+            slotPropValue(...args);
+          };
+        else if (slotPropValue)
+          overrideProps[propName] = slotPropValue;
+      } else if (propName === "style")
+        overrideProps[propName] = {
+          ...slotPropValue,
+          ...childPropValue
+        };
+      else if (propName === "className")
+        overrideProps[propName] = [
+          slotPropValue,
+          childPropValue
+        ].filter(Boolean).join(" ");
+    }
+    return {
+      ...slotProps,
+      ...overrideProps
+    };
+  }
+  const $8927f6f2acc4f386$var$NODES = [
+    "a",
+    "button",
+    "div",
+    "form",
+    "h2",
+    "h3",
+    "img",
+    "input",
+    "label",
+    "li",
+    "nav",
+    "ol",
+    "p",
+    "span",
+    "svg",
+    "ul"
+  ];
+  const $8927f6f2acc4f386$export$250ffa63cdc0d034 = $8927f6f2acc4f386$var$NODES.reduce((primitive, node2) => {
+    const Node = /* @__PURE__ */ k((props, forwardedRef) => {
+      const { asChild, ...primitiveProps } = props;
+      const Comp = asChild ? $5e63c961fc1ce211$export$8c6ed5c666ac1360 : node2;
+      p$1(() => {
+        window[Symbol.for("radix-ui")] = true;
+      }, []);
+      return /* @__PURE__ */ y$1(Comp, _extends({}, primitiveProps, {
+        ref: forwardedRef
+      }));
+    });
+    Node.displayName = `Primitive.${node2}`;
+    return {
+      ...primitive,
+      [node2]: Node
+    };
+  }, {});
+  function $8927f6f2acc4f386$export$6d1a0317bde7de7f(target, event) {
+    if (target)
+      pn(
+        () => target.dispatchEvent(event)
+      );
+  }
+  function $addc16e1bbe58fd0$export$3a72a57244d6e765(onEscapeKeyDownProp, ownerDocument = globalThis === null || globalThis === void 0 ? void 0 : globalThis.document) {
+    const onEscapeKeyDown = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onEscapeKeyDownProp);
+    p$1(() => {
+      const handleKeyDown = (event) => {
+        if (event.key === "Escape")
+          onEscapeKeyDown(event);
+      };
+      ownerDocument.addEventListener("keydown", handleKeyDown);
+      return () => ownerDocument.removeEventListener("keydown", handleKeyDown);
+    }, [
+      onEscapeKeyDown,
+      ownerDocument
+    ]);
+  }
+  const $5cb92bef7577960e$var$CONTEXT_UPDATE = "dismissableLayer.update";
+  const $5cb92bef7577960e$var$POINTER_DOWN_OUTSIDE = "dismissableLayer.pointerDownOutside";
+  const $5cb92bef7577960e$var$FOCUS_OUTSIDE = "dismissableLayer.focusOutside";
+  let $5cb92bef7577960e$var$originalBodyPointerEvents;
+  const $5cb92bef7577960e$var$DismissableLayerContext = /* @__PURE__ */ F$2({
+    layers: /* @__PURE__ */ new Set(),
+    layersWithOutsidePointerEventsDisabled: /* @__PURE__ */ new Set(),
+    branches: /* @__PURE__ */ new Set()
+  });
+  const $5cb92bef7577960e$export$177fb62ff3ec1f22 = /* @__PURE__ */ k((props, forwardedRef) => {
+    var _node$ownerDocument;
+    const { disableOutsidePointerEvents = false, onEscapeKeyDown, onPointerDownOutside, onFocusOutside, onInteractOutside, onDismiss, ...layerProps } = props;
+    const context = q$1($5cb92bef7577960e$var$DismissableLayerContext);
+    const [node1, setNode] = h(null);
+    const ownerDocument = (_node$ownerDocument = node1 === null || node1 === void 0 ? void 0 : node1.ownerDocument) !== null && _node$ownerDocument !== void 0 ? _node$ownerDocument : globalThis === null || globalThis === void 0 ? void 0 : globalThis.document;
+    const [, force] = h({});
+    const composedRefs = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(
+      forwardedRef,
+      (node2) => setNode(node2)
+    );
+    const layers = Array.from(context.layers);
+    const [highestLayerWithOutsidePointerEventsDisabled] = [
+      ...context.layersWithOutsidePointerEventsDisabled
+    ].slice(-1);
+    const highestLayerWithOutsidePointerEventsDisabledIndex = layers.indexOf(highestLayerWithOutsidePointerEventsDisabled);
+    const index2 = node1 ? layers.indexOf(node1) : -1;
+    const isBodyPointerEventsDisabled = context.layersWithOutsidePointerEventsDisabled.size > 0;
+    const isPointerEventsEnabled = index2 >= highestLayerWithOutsidePointerEventsDisabledIndex;
+    const pointerDownOutside = $5cb92bef7577960e$var$usePointerDownOutside((event) => {
+      const target = event.target;
+      const isPointerDownOnBranch = [
+        ...context.branches
+      ].some(
+        (branch) => branch.contains(target)
+      );
+      if (!isPointerEventsEnabled || isPointerDownOnBranch)
+        return;
+      onPointerDownOutside === null || onPointerDownOutside === void 0 || onPointerDownOutside(event);
+      onInteractOutside === null || onInteractOutside === void 0 || onInteractOutside(event);
+      if (!event.defaultPrevented)
+        onDismiss === null || onDismiss === void 0 || onDismiss();
+    }, ownerDocument);
+    const focusOutside = $5cb92bef7577960e$var$useFocusOutside((event) => {
+      const target = event.target;
+      const isFocusInBranch = [
+        ...context.branches
+      ].some(
+        (branch) => branch.contains(target)
+      );
+      if (isFocusInBranch)
+        return;
+      onFocusOutside === null || onFocusOutside === void 0 || onFocusOutside(event);
+      onInteractOutside === null || onInteractOutside === void 0 || onInteractOutside(event);
+      if (!event.defaultPrevented)
+        onDismiss === null || onDismiss === void 0 || onDismiss();
+    }, ownerDocument);
+    $addc16e1bbe58fd0$export$3a72a57244d6e765((event) => {
+      const isHighestLayer = index2 === context.layers.size - 1;
+      if (!isHighestLayer)
+        return;
+      onEscapeKeyDown === null || onEscapeKeyDown === void 0 || onEscapeKeyDown(event);
+      if (!event.defaultPrevented && onDismiss) {
+        event.preventDefault();
+        onDismiss();
+      }
+    }, ownerDocument);
+    p$1(() => {
+      if (!node1)
+        return;
+      if (disableOutsidePointerEvents) {
+        if (context.layersWithOutsidePointerEventsDisabled.size === 0) {
+          $5cb92bef7577960e$var$originalBodyPointerEvents = ownerDocument.body.style.pointerEvents;
+          ownerDocument.body.style.pointerEvents = "none";
+        }
+        context.layersWithOutsidePointerEventsDisabled.add(node1);
+      }
+      context.layers.add(node1);
+      $5cb92bef7577960e$var$dispatchUpdate();
+      return () => {
+        if (disableOutsidePointerEvents && context.layersWithOutsidePointerEventsDisabled.size === 1)
+          ownerDocument.body.style.pointerEvents = $5cb92bef7577960e$var$originalBodyPointerEvents;
+      };
+    }, [
+      node1,
+      ownerDocument,
+      disableOutsidePointerEvents,
+      context
+    ]);
+    p$1(() => {
+      return () => {
+        if (!node1)
+          return;
+        context.layers.delete(node1);
+        context.layersWithOutsidePointerEventsDisabled.delete(node1);
+        $5cb92bef7577960e$var$dispatchUpdate();
+      };
+    }, [
+      node1,
+      context
+    ]);
+    p$1(() => {
+      const handleUpdate = () => force({});
+      document.addEventListener($5cb92bef7577960e$var$CONTEXT_UPDATE, handleUpdate);
+      return () => document.removeEventListener($5cb92bef7577960e$var$CONTEXT_UPDATE, handleUpdate);
+    }, []);
+    return /* @__PURE__ */ y$1($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({}, layerProps, {
+      ref: composedRefs,
+      style: {
+        pointerEvents: isBodyPointerEventsDisabled ? isPointerEventsEnabled ? "auto" : "none" : void 0,
+        ...props.style
+      },
+      onFocusCapture: $e42e1063c40fb3ef$export$b9ecd428b558ff10(props.onFocusCapture, focusOutside.onFocusCapture),
+      onBlurCapture: $e42e1063c40fb3ef$export$b9ecd428b558ff10(props.onBlurCapture, focusOutside.onBlurCapture),
+      onPointerDownCapture: $e42e1063c40fb3ef$export$b9ecd428b558ff10(props.onPointerDownCapture, pointerDownOutside.onPointerDownCapture)
+    }));
+  });
+  function $5cb92bef7577960e$var$usePointerDownOutside(onPointerDownOutside, ownerDocument = globalThis === null || globalThis === void 0 ? void 0 : globalThis.document) {
+    const handlePointerDownOutside = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onPointerDownOutside);
+    const isPointerInsideReactTreeRef = _$1(false);
+    const handleClickRef = _$1(() => {
+    });
+    p$1(() => {
+      const handlePointerDown = (event) => {
+        if (event.target && !isPointerInsideReactTreeRef.current) {
+          let handleAndDispatchPointerDownOutsideEvent = function() {
+            $5cb92bef7577960e$var$handleAndDispatchCustomEvent($5cb92bef7577960e$var$POINTER_DOWN_OUTSIDE, handlePointerDownOutside, eventDetail, {
+              discrete: true
+            });
+          };
+          const eventDetail = {
+            originalEvent: event
+          };
+          if (event.pointerType === "touch") {
+            ownerDocument.removeEventListener("click", handleClickRef.current);
+            handleClickRef.current = handleAndDispatchPointerDownOutsideEvent;
+            ownerDocument.addEventListener("click", handleClickRef.current, {
+              once: true
+            });
+          } else
+            handleAndDispatchPointerDownOutsideEvent();
+        }
+        isPointerInsideReactTreeRef.current = false;
+      };
+      const timerId = window.setTimeout(() => {
+        ownerDocument.addEventListener("pointerdown", handlePointerDown);
+      }, 0);
+      return () => {
+        window.clearTimeout(timerId);
+        ownerDocument.removeEventListener("pointerdown", handlePointerDown);
+        ownerDocument.removeEventListener("click", handleClickRef.current);
+      };
+    }, [
+      ownerDocument,
+      handlePointerDownOutside
+    ]);
+    return {
+      // ensures we check React component tree (not just DOM tree)
+      onPointerDownCapture: () => isPointerInsideReactTreeRef.current = true
+    };
+  }
+  function $5cb92bef7577960e$var$useFocusOutside(onFocusOutside, ownerDocument = globalThis === null || globalThis === void 0 ? void 0 : globalThis.document) {
+    const handleFocusOutside = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onFocusOutside);
+    const isFocusInsideReactTreeRef = _$1(false);
+    p$1(() => {
+      const handleFocus = (event) => {
+        if (event.target && !isFocusInsideReactTreeRef.current) {
+          const eventDetail = {
+            originalEvent: event
+          };
+          $5cb92bef7577960e$var$handleAndDispatchCustomEvent($5cb92bef7577960e$var$FOCUS_OUTSIDE, handleFocusOutside, eventDetail, {
+            discrete: false
+          });
+        }
+      };
+      ownerDocument.addEventListener("focusin", handleFocus);
+      return () => ownerDocument.removeEventListener("focusin", handleFocus);
+    }, [
+      ownerDocument,
+      handleFocusOutside
+    ]);
+    return {
+      onFocusCapture: () => isFocusInsideReactTreeRef.current = true,
+      onBlurCapture: () => isFocusInsideReactTreeRef.current = false
+    };
+  }
+  function $5cb92bef7577960e$var$dispatchUpdate() {
+    const event = new CustomEvent($5cb92bef7577960e$var$CONTEXT_UPDATE);
+    document.dispatchEvent(event);
+  }
+  function $5cb92bef7577960e$var$handleAndDispatchCustomEvent(name, handler, detail, { discrete }) {
+    const target = detail.originalEvent.target;
+    const event = new CustomEvent(name, {
+      bubbles: false,
+      cancelable: true,
+      detail
+    });
+    if (handler)
+      target.addEventListener(name, handler, {
+        once: true
+      });
+    if (discrete)
+      $8927f6f2acc4f386$export$6d1a0317bde7de7f(target, event);
+    else
+      target.dispatchEvent(event);
+  }
+  const $d3863c46a17e8a28$var$AUTOFOCUS_ON_MOUNT = "focusScope.autoFocusOnMount";
+  const $d3863c46a17e8a28$var$AUTOFOCUS_ON_UNMOUNT = "focusScope.autoFocusOnUnmount";
+  const $d3863c46a17e8a28$var$EVENT_OPTIONS = {
+    bubbles: false,
+    cancelable: true
+  };
+  const $d3863c46a17e8a28$export$20e40289641fbbb6 = /* @__PURE__ */ k((props, forwardedRef) => {
+    const { loop = false, trapped = false, onMountAutoFocus: onMountAutoFocusProp, onUnmountAutoFocus: onUnmountAutoFocusProp, ...scopeProps } = props;
+    const [container1, setContainer] = h(null);
+    const onMountAutoFocus = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onMountAutoFocusProp);
+    const onUnmountAutoFocus = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onUnmountAutoFocusProp);
+    const lastFocusedElementRef = _$1(null);
+    const composedRefs = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(
+      forwardedRef,
+      (node2) => setContainer(node2)
+    );
+    const focusScope = _$1({
+      paused: false,
+      pause() {
+        this.paused = true;
+      },
+      resume() {
+        this.paused = false;
+      }
+    }).current;
+    p$1(() => {
+      if (trapped) {
+        let handleFocusIn = function(event) {
+          if (focusScope.paused || !container1)
+            return;
+          const target = event.target;
+          if (container1.contains(target))
+            lastFocusedElementRef.current = target;
+          else
+            $d3863c46a17e8a28$var$focus(lastFocusedElementRef.current, {
+              select: true
+            });
+        }, handleFocusOut = function(event) {
+          if (focusScope.paused || !container1)
+            return;
+          if (!container1.contains(event.relatedTarget))
+            $d3863c46a17e8a28$var$focus(lastFocusedElementRef.current, {
+              select: true
+            });
+        };
+        document.addEventListener("focusin", handleFocusIn);
+        document.addEventListener("focusout", handleFocusOut);
+        return () => {
+          document.removeEventListener("focusin", handleFocusIn);
+          document.removeEventListener("focusout", handleFocusOut);
+        };
+      }
+    }, [
+      trapped,
+      container1,
+      focusScope.paused
+    ]);
+    p$1(() => {
+      if (container1) {
+        $d3863c46a17e8a28$var$focusScopesStack.add(focusScope);
+        const previouslyFocusedElement = document.activeElement;
+        const hasFocusedCandidate = container1.contains(previouslyFocusedElement);
+        if (!hasFocusedCandidate) {
+          const mountEvent = new CustomEvent($d3863c46a17e8a28$var$AUTOFOCUS_ON_MOUNT, $d3863c46a17e8a28$var$EVENT_OPTIONS);
+          container1.addEventListener($d3863c46a17e8a28$var$AUTOFOCUS_ON_MOUNT, onMountAutoFocus);
+          container1.dispatchEvent(mountEvent);
+          if (!mountEvent.defaultPrevented) {
+            $d3863c46a17e8a28$var$focusFirst($d3863c46a17e8a28$var$removeLinks($d3863c46a17e8a28$var$getTabbableCandidates(container1)), {
+              select: true
+            });
+            if (document.activeElement === previouslyFocusedElement)
+              $d3863c46a17e8a28$var$focus(container1);
+          }
+        }
+        return () => {
+          container1.removeEventListener($d3863c46a17e8a28$var$AUTOFOCUS_ON_MOUNT, onMountAutoFocus);
+          setTimeout(() => {
+            const unmountEvent = new CustomEvent($d3863c46a17e8a28$var$AUTOFOCUS_ON_UNMOUNT, $d3863c46a17e8a28$var$EVENT_OPTIONS);
+            container1.addEventListener($d3863c46a17e8a28$var$AUTOFOCUS_ON_UNMOUNT, onUnmountAutoFocus);
+            container1.dispatchEvent(unmountEvent);
+            if (!unmountEvent.defaultPrevented)
+              $d3863c46a17e8a28$var$focus(previouslyFocusedElement !== null && previouslyFocusedElement !== void 0 ? previouslyFocusedElement : document.body, {
+                select: true
+              });
+            container1.removeEventListener($d3863c46a17e8a28$var$AUTOFOCUS_ON_UNMOUNT, onUnmountAutoFocus);
+            $d3863c46a17e8a28$var$focusScopesStack.remove(focusScope);
+          }, 0);
+        };
+      }
+    }, [
+      container1,
+      onMountAutoFocus,
+      onUnmountAutoFocus,
+      focusScope
+    ]);
+    const handleKeyDown = T$1((event) => {
+      if (!loop && !trapped)
+        return;
+      if (focusScope.paused)
+        return;
+      const isTabKey = event.key === "Tab" && !event.altKey && !event.ctrlKey && !event.metaKey;
+      const focusedElement = document.activeElement;
+      if (isTabKey && focusedElement) {
+        const container = event.currentTarget;
+        const [first, last] = $d3863c46a17e8a28$var$getTabbableEdges(container);
+        const hasTabbableElementsInside = first && last;
+        if (!hasTabbableElementsInside) {
+          if (focusedElement === container)
+            event.preventDefault();
+        } else {
+          if (!event.shiftKey && focusedElement === last) {
+            event.preventDefault();
+            if (loop)
+              $d3863c46a17e8a28$var$focus(first, {
+                select: true
+              });
+          } else if (event.shiftKey && focusedElement === first) {
+            event.preventDefault();
+            if (loop)
+              $d3863c46a17e8a28$var$focus(last, {
+                select: true
+              });
+          }
+        }
+      }
+    }, [
+      loop,
+      trapped,
+      focusScope.paused
+    ]);
+    return /* @__PURE__ */ y$1($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({
+      tabIndex: -1
+    }, scopeProps, {
+      ref: composedRefs,
+      onKeyDown: handleKeyDown
+    }));
+  });
+  function $d3863c46a17e8a28$var$focusFirst(candidates, { select = false } = {}) {
+    const previouslyFocusedElement = document.activeElement;
+    for (const candidate of candidates) {
+      $d3863c46a17e8a28$var$focus(candidate, {
+        select
+      });
+      if (document.activeElement !== previouslyFocusedElement)
+        return;
+    }
+  }
+  function $d3863c46a17e8a28$var$getTabbableEdges(container) {
+    const candidates = $d3863c46a17e8a28$var$getTabbableCandidates(container);
+    const first = $d3863c46a17e8a28$var$findVisible(candidates, container);
+    const last = $d3863c46a17e8a28$var$findVisible(candidates.reverse(), container);
+    return [
+      first,
+      last
+    ];
+  }
+  function $d3863c46a17e8a28$var$getTabbableCandidates(container) {
+    const nodes = [];
+    const walker = document.createTreeWalker(container, NodeFilter.SHOW_ELEMENT, {
+      acceptNode: (node2) => {
+        const isHiddenInput = node2.tagName === "INPUT" && node2.type === "hidden";
+        if (node2.disabled || node2.hidden || isHiddenInput)
+          return NodeFilter.FILTER_SKIP;
+        return node2.tabIndex >= 0 ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+      }
+    });
+    while (walker.nextNode())
+      nodes.push(walker.currentNode);
+    return nodes;
+  }
+  function $d3863c46a17e8a28$var$findVisible(elements, container) {
+    for (const element2 of elements) {
+      if (!$d3863c46a17e8a28$var$isHidden(element2, {
+        upTo: container
+      }))
+        return element2;
+    }
+  }
+  function $d3863c46a17e8a28$var$isHidden(node2, { upTo }) {
+    if (getComputedStyle(node2).visibility === "hidden")
+      return true;
+    while (node2) {
+      if (upTo !== void 0 && node2 === upTo)
+        return false;
+      if (getComputedStyle(node2).display === "none")
+        return true;
+      node2 = node2.parentElement;
+    }
+    return false;
+  }
+  function $d3863c46a17e8a28$var$isSelectableInput(element2) {
+    return element2 instanceof HTMLInputElement && "select" in element2;
+  }
+  function $d3863c46a17e8a28$var$focus(element2, { select = false } = {}) {
+    if (element2 && element2.focus) {
+      const previouslyFocusedElement = document.activeElement;
+      element2.focus({
+        preventScroll: true
+      });
+      if (element2 !== previouslyFocusedElement && $d3863c46a17e8a28$var$isSelectableInput(element2) && select)
+        element2.select();
+    }
+  }
+  const $d3863c46a17e8a28$var$focusScopesStack = $d3863c46a17e8a28$var$createFocusScopesStack();
+  function $d3863c46a17e8a28$var$createFocusScopesStack() {
+    let stack = [];
+    return {
+      add(focusScope) {
+        const activeFocusScope = stack[0];
+        if (focusScope !== activeFocusScope)
+          activeFocusScope === null || activeFocusScope === void 0 || activeFocusScope.pause();
+        stack = $d3863c46a17e8a28$var$arrayRemove(stack, focusScope);
+        stack.unshift(focusScope);
+      },
+      remove(focusScope) {
+        var _stack$;
+        stack = $d3863c46a17e8a28$var$arrayRemove(stack, focusScope);
+        (_stack$ = stack[0]) === null || _stack$ === void 0 || _stack$.resume();
+      }
+    };
+  }
+  function $d3863c46a17e8a28$var$arrayRemove(array, item) {
+    const updatedArray = [
+      ...array
+    ];
+    const index2 = updatedArray.indexOf(item);
+    if (index2 !== -1)
+      updatedArray.splice(index2, 1);
+    return updatedArray;
+  }
+  function $d3863c46a17e8a28$var$removeLinks(items) {
+    return items.filter(
+      (item) => item.tagName !== "A"
+    );
+  }
+  const $f1701beae083dbae$export$602eac185826482c = /* @__PURE__ */ k((props, forwardedRef) => {
+    var _globalThis$document;
+    const { container = globalThis === null || globalThis === void 0 ? void 0 : (_globalThis$document = globalThis.document) === null || _globalThis$document === void 0 ? void 0 : _globalThis$document.body, ...portalProps } = props;
+    return container ? /* @__PURE__ */ Cn.createPortal(/* @__PURE__ */ y$1($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({}, portalProps, {
+      ref: forwardedRef
+    })), container) : null;
+  });
+  function $fe963b355347cc68$export$3e6543de14f8614f(initialState, machine) {
+    return s((state, event) => {
+      const nextState = machine[state][event];
+      return nextState !== null && nextState !== void 0 ? nextState : state;
+    }, initialState);
+  }
+  const $921a889cee6df7e8$export$99c2b779aa4e8b8b = (props) => {
+    const { present, children } = props;
+    const presence = $921a889cee6df7e8$var$usePresence(present);
+    const child = typeof children === "function" ? children({
+      present: presence.isPresent
+    }) : O.only(children);
+    const ref = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(presence.ref, child.ref);
+    const forceMount = typeof children === "function";
+    return forceMount || presence.isPresent ? /* @__PURE__ */ sn(child, {
+      ref
+    }) : null;
+  };
+  $921a889cee6df7e8$export$99c2b779aa4e8b8b.displayName = "Presence";
+  function $921a889cee6df7e8$var$usePresence(present) {
+    const [node1, setNode] = h();
+    const stylesRef = _$1({});
+    const prevPresentRef = _$1(present);
+    const prevAnimationNameRef = _$1("none");
+    const initialState = present ? "mounted" : "unmounted";
+    const [state, send] = $fe963b355347cc68$export$3e6543de14f8614f(initialState, {
+      mounted: {
+        UNMOUNT: "unmounted",
+        ANIMATION_OUT: "unmountSuspended"
+      },
+      unmountSuspended: {
+        MOUNT: "mounted",
+        ANIMATION_END: "unmounted"
+      },
+      unmounted: {
+        MOUNT: "mounted"
+      }
+    });
+    p$1(() => {
+      const currentAnimationName = $921a889cee6df7e8$var$getAnimationName(stylesRef.current);
+      prevAnimationNameRef.current = state === "mounted" ? currentAnimationName : "none";
+    }, [
+      state
+    ]);
+    $9f79659886946c16$export$e5c5a5f917a5871c(() => {
+      const styles = stylesRef.current;
+      const wasPresent = prevPresentRef.current;
+      const hasPresentChanged = wasPresent !== present;
+      if (hasPresentChanged) {
+        const prevAnimationName = prevAnimationNameRef.current;
+        const currentAnimationName = $921a889cee6df7e8$var$getAnimationName(styles);
+        if (present)
+          send("MOUNT");
+        else if (currentAnimationName === "none" || (styles === null || styles === void 0 ? void 0 : styles.display) === "none")
+          send("UNMOUNT");
+        else {
+          const isAnimating = prevAnimationName !== currentAnimationName;
+          if (wasPresent && isAnimating)
+            send("ANIMATION_OUT");
+          else
+            send("UNMOUNT");
+        }
+        prevPresentRef.current = present;
+      }
+    }, [
+      present,
+      send
+    ]);
+    $9f79659886946c16$export$e5c5a5f917a5871c(() => {
+      if (node1) {
+        const handleAnimationEnd = (event) => {
+          const currentAnimationName = $921a889cee6df7e8$var$getAnimationName(stylesRef.current);
+          const isCurrentAnimation = currentAnimationName.includes(event.animationName);
+          if (event.target === node1 && isCurrentAnimation)
+            pn(
+              () => send("ANIMATION_END")
+            );
+        };
+        const handleAnimationStart = (event) => {
+          if (event.target === node1)
+            prevAnimationNameRef.current = $921a889cee6df7e8$var$getAnimationName(stylesRef.current);
+        };
+        node1.addEventListener("animationstart", handleAnimationStart);
+        node1.addEventListener("animationcancel", handleAnimationEnd);
+        node1.addEventListener("animationend", handleAnimationEnd);
+        return () => {
+          node1.removeEventListener("animationstart", handleAnimationStart);
+          node1.removeEventListener("animationcancel", handleAnimationEnd);
+          node1.removeEventListener("animationend", handleAnimationEnd);
+        };
+      } else
+        send("ANIMATION_END");
+    }, [
+      node1,
+      send
+    ]);
+    return {
+      isPresent: [
+        "mounted",
+        "unmountSuspended"
+      ].includes(state),
+      ref: T$1((node2) => {
+        if (node2)
+          stylesRef.current = getComputedStyle(node2);
+        setNode(node2);
+      }, [])
+    };
+  }
+  function $921a889cee6df7e8$var$getAnimationName(styles) {
+    return (styles === null || styles === void 0 ? void 0 : styles.animationName) || "none";
+  }
+  let $3db38b7d1fb3fe6a$var$count = 0;
+  function $3db38b7d1fb3fe6a$export$b7ece24a22aeda8c() {
+    p$1(() => {
+      var _edgeGuards$, _edgeGuards$2;
+      const edgeGuards = document.querySelectorAll("[data-radix-focus-guard]");
+      document.body.insertAdjacentElement("afterbegin", (_edgeGuards$ = edgeGuards[0]) !== null && _edgeGuards$ !== void 0 ? _edgeGuards$ : $3db38b7d1fb3fe6a$var$createFocusGuard());
+      document.body.insertAdjacentElement("beforeend", (_edgeGuards$2 = edgeGuards[1]) !== null && _edgeGuards$2 !== void 0 ? _edgeGuards$2 : $3db38b7d1fb3fe6a$var$createFocusGuard());
+      $3db38b7d1fb3fe6a$var$count++;
+      return () => {
+        if ($3db38b7d1fb3fe6a$var$count === 1)
+          document.querySelectorAll("[data-radix-focus-guard]").forEach(
+            (node2) => node2.remove()
+          );
+        $3db38b7d1fb3fe6a$var$count--;
+      };
+    }, []);
+  }
+  function $3db38b7d1fb3fe6a$var$createFocusGuard() {
+    const element2 = document.createElement("span");
+    element2.setAttribute("data-radix-focus-guard", "");
+    element2.tabIndex = 0;
+    element2.style.cssText = "outline: none; opacity: 0; position: fixed; pointer-events: none";
+    return element2;
+  }
+  var __assign = function() {
+    __assign = Object.assign || function __assign2(t2) {
+      for (var s2, i2 = 1, n2 = arguments.length; i2 < n2; i2++) {
+        s2 = arguments[i2];
+        for (var p2 in s2)
+          if (Object.prototype.hasOwnProperty.call(s2, p2))
+            t2[p2] = s2[p2];
+      }
+      return t2;
+    };
+    return __assign.apply(this, arguments);
+  };
+  function __rest(s2, e2) {
+    var t2 = {};
+    for (var p2 in s2)
+      if (Object.prototype.hasOwnProperty.call(s2, p2) && e2.indexOf(p2) < 0)
+        t2[p2] = s2[p2];
+    if (s2 != null && typeof Object.getOwnPropertySymbols === "function")
+      for (var i2 = 0, p2 = Object.getOwnPropertySymbols(s2); i2 < p2.length; i2++) {
+        if (e2.indexOf(p2[i2]) < 0 && Object.prototype.propertyIsEnumerable.call(s2, p2[i2]))
+          t2[p2[i2]] = s2[p2[i2]];
+      }
+    return t2;
+  }
+  function __spreadArray(to, from, pack) {
+    if (pack || arguments.length === 2)
+      for (var i2 = 0, l2 = from.length, ar; i2 < l2; i2++) {
+        if (ar || !(i2 in from)) {
+          if (!ar)
+            ar = Array.prototype.slice.call(from, 0, i2);
+          ar[i2] = from[i2];
+        }
+      }
+    return to.concat(ar || Array.prototype.slice.call(from));
+  }
+  var zeroRightClassName = "right-scroll-bar-position";
+  var fullWidthClassName = "width-before-scroll-bar";
+  var noScrollbarsClassName = "with-scroll-bars-hidden";
+  var removedBarSizeVariable = "--removed-body-scroll-bar-size";
+  function assignRef(ref, value) {
+    if (typeof ref === "function") {
+      ref(value);
+    } else if (ref) {
+      ref.current = value;
+    }
+    return ref;
+  }
+  function useCallbackRef(initialValue, callback) {
+    var ref = h(function() {
+      return {
+        // value
+        value: initialValue,
+        // last callback
+        callback,
+        // "memoized" public interface
+        facade: {
+          get current() {
+            return ref.value;
+          },
+          set current(value) {
+            var last = ref.value;
+            if (last !== value) {
+              ref.value = value;
+              ref.callback(value, last);
+            }
+          }
+        }
+      };
+    })[0];
+    ref.callback = callback;
+    return ref.facade;
+  }
+  function useMergeRefs(refs, defaultValue) {
+    return useCallbackRef(defaultValue || null, function(newValue) {
+      return refs.forEach(function(ref) {
+        return assignRef(ref, newValue);
+      });
+    });
+  }
+  function ItoI(a2) {
+    return a2;
+  }
+  function innerCreateMedium(defaults, middleware) {
+    if (middleware === void 0) {
+      middleware = ItoI;
+    }
+    var buffer = [];
+    var assigned = false;
+    var medium = {
+      read: function() {
+        if (assigned) {
+          throw new Error("Sidecar: could not `read` from an `assigned` medium. `read` could be used only with `useMedium`.");
+        }
+        if (buffer.length) {
+          return buffer[buffer.length - 1];
+        }
+        return defaults;
+      },
+      useMedium: function(data) {
+        var item = middleware(data, assigned);
+        buffer.push(item);
+        return function() {
+          buffer = buffer.filter(function(x2) {
+            return x2 !== item;
+          });
+        };
+      },
+      assignSyncMedium: function(cb) {
+        assigned = true;
+        while (buffer.length) {
+          var cbs = buffer;
+          buffer = [];
+          cbs.forEach(cb);
+        }
+        buffer = {
+          push: function(x2) {
+            return cb(x2);
+          },
+          filter: function() {
+            return buffer;
+          }
+        };
+      },
+      assignMedium: function(cb) {
+        assigned = true;
+        var pendingQueue = [];
+        if (buffer.length) {
+          var cbs = buffer;
+          buffer = [];
+          cbs.forEach(cb);
+          pendingQueue = buffer;
+        }
+        var executeQueue = function() {
+          var cbs2 = pendingQueue;
+          pendingQueue = [];
+          cbs2.forEach(cb);
+        };
+        var cycle = function() {
+          return Promise.resolve().then(executeQueue);
+        };
+        cycle();
+        buffer = {
+          push: function(x2) {
+            pendingQueue.push(x2);
+            cycle();
+          },
+          filter: function(filter) {
+            pendingQueue = pendingQueue.filter(filter);
+            return buffer;
+          }
+        };
+      }
+    };
+    return medium;
+  }
+  function createSidecarMedium(options2) {
+    if (options2 === void 0) {
+      options2 = {};
+    }
+    var medium = innerCreateMedium(null);
+    medium.options = __assign({ async: true, ssr: false }, options2);
+    return medium;
+  }
+  var SideCar$1 = function(_a) {
+    var sideCar = _a.sideCar, rest = __rest(_a, ["sideCar"]);
+    if (!sideCar) {
+      throw new Error("Sidecar: please provide `sideCar` property to import the right car");
+    }
+    var Target = sideCar.read();
+    if (!Target) {
+      throw new Error("Sidecar medium not found");
+    }
+    return y$1(Target, __assign({}, rest));
+  };
+  SideCar$1.isSideCarExport = true;
+  function exportSidecar(medium, exported) {
+    medium.useMedium(exported);
+    return SideCar$1;
+  }
+  var effectCar = createSidecarMedium();
+  var nothing = function() {
+    return;
+  };
+  var RemoveScroll = k(function(props, parentRef) {
+    var ref = _$1(null);
+    var _a = h({
+      onScrollCapture: nothing,
+      onWheelCapture: nothing,
+      onTouchMoveCapture: nothing
+    }), callbacks = _a[0], setCallbacks = _a[1];
+    var forwardProps = props.forwardProps, children = props.children, className = props.className, removeScrollBar = props.removeScrollBar, enabled = props.enabled, shards = props.shards, sideCar = props.sideCar, noIsolation = props.noIsolation, inert = props.inert, allowPinchZoom = props.allowPinchZoom, _b = props.as, Container = _b === void 0 ? "div" : _b, rest = __rest(props, ["forwardProps", "children", "className", "removeScrollBar", "enabled", "shards", "sideCar", "noIsolation", "inert", "allowPinchZoom", "as"]);
+    var SideCar2 = sideCar;
+    var containerRef = useMergeRefs([ref, parentRef]);
+    var containerProps = __assign(__assign({}, rest), callbacks);
+    return y$1(
+      _$2,
+      null,
+      enabled && y$1(SideCar2, { sideCar: effectCar, removeScrollBar, shards, noIsolation, inert, setCallbacks, allowPinchZoom: !!allowPinchZoom, lockRef: ref }),
+      forwardProps ? sn(O.only(children), __assign(__assign({}, containerProps), { ref: containerRef })) : y$1(Container, __assign({}, containerProps, { className, ref: containerRef }), children)
+    );
+  });
+  RemoveScroll.defaultProps = {
+    enabled: true,
+    removeScrollBar: true,
+    inert: false
+  };
+  RemoveScroll.classNames = {
+    fullWidth: fullWidthClassName,
+    zeroRight: zeroRightClassName
+  };
+  var currentNonce;
+  var getNonce = function() {
+    if (currentNonce) {
+      return currentNonce;
+    }
+    if (typeof __webpack_nonce__ !== "undefined") {
+      return __webpack_nonce__;
+    }
+    return void 0;
+  };
+  function makeStyleTag() {
+    if (!document)
+      return null;
+    var tag = document.createElement("style");
+    tag.type = "text/css";
+    var nonce = getNonce();
+    if (nonce) {
+      tag.setAttribute("nonce", nonce);
+    }
+    return tag;
+  }
+  function injectStyles(tag, css) {
+    if (tag.styleSheet) {
+      tag.styleSheet.cssText = css;
+    } else {
+      tag.appendChild(document.createTextNode(css));
+    }
+  }
+  function insertStyleTag(tag) {
+    var head2 = document.head || document.getElementsByTagName("head")[0];
+    head2.appendChild(tag);
+  }
+  var stylesheetSingleton = function() {
+    var counter = 0;
+    var stylesheet = null;
+    return {
+      add: function(style2) {
+        if (counter == 0) {
+          if (stylesheet = makeStyleTag()) {
+            injectStyles(stylesheet, style2);
+            insertStyleTag(stylesheet);
+          }
+        }
+        counter++;
+      },
+      remove: function() {
+        counter--;
+        if (!counter && stylesheet) {
+          stylesheet.parentNode && stylesheet.parentNode.removeChild(stylesheet);
+          stylesheet = null;
+        }
+      }
+    };
+  };
+  var styleHookSingleton = function() {
+    var sheet = stylesheetSingleton();
+    return function(styles, isDynamic) {
+      p$1(function() {
+        sheet.add(styles);
+        return function() {
+          sheet.remove();
+        };
+      }, [styles && isDynamic]);
+    };
+  };
+  var styleSingleton = function() {
+    var useStyle = styleHookSingleton();
+    var Sheet = function(_a) {
+      var styles = _a.styles, dynamic = _a.dynamic;
+      useStyle(styles, dynamic);
+      return null;
+    };
+    return Sheet;
+  };
+  var zeroGap = {
+    left: 0,
+    top: 0,
+    right: 0,
+    gap: 0
+  };
+  var parse = function(x2) {
+    return parseInt(x2 || "", 10) || 0;
+  };
+  var getOffset = function(gapMode) {
+    var cs = window.getComputedStyle(document.body);
+    var left = cs[gapMode === "padding" ? "paddingLeft" : "marginLeft"];
+    var top = cs[gapMode === "padding" ? "paddingTop" : "marginTop"];
+    var right = cs[gapMode === "padding" ? "paddingRight" : "marginRight"];
+    return [parse(left), parse(top), parse(right)];
+  };
+  var getGapWidth = function(gapMode) {
+    if (gapMode === void 0) {
+      gapMode = "margin";
+    }
+    if (typeof window === "undefined") {
+      return zeroGap;
+    }
+    var offsets = getOffset(gapMode);
+    var documentWidth = document.documentElement.clientWidth;
+    var windowWidth = window.innerWidth;
+    return {
+      left: offsets[0],
+      top: offsets[1],
+      right: offsets[2],
+      gap: Math.max(0, windowWidth - documentWidth + offsets[2] - offsets[0])
+    };
+  };
+  var Style = styleSingleton();
+  var getStyles = function(_a, allowRelative, gapMode, important) {
+    var left = _a.left, top = _a.top, right = _a.right, gap = _a.gap;
+    if (gapMode === void 0) {
+      gapMode = "margin";
+    }
+    return "\n  .".concat(noScrollbarsClassName, " {\n   overflow: hidden ").concat(important, ";\n   padding-right: ").concat(gap, "px ").concat(important, ";\n  }\n  body {\n    overflow: hidden ").concat(important, ";\n    overscroll-behavior: contain;\n    ").concat([
+      allowRelative && "position: relative ".concat(important, ";"),
+      gapMode === "margin" && "\n    padding-left: ".concat(left, "px;\n    padding-top: ").concat(top, "px;\n    padding-right: ").concat(right, "px;\n    margin-left:0;\n    margin-top:0;\n    margin-right: ").concat(gap, "px ").concat(important, ";\n    "),
+      gapMode === "padding" && "padding-right: ".concat(gap, "px ").concat(important, ";")
+    ].filter(Boolean).join(""), "\n  }\n  \n  .").concat(zeroRightClassName, " {\n    right: ").concat(gap, "px ").concat(important, ";\n  }\n  \n  .").concat(fullWidthClassName, " {\n    margin-right: ").concat(gap, "px ").concat(important, ";\n  }\n  \n  .").concat(zeroRightClassName, " .").concat(zeroRightClassName, " {\n    right: 0 ").concat(important, ";\n  }\n  \n  .").concat(fullWidthClassName, " .").concat(fullWidthClassName, " {\n    margin-right: 0 ").concat(important, ";\n  }\n  \n  body {\n    ").concat(removedBarSizeVariable, ": ").concat(gap, "px;\n  }\n");
+  };
+  var RemoveScrollBar = function(props) {
+    var noRelative = props.noRelative, noImportant = props.noImportant, _a = props.gapMode, gapMode = _a === void 0 ? "margin" : _a;
+    var gap = F$1(function() {
+      return getGapWidth(gapMode);
+    }, [gapMode]);
+    return y$1(Style, { styles: getStyles(gap, !noRelative, gapMode, !noImportant ? "!important" : "") });
+  };
+  var passiveSupported = false;
+  if (typeof window !== "undefined") {
+    try {
+      var options = Object.defineProperty({}, "passive", {
+        get: function() {
+          passiveSupported = true;
+          return true;
+        }
+      });
+      window.addEventListener("test", options, options);
+      window.removeEventListener("test", options, options);
+    } catch (err) {
+      passiveSupported = false;
+    }
+  }
+  var nonPassive = passiveSupported ? { passive: false } : false;
+  var alwaysContainsScroll = function(node2) {
+    return node2.tagName === "TEXTAREA";
+  };
+  var elementCanBeScrolled = function(node2, overflow) {
+    var styles = window.getComputedStyle(node2);
+    return (
+      // not-not-scrollable
+      styles[overflow] !== "hidden" && // contains scroll inside self
+      !(styles.overflowY === styles.overflowX && !alwaysContainsScroll(node2) && styles[overflow] === "visible")
+    );
+  };
+  var elementCouldBeVScrolled = function(node2) {
+    return elementCanBeScrolled(node2, "overflowY");
+  };
+  var elementCouldBeHScrolled = function(node2) {
+    return elementCanBeScrolled(node2, "overflowX");
+  };
+  var locationCouldBeScrolled = function(axis, node2) {
+    var current = node2;
+    do {
+      if (typeof ShadowRoot !== "undefined" && current instanceof ShadowRoot) {
+        current = current.host;
+      }
+      var isScrollable = elementCouldBeScrolled(axis, current);
+      if (isScrollable) {
+        var _a = getScrollVariables(axis, current), s2 = _a[1], d2 = _a[2];
+        if (s2 > d2) {
+          return true;
+        }
+      }
+      current = current.parentNode;
+    } while (current && current !== document.body);
+    return false;
+  };
+  var getVScrollVariables = function(_a) {
+    var scrollTop = _a.scrollTop, scrollHeight = _a.scrollHeight, clientHeight = _a.clientHeight;
+    return [
+      scrollTop,
+      scrollHeight,
+      clientHeight
+    ];
+  };
+  var getHScrollVariables = function(_a) {
+    var scrollLeft = _a.scrollLeft, scrollWidth = _a.scrollWidth, clientWidth = _a.clientWidth;
+    return [
+      scrollLeft,
+      scrollWidth,
+      clientWidth
+    ];
+  };
+  var elementCouldBeScrolled = function(axis, node2) {
+    return axis === "v" ? elementCouldBeVScrolled(node2) : elementCouldBeHScrolled(node2);
+  };
+  var getScrollVariables = function(axis, node2) {
+    return axis === "v" ? getVScrollVariables(node2) : getHScrollVariables(node2);
+  };
+  var getDirectionFactor = function(axis, direction) {
+    return axis === "h" && direction === "rtl" ? -1 : 1;
+  };
+  var handleScroll = function(axis, endTarget, event, sourceDelta, noOverscroll) {
+    var directionFactor = getDirectionFactor(axis, window.getComputedStyle(endTarget).direction);
+    var delta = directionFactor * sourceDelta;
+    var target = event.target;
+    var targetInLock = endTarget.contains(target);
+    var shouldCancelScroll = false;
+    var isDeltaPositive = delta > 0;
+    var availableScroll = 0;
+    var availableScrollTop = 0;
+    do {
+      var _a = getScrollVariables(axis, target), position2 = _a[0], scroll_1 = _a[1], capacity = _a[2];
+      var elementScroll = scroll_1 - capacity - directionFactor * position2;
+      if (position2 || elementScroll) {
+        if (elementCouldBeScrolled(axis, target)) {
+          availableScroll += elementScroll;
+          availableScrollTop += position2;
+        }
+      }
+      target = target.parentNode;
+    } while (
+      // portaled content
+      !targetInLock && target !== document.body || // self content
+      targetInLock && (endTarget.contains(target) || endTarget === target)
+    );
+    if (isDeltaPositive && (noOverscroll && availableScroll === 0 || !noOverscroll && delta > availableScroll)) {
+      shouldCancelScroll = true;
+    } else if (!isDeltaPositive && (noOverscroll && availableScrollTop === 0 || !noOverscroll && -delta > availableScrollTop)) {
+      shouldCancelScroll = true;
+    }
+    return shouldCancelScroll;
+  };
+  var getTouchXY = function(event) {
+    return "changedTouches" in event ? [event.changedTouches[0].clientX, event.changedTouches[0].clientY] : [0, 0];
+  };
+  var getDeltaXY = function(event) {
+    return [event.deltaX, event.deltaY];
+  };
+  var extractRef = function(ref) {
+    return ref && "current" in ref ? ref.current : ref;
+  };
+  var deltaCompare = function(x2, y2) {
+    return x2[0] === y2[0] && x2[1] === y2[1];
+  };
+  var generateStyle = function(id) {
+    return "\n  .block-interactivity-".concat(id, " {pointer-events: none;}\n  .allow-interactivity-").concat(id, " {pointer-events: all;}\n");
+  };
+  var idCounter = 0;
+  var lockStack = [];
+  function RemoveScrollSideCar(props) {
+    var shouldPreventQueue = _$1([]);
+    var touchStartRef = _$1([0, 0]);
+    var activeAxis = _$1();
+    var id = h(idCounter++)[0];
+    var Style2 = h(function() {
+      return styleSingleton();
+    })[0];
+    var lastProps = _$1(props);
+    p$1(function() {
+      lastProps.current = props;
+    }, [props]);
+    p$1(function() {
+      if (props.inert) {
+        document.body.classList.add("block-interactivity-".concat(id));
+        var allow_1 = __spreadArray([props.lockRef.current], (props.shards || []).map(extractRef), true).filter(Boolean);
+        allow_1.forEach(function(el) {
+          return el.classList.add("allow-interactivity-".concat(id));
+        });
+        return function() {
+          document.body.classList.remove("block-interactivity-".concat(id));
+          allow_1.forEach(function(el) {
+            return el.classList.remove("allow-interactivity-".concat(id));
+          });
+        };
+      }
+      return;
+    }, [props.inert, props.lockRef.current, props.shards]);
+    var shouldCancelEvent = T$1(function(event, parent) {
+      if ("touches" in event && event.touches.length === 2) {
+        return !lastProps.current.allowPinchZoom;
+      }
+      var touch = getTouchXY(event);
+      var touchStart = touchStartRef.current;
+      var deltaX = "deltaX" in event ? event.deltaX : touchStart[0] - touch[0];
+      var deltaY = "deltaY" in event ? event.deltaY : touchStart[1] - touch[1];
+      var currentAxis;
+      var target = event.target;
+      var moveDirection = Math.abs(deltaX) > Math.abs(deltaY) ? "h" : "v";
+      if ("touches" in event && moveDirection === "h" && target.type === "range") {
+        return false;
+      }
+      var canBeScrolledInMainDirection = locationCouldBeScrolled(moveDirection, target);
+      if (!canBeScrolledInMainDirection) {
+        return true;
+      }
+      if (canBeScrolledInMainDirection) {
+        currentAxis = moveDirection;
+      } else {
+        currentAxis = moveDirection === "v" ? "h" : "v";
+        canBeScrolledInMainDirection = locationCouldBeScrolled(moveDirection, target);
+      }
+      if (!canBeScrolledInMainDirection) {
+        return false;
+      }
+      if (!activeAxis.current && "changedTouches" in event && (deltaX || deltaY)) {
+        activeAxis.current = currentAxis;
+      }
+      if (!currentAxis) {
+        return true;
+      }
+      var cancelingAxis = activeAxis.current || currentAxis;
+      return handleScroll(cancelingAxis, parent, event, cancelingAxis === "h" ? deltaX : deltaY, true);
+    }, []);
+    var shouldPrevent = T$1(function(_event) {
+      var event = _event;
+      if (!lockStack.length || lockStack[lockStack.length - 1] !== Style2) {
+        return;
+      }
+      var delta = "deltaY" in event ? getDeltaXY(event) : getTouchXY(event);
+      var sourceEvent = shouldPreventQueue.current.filter(function(e2) {
+        return e2.name === event.type && e2.target === event.target && deltaCompare(e2.delta, delta);
+      })[0];
+      if (sourceEvent && sourceEvent.should) {
+        if (event.cancelable) {
+          event.preventDefault();
+        }
+        return;
+      }
+      if (!sourceEvent) {
+        var shardNodes = (lastProps.current.shards || []).map(extractRef).filter(Boolean).filter(function(node2) {
+          return node2.contains(event.target);
+        });
+        var shouldStop = shardNodes.length > 0 ? shouldCancelEvent(event, shardNodes[0]) : !lastProps.current.noIsolation;
+        if (shouldStop) {
+          if (event.cancelable) {
+            event.preventDefault();
+          }
+        }
+      }
+    }, []);
+    var shouldCancel = T$1(function(name, delta, target, should) {
+      var event = { name, delta, target, should };
+      shouldPreventQueue.current.push(event);
+      setTimeout(function() {
+        shouldPreventQueue.current = shouldPreventQueue.current.filter(function(e2) {
+          return e2 !== event;
+        });
+      }, 1);
+    }, []);
+    var scrollTouchStart = T$1(function(event) {
+      touchStartRef.current = getTouchXY(event);
+      activeAxis.current = void 0;
+    }, []);
+    var scrollWheel = T$1(function(event) {
+      shouldCancel(event.type, getDeltaXY(event), event.target, shouldCancelEvent(event, props.lockRef.current));
+    }, []);
+    var scrollTouchMove = T$1(function(event) {
+      shouldCancel(event.type, getTouchXY(event), event.target, shouldCancelEvent(event, props.lockRef.current));
+    }, []);
+    p$1(function() {
+      lockStack.push(Style2);
+      props.setCallbacks({
+        onScrollCapture: scrollWheel,
+        onWheelCapture: scrollWheel,
+        onTouchMoveCapture: scrollTouchMove
+      });
+      document.addEventListener("wheel", shouldPrevent, nonPassive);
+      document.addEventListener("touchmove", shouldPrevent, nonPassive);
+      document.addEventListener("touchstart", scrollTouchStart, nonPassive);
+      return function() {
+        lockStack = lockStack.filter(function(inst) {
+          return inst !== Style2;
+        });
+        document.removeEventListener("wheel", shouldPrevent, nonPassive);
+        document.removeEventListener("touchmove", shouldPrevent, nonPassive);
+        document.removeEventListener("touchstart", scrollTouchStart, nonPassive);
+      };
+    }, []);
+    var removeScrollBar = props.removeScrollBar, inert = props.inert;
+    return y$1(
+      _$2,
+      null,
+      inert ? y$1(Style2, { styles: generateStyle(id) }) : null,
+      removeScrollBar ? y$1(RemoveScrollBar, { gapMode: "margin" }) : null
+    );
+  }
+  const SideCar = exportSidecar(effectCar, RemoveScrollSideCar);
+  var ReactRemoveScroll = k(function(props, ref) {
+    return y$1(RemoveScroll, __assign({}, props, { ref, sideCar: SideCar }));
+  });
+  ReactRemoveScroll.classNames = RemoveScroll.classNames;
+  const $67UHm$RemoveScroll = ReactRemoveScroll;
+  var getDefaultParent = function(originalTarget) {
+    if (typeof document === "undefined") {
+      return null;
+    }
+    var sampleTarget = Array.isArray(originalTarget) ? originalTarget[0] : originalTarget;
+    return sampleTarget.ownerDocument.body;
+  };
+  var counterMap = /* @__PURE__ */ new WeakMap();
+  var uncontrolledNodes = /* @__PURE__ */ new WeakMap();
+  var markerMap = {};
+  var lockCount = 0;
+  var unwrapHost = function(node2) {
+    return node2 && (node2.host || unwrapHost(node2.parentNode));
+  };
+  var correctTargets = function(parent, targets) {
+    return targets.map(function(target) {
+      if (parent.contains(target)) {
+        return target;
+      }
+      var correctedTarget = unwrapHost(target);
+      if (correctedTarget && parent.contains(correctedTarget)) {
+        return correctedTarget;
+      }
+      console.error("aria-hidden", target, "in not contained inside", parent, ". Doing nothing");
+      return null;
+    }).filter(function(x2) {
+      return Boolean(x2);
+    });
+  };
+  var applyAttributeToOthers = function(originalTarget, parentNode, markerName, controlAttribute) {
+    var targets = correctTargets(parentNode, Array.isArray(originalTarget) ? originalTarget : [originalTarget]);
+    if (!markerMap[markerName]) {
+      markerMap[markerName] = /* @__PURE__ */ new WeakMap();
+    }
+    var markerCounter = markerMap[markerName];
+    var hiddenNodes = [];
+    var elementsToKeep = /* @__PURE__ */ new Set();
+    var elementsToStop = new Set(targets);
+    var keep = function(el) {
+      if (!el || elementsToKeep.has(el)) {
+        return;
+      }
+      elementsToKeep.add(el);
+      keep(el.parentNode);
+    };
+    targets.forEach(keep);
+    var deep = function(parent) {
+      if (!parent || elementsToStop.has(parent)) {
+        return;
+      }
+      Array.prototype.forEach.call(parent.children, function(node2) {
+        if (elementsToKeep.has(node2)) {
+          deep(node2);
+        } else {
+          var attr = node2.getAttribute(controlAttribute);
+          var alreadyHidden = attr !== null && attr !== "false";
+          var counterValue = (counterMap.get(node2) || 0) + 1;
+          var markerValue = (markerCounter.get(node2) || 0) + 1;
+          counterMap.set(node2, counterValue);
+          markerCounter.set(node2, markerValue);
+          hiddenNodes.push(node2);
+          if (counterValue === 1 && alreadyHidden) {
+            uncontrolledNodes.set(node2, true);
+          }
+          if (markerValue === 1) {
+            node2.setAttribute(markerName, "true");
+          }
+          if (!alreadyHidden) {
+            node2.setAttribute(controlAttribute, "true");
+          }
+        }
+      });
+    };
+    deep(parentNode);
+    elementsToKeep.clear();
+    lockCount++;
+    return function() {
+      hiddenNodes.forEach(function(node2) {
+        var counterValue = counterMap.get(node2) - 1;
+        var markerValue = markerCounter.get(node2) - 1;
+        counterMap.set(node2, counterValue);
+        markerCounter.set(node2, markerValue);
+        if (!counterValue) {
+          if (!uncontrolledNodes.has(node2)) {
+            node2.removeAttribute(controlAttribute);
+          }
+          uncontrolledNodes.delete(node2);
+        }
+        if (!markerValue) {
+          node2.removeAttribute(markerName);
+        }
+      });
+      lockCount--;
+      if (!lockCount) {
+        counterMap = /* @__PURE__ */ new WeakMap();
+        counterMap = /* @__PURE__ */ new WeakMap();
+        uncontrolledNodes = /* @__PURE__ */ new WeakMap();
+        markerMap = {};
+      }
+    };
+  };
+  var hideOthers = function(originalTarget, parentNode, markerName) {
+    if (markerName === void 0) {
+      markerName = "data-aria-hidden";
+    }
+    var targets = Array.from(Array.isArray(originalTarget) ? originalTarget : [originalTarget]);
+    var activeParentNode = parentNode || getDefaultParent(originalTarget);
+    if (!activeParentNode) {
+      return function() {
+        return null;
+      };
+    }
+    targets.push.apply(targets, Array.from(activeParentNode.querySelectorAll("[aria-live]")));
+    return applyAttributeToOthers(targets, activeParentNode, markerName, "aria-hidden");
+  };
+  const $5d3850c4d0b4e6c7$var$DIALOG_NAME = "Dialog";
+  const [$5d3850c4d0b4e6c7$var$createDialogContext, $5d3850c4d0b4e6c7$export$cc702773b8ea3e41] = $c512c27ab02ef895$export$50c7b4e9d9f19c1($5d3850c4d0b4e6c7$var$DIALOG_NAME);
+  const [$5d3850c4d0b4e6c7$var$DialogProvider, $5d3850c4d0b4e6c7$var$useDialogContext] = $5d3850c4d0b4e6c7$var$createDialogContext($5d3850c4d0b4e6c7$var$DIALOG_NAME);
+  const $5d3850c4d0b4e6c7$export$3ddf2d174ce01153 = (props) => {
+    const { __scopeDialog, children, open: openProp, defaultOpen, onOpenChange, modal = true } = props;
+    const triggerRef = _$1(null);
+    const contentRef = _$1(null);
+    const [open = false, setOpen] = $71cd76cc60e0454e$export$6f32135080cb4c3({
+      prop: openProp,
+      defaultProp: defaultOpen,
+      onChange: onOpenChange
+    });
+    return /* @__PURE__ */ y$1($5d3850c4d0b4e6c7$var$DialogProvider, {
+      scope: __scopeDialog,
+      triggerRef,
+      contentRef,
+      contentId: $1746a345f3d73bb7$export$f680877a34711e37(),
+      titleId: $1746a345f3d73bb7$export$f680877a34711e37(),
+      descriptionId: $1746a345f3d73bb7$export$f680877a34711e37(),
+      open,
+      onOpenChange: setOpen,
+      onOpenToggle: T$1(
+        () => setOpen(
+          (prevOpen) => !prevOpen
+        ),
+        [
+          setOpen
+        ]
+      ),
+      modal
+    }, children);
+  };
+  const $5d3850c4d0b4e6c7$var$TRIGGER_NAME = "DialogTrigger";
+  const $5d3850c4d0b4e6c7$export$2e1e1122cf0cba88 = /* @__PURE__ */ k((props, forwardedRef) => {
+    const { __scopeDialog, ...triggerProps } = props;
+    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$TRIGGER_NAME, __scopeDialog);
+    const composedTriggerRef = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(forwardedRef, context.triggerRef);
+    return /* @__PURE__ */ y$1($8927f6f2acc4f386$export$250ffa63cdc0d034.button, _extends({
+      type: "button",
+      "aria-haspopup": "dialog",
+      "aria-expanded": context.open,
+      "aria-controls": context.contentId,
+      "data-state": $5d3850c4d0b4e6c7$var$getState(context.open)
+    }, triggerProps, {
+      ref: composedTriggerRef,
+      onClick: $e42e1063c40fb3ef$export$b9ecd428b558ff10(props.onClick, context.onOpenToggle)
+    }));
+  });
+  const $5d3850c4d0b4e6c7$var$PORTAL_NAME = "DialogPortal";
+  const [$5d3850c4d0b4e6c7$var$PortalProvider, $5d3850c4d0b4e6c7$var$usePortalContext] = $5d3850c4d0b4e6c7$var$createDialogContext($5d3850c4d0b4e6c7$var$PORTAL_NAME, {
+    forceMount: void 0
+  });
+  const $5d3850c4d0b4e6c7$export$dad7c95542bacce0 = (props) => {
+    const { __scopeDialog, forceMount, children, container } = props;
+    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$PORTAL_NAME, __scopeDialog);
+    return /* @__PURE__ */ y$1($5d3850c4d0b4e6c7$var$PortalProvider, {
+      scope: __scopeDialog,
+      forceMount
+    }, O.map(
+      children,
+      (child) => /* @__PURE__ */ y$1($921a889cee6df7e8$export$99c2b779aa4e8b8b, {
+        present: forceMount || context.open
+      }, /* @__PURE__ */ y$1($f1701beae083dbae$export$602eac185826482c, {
+        asChild: true,
+        container
+      }, child))
+    ));
+  };
+  const $5d3850c4d0b4e6c7$var$OVERLAY_NAME = "DialogOverlay";
+  const $5d3850c4d0b4e6c7$export$bd1d06c79be19e17 = /* @__PURE__ */ k((props, forwardedRef) => {
+    const portalContext = $5d3850c4d0b4e6c7$var$usePortalContext($5d3850c4d0b4e6c7$var$OVERLAY_NAME, props.__scopeDialog);
+    const { forceMount = portalContext.forceMount, ...overlayProps } = props;
+    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$OVERLAY_NAME, props.__scopeDialog);
+    return context.modal ? /* @__PURE__ */ y$1($921a889cee6df7e8$export$99c2b779aa4e8b8b, {
+      present: forceMount || context.open
+    }, /* @__PURE__ */ y$1($5d3850c4d0b4e6c7$var$DialogOverlayImpl, _extends({}, overlayProps, {
+      ref: forwardedRef
+    }))) : null;
+  });
+  const $5d3850c4d0b4e6c7$var$DialogOverlayImpl = /* @__PURE__ */ k((props, forwardedRef) => {
+    const { __scopeDialog, ...overlayProps } = props;
+    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$OVERLAY_NAME, __scopeDialog);
+    return (
+      // Make sure `Content` is scrollable even when it doesn't live inside `RemoveScroll`
+      // ie. when `Overlay` and `Content` are siblings
+      /* @__PURE__ */ y$1($67UHm$RemoveScroll, {
+        as: $5e63c961fc1ce211$export$8c6ed5c666ac1360,
+        allowPinchZoom: true,
+        shards: [
+          context.contentRef
+        ]
+      }, /* @__PURE__ */ y$1($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({
+        "data-state": $5d3850c4d0b4e6c7$var$getState(context.open)
+      }, overlayProps, {
+        ref: forwardedRef,
+        style: {
+          pointerEvents: "auto",
+          ...overlayProps.style
+        }
+      })))
+    );
+  });
+  const $5d3850c4d0b4e6c7$var$CONTENT_NAME = "DialogContent";
+  const $5d3850c4d0b4e6c7$export$b6d9565de1e068cf = /* @__PURE__ */ k((props, forwardedRef) => {
+    const portalContext = $5d3850c4d0b4e6c7$var$usePortalContext($5d3850c4d0b4e6c7$var$CONTENT_NAME, props.__scopeDialog);
+    const { forceMount = portalContext.forceMount, ...contentProps } = props;
+    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$CONTENT_NAME, props.__scopeDialog);
+    return /* @__PURE__ */ y$1($921a889cee6df7e8$export$99c2b779aa4e8b8b, {
+      present: forceMount || context.open
+    }, context.modal ? /* @__PURE__ */ y$1($5d3850c4d0b4e6c7$var$DialogContentModal, _extends({}, contentProps, {
+      ref: forwardedRef
+    })) : /* @__PURE__ */ y$1($5d3850c4d0b4e6c7$var$DialogContentNonModal, _extends({}, contentProps, {
+      ref: forwardedRef
+    })));
+  });
+  const $5d3850c4d0b4e6c7$var$DialogContentModal = /* @__PURE__ */ k((props, forwardedRef) => {
+    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$CONTENT_NAME, props.__scopeDialog);
+    const contentRef = _$1(null);
+    const composedRefs = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(forwardedRef, context.contentRef, contentRef);
+    p$1(() => {
+      const content2 = contentRef.current;
+      if (content2)
+        return hideOthers(content2);
+    }, []);
+    return /* @__PURE__ */ y$1($5d3850c4d0b4e6c7$var$DialogContentImpl, _extends({}, props, {
+      ref: composedRefs,
+      trapFocus: context.open,
+      disableOutsidePointerEvents: true,
+      onCloseAutoFocus: $e42e1063c40fb3ef$export$b9ecd428b558ff10(props.onCloseAutoFocus, (event) => {
+        var _context$triggerRef$c;
+        event.preventDefault();
+        (_context$triggerRef$c = context.triggerRef.current) === null || _context$triggerRef$c === void 0 || _context$triggerRef$c.focus();
+      }),
+      onPointerDownOutside: $e42e1063c40fb3ef$export$b9ecd428b558ff10(props.onPointerDownOutside, (event) => {
+        const originalEvent = event.detail.originalEvent;
+        const ctrlLeftClick = originalEvent.button === 0 && originalEvent.ctrlKey === true;
+        const isRightClick = originalEvent.button === 2 || ctrlLeftClick;
+        if (isRightClick)
+          event.preventDefault();
+      }),
+      onFocusOutside: $e42e1063c40fb3ef$export$b9ecd428b558ff10(
+        props.onFocusOutside,
+        (event) => event.preventDefault()
+      )
+    }));
+  });
+  const $5d3850c4d0b4e6c7$var$DialogContentNonModal = /* @__PURE__ */ k((props, forwardedRef) => {
+    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$CONTENT_NAME, props.__scopeDialog);
+    const hasInteractedOutsideRef = _$1(false);
+    return /* @__PURE__ */ y$1($5d3850c4d0b4e6c7$var$DialogContentImpl, _extends({}, props, {
+      ref: forwardedRef,
+      trapFocus: false,
+      disableOutsidePointerEvents: false,
+      onCloseAutoFocus: (event) => {
+        var _props$onCloseAutoFoc;
+        (_props$onCloseAutoFoc = props.onCloseAutoFocus) === null || _props$onCloseAutoFoc === void 0 || _props$onCloseAutoFoc.call(props, event);
+        if (!event.defaultPrevented) {
+          var _context$triggerRef$c2;
+          if (!hasInteractedOutsideRef.current)
+            (_context$triggerRef$c2 = context.triggerRef.current) === null || _context$triggerRef$c2 === void 0 || _context$triggerRef$c2.focus();
+          event.preventDefault();
+        }
+        hasInteractedOutsideRef.current = false;
+      },
+      onInteractOutside: (event) => {
+        var _props$onInteractOuts, _context$triggerRef$c3;
+        (_props$onInteractOuts = props.onInteractOutside) === null || _props$onInteractOuts === void 0 || _props$onInteractOuts.call(props, event);
+        if (!event.defaultPrevented)
+          hasInteractedOutsideRef.current = true;
+        const target = event.target;
+        const targetIsTrigger = (_context$triggerRef$c3 = context.triggerRef.current) === null || _context$triggerRef$c3 === void 0 ? void 0 : _context$triggerRef$c3.contains(target);
+        if (targetIsTrigger)
+          event.preventDefault();
+      }
+    }));
+  });
+  const $5d3850c4d0b4e6c7$var$DialogContentImpl = /* @__PURE__ */ k((props, forwardedRef) => {
+    const { __scopeDialog, trapFocus, onOpenAutoFocus, onCloseAutoFocus, ...contentProps } = props;
+    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$CONTENT_NAME, __scopeDialog);
+    const contentRef = _$1(null);
+    const composedRefs = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(forwardedRef, contentRef);
+    $3db38b7d1fb3fe6a$export$b7ece24a22aeda8c();
+    return /* @__PURE__ */ y$1(_$2, null, /* @__PURE__ */ y$1($d3863c46a17e8a28$export$20e40289641fbbb6, {
+      asChild: true,
+      loop: true,
+      trapped: trapFocus,
+      onMountAutoFocus: onOpenAutoFocus,
+      onUnmountAutoFocus: onCloseAutoFocus
+    }, /* @__PURE__ */ y$1($5cb92bef7577960e$export$177fb62ff3ec1f22, _extends({
+      role: "dialog",
+      id: context.contentId,
+      "aria-describedby": context.descriptionId,
+      "aria-labelledby": context.titleId,
+      "data-state": $5d3850c4d0b4e6c7$var$getState(context.open)
+    }, contentProps, {
+      ref: composedRefs,
+      onDismiss: () => context.onOpenChange(false)
+    }))), false);
+  });
+  const $5d3850c4d0b4e6c7$var$TITLE_NAME = "DialogTitle";
+  const $5d3850c4d0b4e6c7$export$16f7638e4a34b909 = /* @__PURE__ */ k((props, forwardedRef) => {
+    const { __scopeDialog, ...titleProps } = props;
+    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$TITLE_NAME, __scopeDialog);
+    return /* @__PURE__ */ y$1($8927f6f2acc4f386$export$250ffa63cdc0d034.h2, _extends({
+      id: context.titleId
+    }, titleProps, {
+      ref: forwardedRef
+    }));
+  });
+  const $5d3850c4d0b4e6c7$var$CLOSE_NAME = "DialogClose";
+  const $5d3850c4d0b4e6c7$export$fba2fb7cd781b7ac = /* @__PURE__ */ k((props, forwardedRef) => {
+    const { __scopeDialog, ...closeProps } = props;
+    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$CLOSE_NAME, __scopeDialog);
+    return /* @__PURE__ */ y$1($8927f6f2acc4f386$export$250ffa63cdc0d034.button, _extends({
+      type: "button"
+    }, closeProps, {
+      ref: forwardedRef,
+      onClick: $e42e1063c40fb3ef$export$b9ecd428b558ff10(
+        props.onClick,
+        () => context.onOpenChange(false)
+      )
+    }));
+  });
+  function $5d3850c4d0b4e6c7$var$getState(open) {
+    return open ? "open" : "closed";
+  }
+  const $5d3850c4d0b4e6c7$export$be92b6f5f03c0fe9 = $5d3850c4d0b4e6c7$export$3ddf2d174ce01153;
+  const $5d3850c4d0b4e6c7$export$41fb9f06171c75f4 = $5d3850c4d0b4e6c7$export$2e1e1122cf0cba88;
+  const $5d3850c4d0b4e6c7$export$602eac185826482c = $5d3850c4d0b4e6c7$export$dad7c95542bacce0;
+  const $5d3850c4d0b4e6c7$export$c6fdb837b070b4ff = $5d3850c4d0b4e6c7$export$bd1d06c79be19e17;
+  const $5d3850c4d0b4e6c7$export$7c6e2c02157bb7d2 = $5d3850c4d0b4e6c7$export$b6d9565de1e068cf;
+  const $5d3850c4d0b4e6c7$export$f99233281efd08a0 = $5d3850c4d0b4e6c7$export$16f7638e4a34b909;
+  const $5d3850c4d0b4e6c7$export$f39c2d165cd861fe = $5d3850c4d0b4e6c7$export$fba2fb7cd781b7ac;
+  var eventemitter3Exports = {};
+  var eventemitter3 = {
+    get exports() {
+      return eventemitter3Exports;
+    },
+    set exports(v2) {
+      eventemitter3Exports = v2;
+    }
+  };
+  (function(module) {
+    var has = Object.prototype.hasOwnProperty, prefix = "~";
+    function Events() {
+    }
+    if (Object.create) {
+      Events.prototype = /* @__PURE__ */ Object.create(null);
+      if (!new Events().__proto__)
+        prefix = false;
+    }
+    function EE(fn2, context, once) {
+      this.fn = fn2;
+      this.context = context;
+      this.once = once || false;
+    }
+    function addListener(emitter, event, fn2, context, once) {
+      if (typeof fn2 !== "function") {
+        throw new TypeError("The listener must be a function");
+      }
+      var listener = new EE(fn2, context || emitter, once), evt = prefix ? prefix + event : event;
+      if (!emitter._events[evt])
+        emitter._events[evt] = listener, emitter._eventsCount++;
+      else if (!emitter._events[evt].fn)
+        emitter._events[evt].push(listener);
+      else
+        emitter._events[evt] = [emitter._events[evt], listener];
+      return emitter;
+    }
+    function clearEvent(emitter, evt) {
+      if (--emitter._eventsCount === 0)
+        emitter._events = new Events();
+      else
+        delete emitter._events[evt];
+    }
+    function EventEmitter2() {
+      this._events = new Events();
+      this._eventsCount = 0;
+    }
+    EventEmitter2.prototype.eventNames = function eventNames() {
+      var names = [], events, name;
+      if (this._eventsCount === 0)
+        return names;
+      for (name in events = this._events) {
+        if (has.call(events, name))
+          names.push(prefix ? name.slice(1) : name);
+      }
+      if (Object.getOwnPropertySymbols) {
+        return names.concat(Object.getOwnPropertySymbols(events));
+      }
+      return names;
+    };
+    EventEmitter2.prototype.listeners = function listeners(event) {
+      var evt = prefix ? prefix + event : event, handlers2 = this._events[evt];
+      if (!handlers2)
+        return [];
+      if (handlers2.fn)
+        return [handlers2.fn];
+      for (var i2 = 0, l2 = handlers2.length, ee = new Array(l2); i2 < l2; i2++) {
+        ee[i2] = handlers2[i2].fn;
+      }
+      return ee;
+    };
+    EventEmitter2.prototype.listenerCount = function listenerCount(event) {
+      var evt = prefix ? prefix + event : event, listeners = this._events[evt];
+      if (!listeners)
+        return 0;
+      if (listeners.fn)
+        return 1;
+      return listeners.length;
+    };
+    EventEmitter2.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
+      var evt = prefix ? prefix + event : event;
+      if (!this._events[evt])
+        return false;
+      var listeners = this._events[evt], len = arguments.length, args, i2;
+      if (listeners.fn) {
+        if (listeners.once)
+          this.removeListener(event, listeners.fn, void 0, true);
+        switch (len) {
+          case 1:
+            return listeners.fn.call(listeners.context), true;
+          case 2:
+            return listeners.fn.call(listeners.context, a1), true;
+          case 3:
+            return listeners.fn.call(listeners.context, a1, a2), true;
+          case 4:
+            return listeners.fn.call(listeners.context, a1, a2, a3), true;
+          case 5:
+            return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
+          case 6:
+            return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
+        }
+        for (i2 = 1, args = new Array(len - 1); i2 < len; i2++) {
+          args[i2 - 1] = arguments[i2];
+        }
+        listeners.fn.apply(listeners.context, args);
+      } else {
+        var length = listeners.length, j2;
+        for (i2 = 0; i2 < length; i2++) {
+          if (listeners[i2].once)
+            this.removeListener(event, listeners[i2].fn, void 0, true);
+          switch (len) {
+            case 1:
+              listeners[i2].fn.call(listeners[i2].context);
+              break;
+            case 2:
+              listeners[i2].fn.call(listeners[i2].context, a1);
+              break;
+            case 3:
+              listeners[i2].fn.call(listeners[i2].context, a1, a2);
+              break;
+            case 4:
+              listeners[i2].fn.call(listeners[i2].context, a1, a2, a3);
+              break;
+            default:
+              if (!args)
+                for (j2 = 1, args = new Array(len - 1); j2 < len; j2++) {
+                  args[j2 - 1] = arguments[j2];
+                }
+              listeners[i2].fn.apply(listeners[i2].context, args);
+          }
+        }
+      }
+      return true;
+    };
+    EventEmitter2.prototype.on = function on2(event, fn2, context) {
+      return addListener(this, event, fn2, context, false);
+    };
+    EventEmitter2.prototype.once = function once(event, fn2, context) {
+      return addListener(this, event, fn2, context, true);
+    };
+    EventEmitter2.prototype.removeListener = function removeListener(event, fn2, context, once) {
+      var evt = prefix ? prefix + event : event;
+      if (!this._events[evt])
+        return this;
+      if (!fn2) {
+        clearEvent(this, evt);
+        return this;
+      }
+      var listeners = this._events[evt];
+      if (listeners.fn) {
+        if (listeners.fn === fn2 && (!once || listeners.once) && (!context || listeners.context === context)) {
+          clearEvent(this, evt);
+        }
+      } else {
+        for (var i2 = 0, events = [], length = listeners.length; i2 < length; i2++) {
+          if (listeners[i2].fn !== fn2 || once && !listeners[i2].once || context && listeners[i2].context !== context) {
+            events.push(listeners[i2]);
+          }
+        }
+        if (events.length)
+          this._events[evt] = events.length === 1 ? events[0] : events;
+        else
+          clearEvent(this, evt);
+      }
+      return this;
+    };
+    EventEmitter2.prototype.removeAllListeners = function removeAllListeners(event) {
+      var evt;
+      if (event) {
+        evt = prefix ? prefix + event : event;
+        if (this._events[evt])
+          clearEvent(this, evt);
+      } else {
+        this._events = new Events();
+        this._eventsCount = 0;
+      }
+      return this;
+    };
+    EventEmitter2.prototype.off = EventEmitter2.prototype.removeListener;
+    EventEmitter2.prototype.addListener = EventEmitter2.prototype.on;
+    EventEmitter2.prefixed = prefix;
+    EventEmitter2.EventEmitter = EventEmitter2;
+    {
+      module.exports = EventEmitter2;
+    }
+  })(eventemitter3);
+  const EventEmitter = eventemitter3Exports;
+  class RequestQueue {
+    constructor(minBackoff, maxBackoff) {
+      __publicField(this, "eventEmitter", new eventemitter3Exports());
+      __publicField(this, "queue", []);
+      __publicField(this, "results", []);
+      __publicField(this, "status", "IDLE");
+      __publicField(this, "backoffMultiplier", 2);
+      __publicField(this, "backoff");
+      __publicField(this, "total", 0);
+      __publicField(this, "completed", 0);
+      this.minBackoff = minBackoff;
+      this.maxBackoff = maxBackoff;
+      this.backoff = minBackoff;
+    }
+    add(requestObject) {
+      this.queue.push(requestObject);
+    }
+    start() {
+      if (this.status === "IDLE") {
+        this.total = this.queue.length;
+        this.process();
+      }
+    }
+    stop() {
+      this.status = "STOPPED";
+      this.eventEmitter.emit("done", this.results);
+    }
+    clear() {
+      this.queue = [];
+      this.results = [];
+      this.status = "IDLE";
+      this.backoff = this.minBackoff;
+      this.total = 0;
+      this.completed = 0;
+    }
+    on(event, fn2) {
+      this.eventEmitter.on(event, fn2);
+      return () => this.eventEmitter.off(event, fn2);
+    }
+    async process() {
+      if (this.status === "STOPPED" || this.status === "COMPLETED") {
+        return;
+      }
+      if (this.queue.length === 0) {
+        this.done();
+        return;
+      }
+      this.status = "IN_PROGRESS";
+      const requestObject = this.queue.shift();
+      const {
+        name,
+        request
+      } = requestObject;
+      try {
+        this.progress(name, "processing");
+        const result = await request();
+        this.results.push(result);
+        this.completed++;
+        this.progress(name, "processing");
+        this.backoff = this.minBackoff;
+      } catch (error) {
+        console.error(`Request ${name} failed:`, error);
+        this.progress(name, "retrying");
+        this.backoff = Math.min(this.backoff * this.backoffMultiplier, this.maxBackoff);
+        this.queue.unshift(requestObject);
+      }
+      await sleep(this.backoff);
+      this.process();
+    }
+    progress(name, status) {
+      this.eventEmitter.emit("progress", {
+        total: this.total,
+        completed: this.completed,
+        currentName: name,
+        currentStatus: status
+      });
+    }
+    done() {
+      this.status = "COMPLETED";
+      this.eventEmitter.emit("done", this.results);
+    }
+  }
+  const CheckBox$1 = "";
+  const CheckBox = ({
+    className,
+    checked = false,
+    disabled,
+    label,
+    onCheckedChange
+  }) => {
+    const [isChecked, setChecked] = h(checked);
+    const onChange = (e2) => {
+      const newValue = e2.currentTarget.checked;
+      setChecked(newValue);
+      onCheckedChange == null ? void 0 : onCheckedChange(newValue);
+    };
+    p$1(() => {
+      setChecked(checked);
+    }, [checked]);
+    return o("label", {
+      className: `CheckBoxLabel ${className ?? ""}`,
+      disabled,
+      children: [o("span", {
+        className: "IconWrapper",
+        children: [o("input", {
+          type: "checkbox",
+          checked: isChecked,
+          onChange,
+          disabled
+        }), isChecked ? o(IconCheckBoxChecked, {}) : o(IconCheckBox, {})]
+      }), o("span", {
+        className: "LabelText",
+        children: label
+      })]
+    });
+  };
+  const exportAllOptions = [{
+    label: "Markdown",
+    callback: exportAllToMarkdown
+  }, {
+    label: "JSON",
+    callback: exportAllToJson
+  }, {
+    label: "HTML",
+    callback: exportAllToHtml
+  }];
+  const ConversationSelect = ({
+    conversations,
+    selected,
+    setSelected,
+    disabled,
+    loading,
+    error
+  }) => {
+    return o(_$2, {
+      children: [o("div", {
+        className: "SelectToolbar",
+        children: o(CheckBox, {
+          label: "Select All",
+          disabled,
+          checked: selected.length === conversations.length,
+          onCheckedChange: (checked) => {
+            setSelected(checked ? conversations : []);
+          }
+        })
+      }), o("ul", {
+        className: "SelectList",
+        children: [loading && o("li", {
+          className: "SelectItem",
+          children: "Loading..."
+        }), error && o("li", {
+          className: "SelectItem",
+          children: ["Error: ", error]
+        }), conversations.map((c2) => o("li", {
+          className: "SelectItem",
+          children: o(CheckBox, {
+            label: c2.title,
+            disabled,
+            checked: selected.some((x2) => x2.id === c2.id),
+            onCheckedChange: (checked) => {
+              setSelected(checked ? [...selected, c2] : selected.filter((x2) => x2.id !== c2.id));
+            }
+          })
+        }, c2.id))]
+      })]
+    });
+  };
+  const ExportDialog = ({
+    format,
+    children
+  }) => {
+    const [conversations, setConversations] = h([]);
+    const [loading, setLoading] = h(false);
+    const [error, setError] = h("");
+    const [processing, setProcessing] = h(false);
+    const [selected, setSelected] = h([]);
+    const [exportType, setExportType] = h(exportAllOptions[0].label);
+    const disabled = loading || processing || !!error || selected.length === 0;
+    const requestQueue = F$1(() => new RequestQueue(200, 1600), []);
+    const [progress, setProgress] = h({
+      total: 0,
+      completed: 0,
+      currentName: "",
+      currentStatus: ""
+    });
+    p$1(() => {
+      const off = requestQueue.on("progress", (progress2) => {
+        setProcessing(true);
+        setProgress(progress2);
+      });
+      return () => off();
+    }, [requestQueue]);
+    p$1(() => {
+      const off = requestQueue.on("done", (results) => {
+        var _a;
+        setProcessing(false);
+        console.log(results);
+        const callback = (_a = exportAllOptions.find((o2) => o2.label === exportType)) == null ? void 0 : _a.callback;
+        if (callback)
+          callback(format, results);
+      });
+      return () => off();
+    }, [requestQueue, exportType, format]);
+    const exportAll = T$1(() => {
+      if (disabled)
+        return;
+      requestQueue.clear();
+      selected.forEach(({
+        id,
+        title
+      }) => {
+        requestQueue.add({
+          name: title,
+          request: () => fetchConversation(id)
+        });
+      });
+      requestQueue.start();
+    }, [disabled, selected, requestQueue]);
+    p$1(() => {
+      setLoading(true);
+      fetchAllConversations().then(setConversations).catch(setError).finally(() => setLoading(false));
+    }, []);
+    return o($5d3850c4d0b4e6c7$export$be92b6f5f03c0fe9, {
+      children: [o($5d3850c4d0b4e6c7$export$41fb9f06171c75f4, {
+        asChild: true,
+        children
+      }), o($5d3850c4d0b4e6c7$export$602eac185826482c, {
+        children: [o($5d3850c4d0b4e6c7$export$c6fdb837b070b4ff, {
+          className: "DialogOverlay"
+        }), o($5d3850c4d0b4e6c7$export$7c6e2c02157bb7d2, {
+          className: "DialogContent",
+          children: [o($5d3850c4d0b4e6c7$export$f99233281efd08a0, {
+            className: "DialogTitle",
+            children: "Export Conversations"
+          }), o(ConversationSelect, {
+            conversations,
+            selected,
+            setSelected,
+            disabled: processing,
+            loading,
+            error
+          }), o("div", {
+            className: "flex mt-6",
+            style: {
+              justifyContent: "space-between"
+            },
+            children: [o("select", {
+              className: "Select",
+              disabled: processing,
+              value: exportType,
+              onChange: (e2) => setExportType(e2.currentTarget.value),
+              children: exportAllOptions.map(({
+                label
+              }) => o("option", {
+                value: label,
+                children: label
+              }, label))
+            }), o("button", {
+              className: "Button green",
+              disabled,
+              onClick: exportAll,
+              children: "Export"
+            })]
+          }), processing && o(_$2, {
+            children: [o("div", {
+              className: "mt-2 mb-1 justify-between flex",
+              children: [o("span", {
+                className: "truncate mr-8",
+                children: progress.currentName
+              }), o("span", {
+                children: `${progress.completed}/${progress.total}`
+              })]
+            }), o("div", {
+              className: "w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700",
+              children: o("div", {
+                className: "bg-blue-600 h-2.5 rounded-full",
+                style: {
+                  width: `${progress.completed / progress.total * 100}%`
+                }
+              })
+            })]
+          }), o($5d3850c4d0b4e6c7$export$f39c2d165cd861fe, {
+            asChild: true,
+            children: o("button", {
+              className: "IconButton",
+              "aria-label": "Close",
+              children: o(IconCross, {})
+            })
+          })]
+        })]
+      })]
+    });
+  };
   function useTitle() {
     const title = gn(subscribe, getSnapshot);
     return title;
@@ -15916,37 +16417,6 @@ ${message}`;
   function getSnapshot() {
     return document.title;
   }
-  const CheckBox$1 = "";
-  const CheckBox = ({
-    checked,
-    label,
-    onCheckedChange
-  }) => {
-    const onChange = (e2) => {
-      onCheckedChange(e2.currentTarget.checked);
-    };
-    return o("label", {
-      className: "CheckBoxLabel",
-      children: [o("span", {
-        className: "IconWrapper",
-        children: [o("input", {
-          type: "checkbox",
-          checked,
-          onChange
-        }), checked ? o(IconCheckBoxChecked, {
-          className: "Checked"
-        }) : o(IconCheckBox, {})]
-      }), o("span", {
-        className: "LabelText",
-        children: label
-      })]
-    });
-  };
-  const missingTailwind = "";
-  const style = "";
-  const dialog = "";
-  const KEY = "exporter-format";
-  const defaultFormat = "ChatGPT-{title}";
   const SettingDialog = ({
     format,
     setFormat,
@@ -16033,114 +16503,17 @@ ${message}`;
       })]
     });
   };
-  const exportAllOptions = [{
-    label: "Markdown",
-    callback: exportAllToMarkdown
-  }, {
-    label: "JSON",
-    callback: exportAllToJson
-  }, {
-    label: "HTML",
-    callback: exportAllToHtml
-  }];
-  const ExportDialog = ({
-    format,
-    children
-  }) => {
-    const [conversations, setConversations] = h([]);
-    const [loading, setLoading] = h(false);
-    const [error, setError] = h("");
-    const [selected, setSelected] = h([]);
-    const [exportType, setExportType] = h(exportAllOptions[0].label);
-    const disabled = loading || !!error || selected.length === 0;
-    const exportAll = T$1(() => {
-      var _a;
-      if (disabled)
-        return;
-      const callback = (_a = exportAllOptions.find((o2) => o2.label === exportType)) == null ? void 0 : _a.callback;
-      if (callback)
-        callback(format, selected);
-    }, [disabled, exportType, format, selected]);
-    p$1(() => {
-      setLoading(true);
-      fetchAllConversations().then(setConversations).catch(setError).finally(() => setLoading(false));
-    }, []);
-    return o($5d3850c4d0b4e6c7$export$be92b6f5f03c0fe9, {
-      children: [o($5d3850c4d0b4e6c7$export$41fb9f06171c75f4, {
-        asChild: true,
-        children
-      }), o($5d3850c4d0b4e6c7$export$602eac185826482c, {
-        children: [o($5d3850c4d0b4e6c7$export$c6fdb837b070b4ff, {
-          className: "DialogOverlay"
-        }), o($5d3850c4d0b4e6c7$export$7c6e2c02157bb7d2, {
-          className: "DialogContent",
-          children: [o($5d3850c4d0b4e6c7$export$f99233281efd08a0, {
-            className: "DialogTitle",
-            children: "Export Conversations"
-          }), o("div", {
-            className: "SelectToolbar",
-            children: o(CheckBox, {
-              label: "Select All",
-              checked: selected.length === conversations.length,
-              onCheckedChange: (checked) => {
-                setSelected(checked ? conversations.map((c2) => c2.id) : []);
-              }
-            })
-          }), o("ul", {
-            className: "SelectList",
-            children: [loading && o("li", {
-              className: "SelectItem",
-              children: "Loading..."
-            }), error && o("li", {
-              className: "SelectItem",
-              children: ["Error: ", error]
-            }), conversations.map((c2) => o("li", {
-              className: "SelectItem",
-              children: o(CheckBox, {
-                label: c2.title,
-                checked: selected.includes(c2.id),
-                onCheckedChange: (checked) => {
-                  setSelected(checked ? [...selected, c2.id] : selected.filter((id) => id !== c2.id));
-                }
-              })
-            }, c2.id))]
-          }), o("div", {
-            className: "flex mt-6",
-            style: {
-              justifyContent: "space-between"
-            },
-            children: [o("select", {
-              className: "Select",
-              value: exportType,
-              onChange: (e2) => setExportType(e2.currentTarget.value),
-              children: exportAllOptions.map(({
-                label
-              }) => o("option", {
-                value: label,
-                children: label
-              }, label))
-            }), o("button", {
-              className: "Button green",
-              disabled,
-              onClick: exportAll,
-              children: "Export"
-            })]
-          }), o($5d3850c4d0b4e6c7$export$f39c2d165cd861fe, {
-            asChild: true,
-            children: o("button", {
-              className: "IconButton",
-              "aria-label": "Close",
-              children: o(IconCross, {})
-            })
-          })]
-        })]
-      })]
-    });
-  };
+  const missingTailwind = "";
+  const style = "";
+  const dialog = "";
+  const KEY = "exporter-format";
+  const defaultFormat = "ChatGPT-{title}";
   function Menu() {
     const disabled = getHistoryDisabled();
     const menuText = disabled ? "Exporter unavailable" : "Export";
-    const menuTitle = disabled ? "Exporter is relying on the History API.\nBut History feature is disabled by OpenAI temporarily.\nWe all have to wait for them to bring it back." : "";
+    const menuTitle = disabled ? `Exporter is relying on the History API.
+But History feature is disabled by OpenAI temporarily.
+We all have to wait for them to bring it back.` : "";
     const [format, setFormat] = useGMStorage(KEY, defaultFormat);
     const onClickText = T$1(() => exportToText(), []);
     const onClickPng = T$1(() => exportToPng(format), [format]);
@@ -16199,8 +16572,7 @@ ${message}`;
             className: "row-full",
             children: o(MenuItem, {
               text: "Export All",
-              icon: IconZip,
-              className: "row-full"
+              icon: IconZip
             })
           })
         })]
