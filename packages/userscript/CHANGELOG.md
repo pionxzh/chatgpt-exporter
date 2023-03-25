@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.3](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.3.2...userscript-v2.3.3) (2023-03-25)
+
+
+### Bug Fixes
+
+* handle rate limiting in export all ([ba739e0](https://github.com/pionxzh/chatgpt-exporter/commit/ba739e017bf4c596a74a9a4db85270c450313b43)), closes [#88](https://github.com/pionxzh/chatgpt-exporter/issues/88)
+
 ## [2.3.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.3.1...userscript-v2.3.2) (2023-03-24)
 
 
