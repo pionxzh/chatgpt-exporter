@@ -1,25 +1,41 @@
+import { useEffect, useState } from 'preact/hooks'
 import './CheckBox.css'
 import { IconCheckBox, IconCheckBoxChecked } from './icons'
 
 export interface CheckBoxProps {
-    checked: boolean
+    className?: string
+    checked?: boolean
+    disabled?: boolean
     label: string
-    onCheckedChange: (checked: boolean) => void
+    onCheckedChange?: (checked: boolean) => void
 }
 
-export const CheckBox: React.FC<CheckBoxProps> = ({ checked, label, onCheckedChange }) => {
+export const CheckBox: React.FC<CheckBoxProps> = ({
+    className,
+    checked = false,
+    disabled,
+    label,
+    onCheckedChange,
+}) => {
+    const [isChecked, setChecked] = useState(checked)
     const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        onCheckedChange(e.currentTarget.checked)
+        const newValue = e.currentTarget.checked
+        setChecked(newValue)
+        onCheckedChange?.(newValue)
     }
+    useEffect(() => {
+        setChecked(checked)
+    }, [checked])
     return (
-        <label className="CheckBoxLabel">
+        <label className={`CheckBoxLabel ${className ?? ''}`} disabled={disabled}>
             <span className="IconWrapper">
                 <input
                     type="checkbox"
-                    checked={checked}
+                    checked={isChecked}
                     onChange={onChange}
+                    disabled={disabled}
                 />
-                {checked ? <IconCheckBoxChecked className="Checked" /> : <IconCheckBox />}
+                {isChecked ? <IconCheckBoxChecked /> : <IconCheckBox />}
             </span>
             <span className="LabelText">{label}</span>
         </label>

@@ -21,16 +21,12 @@ export async function exportToJson(fileNameFormat: string) {
     return true
 }
 
-export async function exportAllToJson(fileNameFormat: string, conversationIds: string[]) {
-    const conversations = await Promise.all(
-        conversationIds.map(async (id) => {
-            const rawConversation = await fetchConversation(id)
-            const conversation = processConversation(rawConversation)
-            return { conversation, rawConversation }
-        }),
-    )
-
+export async function exportAllToJson(fileNameFormat: string, apiConversations: ApiConversationWithId[]) {
     const zip = new JSZip()
+    const conversations = apiConversations.map(x => ({
+        conversation: processConversation(x),
+        rawConversation: x,
+    }))
     conversations.forEach(({ conversation, rawConversation }) => {
         const fileName = getFileNameWithFormat(fileNameFormat, 'json', { title: conversation.title })
         const content = conversationToJson(rawConversation)

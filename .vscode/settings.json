@@ -19,6 +19,7 @@
   ],
   "prettier.enable": false,
   "cSpell.words": [
+    "backoff",
     "chatgpt",
     "davinci",
     "mdast",

@@ -1,9 +1,33 @@
+.bg-gray-200 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(229 231 235/var(--tw-bg-opacity));
+}
+
+.bg-blue-600 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(28 100 242/var(--tw-bg-opacity));
+}
+
 .cursor-help {
     cursor: help;
 }
 
+.h-2\.5 {
+    height: 0.625rem;
+}
+
+.mr-8 {
+    margin-right: 2rem;
+}
+
 .select-all {
     user-select: all!important;
+}
+
+.truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 @media (min-width:768px) {

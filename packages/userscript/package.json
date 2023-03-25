@@ -22,6 +22,7 @@
   "dependencies": {
     "@radix-ui/colors": "^0.1.8",
     "@radix-ui/react-dialog": "^1.0.3",
+    "eventemitter3": "^5.0.0",
     "hast-util-to-html": "^8.0.4",
     "html2canvas": "^1.4.1",
     "jszip": "3.9.1",

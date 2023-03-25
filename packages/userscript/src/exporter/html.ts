@@ -3,7 +3,7 @@ import templateHtml from '../template.html?raw'
 import { downloadFile, getFileNameWithFormat } from '../utils/download'
 import { dateStr, getColorScheme } from '../utils/utils'
 import { standardizeLineBreaks } from '../utils/text'
-import { type ConversationResult, baseUrl, fetchConversation, getCurrentChatId, processConversation } from '../api'
+import { type ApiConversationWithId, type ConversationResult, baseUrl, fetchConversation, getCurrentChatId, processConversation } from '../api'
 import { fromMarkdown, toHtml } from '../utils/markdown'
 import { checkIfConversationStarted, getConversationChoice, getUserAvatar } from '../page'
 
@@ -27,17 +27,11 @@ export async function exportToHtml(fileNameFormat: string) {
     return true
 }
 
-export async function exportAllToHtml(fileNameFormat: string, conversationIds: string[]) {
-    const conversations = await Promise.all(
-        conversationIds.map(async (id) => {
-            const rawConversation = await fetchConversation(id)
-            return processConversation(rawConversation)
-        }),
-    )
-
+export async function exportAllToHtml(fileNameFormat: string, apiConversations: ApiConversationWithId[]) {
     const userAvatar = await getUserAvatar()
 
     const zip = new JSZip()
+    const conversations = apiConversations.map(x => processConversation(x))
     conversations.forEach((conversation) => {
         const fileName = getFileNameWithFormat(fileNameFormat, 'html', { title: conversation.title })
         const content = conversationToHtml(conversation, userAvatar)

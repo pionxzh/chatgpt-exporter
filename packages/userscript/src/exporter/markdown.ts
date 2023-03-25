@@ -1,5 +1,5 @@
 import JSZip from 'jszip'
-import { type ConversationResult, fetchConversation, getCurrentChatId, processConversation } from '../api'
+import { type ApiConversationWithId, type ConversationResult, fetchConversation, getCurrentChatId, processConversation } from '../api'
 import { fromMarkdown, toMarkdown } from '../utils/markdown'
 import { downloadFile, getFileNameWithFormat } from '../utils/download'
 import { standardizeLineBreaks } from '../utils/text'
@@ -24,15 +24,9 @@ export async function exportToMarkdown(fileNameFormat: string) {
     return true
 }
 
-export async function exportAllToMarkdown(fileNameFormat: string, conversationIds: string[]) {
-    const conversations = await Promise.all(
-        conversationIds.map(async (id) => {
-            const rawConversation = await fetchConversation(id)
-            return processConversation(rawConversation)
-        }),
-    )
-
+export async function exportAllToMarkdown(fileNameFormat: string, apiConversations: ApiConversationWithId[]) {
     const zip = new JSZip()
+    const conversations = apiConversations.map(x => processConversation(x))
     conversations.forEach((conversation) => {
         const fileName = getFileNameWithFormat(fileNameFormat, 'md', { title: conversation.title })
         const content = conversationToMarkdown(conversation)

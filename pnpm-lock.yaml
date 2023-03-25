@@ -40,6 +40,7 @@ importers:
       '@radix-ui/react-dialog': ^1.0.3
       '@types/mdast': ^3.0.11
       '@types/unist': ^2.0.6
+      eventemitter3: ^5.0.0
       hast-util-to-html: ^8.0.4
       html2canvas: ^1.4.1
       jszip: 3.9.1
@@ -60,6 +61,7 @@ importers:
     dependencies:
       '@radix-ui/colors': 0.1.8
       '@radix-ui/react-dialog': 1.0.3_biqbaboplfbrettd7655fr4n2y
+      eventemitter3: 5.0.0
       hast-util-to-html: 8.0.4
       html2canvas: 1.4.1
       jszip: 3.9.1
@@ -2638,6 +2640,10 @@ packages:
     resolution: {integrity: sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==}
     engines: {node: '>=0.10.0'}
     dev: true
+
+  /eventemitter3/5.0.0:
+    resolution: {integrity: sha512-riuVbElZZNXLeLEoprfNYoDSwTBRR44X3mnhdI1YcnENpWTCsTTVZ2zFuqQcpoyqPQIUXdiPEU0ECAq0KQRaHg==}
+    dev: false
 
   /execa/5.1.1:
     resolution: {integrity: sha512-8uSpZZocAZRBAPIEINJj3Lo9HyGitllczc27Eh5YYojjMFMn8yHMDMaUHE2Jqfq05D/wucwI4JGURyXt1vchyg==}

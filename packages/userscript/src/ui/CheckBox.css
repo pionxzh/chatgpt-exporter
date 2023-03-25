@@ -9,6 +9,14 @@
     cursor: pointer;
 }
 
+.CheckBoxLabel[disabled] {
+    opacity: 0.7;
+}
+
+.CheckBoxLabel[disabled] * {
+    cursor: not-allowed;
+}
+
 .CheckBoxLabel input {
     position: absolute;
     opacity: 0;
@@ -28,11 +36,11 @@
     font-size: 1.5rem;
 }
 
-.CheckBoxLabel .Checked {
+.CheckBoxLabel input:checked ~ svg {
     color: rgb(118 194 255);
 }
 
-.dark .CheckBoxLabel .Checked {
+.dark .CheckBoxLabel input:checked ~ svg {
     color: rgb(144, 202, 249);
 }
 

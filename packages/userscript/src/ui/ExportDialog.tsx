@@ -1,10 +1,11 @@
 import * as Dialog from '@radix-ui/react-dialog'
-import { useCallback, useEffect, useState } from 'preact/hooks'
-import { type ApiConversationItem, fetchAllConversations } from '../api'
+import { useCallback, useEffect, useMemo, useState } from 'preact/hooks'
+import { type ApiConversationItem, type ApiConversationWithId, fetchAllConversations, fetchConversation } from '../api'
 import { exportAllToHtml } from '../exporter/html'
 import { exportAllToJson } from '../exporter/json'
 import { exportAllToMarkdown } from '../exporter/markdown'
 import type { FC } from '../type'
+import { RequestQueue } from '../utils/queue'
 import { CheckBox } from './CheckBox'
 import { IconCross } from './icons'
 
@@ -14,21 +15,109 @@ const exportAllOptions = [
     { label: 'HTML', callback: exportAllToHtml },
 ]
 
+interface ConversationSelectProps {
+    conversations: ApiConversationItem[]
+    selected: ApiConversationItem[]
+    setSelected: (selected: ApiConversationItem[]) => void
+    disabled: boolean
+    loading: boolean
+    error: string
+}
+
+const ConversationSelect: FC<ConversationSelectProps> = ({
+    conversations,
+    selected,
+    setSelected,
+    disabled,
+    loading,
+    error,
+}) => {
+    return (
+        <>
+            <div className="SelectToolbar">
+                <CheckBox
+                    label="Select All"
+                    disabled={disabled}
+                    checked={selected.length === conversations.length}
+                    onCheckedChange={(checked) => {
+                        setSelected(checked ? conversations : [])
+                    }}
+                />
+            </div>
+            <ul className="SelectList">
+                {loading && <li className="SelectItem">Loading...</li>}
+                {error && <li className="SelectItem">Error: {error}</li>}
+                {conversations.map(c => (
+                    <li className="SelectItem" key={c.id}>
+                        <CheckBox
+                            label={c.title}
+                            disabled={disabled}
+                            checked={selected.some(x => x.id === c.id)}
+                            onCheckedChange={(checked) => {
+                                setSelected(checked
+                                    ? [...selected, c]
+                                    : selected.filter(x => x.id !== c.id),
+                                )
+                            }}
+                        />
+                    </li>
+                ))}
+            </ul>
+        </>
+    )
+}
+
 export const ExportDialog: FC<{ format: string }> = ({ format, children }) => {
     const [conversations, setConversations] = useState<ApiConversationItem[]>([])
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
+    const [processing, setProcessing] = useState(false)
 
-    const [selected, setSelected] = useState<string[]>([])
+    const [selected, setSelected] = useState<ApiConversationItem[]>([])
     const [exportType, setExportType] = useState(exportAllOptions[0].label)
-    const disabled = loading || !!error || selected.length === 0
+    const disabled = loading || processing || !!error || selected.length === 0
+
+    const requestQueue = useMemo(() => new RequestQueue<ApiConversationWithId>(200, 1600), [])
+    const [progress, setProgress] = useState({
+        total: 0,
+        completed: 0,
+        currentName: '',
+        currentStatus: '',
+    })
+
+    useEffect(() => {
+        const off = requestQueue.on('progress', (progress) => {
+            setProcessing(true)
+            setProgress(progress)
+        })
+
+        return () => off()
+    }, [requestQueue])
+
+    useEffect(() => {
+        const off = requestQueue.on('done', (results) => {
+            setProcessing(false)
+            console.log(results)
+            const callback = exportAllOptions.find(o => o.label === exportType)?.callback
+            if (callback) callback(format, results)
+        })
+        return () => off()
+    }, [requestQueue, exportType, format])
 
     const exportAll = useCallback(() => {
         if (disabled) return
 
-        const callback = exportAllOptions.find(o => o.label === exportType)?.callback
-        if (callback) callback(format, selected)
-    }, [disabled, exportType, format, selected])
+        requestQueue.clear()
+
+        selected.forEach(({ id, title }) => {
+            requestQueue.add({
+                name: title,
+                request: () => fetchConversation(id),
+            })
+        })
+
+        requestQueue.start()
+    }, [disabled, selected, requestQueue])
 
     useEffect(() => {
         setLoading(true)
@@ -47,35 +136,17 @@ export const ExportDialog: FC<{ format: string }> = ({ format, children }) => {
                 <Dialog.Overlay className="DialogOverlay" />
                 <Dialog.Content className="DialogContent">
                     <Dialog.Title className="DialogTitle">Export Conversations</Dialog.Title>
-                    <div className="SelectToolbar">
-                        <CheckBox
-                            label="Select All"
-                            checked={selected.length === conversations.length}
-                            onCheckedChange={(checked) => {
-                                setSelected(checked ? conversations.map(c => c.id) : [])
-                            }}
-                        />
-                    </div>
-                    <ul className="SelectList">
-                        {loading && <li className="SelectItem">Loading...</li>}
-                        {error && <li className="SelectItem">Error: {error}</li>}
-                        {conversations.map(c => (
-                            <li className="SelectItem" key={c.id}>
-                                <CheckBox
-                                    label={c.title}
-                                    checked={selected.includes(c.id)}
-                                    onCheckedChange={(checked) => {
-                                        setSelected(checked
-                                            ? [...selected, c.id]
-                                            : selected.filter(id => id !== c.id),
-                                        )
-                                    }}
-                                />
-                            </li>
-                        ))}
-                    </ul>
+
+                    <ConversationSelect
+                        conversations={conversations}
+                        selected={selected}
+                        setSelected={setSelected}
+                        disabled={processing}
+                        loading={loading}
+                        error={error}
+                    />
                     <div className="flex mt-6" style={{ justifyContent: 'space-between' }}>
-                        <select className="Select" value={exportType} onChange={e => setExportType(e.currentTarget.value)}>
+                        <select className="Select" disabled={processing} value={exportType} onChange={e => setExportType(e.currentTarget.value)}>
                             {exportAllOptions.map(({ label }) => (
                                 <option key={label} value={label}>{label}</option>
                             ))}
@@ -84,6 +155,17 @@ export const ExportDialog: FC<{ format: string }> = ({ format, children }) => {
                             Export
                         </button>
                     </div>
+                    {processing && (
+                        <>
+                            <div className="mt-2 mb-1 justify-between flex">
+                                <span className="truncate mr-8">{progress.currentName}</span>
+                                <span>{`${progress.completed}/${progress.total}`}</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
+                                <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${progress.completed / progress.total * 100}%` }} />
+                            </div>
+                        </>
+                    )}
                     <Dialog.Close asChild>
                         <button className="IconButton" aria-label="Close">
                             <IconCross />
