@@ -1,11 +1,12 @@
 import JSZip from 'jszip'
+import { baseUrl, fetchConversation, getCurrentChatId, processConversation } from '../api'
+import { checkIfConversationStarted, getConversationChoice, getUserAvatar } from '../page'
 import templateHtml from '../template.html?raw'
 import { downloadFile, getFileNameWithFormat } from '../utils/download'
-import { dateStr, getColorScheme } from '../utils/utils'
-import { standardizeLineBreaks } from '../utils/text'
-import { type ApiConversationWithId, type ConversationResult, baseUrl, fetchConversation, getCurrentChatId, processConversation } from '../api'
 import { fromMarkdown, toHtml } from '../utils/markdown'
-import { checkIfConversationStarted, getConversationChoice, getUserAvatar } from '../page'
+import { standardizeLineBreaks } from '../utils/text'
+import { dateStr, getColorScheme } from '../utils/utils'
+import type { ApiConversationWithId, ConversationResult } from '../api'
 
 export async function exportToHtml(fileNameFormat: string) {
     if (!checkIfConversationStarted()) {

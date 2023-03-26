@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks'
-import type { FC } from '../type'
 import { IconLoading } from './Icons'
+import type { FC } from '../type'
 
 const TIMEOUT = 2500
 
@@ -44,17 +44,16 @@ export const MenuItem: FC<MenuItemProps> = ({ text, successText, disabled = fals
         >
             {loading
                 ? (
-                <div className="flex justify-center items-center w-full h-full">
-                    <IconLoading className="w-4 h-4"/>
-                </div>
+                    <div className="flex justify-center items-center w-full h-full">
+                        <IconLoading className="w-4 h-4" />
+                    </div>
                     )
                 : (
                     <>
                         {Icon && <Icon />}
-                        {succeed && successText ? successText : text}
+                        {(succeed && successText) ? successText : text}
                     </>
-                    )
-            }
+                    )}
         </div>
     )
 }

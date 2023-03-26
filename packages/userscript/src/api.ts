@@ -164,7 +164,7 @@ export interface ConversationResult {
     conversationNodes: ConversationNode[]
 }
 
-export function processConversation(conversation: ApiConversationWithId, conversationChoices: (number | null)[] = []): ConversationResult {
+export function processConversation(conversation: ApiConversationWithId, conversationChoices: Array<number | null> = []): ConversationResult {
     const title = conversation.title || 'ChatGPT Conversation'
     const createTime = conversation.create_time
 

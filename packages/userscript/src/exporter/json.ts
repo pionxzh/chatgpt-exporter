@@ -1,7 +1,8 @@
 import JSZip from 'jszip'
-import { type ApiConversationWithId, fetchConversation, getCurrentChatId, processConversation } from '../api'
-import { downloadFile, getFileNameWithFormat } from '../utils/download'
+import { fetchConversation, getCurrentChatId, processConversation } from '../api'
 import { checkIfConversationStarted, getConversationChoice } from '../page'
+import { downloadFile, getFileNameWithFormat } from '../utils/download'
+import type { ApiConversationWithId } from '../api'
 
 export async function exportToJson(fileNameFormat: string) {
     if (!checkIfConversationStarted()) {

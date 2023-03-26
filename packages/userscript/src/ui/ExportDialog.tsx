@@ -1,13 +1,14 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { useCallback, useEffect, useMemo, useState } from 'preact/hooks'
-import { type ApiConversationItem, type ApiConversationWithId, fetchAllConversations, fetchConversation } from '../api'
+import { fetchAllConversations, fetchConversation } from '../api'
 import { exportAllToHtml } from '../exporter/html'
 import { exportAllToJson } from '../exporter/json'
 import { exportAllToMarkdown } from '../exporter/markdown'
-import type { FC } from '../type'
 import { RequestQueue } from '../utils/queue'
 import { CheckBox } from './CheckBox'
 import { IconCross } from './Icons'
+import type { ApiConversationItem, ApiConversationWithId } from '../api'
+import type { FC } from '../type'
 
 const exportAllOptions = [
     { label: 'Markdown', callback: exportAllToMarkdown },

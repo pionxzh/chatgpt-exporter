@@ -15,7 +15,7 @@ interface ProgressEvent {
 
 export class RequestQueue<T> {
     private eventEmitter = new EventEmitter()
-    private queue: RequestObject<T>[] = []
+    private queue: Array<RequestObject<T>> = []
     private results: T[] = []
 
     private status: 'IDLE' | 'IN_PROGRESS' | 'STOPPED' | 'COMPLETED' = 'IDLE'

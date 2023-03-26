@@ -1,9 +1,9 @@
-import type { Emphasis, Strong } from 'mdast'
-import { copyToClipboard } from '../utils/clipboard'
-import { standardizeLineBreaks } from '../utils/text'
 import { fetchConversation, getCurrentChatId, processConversation } from '../api'
-import { flatMap, fromMarkdown, toMarkdown } from '../utils/markdown'
 import { checkIfConversationStarted, getConversationChoice } from '../page'
+import { copyToClipboard } from '../utils/clipboard'
+import { flatMap, fromMarkdown, toMarkdown } from '../utils/markdown'
+import { standardizeLineBreaks } from '../utils/text'
+import type { Emphasis, Strong } from 'mdast'
 
 export async function exportToText() {
     if (!checkIfConversationStarted()) {

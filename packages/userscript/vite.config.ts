@@ -1,6 +1,6 @@
+import preact from '@preact/preset-vite'
 import { defineConfig } from 'vite'
 import monkey, { cdn } from 'vite-plugin-monkey'
-import preact from '@preact/preset-vite'
 import packageJson from './package.json'
 
 // https://vitejs.dev/config/

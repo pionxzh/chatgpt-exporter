@@ -82,7 +82,8 @@ export function IconLoading({ className, style }: { className?: string; style?: 
                     r="20.2"
                     fill="none"
                     stroke="currentColor"
-                    stroke-width="3.6">
+                    stroke-width="3.6"
+                >
                 </circle>
             </svg>
         </span>

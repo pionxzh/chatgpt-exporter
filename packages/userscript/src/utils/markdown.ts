@@ -1,10 +1,10 @@
+import { toHtml as hastToHtml } from 'hast-util-to-html'
 import { fromMarkdown as fm } from 'mdast-util-from-markdown'
-import { toMarkdown as tm } from 'mdast-util-to-markdown'
-import type { Content, Parent, Root } from 'mdast'
-import { gfm } from 'micromark-extension-gfm'
 import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm'
 import { toHast } from 'mdast-util-to-hast'
-import { toHtml as hastToHtml } from 'hast-util-to-html'
+import { toMarkdown as tm } from 'mdast-util-to-markdown'
+import { gfm } from 'micromark-extension-gfm'
+import type { Content, Parent, Root } from 'mdast'
 import type { Node } from 'unist'
 
 // ref: https://github.com/rxliuli/mdbook/blob/master/libs/markdown-util

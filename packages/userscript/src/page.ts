@@ -43,7 +43,7 @@ function getUserProfile() {
 
 export function getConversationChoice() {
     // parse x from `< x / y >` to get the index of the selected response
-    const conversationChoices: (number | null)[] = Array.from(document.querySelectorAll('main .group'))
+    const conversationChoices: Array<number | null> = Array.from(document.querySelectorAll('main .group'))
         .map(group => group.querySelector('.flex.justify-center span.flex-grow'))
         // non-existing element will produce null here, which will point to the last child
         // just in case the selector changed
