@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks'
 import type { FC } from '../type'
-import { IconLoading } from './icons'
+import { IconLoading } from './Icons'
 
 const TIMEOUT = 2500
 

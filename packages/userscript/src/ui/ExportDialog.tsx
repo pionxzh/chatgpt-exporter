@@ -7,7 +7,7 @@ import { exportAllToMarkdown } from '../exporter/markdown'
 import type { FC } from '../type'
 import { RequestQueue } from '../utils/queue'
 import { CheckBox } from './CheckBox'
-import { IconCross } from './icons'
+import { IconCross } from './Icons'
 
 const exportAllOptions = [
     { label: 'Markdown', callback: exportAllToMarkdown },

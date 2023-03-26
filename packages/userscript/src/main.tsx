@@ -1,8 +1,10 @@
 import sentinel from 'sentinel-js'
 import { render } from 'preact'
-import { Menu } from './ui/menu'
+import { Menu } from './ui/Menu'
 import { onloadSafe } from './utils/utils'
 import { SecondaryToolbar } from './ui/SecondaryToolbar'
+
+import './styles/missing-tailwind.css'
 
 main()
 

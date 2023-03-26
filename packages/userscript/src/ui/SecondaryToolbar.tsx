@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks'
 import { exportToTextFromIndex } from '../exporter/text'
-import { IconCheck, IconCopy, IconLoading } from './icons'
+import { IconCheck, IconCopy, IconLoading } from './Icons'
 
 import './SecondaryToolbar.css'
 

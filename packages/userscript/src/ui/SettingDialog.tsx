@@ -1,11 +1,11 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import type { JSXInternal } from 'preact/src/jsx'
 import sanitize from 'sanitize-filename'
+import { useTitle } from '../hooks/useTitle'
 import type { FC } from '../type'
 import { getFileNameWithFormat } from '../utils/download'
 import { dateStr, timestamp } from '../utils/utils'
-import { IconCross } from './icons'
-import { useTitle } from './useTitle'
+import { IconCross } from './Icons'
 
 export const SettingDialog: FC<{ format: string; setFormat: (value: string) => void }> = ({ format, setFormat, children }) => {
     const handleChange: JSXInternal.GenericEventHandler<HTMLInputElement> = (e) => {

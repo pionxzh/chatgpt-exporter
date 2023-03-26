@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'preact/hooks'
 import './CheckBox.css'
-import { IconCheckBox, IconCheckBoxChecked } from './icons'
+import { IconCheckBox, IconCheckBoxChecked } from './Icons'
 
 export interface CheckBoxProps {
     className?: string
