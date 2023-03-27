@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.3.3...userscript-v2.4.0) (2023-03-27)
+
+
+### Features
+
+* export metadata ([4b92e53](https://github.com/pionxzh/chatgpt-exporter/commit/4b92e53b106ca49bec67e683ce8bd19280147700))
+
 ## [2.3.3](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.3.2...userscript-v2.3.3) (2023-03-25)
 
 
