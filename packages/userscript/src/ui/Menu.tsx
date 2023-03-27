@@ -1,25 +1,23 @@
-import { useCallback } from 'preact/hooks'
+import { useCallback, useMemo } from 'preact/hooks'
 import { exportToHtml } from '../exporter/html'
 import { exportToPng } from '../exporter/image'
 import { exportToJson } from '../exporter/json'
 import { exportToMarkdown } from '../exporter/markdown'
 import { exportToText } from '../exporter/text'
-import { useGMStorage } from '../hooks/useGMStorage'
 import { getHistoryDisabled } from '../page'
 import { Divider } from './Divider'
 import { Dropdown } from './Dropdown'
 import { ExportDialog } from './ExportDialog'
+import { FormatProvider, useFormatContext } from './FormatContext'
 import { FileCode, IconArrowRightFromBracket, IconCamera, IconCopy, IconJSON, IconMarkdown, IconSetting, IconZip } from './Icons'
 import { MenuItem } from './MenuItem'
+import { MetaDataProvider, useMetaDataContext } from './MetaContext'
 import { SettingDialog } from './SettingDialog'
 
 import '../style.css'
 import './Dialog.css'
 
-const KEY = 'exporter-format'
-const defaultFormat = 'ChatGPT-{title}'
-
-export function Menu() {
+function MenuInner() {
     const disabled = getHistoryDisabled()
     const menuText = disabled ? 'Exporter unavailable' : 'Export'
     const menuTitle = disabled
@@ -28,12 +26,14 @@ But History feature is disabled by OpenAI temporarily.
 We all have to wait for them to bring it back.`
         : ''
 
-    const [format, setFormat] = useGMStorage(KEY, defaultFormat)
+    const { format } = useFormatContext()
+    const { enableMeta, exportMetaList } = useMetaDataContext()
+    const metaList = useMemo(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList])
 
     const onClickText = useCallback(() => exportToText(), [])
     const onClickPng = useCallback(() => exportToPng(format), [format])
-    const onClickMarkdown = useCallback(() => exportToMarkdown(format), [format])
-    const onClickHtml = useCallback(() => exportToHtml(format), [format])
+    const onClickMarkdown = useCallback(() => exportToMarkdown(format, metaList), [format, metaList])
+    const onClickHtml = useCallback(() => exportToHtml(format, metaList), [format, metaList])
     const onClickJSON = useCallback(() => exportToJson(format), [format])
 
     return (
@@ -44,7 +44,7 @@ We all have to wait for them to bring it back.`
                 disabled={disabled}
             />
             <Dropdown>
-                <SettingDialog format={format} setFormat={setFormat}>
+                <SettingDialog>
                     <div className="row-full">
                         <MenuItem text="Setting" icon={IconSetting} />
                     </div>
@@ -53,7 +53,7 @@ We all have to wait for them to bring it back.`
                 <MenuItem
                     text="Copy Text"
                     successText="Copied!"
-                    icon={IconCopy}
+                    icon={() => <IconCopy className="w-4 h-4" />}
                     className="row-full"
                     onClick={onClickText}
                 />
@@ -92,5 +92,15 @@ We all have to wait for them to bring it back.`
             </Dropdown>
             <Divider />
         </div>
+    )
+}
+
+export function Menu() {
+    return (
+        <FormatProvider>
+            <MetaDataProvider>
+                <MenuInner />
+            </MetaDataProvider>
+        </FormatProvider>
     )
 }

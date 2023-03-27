@@ -82,12 +82,15 @@
     align-items: center;
     justify-content: center;
     color: #6f6e77;
-    position: absolute;
-    top: 10px;
-    right: 10px;
 }
 .IconButton:hover {
     background-color: rgba(0, 0, 0, 0.06);
+}
+
+.CloseButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
 }
 
 .Fieldset {
@@ -118,8 +121,8 @@
     padding: 0 10px;
     font-size: 15px;
     line-height: 1;
-    color: #5a5865;
-    background-color: #f7f7f7;
+    color: #000;
+    background-color: #fafafa;
     box-shadow: 0 0 0 1px #6f6e77;
     height: 35px;
     outline: none;

@@ -72,7 +72,7 @@ p > img[src*="https://images.unsplash.com/"] {
     column-gap: 4px;
     left: calc(100% + 1rem);
     top: -3.85rem;
-    width: 260px;
+    width: 268px;
     padding: .75rem .4rem 0 .4rem;
     border-radius: .375rem;
     box-shadow: 0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px -1px rgba(0,0,0,.1);
