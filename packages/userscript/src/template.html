@@ -24,6 +24,7 @@
             --conversation-odd-bg: rgba(247,247,248);
             --th-boarders: #4b5563;
             --td-boarders: #374151;
+            --meta-title: #616c77;
         }
 
         [data-theme="dark"] {
@@ -36,6 +37,7 @@
             --page-bg: rgba(52,53,65);
             --page-text: #fff;
             --conversation-odd-bg: rgb(68,70,84);
+            --meta-title: #959faa;
         }
 
         * {
@@ -118,6 +120,34 @@
             border-radius: 4px;
             background-color: #fff;
             border: 1px solid #e2e8f0;
+        }
+
+        .metadata_container {
+            display: flex;
+            flex-direction: column;
+            margin-top: 8px;
+            padding-left: 1rem;
+        }
+
+        .metadata_item {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            border-radius: 16px;
+            padding: 4px 0.5rem;
+        }
+
+        .metadata_item:hover {
+            background-color: rgba(0,0,0,.1);
+        }
+
+        .metadata_item > div:first-child {
+            flex: 0 1 100px;
+            color: var(--meta-title);
+        }
+
+        .metadata_item > div:last-child {
+            flex: 1;
         }
 
         a {
@@ -445,6 +475,7 @@
                 <a href="https://github.com/pionxzh/chatgpt-exporter">ChatGPT Exporter</a>
                 at {{time}}</p>
             </div>
+            {{details}}
         </div>
 
         {{content}}

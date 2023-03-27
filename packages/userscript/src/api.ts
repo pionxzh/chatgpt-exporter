@@ -1,4 +1,5 @@
 import urlcat from 'urlcat'
+import { baseUrl } from './constants'
 import { getPageAccessToken } from './page'
 
 interface ApiSession {
@@ -73,7 +74,6 @@ export interface ApiConversations {
     total: number
 }
 
-export const baseUrl = 'https://chat.openai.com'
 const apiUrl = `${baseUrl}/backend-api`
 
 const sessionApi = urlcat(baseUrl, '/api/auth/session')

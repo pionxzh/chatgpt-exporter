@@ -1,13 +1,15 @@
 import JSZip from 'jszip'
 import { fetchConversation, getCurrentChatId, processConversation } from '../api'
+import { baseUrl } from '../constants'
 import { checkIfConversationStarted, getConversationChoice } from '../page'
 import { downloadFile, getFileNameWithFormat } from '../utils/download'
 import { fromMarkdown, toMarkdown } from '../utils/markdown'
 import { standardizeLineBreaks } from '../utils/text'
+import { dateStr, timestamp } from '../utils/utils'
 import type { ApiConversationWithId, ConversationResult } from '../api'
-// import { dateStr } from '../utils/utils'
+import type { ExportMeta } from '../ui/MetaContext'
 
-export async function exportToMarkdown(fileNameFormat: string) {
+export async function exportToMarkdown(fileNameFormat: string, metaList: ExportMeta[]) {
     if (!checkIfConversationStarted()) {
         alert('Please start a conversation first.')
         return false
@@ -17,7 +19,7 @@ export async function exportToMarkdown(fileNameFormat: string) {
     const rawConversation = await fetchConversation(chatId)
     const conversationChoices = getConversationChoice()
     const conversation = processConversation(rawConversation, conversationChoices)
-    const markdown = conversationToMarkdown(conversation)
+    const markdown = conversationToMarkdown(conversation, metaList)
 
     const fileName = getFileNameWithFormat(fileNameFormat, 'md', { title: conversation.title })
     downloadFile(fileName, 'text/markdown', standardizeLineBreaks(markdown))
@@ -25,12 +27,12 @@ export async function exportToMarkdown(fileNameFormat: string) {
     return true
 }
 
-export async function exportAllToMarkdown(fileNameFormat: string, apiConversations: ApiConversationWithId[]) {
+export async function exportAllToMarkdown(fileNameFormat: string, apiConversations: ApiConversationWithId[], metaList?: ExportMeta[]) {
     const zip = new JSZip()
     const conversations = apiConversations.map(x => processConversation(x))
     conversations.forEach((conversation) => {
         const fileName = getFileNameWithFormat(fileNameFormat, 'md', { title: conversation.title })
-        const content = conversationToMarkdown(conversation)
+        const content = conversationToMarkdown(conversation, metaList)
         zip.file(fileName, content)
     })
 
@@ -40,16 +42,24 @@ export async function exportAllToMarkdown(fileNameFormat: string, apiConversatio
     return true
 }
 
-function conversationToMarkdown(conversation: ConversationResult) {
-    const { conversationNodes } = conversation
+function conversationToMarkdown(conversation: ConversationResult, metaList?: ExportMeta[]) {
+    const { id, title, conversationNodes } = conversation
 
-    // const date = dateStr()
-    // const source = `${baseUrl}/chat/${id}`
-    // const frontMatter = `---
-    // title: ${title}
-    // date: ${date}
-    // source: ${source}
-    // ---`
+    const _metaList = metaList
+        ?.filter(x => !!x.name)
+        .map(({ name, value }) => {
+            const val = value
+                .replace('{title}', title)
+                .replace('{date}', dateStr())
+                .replace('{timestamp}', timestamp())
+                .replace('{source}', `${baseUrl}/chat/${id}`)
+
+            return `${name}: ${val}`
+        })
+    ?? []
+    const frontMatter = _metaList.length > 0
+        ? `---\n${_metaList.join('\n')}\n---\n\n`
+        : ''
 
     const content = conversationNodes.map((item) => {
         const author = item.message?.author.role === 'assistant' ? 'ChatGPT' : 'You'
@@ -64,8 +74,7 @@ function conversationToMarkdown(conversation: ConversationResult) {
         return `#### ${author}:\n${message}`
     }).join('\n\n')
 
-    // const markdown = `${frontMatter}\n\n${content}`
-    const markdown = content
+    const markdown = `${frontMatter}# ${title}\n\n${content}`
 
     return markdown
 }

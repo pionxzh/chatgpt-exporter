@@ -1,14 +1,16 @@
 import JSZip from 'jszip'
-import { baseUrl, fetchConversation, getCurrentChatId, processConversation } from '../api'
+import { fetchConversation, getCurrentChatId, processConversation } from '../api'
+import { baseUrl } from '../constants'
 import { checkIfConversationStarted, getConversationChoice, getUserAvatar } from '../page'
 import templateHtml from '../template.html?raw'
 import { downloadFile, getFileNameWithFormat } from '../utils/download'
 import { fromMarkdown, toHtml } from '../utils/markdown'
 import { standardizeLineBreaks } from '../utils/text'
-import { dateStr, getColorScheme } from '../utils/utils'
+import { dateStr, getColorScheme, timestamp } from '../utils/utils'
 import type { ApiConversationWithId, ConversationResult } from '../api'
+import type { ExportMeta } from '../ui/MetaContext'
 
-export async function exportToHtml(fileNameFormat: string) {
+export async function exportToHtml(fileNameFormat: string, metaList: ExportMeta[]) {
     if (!checkIfConversationStarted()) {
         alert('Please start a conversation first.')
         return false
@@ -20,7 +22,7 @@ export async function exportToHtml(fileNameFormat: string) {
     const rawConversation = await fetchConversation(chatId)
     const conversationChoices = getConversationChoice()
     const conversation = processConversation(rawConversation, conversationChoices)
-    const html = conversationToHtml(conversation, userAvatar)
+    const html = conversationToHtml(conversation, userAvatar, metaList)
 
     const fileName = getFileNameWithFormat(fileNameFormat, 'html', { title: conversation.title })
     downloadFile(fileName, 'text/html', standardizeLineBreaks(html))
@@ -28,14 +30,14 @@ export async function exportToHtml(fileNameFormat: string) {
     return true
 }
 
-export async function exportAllToHtml(fileNameFormat: string, apiConversations: ApiConversationWithId[]) {
+export async function exportAllToHtml(fileNameFormat: string, apiConversations: ApiConversationWithId[], metaList?: ExportMeta[]) {
     const userAvatar = await getUserAvatar()
 
     const zip = new JSZip()
     const conversations = apiConversations.map(x => processConversation(x))
     conversations.forEach((conversation) => {
         const fileName = getFileNameWithFormat(fileNameFormat, 'html', { title: conversation.title })
-        const content = conversationToHtml(conversation, userAvatar)
+        const content = conversationToHtml(conversation, userAvatar, metaList)
         zip.file(fileName, content)
     })
 
@@ -45,7 +47,7 @@ export async function exportAllToHtml(fileNameFormat: string, apiConversations: 
     return true
 }
 
-function conversationToHtml(conversation: ConversationResult, avatar: string) {
+function conversationToHtml(conversation: ConversationResult, avatar: string, metaList?: ExportMeta[]) {
     const { id, title, conversationNodes } = conversation
 
     const conversationHtml = conversationNodes.map((item) => {
@@ -97,6 +99,27 @@ function conversationToHtml(conversation: ConversationResult, avatar: string) {
     const lang = document.documentElement.lang ?? 'en'
     const theme = getColorScheme()
 
+    const _metaList = metaList
+        ?.filter(x => !!x.name)
+        .map(({ name, value }) => {
+            const val = value
+                .replace('{title}', title)
+                .replace('{date}', date)
+                .replace('{timestamp}', timestamp())
+                .replace('{source}', source)
+
+            return [name, val] as const
+        })
+    ?? []
+    const detailsHtml = _metaList.length > 0
+        ? `<details>
+    <summary>Metadata</summary>
+    <div class="metadata_container">
+        ${_metaList.map(([key, value]) => `<div class="metadata_item"><div>${key}</div><div>${value}</div></div>`).join('\n')}
+    </div>
+</details>`
+        : ''
+
     const html = templateHtml
         .replaceAll('{{title}}', title)
         .replaceAll('{{date}}', date)
@@ -105,6 +128,7 @@ function conversationToHtml(conversation: ConversationResult, avatar: string) {
         .replaceAll('{{lang}}', lang)
         .replaceAll('{{theme}}', theme)
         .replaceAll('{{avatar}}', avatar)
+        .replaceAll('{{details}}', detailsHtml)
         .replaceAll('{{content}}', conversationHtml)
     return html
 }

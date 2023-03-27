@@ -7,6 +7,7 @@ import { exportAllToMarkdown } from '../exporter/markdown'
 import { RequestQueue } from '../utils/queue'
 import { CheckBox } from './CheckBox'
 import { IconCross } from './Icons'
+import { useMetaDataContext } from './MetaContext'
 import type { ApiConversationItem, ApiConversationWithId } from '../api'
 import type { FC } from '../type'
 
@@ -69,6 +70,9 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
 }
 
 export const ExportDialog: FC<{ format: string }> = ({ format, children }) => {
+    const { enableMeta, exportMetaList } = useMetaDataContext()
+    const metaList = useMemo(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList])
+
     const [conversations, setConversations] = useState<ApiConversationItem[]>([])
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
@@ -100,10 +104,10 @@ export const ExportDialog: FC<{ format: string }> = ({ format, children }) => {
             setProcessing(false)
             console.log(results)
             const callback = exportAllOptions.find(o => o.label === exportType)?.callback
-            if (callback) callback(format, results)
+            if (callback) callback(format, results, metaList)
         })
         return () => off()
-    }, [requestQueue, exportType, format])
+    }, [requestQueue, exportType, format, metaList])
 
     const exportAll = useCallback(() => {
         if (disabled) return

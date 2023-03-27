@@ -37,7 +37,7 @@
 }
 
 .CheckBoxLabel input:checked ~ svg {
-    color: rgb(118 194 255);
+    color: rgb(28 100 242);
 }
 
 .dark .CheckBoxLabel input:checked ~ svg {

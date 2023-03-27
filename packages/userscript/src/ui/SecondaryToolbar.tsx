@@ -38,7 +38,7 @@ export const SecondaryToolbar = ({ index }: { index: number }) => {
                             onClick={handleClick}
                             className="p-1 rounded-md hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200"
                         >
-                            <IconCopy />
+                            <IconCopy className="w-4 h-4 text-gray-400 dark:text-gray-400" />
                         </button>
                         )}
         </div>
