@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.4.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.4.0...userscript-v2.4.1) (2023-03-29)
+
+
+### Bug Fixes
+
+* fix close button position in Export Dialog ([2498d55](https://github.com/pionxzh/chatgpt-exporter/commit/2498d55fde57c80d87aec8ac80738ce09d87d511))
+* setting dialog should allow scroll when overflow ([cd3340d](https://github.com/pionxzh/chatgpt-exporter/commit/cd3340dabf4fe6907a21e641c3d7a08e8518dcdc))
+* user's input should respect line break and be escaped ([46b5369](https://github.com/pionxzh/chatgpt-exporter/commit/46b53692548880abb410af07c31585730fa74666)), closes [#95](https://github.com/pionxzh/chatgpt-exporter/issues/95)
+
 ## [2.4.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.3.3...userscript-v2.4.0) (2023-03-27)
 
 
