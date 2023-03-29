@@ -172,7 +172,7 @@ export const ExportDialog: FC<{ format: string }> = ({ format, children }) => {
                         </>
                     )}
                     <Dialog.Close asChild>
-                        <button className="IconButton" aria-label="Close">
+                        <button className="IconButton CloseButton" aria-label="Close">
                             <IconCross />
                         </button>
                     </Dialog.Close>
