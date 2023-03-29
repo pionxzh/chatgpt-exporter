@@ -60,10 +60,12 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
         const content = item.message?.content.parts.join('\n') ?? ''
         let conversationContent = content
 
-        // User's message will not be reformatted
         if (author === 'ChatGPT') {
             const root = fromMarkdown(content)
             conversationContent = toHtml(root)
+        }
+        else {
+            conversationContent = `<p>${escapeHtml(content)}</p>`
         }
 
         const timestamp = item.message?.create_time ?? ''
@@ -131,4 +133,13 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
         .replaceAll('{{details}}', detailsHtml)
         .replaceAll('{{content}}', conversationHtml)
     return html
+}
+
+function escapeHtml(html: string) {
+    return html
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;')
 }
