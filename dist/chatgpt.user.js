@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.4.0
+// @version            2.4.1
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -304,6 +304,7 @@ p > img[src*="https://images.unsplash.com/"] {
     width: 90vw;
     max-width: 450px;
     max-height: 85vh;
+    overflow-y: auto;
     padding: 16px 24px;
     z-index: 1001;
     animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -13224,6 +13225,8 @@ var __publicField = (obj, key, value) => {
       if (author === "ChatGPT") {
         const root2 = fromMarkdown(content2);
         conversationContent = toHtml(root2);
+      } else {
+        conversationContent = `<p>${escapeHtml(content2)}</p>`;
       }
       const timestamp2 = ((_e = item.message) == null ? void 0 : _e.create_time) ?? "";
       let conversationDate = "";
@@ -13270,6 +13273,9 @@ var __publicField = (obj, key, value) => {
 </details>` : "";
     const html2 = templateHtml.replaceAll("{{title}}", title).replaceAll("{{date}}", date).replaceAll("{{time}}", time).replaceAll("{{source}}", source).replaceAll("{{lang}}", lang).replaceAll("{{theme}}", theme).replaceAll("{{avatar}}", avatar).replaceAll("{{details}}", detailsHtml).replaceAll("{{content}}", conversationHtml);
     return html2;
+  }
+  function escapeHtml(html2) {
+    return html2.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
   }
   function fnIgnoreElements(el) {
     return typeof el.shadowRoot === "object" && el.shadowRoot !== null;
@@ -16516,7 +16522,7 @@ ${message}`;
           }), o($5d3850c4d0b4e6c7$export$f39c2d165cd861fe, {
             asChild: true,
             children: o("button", {
-              className: "IconButton",
+              className: "IconButton CloseButton",
               "aria-label": "Close",
               children: o(IconCross, {})
             })
