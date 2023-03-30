@@ -66,6 +66,7 @@ function main() {
             }
         })
 
+        /** Insert copy button to the next of feedback buttons */
         sentinel.on('.flex.justify-between', (node) => {
             if (!node.querySelector('button')) return
             // ignore codeblock

@@ -2,6 +2,7 @@ import * as Dialog from '@radix-ui/react-dialog'
 import sanitize from 'sanitize-filename'
 import { baseUrl } from '../constants'
 import { useTitle } from '../hooks/useTitle'
+import { getChatIdFromUrl } from '../page'
 import { getFileNameWithFormat } from '../utils/download'
 import { timestamp as _timestamp, dateStr } from '../utils/utils'
 import { CheckBox } from './CheckBox'
@@ -20,8 +21,8 @@ export const SettingDialog: FC = ({ children }) => {
     const title = sanitize(_title).replace(/\s+/g, '_')
     const preview = getFileNameWithFormat(format, '{ext}', { title })
 
-    const match = location.pathname.match(/^\/chat\/([a-z0-9-]+)$/i)
-    const source = `${baseUrl}/${(match ? match[1] : 'xxx')}`
+    const chatId = getChatIdFromUrl() || 'xxx'
+    const source = `${baseUrl}/${chatId}`
 
     return (
         <Dialog.Root>
@@ -116,7 +117,6 @@ export const SettingDialog: FC = ({ children }) => {
                                                 aria-label="Add"
                                                 onClick={() => setExportMetaList([...exportMetaList, { name: '', value: '' }])}
                                             >
-
                                                 +
                                             </button>
                                         </div>

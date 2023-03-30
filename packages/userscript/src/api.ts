@@ -1,6 +1,6 @@
 import urlcat from 'urlcat'
 import { baseUrl } from './constants'
-import { getPageAccessToken } from './page'
+import { getChatIdFromUrl, getPageAccessToken } from './page'
 
 interface ApiSession {
     accessToken: string
@@ -81,8 +81,8 @@ const conversationApi = (id: string) => urlcat(apiUrl, '/conversation/:id', { id
 const conversationsApi = (offset: number, limit: number) => urlcat(apiUrl, '/conversations', { offset, limit })
 
 export async function getCurrentChatId(): Promise<string> {
-    const match = location.pathname.match(/^\/chat\/([a-z0-9-]+)$/i)
-    if (match) return match[1]
+    const chatId = getChatIdFromUrl()
+    if (chatId) return chatId
 
     const conversations = await fetchConversations()
     if (conversations && conversations.items.length > 0) {
