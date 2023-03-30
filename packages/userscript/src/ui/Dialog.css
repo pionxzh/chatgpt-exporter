@@ -17,6 +17,7 @@
     width: 90vw;
     max-width: 450px;
     max-height: 85vh;
+    overflow-x: hidden;
     overflow-y: auto;
     padding: 16px 24px;
     z-index: 1001;

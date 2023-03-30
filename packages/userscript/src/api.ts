@@ -15,12 +15,14 @@ interface ApiSession {
     }
 }
 
+type ModelSlug = 'text-davinci-002-render-sha' | 'text-davinci-002-render-paid' | 'gpt-4'
+
 interface MessageMeta {
     finish_details?: {
         stop: string
-        type: string
+        type: 'stop' | 'interrupted' & (string & {})
     }
-    model_slug?: 'text-davinci-002-render-sha' | 'text-davinci-002-render-paid' | 'gpt-4' & (string & {})
+    model_slug?: ModelSlug & (string & {})
     timestamp_: 'absolute' & (string & {})
 }
 
@@ -41,7 +43,6 @@ interface ConversationNode {
         id: string
         metadata?: MessageMeta
         recipient: 'all' & (string & {})
-        update_time: string | null
         weight: number
     }
     parent?: string
@@ -55,6 +56,7 @@ export interface ApiConversation {
     }
     moderation_results: unknown[]
     title: string
+    update_time: number
 }
 
 export type ApiConversationWithId = ApiConversation & {
@@ -160,13 +162,23 @@ class LinkedListItem<T> {
 export interface ConversationResult {
     id: string
     title: string
+    modelSlug: string
+    model: string
     createTime: number
     conversationNodes: ConversationNode[]
+}
+
+const modelMapping: { [key in ModelSlug]: string } = {
+    'text-davinci-002-render-sha': 'GTP-3.5',
+    'text-davinci-002-render-paid': 'GTP-3.5',
+    'gpt-4': 'GPT-4',
 }
 
 export function processConversation(conversation: ApiConversationWithId, conversationChoices: Array<number | null> = []): ConversationResult {
     const title = conversation.title || 'ChatGPT Conversation'
     const createTime = conversation.create_time
+    const modelSlug = Object.values(conversation.mapping).find(node => node.message?.metadata?.model_slug)?.message?.metadata?.model_slug || ''
+    const model = modelSlug ? (modelMapping[modelSlug] || '') : ''
 
     const result: ConversationNode[] = []
     const nodes = Object.values(conversation.mapping)
@@ -205,6 +217,8 @@ export function processConversation(conversation: ApiConversationWithId, convers
     return {
         id: conversation.id,
         title,
+        modelSlug,
+        model,
         createTime,
         conversationNodes: result,
     }

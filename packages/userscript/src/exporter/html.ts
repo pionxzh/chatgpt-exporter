@@ -48,7 +48,7 @@ export async function exportAllToHtml(fileNameFormat: string, apiConversations: 
 }
 
 function conversationToHtml(conversation: ConversationResult, avatar: string, metaList?: ExportMeta[]) {
-    const { id, title, conversationNodes } = conversation
+    const { id, title, model, modelSlug, conversationNodes } = conversation
 
     const conversationHtml = conversationNodes.map((item) => {
         const author = item.message?.author.role === 'assistant' ? 'ChatGPT' : 'You'
@@ -109,6 +109,8 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
                 .replace('{date}', date)
                 .replace('{timestamp}', timestamp())
                 .replace('{source}', source)
+                .replace('{model}', model)
+                .replace('{mode_name}', modelSlug)
 
             return [name, val] as const
         })

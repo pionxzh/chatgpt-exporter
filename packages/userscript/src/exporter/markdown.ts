@@ -43,7 +43,8 @@ export async function exportAllToMarkdown(fileNameFormat: string, apiConversatio
 }
 
 function conversationToMarkdown(conversation: ConversationResult, metaList?: ExportMeta[]) {
-    const { id, title, conversationNodes } = conversation
+    const { id, title, model, modelSlug, conversationNodes } = conversation
+    const source = `${baseUrl}/chat/${id}`
 
     const _metaList = metaList
         ?.filter(x => !!x.name)
@@ -52,7 +53,9 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
                 .replace('{title}', title)
                 .replace('{date}', dateStr())
                 .replace('{timestamp}', timestamp())
-                .replace('{source}', `${baseUrl}/chat/${id}`)
+                .replace('{source}', source)
+                .replace('{model}', model)
+                .replace('{modelSlug}', modelSlug)
 
             return `${name}: ${val}`
         })

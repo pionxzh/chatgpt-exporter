@@ -57,6 +57,10 @@
     white-space: nowrap;
 }
 
+.whitespace-nowrap {
+    white-space: nowrap;
+}
+
 @media (min-width:768px) {
     /* md */
 }

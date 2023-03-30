@@ -11,6 +11,10 @@ import { IconCross, IconTrash } from './Icons'
 import { useMetaDataContext } from './MetaContext'
 import type { FC } from '../type'
 
+const Variable = ({ name, title }: { name: string; title: string }) => (
+    <strong className="cursor-help select-all whitespace-nowrap" title={title}>{name}</strong>
+)
+
 export const SettingDialog: FC = ({ children }) => {
     const { format, setFormat } = useFormatContext()
     const { enableMeta, setEnableMeta, exportMetaList, setExportMetaList } = useMetaDataContext()
@@ -44,11 +48,11 @@ export const SettingDialog: FC = ({ children }) => {
                             <dd>
                                 <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
                                     Available variables:&nbsp;
-                                    <strong className="cursor-help select-all" title={title}>{'{title}'}</strong>
+                                    <Variable name="{title}" title={title} />
                                     ,&nbsp;
-                                    <strong className="cursor-help select-all" title={date}>{'{date}'}</strong>
+                                    <Variable name="{date}" title={date} />
                                     ,&nbsp;
-                                    <strong className="cursor-help select-all" title={timestamp}>{'{timestamp}'}</strong>
+                                    <Variable name="{timestamp}" title={timestamp} />
                                 </p>
                                 <input className="Input mt-1" id="filename" value={format} onChange={e => setFormat(e.currentTarget.value)} />
                                 <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">
@@ -73,13 +77,18 @@ export const SettingDialog: FC = ({ children }) => {
                                     <>
                                         <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
                                             Available variables:&nbsp;
-                                            <strong className="cursor-help select-all" title={title}>{'{title}'}</strong>
+                                            <Variable name="{title}" title={title} />
                                             ,&nbsp;
-                                            <strong className="cursor-help select-all" title={date}>{'{date}'}</strong>
+                                            <Variable name="{date}" title={date} />
                                             ,&nbsp;
-                                            <strong className="cursor-help select-all" title={timestamp}>{'{timestamp}'}</strong>
+                                            <Variable name="{timestamp}" title={timestamp} />
                                             ,&nbsp;
-                                            <strong className="cursor-help select-all" title={source}>{'{source}'}</strong>
+                                            <Variable name="{source}" title={source} />
+                                            ,&nbsp;
+                                            <br />
+                                            <Variable name="{model}" title={'ChatGPT-3.5'} />
+                                            ,&nbsp;
+                                            <Variable name="{model_name}" title={'text-davinci-002-render-sha'} />
                                         </p>
                                         {exportMetaList.map((meta, i) => (
                                             <div className="flex items-center mt-2" key={i}>
