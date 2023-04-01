@@ -21,7 +21,7 @@ export async function exportToMarkdown(fileNameFormat: string, metaList: ExportM
     const conversation = processConversation(rawConversation, conversationChoices)
     const markdown = conversationToMarkdown(conversation, metaList)
 
-    const fileName = getFileNameWithFormat(fileNameFormat, 'md', { title: conversation.title })
+    const fileName = getFileNameWithFormat(fileNameFormat, 'md', { title: conversation.title, chatId })
     downloadFile(fileName, 'text/markdown', standardizeLineBreaks(markdown))
 
     return true

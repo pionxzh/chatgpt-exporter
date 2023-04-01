@@ -24,7 +24,7 @@ export async function exportToHtml(fileNameFormat: string, metaList: ExportMeta[
     const conversation = processConversation(rawConversation, conversationChoices)
     const html = conversationToHtml(conversation, userAvatar, metaList)
 
-    const fileName = getFileNameWithFormat(fileNameFormat, 'html', { title: conversation.title })
+    const fileName = getFileNameWithFormat(fileNameFormat, 'html', { title: conversation.title, chatId })
     downloadFile(fileName, 'text/html', standardizeLineBreaks(html))
 
     return true

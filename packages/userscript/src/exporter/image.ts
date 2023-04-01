@@ -1,5 +1,5 @@
 import html2canvas from 'html2canvas'
-import { checkIfConversationStarted } from '../page'
+import { checkIfConversationStarted, getChatIdFromUrl } from '../page'
 import { downloadUrl, getFileNameWithFormat } from '../utils/download'
 import { sleep } from '../utils/utils'
 
@@ -70,7 +70,8 @@ export async function exportToPng(fileNameFormat: string) {
 
     const dataUrl = canvas.toDataURL('image/png', 1)
         .replace(/^data:image\/[^;]/, 'data:application/octet-stream')
-    const fileName = getFileNameWithFormat(fileNameFormat, 'png')
+    const chatId = getChatIdFromUrl() || undefined
+    const fileName = getFileNameWithFormat(fileNameFormat, 'png', { chatId })
     downloadUrl(fileName, dataUrl)
     window.URL.revokeObjectURL(dataUrl)
 

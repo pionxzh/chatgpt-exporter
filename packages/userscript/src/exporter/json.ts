@@ -15,7 +15,7 @@ export async function exportToJson(fileNameFormat: string) {
     const conversationChoices = getConversationChoice()
     const conversation = processConversation(rawConversation, conversationChoices)
 
-    const fileName = getFileNameWithFormat(fileNameFormat, 'json', { title: conversation.title })
+    const fileName = getFileNameWithFormat(fileNameFormat, 'json', { title: conversation.title, chatId })
     const content = conversationToJson(rawConversation)
     downloadFile(fileName, 'application/json', content)
 

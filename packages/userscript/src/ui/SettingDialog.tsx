@@ -23,9 +23,9 @@ export const SettingDialog: FC = ({ children }) => {
     const date = dateStr()
     const timestamp = _timestamp()
     const title = sanitize(_title).replace(/\s+/g, '_')
-    const preview = getFileNameWithFormat(format, '{ext}', { title })
+    const chatId = getChatIdFromUrl() || 'this-is-a-mock-chat-id'
+    const preview = getFileNameWithFormat(format, '{ext}', { title, chatId })
 
-    const chatId = getChatIdFromUrl() || 'xxx'
     const source = `${baseUrl}/${chatId}`
 
     return (
@@ -53,6 +53,8 @@ export const SettingDialog: FC = ({ children }) => {
                                     <Variable name="{date}" title={date} />
                                     ,&nbsp;
                                     <Variable name="{timestamp}" title={timestamp} />
+                                    ,&nbsp;
+                                    <Variable name="{chat_id}" title={chatId} />
                                 </p>
                                 <input className="Input mt-1" id="filename" value={format} onChange={e => setFormat(e.currentTarget.value)} />
                                 <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">

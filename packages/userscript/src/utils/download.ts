@@ -21,12 +21,17 @@ export function downloadUrl(filename: string, url: string) {
     document.body.removeChild(a)
 }
 
-export function getFileNameWithFormat(format: string, ext: string, { title = document.title } = {}) {
+export function getFileNameWithFormat(format: string, ext: string, {
+    title = document.title,
+    // chatId will be empty when exporting all conversations
+    chatId = '',
+} = {}) {
     const _title = sanitize(title).replace(/\s+/g, '_')
 
     return format
         .replace('{title}', _title)
         .replace('{date}', dateStr())
         .replace('{timestamp}', timestamp())
+        .replace('{chat_id}', chatId)
         .concat(`.${ext}`)
 }
