@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.5.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.4.1...userscript-v2.5.0) (2023-04-01)
+
+
+### Features
+
+* add `{chat_id}` to filename varaible ([d27e225](https://github.com/pionxzh/chatgpt-exporter/commit/d27e2258d55261a14c08d1255c131d4463caef2d))
+* add `{model}` and `{model_name}` to variable ([057fe9f](https://github.com/pionxzh/chatgpt-exporter/commit/057fe9fcfd0ef8e3e9fe834a976d56b3134b86b3))
+
+
+### Bug Fixes
+
+* load plugin on page with model query string ([5d64f04](https://github.com/pionxzh/chatgpt-exporter/commit/5d64f045ba9bba28af468b34c40989c5655b4cdc)), closes [#100](https://github.com/pionxzh/chatgpt-exporter/issues/100)
+
 ## [2.4.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.4.0...userscript-v2.4.1) (2023-03-29)
 
 
