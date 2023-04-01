@@ -6,10 +6,17 @@ import { GM_deleteValue, GM_getValue, GM_setValue } from 'vite-plugin-monkey/dis
  * @see https://www.tampermonkey.net/documentation.php#api:GM_setValue
  */
 class GMStorage {
-    static get<T>(key: string): T {
+    static get<T>(key: string): T | null {
         const item = GM_getValue<string>(key, '')
-        if (!item) throw new Error('No item found.')
-        return JSON.parse(item)
+        if (item) {
+            try {
+                return JSON.parse(item)
+            }
+            catch {
+                return null
+            }
+        }
+        return null
     }
 
     static set<T>(key: string, value: T): void {
@@ -23,10 +30,17 @@ class GMStorage {
 }
 
 class LocalStorage {
-    static get<T>(key: string): T {
+    static get<T>(key: string): T | null {
         const item = localStorage.getItem(key)
-        if (!item) throw new Error('No item found.')
-        return JSON.parse(item)
+        if (item) {
+            try {
+                return JSON.parse(item)
+            }
+            catch {
+                return null
+            }
+        }
+        return null
     }
 
     static set<T>(key: string, value: T): void {
@@ -42,9 +56,9 @@ class LocalStorage {
 class MemoryStorage {
     private static map = new Map<string, any>()
 
-    static get<T>(key: string): T {
+    static get<T>(key: string): T | null {
         const item = this.map.get(key)
-        if (!item) throw new Error('No item found.')
+        if (!item) return null
         return item
     }
 
@@ -58,7 +72,7 @@ class MemoryStorage {
 }
 
 export class ScriptStorage {
-    static get<T>(key: string): T {
+    static get<T>(key: string): T | null {
         try {
             return GMStorage.get<T>(key)
         }
