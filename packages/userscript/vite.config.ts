@@ -30,7 +30,13 @@ export default defineConfig({
                     'zh-TW': packageJson['description:zh-TW'],
                 },
                 'license': packageJson.license,
-                'match': ['https://chat.openai.com/chat', 'https://chat.openai.com/chat/*'],
+                'match': [
+                    'https://chat.openai.com/chat',
+                    // support https://chat.openai.com/chat?model=gpt-4
+                    'https://chat.openai.com/chat?*',
+                    // support https://chat.openai.com/chat/123456789
+                    'https://chat.openai.com/chat/*',
+                ],
                 'icon': 'https://chat.openai.com/favicon.ico',
                 'run-at': 'document-end',
             },
