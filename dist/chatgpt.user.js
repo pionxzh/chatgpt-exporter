@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.4.1
+// @version            2.5.0
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -11,9 +11,11 @@
 // @license            MIT
 // @icon               https://chat.openai.com/favicon.ico
 // @match              https://chat.openai.com/chat
+// @match              https://chat.openai.com/chat?*
 // @match              https://chat.openai.com/chat/*
 // @require            https://cdn.jsdelivr.net/npm/jszip@3.9.1/dist/jszip.min.js
 // @require            https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js
+// @grant              GM_deleteValue
 // @grant              GM_getValue
 // @grant              GM_setValue
 // @grant              unsafeWindow
@@ -304,6 +306,7 @@ p > img[src*="https://images.unsplash.com/"] {
     width: 90vw;
     max-width: 450px;
     max-height: 85vh;
+    overflow-x: hidden;
     overflow-y: auto;
     padding: 16px 24px;
     z-index: 1001;
@@ -539,6 +542,10 @@ p > img[src*="https://images.unsplash.com/"] {
     white-space: nowrap;
 }
 
+.whitespace-nowrap {
+    white-space: nowrap;
+}
+
 @media (min-width:768px) {
     /* md */
 }
@@ -716,7 +723,7 @@ var __publicField = (obj, key, value) => {
             break n;
           } catch (n3) {
           }
-        "function" == typeof u2 || (null == u2 || false === u2 && -1 == l2.indexOf("-") ? n2.removeAttribute(l2) : n2.setAttribute(l2, u2));
+        "function" == typeof u2 || (null == u2 || false === u2 && "-" !== l2[4] ? n2.removeAttribute(l2) : n2.setAttribute(l2, u2));
       }
   }
   function j$2(n2) {
@@ -991,6 +998,18 @@ var __publicField = (obj, key, value) => {
     });
   })(sentinel_umd);
   const sentinel = sentinel_umdExports;
+  var monkeyWindow = window;
+  var unsafeWindow = /* @__PURE__ */ (() => {
+    return monkeyWindow.unsafeWindow;
+  })();
+  var GM_setValue = /* @__PURE__ */ (() => monkeyWindow.GM_setValue)();
+  var GM_deleteValue = /* @__PURE__ */ (() => monkeyWindow.GM_deleteValue)();
+  var GM_getValue = /* @__PURE__ */ (() => monkeyWindow.GM_getValue)();
+  const baseUrl = "https://chat.openai.com";
+  const LEGACY_KEY_FILENAME_FORMAT = "exporter-format";
+  const KEY_FILENAME_FORMAT = "exporter:filename_format";
+  const KEY_META_ENABLED = "exporter:enable_meta";
+  const KEY_META_LIST = "exporter:meta_list";
   var t, r, u, i, o$1 = 0, f = [], c = [], e = l$1.__b, a = l$1.__r, v = l$1.diffed, l = l$1.__c, m = l$1.unmount;
   function d(t2, u2) {
     l$1.__h && l$1.__h(r, t2, o$1 || u2), o$1 = 0;
@@ -1247,16 +1266,6 @@ var __publicField = (obj, key, value) => {
   function notNullOrUndefined(v2) {
     return v2 !== void 0 && v2 !== null;
   }
-  const baseUrl = "https://chat.openai.com";
-  const KEY_FILENAME_FORMAT = "exporter-format";
-  const KEY_META_ENABLED = "exporter:enable_meta";
-  const KEY_META_LIST = "exporter:meta_list";
-  var monkeyWindow = window;
-  var unsafeWindow = /* @__PURE__ */ (() => {
-    return monkeyWindow.unsafeWindow;
-  })();
-  var GM_setValue = /* @__PURE__ */ (() => monkeyWindow.GM_setValue)();
-  var GM_getValue = /* @__PURE__ */ (() => monkeyWindow.GM_getValue)();
   function getBase64FromImg(el) {
     const canvas = document.createElement("canvas");
     canvas.width = el.naturalWidth;
@@ -1294,6 +1303,12 @@ var __publicField = (obj, key, value) => {
     if (!user)
       throw new Error("No user found.");
     return user;
+  }
+  function getChatIdFromUrl() {
+    const match = location.pathname.match(/^\/chat\/([a-z0-9-]+)$/i);
+    if (match)
+      return match[1];
+    return null;
   }
   function getConversationChoice() {
     const conversationChoices = Array.from(document.querySelectorAll("main .group")).map((group) => group.querySelector(".flex.justify-center span.flex-grow")).map((span) => {
@@ -1336,9 +1351,9 @@ var __publicField = (obj, key, value) => {
     limit
   });
   async function getCurrentChatId() {
-    const match = location.pathname.match(/^\/chat\/([a-z0-9-]+)$/i);
-    if (match)
-      return match[1];
+    const chatId = getChatIdFromUrl();
+    if (chatId)
+      return chatId;
     const conversations = await fetchConversations();
     if (conversations && conversations.items.length > 0) {
       return conversations.items[0].id;
@@ -1407,10 +1422,20 @@ var __publicField = (obj, key, value) => {
       this.value = value;
     }
   }
+  const modelMapping = {
+    "text-davinci-002-render-sha": "GTP-3.5",
+    "text-davinci-002-render-paid": "GTP-3.5",
+    "gpt-4": "GPT-4"
+  };
   function processConversation(conversation, conversationChoices = []) {
-    var _a;
+    var _a, _b, _c, _d;
     const title = conversation.title || "ChatGPT Conversation";
     const createTime = conversation.create_time;
+    const modelSlug = ((_c = (_b = (_a = Object.values(conversation.mapping).find((node2) => {
+      var _a2, _b2;
+      return (_b2 = (_a2 = node2.message) == null ? void 0 : _a2.metadata) == null ? void 0 : _b2.model_slug;
+    })) == null ? void 0 : _a.message) == null ? void 0 : _b.metadata) == null ? void 0 : _c.model_slug) || "";
+    const model = modelSlug ? modelMapping[modelSlug] || "" : "";
     const result = [];
     const nodes = Object.values(conversation.mapping);
     const root2 = nodes.find((node2) => !node2.parent);
@@ -1425,7 +1450,7 @@ var __publicField = (obj, key, value) => {
       const node2 = nodeMap.get(current.value.id);
       if (!node2)
         throw new Error("No node found.");
-      const role = (_a = node2.message) == null ? void 0 : _a.author.role;
+      const role = (_d = node2.message) == null ? void 0 : _d.author.role;
       if (role === "assistant" || role === "user") {
         result.push(node2);
       }
@@ -1446,6 +1471,8 @@ var __publicField = (obj, key, value) => {
     return {
       id: conversation.id,
       title,
+      modelSlug,
+      model,
       createTime,
       conversationNodes: result
     };
@@ -2090,10 +2117,12 @@ var __publicField = (obj, key, value) => {
     document.body.removeChild(a2);
   }
   function getFileNameWithFormat(format, ext, {
-    title = document.title
+    title = document.title,
+    // chatId will be empty when exporting all conversations
+    chatId = ""
   } = {}) {
     const _title = sanitizeFilename(title).replace(/\s+/g, "_");
-    return format.replace("{title}", _title).replace("{date}", dateStr()).replace("{timestamp}", timestamp()).concat(`.${ext}`);
+    return format.replace("{title}", _title).replace("{date}", dateStr()).replace("{timestamp}", timestamp()).replace("{chat_id}", chatId).concat(`.${ext}`);
   }
   class Schema {
     /**
@@ -13186,7 +13215,8 @@ var __publicField = (obj, key, value) => {
     const conversation = processConversation(rawConversation, conversationChoices);
     const html2 = conversationToHtml(conversation, userAvatar, metaList);
     const fileName = getFileNameWithFormat(fileNameFormat, "html", {
-      title: conversation.title
+      title: conversation.title,
+      chatId
     });
     downloadFile(fileName, "text/html", standardizeLineBreaks(html2));
     return true;
@@ -13212,13 +13242,15 @@ var __publicField = (obj, key, value) => {
     const {
       id,
       title,
+      model,
+      modelSlug,
       conversationNodes
     } = conversation;
     const conversationHtml = conversationNodes.map((item) => {
       var _a, _b, _c, _d, _e;
       const author = ((_a = item.message) == null ? void 0 : _a.author.role) === "assistant" ? "ChatGPT" : "You";
-      const model = ((_c = (_b = item.message) == null ? void 0 : _b.metadata) == null ? void 0 : _c.model_slug) === "gpt-4" ? "GPT-4" : "GPT-3";
-      const authorType = author === "ChatGPT" ? model : "user";
+      const model2 = ((_c = (_b = item.message) == null ? void 0 : _b.metadata) == null ? void 0 : _c.model_slug) === "gpt-4" ? "GPT-4" : "GPT-3";
+      const authorType = author === "ChatGPT" ? model2 : "user";
       const avatarEl = author === "ChatGPT" ? '<svg width="41" height="41"><use xlink:href="#chatgpt" /></svg>' : `<img alt="${author}" />`;
       const content2 = ((_d = item.message) == null ? void 0 : _d.content.parts.join("\n")) ?? "";
       let conversationContent = content2;
@@ -13262,7 +13294,7 @@ var __publicField = (obj, key, value) => {
       name,
       value
     }) => {
-      const val = value.replace("{title}", title).replace("{date}", date).replace("{timestamp}", timestamp()).replace("{source}", source);
+      const val = value.replace("{title}", title).replace("{date}", date).replace("{timestamp}", timestamp()).replace("{source}", source).replace("{model}", model).replace("{mode_name}", modelSlug);
       return [name, val];
     })) ?? [];
     const detailsHtml = _metaList.length > 0 ? `<details>
@@ -13327,7 +13359,10 @@ var __publicField = (obj, key, value) => {
       }
     });
     const dataUrl = canvas.toDataURL("image/png", 1).replace(/^data:image\/[^;]/, "data:application/octet-stream");
-    const fileName = getFileNameWithFormat(fileNameFormat, "png");
+    const chatId = getChatIdFromUrl() || void 0;
+    const fileName = getFileNameWithFormat(fileNameFormat, "png", {
+      chatId
+    });
     downloadUrl(fileName, dataUrl);
     window.URL.revokeObjectURL(dataUrl);
     return true;
@@ -13342,7 +13377,8 @@ var __publicField = (obj, key, value) => {
     const conversationChoices = getConversationChoice();
     const conversation = processConversation(rawConversation, conversationChoices);
     const fileName = getFileNameWithFormat(fileNameFormat, "json", {
-      title: conversation.title
+      title: conversation.title,
+      chatId
     });
     const content2 = conversationToJson(rawConversation);
     downloadFile(fileName, "application/json", content2);
@@ -13384,7 +13420,8 @@ var __publicField = (obj, key, value) => {
     const conversation = processConversation(rawConversation, conversationChoices);
     const markdown = conversationToMarkdown(conversation, metaList);
     const fileName = getFileNameWithFormat(fileNameFormat, "md", {
-      title: conversation.title
+      title: conversation.title,
+      chatId
     });
     downloadFile(fileName, "text/markdown", standardizeLineBreaks(markdown));
     return true;
@@ -13409,13 +13446,16 @@ var __publicField = (obj, key, value) => {
     const {
       id,
       title,
+      model,
+      modelSlug,
       conversationNodes
     } = conversation;
+    const source = `${baseUrl}/chat/${id}`;
     const _metaList = (metaList == null ? void 0 : metaList.filter((x2) => !!x2.name).map(({
       name,
       value
     }) => {
-      const val = value.replace("{title}", title).replace("{date}", dateStr()).replace("{timestamp}", timestamp()).replace("{source}", `${baseUrl}/chat/${id}`);
+      const val = value.replace("{title}", title).replace("{date}", dateStr()).replace("{timestamp}", timestamp()).replace("{source}", source).replace("{model}", model).replace("{modelSlug}", modelSlug);
       return `${name}: ${val}`;
     })) ?? [];
     const frontMatter = _metaList.length > 0 ? `---
@@ -13757,26 +13797,25 @@ ${message}`;
   l$1.event = function(n2) {
     return K && (n2 = K(n2)), n2.persist = Q, n2.isPropagationStopped = X, n2.isDefaultPrevented = nn, n2.nativeEvent = n2;
   };
-  var tn, en = { configurable: true, get: function() {
+  var tn, en = { enumerable: false, configurable: true, get: function() {
     return this.class;
   } }, rn = l$1.vnode;
   l$1.vnode = function(n2) {
-    var t2 = n2.type, e2 = n2.props, u2 = e2;
-    if ("string" == typeof t2) {
-      for (var o2 in u2 = {}, e2) {
-        var i2 = e2[o2];
-        if (!("value" === o2 && "defaultValue" in e2 && null == i2 || $ && "children" === o2 && "noscript" === t2)) {
+    "string" == typeof n2.type && function(n3) {
+      var t2 = n3.props, e2 = n3.type, u2 = {};
+      for (var o2 in t2) {
+        var i2 = t2[o2];
+        if (!("value" === o2 && "defaultValue" in t2 && null == i2 || $ && "children" === o2 && "noscript" === e2 || "class" === o2 || "className" === o2)) {
           var l2 = o2.toLowerCase();
-          "defaultValue" === o2 && "value" in e2 && null == e2.value ? o2 = "value" : "download" === o2 && true === i2 ? i2 = "" : "ondoubleclick" === l2 ? o2 = "ondblclick" : "onchange" !== l2 || "input" !== t2 && "textarea" !== t2 || q(e2.type) ? "onfocus" === l2 ? o2 = "onfocusin" : "onblur" === l2 ? o2 = "onfocusout" : Z.test(o2) ? o2 = l2 : -1 === t2.indexOf("-") && H.test(o2) ? o2 = o2.replace(Y, "-$&").toLowerCase() : null === i2 && (i2 = void 0) : l2 = o2 = "oninput", "oninput" === l2 && u2[o2 = l2] && (o2 = "oninputCapture"), u2[o2] = i2;
+          "defaultValue" === o2 && "value" in t2 && null == t2.value ? o2 = "value" : "download" === o2 && true === i2 ? i2 = "" : "ondoubleclick" === l2 ? o2 = "ondblclick" : "onchange" !== l2 || "input" !== e2 && "textarea" !== e2 || q(t2.type) ? "onfocus" === l2 ? o2 = "onfocusin" : "onblur" === l2 ? o2 = "onfocusout" : Z.test(o2) ? o2 = l2 : -1 === e2.indexOf("-") && H.test(o2) ? o2 = o2.replace(Y, "-$&").toLowerCase() : null === i2 && (i2 = void 0) : l2 = o2 = "oninput", "oninput" === l2 && u2[o2 = l2] && (o2 = "oninputCapture"), u2[o2] = i2;
         }
       }
-      "select" == t2 && u2.multiple && Array.isArray(u2.value) && (u2.value = P$2(e2.children).forEach(function(n3) {
-        n3.props.selected = -1 != u2.value.indexOf(n3.props.value);
-      })), "select" == t2 && null != u2.defaultValue && (u2.value = P$2(e2.children).forEach(function(n3) {
-        n3.props.selected = u2.multiple ? -1 != u2.defaultValue.indexOf(n3.props.value) : u2.defaultValue == n3.props.value;
-      })), n2.props = u2, e2.class != e2.className && (en.enumerable = "className" in e2, null != e2.className && (u2.class = e2.className), Object.defineProperty(u2, "className", en));
-    }
-    n2.$$typeof = B, rn && rn(n2);
+      "select" == e2 && u2.multiple && Array.isArray(u2.value) && (u2.value = P$2(t2.children).forEach(function(n4) {
+        n4.props.selected = -1 != u2.value.indexOf(n4.props.value);
+      })), "select" == e2 && null != u2.defaultValue && (u2.value = P$2(t2.children).forEach(function(n4) {
+        n4.props.selected = u2.multiple ? -1 != u2.defaultValue.indexOf(n4.props.value) : u2.defaultValue == n4.props.value;
+      })), t2.class && !t2.className ? (u2.class = t2.class, Object.defineProperty(u2, "className", en)) : (t2.className && !t2.class || t2.class && t2.className) && (u2.class = u2.className = t2.className), n3.props = u2;
+    }(n2), n2.$$typeof = B, rn && rn(n2);
   };
   var un = l$1.__r;
   l$1.__r = function(n2) {
@@ -16278,43 +16317,91 @@ ${message}`;
       })]
     });
   };
-  function useGMStorage(key2, initialValue) {
-    const rawMode = typeof initialValue === "string";
-    const [storedValue, setStoredValue] = h(() => {
-      if (typeof window === "undefined") {
-        return initialValue;
-      }
+  class GMStorage {
+    static get(key2) {
+      const item = GM_getValue(key2, "");
+      if (!item)
+        throw new Error("No item found.");
+      return JSON.parse(item);
+    }
+    static set(key2, value) {
+      const item = JSON.stringify(value);
+      GM_setValue(key2, item);
+    }
+    static delete(key2) {
+      GM_deleteValue(key2);
+    }
+  }
+  class LocalStorage {
+    static get(key2) {
+      const item = localStorage.getItem(key2);
+      if (!item)
+        throw new Error("No item found.");
+      return JSON.parse(item);
+    }
+    static set(key2, value) {
+      const item = JSON.stringify(value);
+      localStorage.setItem(key2, item);
+    }
+    static delete(key2) {
+      localStorage.removeItem(key2);
+    }
+  }
+  class MemoryStorage {
+    static get(key2) {
+      const item = this.map.get(key2);
+      if (!item)
+        throw new Error("No item found.");
+      return item;
+    }
+    static set(key2, value) {
+      this.map.set(key2, value);
+    }
+    static delete(key2) {
+      this.map.delete(key2);
+    }
+  }
+  __publicField(MemoryStorage, "map", /* @__PURE__ */ new Map());
+  class ScriptStorage {
+    static get(key2) {
       try {
-        const item = GM_getValue(key2, initialValue);
-        if (rawMode || item === initialValue)
-          return item;
-        return item ? JSON.parse(item) : initialValue;
-      } catch (error) {
+        return GMStorage.get(key2);
+      } catch {
         try {
-          const item = window.localStorage.getItem(key2);
-          if (rawMode && item)
-            return item;
-          return item ? JSON.parse(item) : initialValue;
-        } catch (error2) {
-          console.error(error2);
-          return initialValue;
+          return LocalStorage.get(key2);
+        } catch {
+          return MemoryStorage.get(key2);
         }
       }
-    });
+    }
+    static set(key2, value) {
+      try {
+        return GMStorage.set(key2, value);
+      } catch {
+        try {
+          return LocalStorage.set(key2, value);
+        } catch {
+          return MemoryStorage.set(key2, value);
+        }
+      }
+    }
+    static delete(key2) {
+      try {
+        return GMStorage.delete(key2);
+      } catch {
+        try {
+          return LocalStorage.delete(key2);
+        } catch {
+          return MemoryStorage.delete(key2);
+        }
+      }
+    }
+  }
+  function useGMStorage(key2, initialValue) {
+    const [storedValue, setStoredValue] = h(() => ScriptStorage.get(key2) ?? initialValue);
     const setValue = (value) => {
       setStoredValue(value);
-      const item = rawMode ? value : JSON.stringify(value);
-      try {
-        GM_setValue(key2, item);
-      } catch (error) {
-        try {
-          if (typeof window !== "undefined") {
-            window.localStorage.setItem(key2, item);
-          }
-        } catch (error2) {
-          console.error(error2);
-        }
-      }
+      ScriptStorage.set(key2, value);
     };
     return [storedValue, setValue];
   }
@@ -16609,6 +16696,14 @@ ${message}`;
   function getSnapshot() {
     return document.title;
   }
+  const Variable = ({
+    name,
+    title
+  }) => o("strong", {
+    className: "cursor-help select-all whitespace-nowrap",
+    title,
+    children: name
+  });
   const SettingDialog = ({
     children
   }) => {
@@ -16626,11 +16721,12 @@ ${message}`;
     const date = dateStr();
     const timestamp$1 = timestamp();
     const title = sanitizeFilename(_title).replace(/\s+/g, "_");
+    const chatId = getChatIdFromUrl() || "this-is-a-mock-chat-id";
     const preview = getFileNameWithFormat(format, "{ext}", {
-      title
+      title,
+      chatId
     });
-    const match = location.pathname.match(/^\/chat\/([a-z0-9-]+)$/i);
-    const source = `${baseUrl}/${match ? match[1] : "xxx"}`;
+    const source = `${baseUrl}/${chatId}`;
     return o($5d3850c4d0b4e6c7$export$be92b6f5f03c0fe9, {
       children: [o($5d3850c4d0b4e6c7$export$41fb9f06171c75f4, {
         asChild: true,
@@ -16655,18 +16751,18 @@ ${message}`;
               }), o("dd", {
                 children: [o("p", {
                   className: "mt-2 text-sm text-gray-700 dark:text-gray-300",
-                  children: ["Available variables: ", o("strong", {
-                    className: "cursor-help select-all",
-                    title,
-                    children: "{title}"
-                  }), ", ", o("strong", {
-                    className: "cursor-help select-all",
-                    title: date,
-                    children: "{date}"
-                  }), ", ", o("strong", {
-                    className: "cursor-help select-all",
-                    title: timestamp$1,
-                    children: "{timestamp}"
+                  children: ["Available variables: ", o(Variable, {
+                    name: "{title}",
+                    title
+                  }), ", ", o(Variable, {
+                    name: "{date}",
+                    title: date
+                  }), ", ", o(Variable, {
+                    name: "{timestamp}",
+                    title: timestamp$1
+                  }), ", ", o(Variable, {
+                    name: "{chat_id}",
+                    title: chatId
                   })]
                 }), o("input", {
                   className: "Input mt-1",
@@ -16703,22 +16799,24 @@ ${message}`;
                 }), enableMeta && o(_$2, {
                   children: [o("p", {
                     className: "mt-2 text-sm text-gray-700 dark:text-gray-300",
-                    children: ["Available variables: ", o("strong", {
-                      className: "cursor-help select-all",
-                      title,
-                      children: "{title}"
-                    }), ", ", o("strong", {
-                      className: "cursor-help select-all",
-                      title: date,
-                      children: "{date}"
-                    }), ", ", o("strong", {
-                      className: "cursor-help select-all",
-                      title: timestamp$1,
-                      children: "{timestamp}"
-                    }), ", ", o("strong", {
-                      className: "cursor-help select-all",
-                      title: source,
-                      children: "{source}"
+                    children: ["Available variables: ", o(Variable, {
+                      name: "{title}",
+                      title
+                    }), ", ", o(Variable, {
+                      name: "{date}",
+                      title: date
+                    }), ", ", o(Variable, {
+                      name: "{timestamp}",
+                      title: timestamp$1
+                    }), ", ", o(Variable, {
+                      name: "{source}",
+                      title: source
+                    }), ", ", o("br", {}), o(Variable, {
+                      name: "{model}",
+                      title: "ChatGPT-3.5"
+                    }), ", ", o(Variable, {
+                      name: "{model_name}",
+                      title: "text-davinci-002-render-sha"
                     })]
                   }), exportMetaList.map((meta, i2) => o("div", {
                     className: "flex items-center mt-2",
@@ -16924,6 +17022,15 @@ We all have to wait for them to bring it back.` : "";
     });
   };
   const missingTailwind = "";
+  const legacyFormat = GM_getValue(LEGACY_KEY_FILENAME_FORMAT, "");
+  const localLegacyFormat = localStorage.getItem(LEGACY_KEY_FILENAME_FORMAT);
+  if (legacyFormat) {
+    GM_deleteValue(LEGACY_KEY_FILENAME_FORMAT);
+    GM_setValue(KEY_FILENAME_FORMAT, JSON.stringify(legacyFormat));
+  } else if (localLegacyFormat) {
+    localStorage.removeItem(LEGACY_KEY_FILENAME_FORMAT);
+    localStorage.setItem(KEY_FILENAME_FORMAT, JSON.stringify(localLegacyFormat));
+  }
   main();
   function main() {
     onloadSafe(() => {
