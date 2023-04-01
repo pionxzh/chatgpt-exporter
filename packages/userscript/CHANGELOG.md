@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.5.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.5.0...userscript-v2.5.1) (2023-04-01)
+
+
+### Bug Fixes
+
+* storage should not throw error when not found ([3de59f8](https://github.com/pionxzh/chatgpt-exporter/commit/3de59f8aae1e84c96879ebe9660a99be18ce1dbd)), closes [#101](https://github.com/pionxzh/chatgpt-exporter/issues/101)
+
 ## [2.5.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.4.1...userscript-v2.5.0) (2023-04-01)
 
 
