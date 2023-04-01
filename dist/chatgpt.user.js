@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.5.0
+// @version            2.5.1
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -16320,9 +16320,14 @@ ${message}`;
   class GMStorage {
     static get(key2) {
       const item = GM_getValue(key2, "");
-      if (!item)
-        throw new Error("No item found.");
-      return JSON.parse(item);
+      if (item) {
+        try {
+          return JSON.parse(item);
+        } catch {
+          return null;
+        }
+      }
+      return null;
     }
     static set(key2, value) {
       const item = JSON.stringify(value);
@@ -16335,9 +16340,14 @@ ${message}`;
   class LocalStorage {
     static get(key2) {
       const item = localStorage.getItem(key2);
-      if (!item)
-        throw new Error("No item found.");
-      return JSON.parse(item);
+      if (item) {
+        try {
+          return JSON.parse(item);
+        } catch {
+          return null;
+        }
+      }
+      return null;
     }
     static set(key2, value) {
       const item = JSON.stringify(value);
@@ -16351,7 +16361,7 @@ ${message}`;
     static get(key2) {
       const item = this.map.get(key2);
       if (!item)
-        throw new Error("No item found.");
+        return null;
       return item;
     }
     static set(key2, value) {
