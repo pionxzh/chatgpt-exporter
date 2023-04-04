@@ -21,11 +21,8 @@ export async function exportToPng(fileNameFormat: string) {
     const effect = new Effect()
 
     // hide model bar
-    const modelBar = Array.from(thread.children).find((el) => {
-        const text = el.textContent
-        return text === 'Model: Default' || text === 'Model: Legacy' || text === 'Model: GPT-4'
-    })
-    if (modelBar) {
+    const modelBar = thread.firstElementChild
+    if (modelBar?.textContent?.startsWith('Model:')) {
         effect.add(() => {
             modelBar.classList.add('hidden')
             return () => modelBar.classList.remove('hidden')
