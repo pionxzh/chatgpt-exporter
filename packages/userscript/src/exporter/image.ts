@@ -36,10 +36,10 @@ export async function exportToPng(fileNameFormat: string) {
         return () => bottomBar.classList.remove('hidden')
     })
 
-    const avatarEls = Array.from(document.querySelectorAll('img[alt]:not([aria-hidden])'))
     // disabled the avatar srcset
     // fix https://github.com/pionxzh/chatgpt-exporter/issues/53
     // seems related to https://github.com/niklasvh/html2canvas/issues/2218
+    const avatarEls = Array.from(document.querySelectorAll('img[alt]:not([aria-hidden])'))
     avatarEls.forEach((el) => {
         const srcset = el.getAttribute('srcset')
         if (srcset) {
@@ -52,6 +52,17 @@ export async function exportToPng(fileNameFormat: string) {
                 }
             })
         }
+    })
+
+    // add `break-words` to all message elements
+    // html2canvas cannot handle the spacing correctly on Firefox with MacOS
+    // fix https://github.com/pionxzh/chatgpt-exporter/issues/78
+    const messageEls = Array.from(thread.querySelectorAll('.group .whitespace-pre-wrap'))
+    messageEls.forEach((el) => {
+        effect.add(() => {
+            el.classList.add('break-words')
+            return () => el.classList.remove('break-words')
+        })
     })
 
     effect.run()
