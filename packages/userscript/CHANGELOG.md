@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.5.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.5.1...userscript-v2.5.2) (2023-04-04)
+
+
+### Bug Fixes
+
+* handling screenshot spacing on MacOS Firefox ([dea099d](https://github.com/pionxzh/chatgpt-exporter/commit/dea099dd21b16d2f766e0e30546ebaac50d4a72b)), closes [#78](https://github.com/pionxzh/chatgpt-exporter/issues/78)
+* model bar should be hide correctly ([8b8844b](https://github.com/pionxzh/chatgpt-exporter/commit/8b8844b2d3a5e764f32ec57562eb57537375db07))
+
 ## [2.5.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.5.0...userscript-v2.5.1) (2023-04-01)
 
 
