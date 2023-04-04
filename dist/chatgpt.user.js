@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.5.1
+// @version            2.5.2
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -13309,11 +13309,52 @@ var __publicField = (obj, key, value) => {
   function escapeHtml(html2) {
     return html2.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
   }
+  class Effect {
+    constructor() {
+      __publicField(this, "_sideEffects", []);
+      __publicField(this, "_cleanupFns", []);
+      __publicField(this, "_isDisposed", false);
+    }
+    /**
+     * Adds a side effect to the effect, with a cleanup function.
+     */
+    add(sideEffect) {
+      if (this._isDisposed)
+        return;
+      this._sideEffects.push(sideEffect);
+    }
+    /**
+     * Executes all the side effects.
+     */
+    run() {
+      if (this._isDisposed)
+        return;
+      this._sideEffects.forEach((fn2) => {
+        const cleanupFn = fn2();
+        if (cleanupFn)
+          this._cleanupFns.push(cleanupFn);
+      });
+      this._sideEffects = [];
+    }
+    /**
+     * Executes all the cleanup functions.
+     * This method should be called when the effect is no longer needed.
+     * After this method is called, the effect is considered disposed.
+     * Any subsequent call to `add` or `run` will be ignored.
+     */
+    dispose() {
+      if (this._isDisposed)
+        return;
+      this._cleanupFns.forEach((fn2) => fn2());
+      this._cleanupFns = [];
+      this._isDisposed = true;
+    }
+  }
   function fnIgnoreElements(el) {
     return typeof el.shadowRoot === "object" && el.shadowRoot !== null;
   }
   async function exportToPng(fileNameFormat) {
-    var _a;
+    var _a, _b;
     if (!checkIfConversationStarted()) {
       alert("Please start a conversation first.");
       return false;
@@ -13321,21 +13362,41 @@ var __publicField = (obj, key, value) => {
     const thread = (_a = document.querySelector("main .group")) == null ? void 0 : _a.parentElement;
     if (!thread || thread.children.length === 0)
       return false;
-    Array.from(thread.children).forEach((el) => {
-      const text2 = el.textContent;
-      if (text2 === "Model: Default" || text2 === "Model: Legacy" || text2 === "Model: GPT-4") {
-        el.classList.add("hidden");
-      }
+    const effect = new Effect();
+    const modelBar = thread.firstElementChild;
+    if ((_b = modelBar == null ? void 0 : modelBar.textContent) == null ? void 0 : _b.startsWith("Model:")) {
+      effect.add(() => {
+        modelBar.classList.add("hidden");
+        return () => modelBar.classList.remove("hidden");
+      });
+    }
+    effect.add(() => {
+      const bottomBar = thread.children[thread.children.length - 1];
+      bottomBar.classList.add("hidden");
+      return () => bottomBar.classList.remove("hidden");
     });
-    thread.children[thread.children.length - 1].classList.add("hidden");
     const avatarEls = Array.from(document.querySelectorAll("img[alt]:not([aria-hidden])"));
     avatarEls.forEach((el) => {
       const srcset = el.getAttribute("srcset");
       if (srcset) {
-        el.setAttribute("data-srcset", srcset);
-        el.removeAttribute("srcset");
+        effect.add(() => {
+          el.setAttribute("data-srcset", srcset);
+          el.removeAttribute("srcset");
+          return () => {
+            el.setAttribute("srcset", srcset);
+            el.removeAttribute("data-srcset");
+          };
+        });
       }
     });
+    const messageEls = Array.from(thread.querySelectorAll(".group .whitespace-pre-wrap"));
+    messageEls.forEach((el) => {
+      effect.add(() => {
+        el.classList.add("break-words");
+        return () => el.classList.remove("break-words");
+      });
+    });
+    effect.run();
     await sleep(100);
     const canvas = await html2canvas2(thread, {
       scale: 1,
@@ -13346,18 +13407,7 @@ var __publicField = (obj, key, value) => {
       windowHeight: thread.scrollHeight,
       ignoreElements: fnIgnoreElements
     });
-    Array.from(thread.children).forEach((el) => {
-      if (el.classList.contains("hidden")) {
-        el.classList.remove("hidden");
-      }
-    });
-    avatarEls.forEach((el) => {
-      const srcset = el.getAttribute("data-srcset");
-      if (srcset) {
-        el.setAttribute("srcset", srcset);
-        el.removeAttribute("data-srcset");
-      }
-    });
+    effect.dispose();
     const dataUrl = canvas.toDataURL("image/png", 1).replace(/^data:image\/[^;]/, "data:application/octet-stream");
     const chatId = getChatIdFromUrl() || void 0;
     const fileName = getFileNameWithFormat(fileNameFormat, "png", {
