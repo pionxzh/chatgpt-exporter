@@ -1,6 +1,7 @@
 import html2canvas from 'html2canvas'
 import { checkIfConversationStarted, getChatIdFromUrl } from '../page'
 import { downloadUrl, getFileNameWithFormat } from '../utils/download'
+import { Effect } from '../utils/effect'
 import { sleep } from '../utils/utils'
 
 // https://github.com/niklasvh/html2canvas/issues/2792#issuecomment-1042948572
@@ -17,16 +18,26 @@ export async function exportToPng(fileNameFormat: string) {
     const thread = document.querySelector('main .group')?.parentElement as HTMLElement
     if (!thread || thread.children.length === 0) return false
 
+    const effect = new Effect()
+
     // hide model bar
-    Array.from(thread.children).forEach((el) => {
+    const modelBar = Array.from(thread.children).find((el) => {
         const text = el.textContent
-        if (text === 'Model: Default' || text === 'Model: Legacy' || text === 'Model: GPT-4') {
-            el.classList.add('hidden')
-        }
+        return text === 'Model: Default' || text === 'Model: Legacy' || text === 'Model: GPT-4'
     })
+    if (modelBar) {
+        effect.add(() => {
+            modelBar.classList.add('hidden')
+            return () => modelBar.classList.remove('hidden')
+        })
+    }
 
     // hide bottom bar
-    thread.children[thread.children.length - 1].classList.add('hidden')
+    effect.add(() => {
+        const bottomBar = thread.children[thread.children.length - 1]
+        bottomBar.classList.add('hidden')
+        return () => bottomBar.classList.remove('hidden')
+    })
 
     const avatarEls = Array.from(document.querySelectorAll('img[alt]:not([aria-hidden])'))
     // disabled the avatar srcset
@@ -35,10 +46,18 @@ export async function exportToPng(fileNameFormat: string) {
     avatarEls.forEach((el) => {
         const srcset = el.getAttribute('srcset')
         if (srcset) {
-            el.setAttribute('data-srcset', srcset)
-            el.removeAttribute('srcset')
+            effect.add(() => {
+                el.setAttribute('data-srcset', srcset)
+                el.removeAttribute('srcset')
+                return () => {
+                    el.setAttribute('srcset', srcset)
+                    el.removeAttribute('data-srcset')
+                }
+            })
         }
     })
+
+    effect.run()
 
     await sleep(100)
 
@@ -52,21 +71,7 @@ export async function exportToPng(fileNameFormat: string) {
         ignoreElements: fnIgnoreElements,
     })
 
-    // restore the layout
-    Array.from(thread.children).forEach((el) => {
-        if (el.classList.contains('hidden')) {
-            el.classList.remove('hidden')
-        }
-    })
-
-    // restore the avatar srcset
-    avatarEls.forEach((el) => {
-        const srcset = el.getAttribute('data-srcset')
-        if (srcset) {
-            el.setAttribute('srcset', srcset)
-            el.removeAttribute('data-srcset')
-        }
-    })
+    effect.dispose()
 
     const dataUrl = canvas.toDataURL('image/png', 1)
         .replace(/^data:image\/[^;]/, 'data:application/octet-stream')
