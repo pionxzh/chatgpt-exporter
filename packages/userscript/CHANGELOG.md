@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.5.3](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.5.2...userscript-v2.5.3) (2023-04-05)
+
+
+### Bug Fixes
+
+* fix menu is not working after OpenAI page update ([9632818](https://github.com/pionxzh/chatgpt-exporter/commit/9632818845ad6d92df00c53e91211eb448b33b47))
+
 ## [2.5.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.5.1...userscript-v2.5.2) (2023-04-04)
 
 
