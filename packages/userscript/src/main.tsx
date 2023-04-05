@@ -27,7 +27,7 @@ main()
 function main() {
     onloadSafe(() => {
         const container = document.createElement('div')
-        render(<Menu />, container)
+        render(<Menu container={container} />, container)
 
         sentinel.on('nav', (nav) => {
             const chatList = document.querySelector('nav > div.overflow-y-auto')

@@ -15,7 +15,16 @@ const Variable = ({ name, title }: { name: string; title: string }) => (
     <strong className="cursor-help select-all whitespace-nowrap" title={title}>{name}</strong>
 )
 
-export const SettingDialog: FC = ({ children }) => {
+interface SettingDialogProps {
+    open: boolean
+    onOpenChange: (value: boolean) => void
+}
+
+export const SettingDialog: FC<SettingDialogProps> = ({
+    open,
+    onOpenChange,
+    children,
+}) => {
     const { format, setFormat } = useFormatContext()
     const { enableMeta, setEnableMeta, exportMetaList, setExportMetaList } = useMetaDataContext()
 
@@ -29,7 +38,10 @@ export const SettingDialog: FC = ({ children }) => {
     const source = `${baseUrl}/${chatId}`
 
     return (
-        <Dialog.Root>
+        <Dialog.Root
+            open={open}
+            onOpenChange={onOpenChange}
+        >
             <Dialog.Trigger asChild>
                 {children}
             </Dialog.Trigger>

@@ -1,3 +1,11 @@
+.animate-fadeIn  {
+    animation: fadeIn .3s;
+}
+
+.animate-slideUp  {
+    animation: slideUp .3s;
+}
+
 .bg-gray-200 {
     --tw-bg-opacity: 1;
     background-color: rgb(229 231 235/var(--tw-bg-opacity));
@@ -25,12 +33,24 @@
     background-color: rgb(55 65 81/var(--tw-bg-opacity));
 }
 
+.fill-current {
+    fill: currentColor;
+}
+
+.gap-x-1	 {
+    column-gap: 0.25rem;
+}
+
 .h-2\.5 {
     height: 0.625rem;
 }
 
 .mr-8 {
     margin-right: 2rem;
+}
+
+.pb-0 {
+    padding-bottom: 0;
 }
 
 .pr-8 {

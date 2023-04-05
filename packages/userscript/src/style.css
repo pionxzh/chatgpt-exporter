@@ -25,7 +25,6 @@ p > img[src*="https://images.unsplash.com/"] {
 }
 
 .menu-item[disabled] {
-    pointer-events: none;
     filter: brightness(0.5);
 }
 
@@ -53,99 +52,15 @@ p > img[src*="https://images.unsplash.com/"] {
 }
 
 .dropdown-backdrop {
-    display: none;
+    display: block;
     position: fixed;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
     background-color: rgba(0,0,0,.5);
-    z-index: 998;
     animation-name: pointerFadeIn;
     animation-duration: .3s;
-}
-
-.dropdown-menu {
-    display: none;
-    position: absolute;
-    grid-template-columns: 1fr 1fr;
-    column-gap: 4px;
-    left: calc(100% + 1rem);
-    top: -3.85rem;
-    width: 268px;
-    padding: .75rem .4rem 0 .4rem;
-    border-radius: .375rem;
-    box-shadow: 0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px -1px rgba(0,0,0,.1);
-    animation: fadeIn .3s;
-}
-
-.dropdown-menu::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -1rem;
-    width: 1rem;
-    height: 100%;
-}
-
-#exporter-menu[disabled] {
-    cursor: not-allowed;
-}
-
-#exporter-menu:not([disabled]):hover::after {
-    content: '';
-    position: absolute;
-    top: 1.2rem;
-    right: -1rem;
-    width: 0;
-    height: 0;
-    border-top: .5rem solid transparent;
-    border-bottom: .5rem solid transparent;
-    border-right: .5rem solid #202123;
-    animation: fadeIn .3s;
-}
-
-@supports not selector(:has(.test:hover)) {
-    #exporter-menu:not([disabled]):hover .dropdown-menu {
-        display: grid;
-    }
-}
-
-@supports selector(:has(.test:hover)) {
-    #exporter-menu:not([disabled]):not(:has(.dropdown-backdrop:hover)):hover .dropdown-menu {
-        display: grid;
-    }
-}
-
-@media screen and (hover: none) and (max-width: 768px) {
-    .dropdown-menu {
-        position: fixed;
-        left: 0;
-        top: unset;
-        bottom: 0;
-        width: 100%;
-        border-radius: 0;
-        box-shadow: none;
-        z-index: 999;
-        animation: slideUp .3s;
-    }
-
-    @supports selector(:has(.test:hover)) {
-        #exporter-menu:not([disabled]):not(:has(.dropdown-backdrop:hover)):hover .dropdown-backdrop {
-            display: block;
-        }
-
-        #exporter-menu:not([disabled]):has(.dropdown-backdrop:hover):hover .dropdown-backdrop {
-            display: block;
-            pointer-events: none;
-            opacity: 0;
-            animation-name: pointerFadeInReverse;
-        }
-    }
-
-    #exporter-menu:hover::after {
-        display: none;
-    }
 }
 
 @keyframes fadeIn {
@@ -174,18 +89,6 @@ p > img[src*="https://images.unsplash.com/"] {
     to {
         opacity: 1;
         pointer-events: auto;
-    }
-}
-
-/* Using `animation-direction: reverse` is not working in our case */
-@keyframes pointerFadeInReverse {
-    from {
-        opacity: 1;
-        pointer-events: auto;
-    }
-    to {
-        opacity: 0;
-        pointer-events: none;
     }
 }
 
