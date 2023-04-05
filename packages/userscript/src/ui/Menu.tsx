@@ -73,7 +73,6 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                         text="Export"
                         icon={IconArrowRightFromBracket}
                         onClick={() => {
-                            console.log('click')
                             setOpen(true)
                             return true
                         }}

@@ -102,7 +102,6 @@ export const ExportDialog: FC<{ format: string }> = ({ format, children }) => {
     useEffect(() => {
         const off = requestQueue.on('done', (results) => {
             setProcessing(false)
-            console.log(results)
             const callback = exportAllOptions.find(o => o.label === exportType)?.callback
             if (callback) callback(format, results, metaList)
         })
