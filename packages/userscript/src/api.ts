@@ -103,7 +103,7 @@ export async function fetchConversation(chatId: string): Promise<ApiConversation
     }
 }
 
-export async function fetchConversations(offset = 0, limit = 20): Promise<ApiConversations> {
+async function fetchConversations(offset = 0, limit = 20): Promise<ApiConversations> {
     const url = conversationsApi(offset, limit)
     return fetchApi(url)
 }
