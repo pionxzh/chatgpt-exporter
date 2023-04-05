@@ -121,10 +121,26 @@ export async function fetchAllConversations(): Promise<ApiConversationItem[]> {
     return conversations
 }
 
-async function fetchApi<T>(url: string): Promise<T> {
+export async function deleteConversation(chatId: string): Promise<boolean> {
+    const url = conversationApi(chatId)
+    const { success } = await fetchApi<{ success: boolean }>(url, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_visible: false }),
+    })
+    return success
+}
+
+async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
     const accessToken = await getAccessToken()
 
-    const response = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } })
+    const response = await fetch(url, {
+        ...options,
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            ...options?.headers,
+        },
+    })
     if (!response.ok) {
         throw new Error(response.statusText)
     }

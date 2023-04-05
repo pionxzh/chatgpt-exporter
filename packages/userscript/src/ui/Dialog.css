@@ -62,6 +62,10 @@
     background-color: #ddf3e4;
     color: #18794e;
 }
+.Button.red {
+    background-color: #f9d9d9;
+    color: #a71d2a;
+}
 .Button.green:hover {
     background-color: #ccebd7;
 }

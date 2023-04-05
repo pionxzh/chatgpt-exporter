@@ -1,6 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { useCallback, useEffect, useMemo, useState } from 'preact/hooks'
-import { fetchAllConversations, fetchConversation } from '../api'
+import { deleteConversation, fetchAllConversations, fetchConversation } from '../api'
 import { exportAllToHtml } from '../exporter/html'
 import { exportAllToJson } from '../exporter/json'
 import { exportAllToMarkdown } from '../exporter/markdown'
@@ -89,6 +89,7 @@ export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange
     const disabled = loading || processing || !!error || selected.length === 0
 
     const requestQueue = useMemo(() => new RequestQueue<ApiConversationWithId>(200, 1600), [])
+    const deleteQueue = useMemo(() => new RequestQueue<boolean>(200, 1600), [])
     const [progress, setProgress] = useState({
         total: 0,
         completed: 0,
@@ -106,6 +107,15 @@ export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange
     }, [requestQueue])
 
     useEffect(() => {
+        const off = deleteQueue.on('progress', (progress) => {
+            setProcessing(true)
+            setProgress(progress)
+        })
+
+        return () => off()
+    }, [deleteQueue])
+
+    useEffect(() => {
         const off = requestQueue.on('done', (results) => {
             setProcessing(false)
             const callback = exportAllOptions.find(o => o.label === exportType)?.callback
@@ -113,6 +123,16 @@ export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange
         })
         return () => off()
     }, [requestQueue, exportType, format, metaList])
+
+    useEffect(() => {
+        const off = deleteQueue.on('done', () => {
+            setProcessing(false)
+            setConversations(conversations.filter(c => !selected.some(s => s.id === c.id)))
+            setSelected([])
+            alert('All selected conversations have been deleted. Please refresh the page to see the changes.')
+        })
+        return () => off()
+    }, [deleteQueue, conversations, selected])
 
     const exportAll = useCallback(() => {
         if (disabled) return
@@ -128,6 +148,24 @@ export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange
 
         requestQueue.start()
     }, [disabled, selected, requestQueue])
+
+    const deleteAll = useCallback(() => {
+        if (disabled) return
+
+        const result = confirm('Are you sure you want to delete all selected conversations?')
+        if (!result) return
+
+        deleteQueue.clear()
+
+        selected.forEach(({ id, title }) => {
+            deleteQueue.add({
+                name: title,
+                request: () => deleteConversation(id),
+            })
+        })
+
+        deleteQueue.start()
+    }, [disabled, selected, deleteQueue])
 
     useEffect(() => {
         setLoading(true)
@@ -164,7 +202,11 @@ export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange
                                 <option key={label} value={label}>{label}</option>
                             ))}
                         </select>
-                        <button className="Button green" disabled={disabled} onClick={exportAll}>
+                        <div className="flex flex-grow"></div>
+                        <button className="Button red" disabled={disabled} onClick={deleteAll}>
+                            Delete
+                        </button>
+                        <button className="Button green ml-4" disabled={disabled} onClick={exportAll}>
                             Export
                         </button>
                     </div>
