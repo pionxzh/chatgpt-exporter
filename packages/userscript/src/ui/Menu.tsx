@@ -25,7 +25,8 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
     const disabled = getHistoryDisabled()
 
     const [open, setOpen] = useState(false)
-    const [dialogOpen, setDialogOpen] = useState(false)
+    const [exportOpen, setExportOpen] = useState(false)
+    const [settingOpen, setSettingOpen] = useState(false)
 
     const { format } = useFormatContext()
     const { enableMeta, exportMetaList } = useMetaDataContext()
@@ -80,7 +81,7 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                 </HoverCard.Trigger>
                 <Portal
                     container={isMobile ? container : document.body}
-                    forceMount={open || dialogOpen}
+                    forceMount={open || settingOpen || exportOpen}
                 >
                     <HoverCard.Content
                         className={isMobile
@@ -97,8 +98,8 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                         alignOffset={isMobile ? 0 : -64}
                     >
                         <SettingDialog
-                            open={dialogOpen}
-                            onOpenChange={setDialogOpen}
+                            open={settingOpen}
+                            onOpenChange={setSettingOpen}
                         >
                             <div className="row-full">
                                 <MenuItem text="Setting" icon={IconSetting} />
@@ -136,7 +137,11 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                             className="row-half"
                             onClick={onClickJSON}
                         />
-                        <ExportDialog format={format}>
+                        <ExportDialog
+                            format={format}
+                            open={exportOpen}
+                            onOpenChange={setExportOpen}
+                        >
                             <div className="row-full">
                                 <MenuItem
                                     text="Export All"

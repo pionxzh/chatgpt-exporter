@@ -69,7 +69,13 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
     )
 }
 
-export const ExportDialog: FC<{ format: string }> = ({ format, children }) => {
+interface ExportDialogProps {
+    format: string
+    open: boolean
+    onOpenChange: (value: boolean) => void
+}
+
+export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange, children }) => {
     const { enableMeta, exportMetaList } = useMetaDataContext()
     const metaList = useMemo(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList])
 
@@ -132,7 +138,10 @@ export const ExportDialog: FC<{ format: string }> = ({ format, children }) => {
     }, [])
 
     return (
-        <Dialog.Root>
+        <Dialog.Root
+            open={open}
+            onOpenChange={onOpenChange}
+        >
             <Dialog.Trigger asChild>
                 {children}
             </Dialog.Trigger>
