@@ -31,7 +31,10 @@ export async function exportAllToMarkdown(fileNameFormat: string, apiConversatio
     const zip = new JSZip()
     const conversations = apiConversations.map(x => processConversation(x))
     conversations.forEach((conversation) => {
-        const fileName = getFileNameWithFormat(fileNameFormat, 'md', { title: conversation.title })
+        const fileName = getFileNameWithFormat(fileNameFormat, 'md', {
+            title: conversation.title,
+            chatId: conversation.id,
+        })
         const content = conversationToMarkdown(conversation, metaList)
         zip.file(fileName, content)
     })

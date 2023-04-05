@@ -36,7 +36,10 @@ export async function exportAllToHtml(fileNameFormat: string, apiConversations: 
     const zip = new JSZip()
     const conversations = apiConversations.map(x => processConversation(x))
     conversations.forEach((conversation) => {
-        const fileName = getFileNameWithFormat(fileNameFormat, 'html', { title: conversation.title })
+        const fileName = getFileNameWithFormat(fileNameFormat, 'html', {
+            title: conversation.title,
+            chatId: conversation.id,
+        })
         const content = conversationToHtml(conversation, userAvatar, metaList)
         zip.file(fileName, content)
     })
