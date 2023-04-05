@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.5.4](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.5.3...userscript-v2.5.4) (2023-04-05)
+
+
+### Bug Fixes
+
+* add missing {chat_id} in Export All ([c8e52aa](https://github.com/pionxzh/chatgpt-exporter/commit/c8e52aaf0d3678ade1c6da01b8171eb9d666423f)), closes [#106](https://github.com/pionxzh/chatgpt-exporter/issues/106)
+* export all is not openable ([ea69a4f](https://github.com/pionxzh/chatgpt-exporter/commit/ea69a4fe65bcd9cdeac8799f553f8cae422a6e3e))
+
 ## [2.5.3](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.5.2...userscript-v2.5.3) (2023-04-05)
 
 
