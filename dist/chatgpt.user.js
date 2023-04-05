@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.5.3
+// @version            2.5.4
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -15308,7 +15308,8 @@ var __publicField = (obj, key, value) => {
     const conversations = apiConversations.map((x2) => processConversation(x2));
     conversations.forEach((conversation) => {
       const fileName = getFileNameWithFormat(fileNameFormat, "html", {
-        title: conversation.title
+        title: conversation.title,
+        chatId: conversation.id
       });
       const content2 = conversationToHtml(conversation, userAvatar, metaList);
       zip.file(fileName, content2);
@@ -15526,7 +15527,8 @@ var __publicField = (obj, key, value) => {
       rawConversation
     }) => {
       const fileName = getFileNameWithFormat(fileNameFormat, "json", {
-        title: conversation.title
+        title: conversation.title,
+        chatId: conversation.id
       });
       const content2 = conversationToJson(rawConversation);
       zip.file(fileName, content2);
@@ -15562,7 +15564,8 @@ var __publicField = (obj, key, value) => {
     const conversations = apiConversations.map((x2) => processConversation(x2));
     conversations.forEach((conversation) => {
       const fileName = getFileNameWithFormat(fileNameFormat, "md", {
-        title: conversation.title
+        title: conversation.title,
+        chatId: conversation.id
       });
       const content2 = conversationToMarkdown(conversation, metaList);
       zip.file(fileName, content2);
@@ -17644,6 +17647,8 @@ ${message}`;
   };
   const ExportDialog = ({
     format,
+    open,
+    onOpenChange,
     children
   }) => {
     const {
@@ -17676,7 +17681,6 @@ ${message}`;
       const off = requestQueue.on("done", (results) => {
         var _a;
         setProcessing(false);
-        console.log(results);
         const callback = (_a = exportAllOptions.find((o2) => o2.label === exportType)) == null ? void 0 : _a.callback;
         if (callback)
           callback(format, results, metaList);
@@ -17703,6 +17707,8 @@ ${message}`;
       fetchAllConversations().then(setConversations).catch(setError).finally(() => setLoading(false));
     }, []);
     return o($5d3850c4d0b4e6c7$export$be92b6f5f03c0fe9, {
+      open,
+      onOpenChange,
       children: [o($5d3850c4d0b4e6c7$export$41fb9f06171c75f4, {
         asChild: true,
         children
@@ -18064,7 +18070,8 @@ We all have to wait for them to bring it back.`;
   }) {
     const disabled = getHistoryDisabled();
     const [open, setOpen] = h$2(false);
-    const [dialogOpen, setDialogOpen] = h$2(false);
+    const [exportOpen, setExportOpen] = h$2(false);
+    const [settingOpen, setSettingOpen] = h$2(false);
     const {
       format
     } = useFormatContext();
@@ -18104,14 +18111,13 @@ We all have to wait for them to bring it back.`;
             text: "Export",
             icon: IconArrowRightFromBracket,
             onClick: () => {
-              console.log("click");
               setOpen(true);
               return true;
             }
           })
         }), o(Portal, {
           container: isMobile ? container : document.body,
-          forceMount: open || dialogOpen,
+          forceMount: open || settingOpen || exportOpen,
           children: o($cef8881cdc69808e$export$7c6e2c02157bb7d2, {
             className: isMobile ? "fixed grid grid-cols-2 gap-x-1 px-1.5 py-2 bg-gray-900 shadow-md transition-opacity duration-200 animate-slideUp" : "grid grid-cols-2 gap-x-1 px-1.5 py-2 pb-0 rounded-md bg-gray-900 shadow-md transition-opacity duration-200 animate-fadeIn",
             style: {
@@ -18124,8 +18130,8 @@ We all have to wait for them to bring it back.`;
             align: "start",
             alignOffset: isMobile ? 0 : -64,
             children: [o(SettingDialog, {
-              open: dialogOpen,
-              onOpenChange: setDialogOpen,
+              open: settingOpen,
+              onOpenChange: setSettingOpen,
               children: o("div", {
                 className: "row-full",
                 children: o(MenuItem, {
@@ -18163,6 +18169,8 @@ We all have to wait for them to bring it back.`;
               onClick: onClickJSON
             }), o(ExportDialog, {
               format,
+              open: exportOpen,
+              onOpenChange: setExportOpen,
               children: o("div", {
                 className: "row-full",
                 children: o(MenuItem, {
