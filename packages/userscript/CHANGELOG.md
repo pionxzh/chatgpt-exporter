@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.6.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.5.4...userscript-v2.6.0) (2023-04-07)
+
+
+### Features
+
+* add conversation timestamp on page and HTML, revamp setting UI ([531a766](https://github.com/pionxzh/chatgpt-exporter/commit/531a766bc89fde5b141efc80ea090f00380e1b42))
+* support delete conversations ([554b26d](https://github.com/pionxzh/chatgpt-exporter/commit/554b26dbe9ca6566a864670dd8c337834f266139)), closes [#85](https://github.com/pionxzh/chatgpt-exporter/issues/85)
+
+
+### Bug Fixes
+
+* update closeDelay 300ms ([388a3ea](https://github.com/pionxzh/chatgpt-exporter/commit/388a3ea718c6d916b818eb197b641a3930d473ba))
+
 ## [2.5.4](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.5.3...userscript-v2.5.4) (2023-04-05)
 
 
