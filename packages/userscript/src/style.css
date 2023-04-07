@@ -7,6 +7,18 @@ p > img[src*="https://images.unsplash.com/"] {
     animation: fadeIn .3s;
 }
 
+span[data-time-format] {
+    display: none;
+}
+
+body[data-time-format="12"] span[data-time-format="12"] {
+    display: inline;
+}
+
+body[data-time-format="24"] span[data-time-format="24"] {
+    display: inline;
+}
+
 .Select {
     padding: 0 0 0 0.5rem;
     width: 7.5rem;

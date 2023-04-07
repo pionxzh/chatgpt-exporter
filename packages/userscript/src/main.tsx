@@ -1,7 +1,9 @@
 import { render } from 'preact'
 import sentinel from 'sentinel-js'
 import { GM_deleteValue, GM_getValue, GM_setValue } from 'vite-plugin-monkey/dist/client'
+import { fetchConversation, processConversation } from './api'
 import { KEY_FILENAME_FORMAT, LEGACY_KEY_FILENAME_FORMAT } from './constants'
+import { getChatIdFromUrl, getConversationChoice } from './page'
 import { Menu } from './ui/Menu'
 import { SecondaryToolbar } from './ui/SecondaryToolbar'
 import { onloadSafe } from './utils/utils'
@@ -67,7 +69,7 @@ function main() {
         })
 
         /** Insert copy button to the next of feedback buttons */
-        sentinel.on('.flex.justify-between', (node) => {
+        sentinel.on('main .flex.justify-between', (node) => {
             if (!node.querySelector('button')) return
             // ignore codeblock
             if (node.closest('pre')) return
@@ -78,6 +80,41 @@ function main() {
             const index = threads.indexOf(node.closest('.group')!)
             render(<SecondaryToolbar index={index} />, secondaryToolbar)
             node.append(secondaryToolbar)
+        })
+
+        /** Insert timestamp to the bottom right of each message */
+        let chatId = ''
+        sentinel.on('main .group', async () => {
+            const threadContents = Array.from(document.querySelectorAll('main .group > .text-base > .relative:nth-child(2)'))
+
+            const currentChatId = getChatIdFromUrl()
+            if (!currentChatId || currentChatId === chatId) return
+            chatId = currentChatId
+
+            const rawConversation = await fetchConversation(chatId)
+            const conversationChoices = getConversationChoice()
+            const { conversationNodes } = processConversation(rawConversation, conversationChoices)
+
+            threadContents.forEach((thread, index) => {
+                const createTime = conversationNodes[index].message?.create_time
+                if (!createTime) return
+
+                const date = new Date(createTime * 1000)
+
+                const timestamp = document.createElement('time')
+                timestamp.className = 'text-gray-500 dark:text-gray-400 text-sm text-right'
+                timestamp.dateTime = date.toISOString()
+                timestamp.title = date.toLocaleString()
+
+                const hour12 = document.createElement('span')
+                hour12.setAttribute('data-time-format', '12')
+                hour12.textContent = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+                const hour24 = document.createElement('span')
+                hour24.setAttribute('data-time-format', '24')
+                hour24.textContent = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
+                timestamp.append(hour12, hour24)
+                thread.append(timestamp)
+            })
         })
     })
 }

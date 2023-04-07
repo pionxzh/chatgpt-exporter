@@ -1,5 +1,5 @@
 import * as HoverCard from '@radix-ui/react-hover-card'
-import { useCallback, useMemo, useState } from 'preact/hooks'
+import { useCallback, useEffect, useMemo, useState } from 'preact/hooks'
 import { exportToHtml } from '../exporter/html'
 import { exportToPng } from '../exporter/image'
 import { exportToJson } from '../exporter/json'
@@ -8,10 +8,9 @@ import { exportToText } from '../exporter/text'
 import { getHistoryDisabled } from '../page'
 import { Divider } from './Divider'
 import { ExportDialog } from './ExportDialog'
-import { FormatProvider, useFormatContext } from './FormatContext'
 import { FileCode, IconArrowRightFromBracket, IconCamera, IconCopy, IconJSON, IconMarkdown, IconSetting, IconZip } from './Icons'
 import { MenuItem } from './MenuItem'
-import { MetaDataProvider, useMetaDataContext } from './MetaContext'
+import { SettingProvider, useSettingContext } from './SettingContext'
 import { SettingDialog } from './SettingDialog'
 
 import '../style.css'
@@ -28,8 +27,24 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
     const [exportOpen, setExportOpen] = useState(false)
     const [settingOpen, setSettingOpen] = useState(false)
 
-    const { format } = useFormatContext()
-    const { enableMeta, exportMetaList } = useMetaDataContext()
+    const {
+        format,
+        enableTimestamp,
+        timeStamp24H,
+        enableMeta,
+        exportMetaList,
+    } = useSettingContext()
+
+    useEffect(() => {
+        console.log('enableTimestamp', enableTimestamp, 'timeStamp24H', timeStamp24H)
+        if (enableTimestamp) {
+            document.body.setAttribute('data-time-format', timeStamp24H ? '24' : '12')
+        }
+        else {
+            document.body.removeAttribute('data-time-format')
+        }
+    }, [enableTimestamp, timeStamp24H])
+
     const metaList = useMemo(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList])
 
     const onClickText = useCallback(() => exportToText(), [])
@@ -161,10 +176,8 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
 
 export function Menu({ container }: { container: HTMLDivElement }) {
     return (
-        <FormatProvider>
-            <MetaDataProvider>
-                <MenuInner container={container} />
-            </MetaDataProvider>
-        </FormatProvider>
+        <SettingProvider>
+            <MenuInner container={container} />
+        </SettingProvider>
     )
 }

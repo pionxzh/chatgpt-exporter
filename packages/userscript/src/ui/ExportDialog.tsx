@@ -7,7 +7,7 @@ import { exportAllToMarkdown } from '../exporter/markdown'
 import { RequestQueue } from '../utils/queue'
 import { CheckBox } from './CheckBox'
 import { IconCross } from './Icons'
-import { useMetaDataContext } from './MetaContext'
+import { useSettingContext } from './SettingContext'
 import type { ApiConversationItem, ApiConversationWithId } from '../api'
 import type { FC } from '../type'
 
@@ -76,7 +76,7 @@ interface ExportDialogProps {
 }
 
 export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange, children }) => {
-    const { enableMeta, exportMetaList } = useMetaDataContext()
+    const { enableMeta, exportMetaList } = useSettingContext()
     const metaList = useMemo(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList])
 
     const [conversations, setConversations] = useState<ApiConversationItem[]>([])

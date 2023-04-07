@@ -7,7 +7,7 @@ import { fromMarkdown, toMarkdown } from '../utils/markdown'
 import { standardizeLineBreaks } from '../utils/text'
 import { dateStr, timestamp } from '../utils/utils'
 import type { ApiConversationWithId, ConversationResult } from '../api'
-import type { ExportMeta } from '../ui/MetaContext'
+import type { ExportMeta } from '../ui/SettingContext'
 
 export async function exportToMarkdown(fileNameFormat: string, metaList: ExportMeta[]) {
     if (!checkIfConversationStarted()) {
