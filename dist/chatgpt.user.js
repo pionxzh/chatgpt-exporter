@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.5.4
+// @version            2.6.0
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -80,6 +80,18 @@ img[src*="https://source.unsplash.com/"] {
 /* hide the flickering */
 p > img[src*="https://images.unsplash.com/"] {
     animation: fadeIn .3s;
+}
+
+span[data-time-format] {
+    display: none;
+}
+
+body[data-time-format="12"] span[data-time-format="12"] {
+    display: inline;
+}
+
+body[data-time-format="24"] span[data-time-format="24"] {
+    display: inline;
 }
 
 .Select {
@@ -199,7 +211,7 @@ p > img[src*="https://images.unsplash.com/"] {
 }
 
 .DialogContent {
-    background-color: white;
+    background-color: #f3f3f3;
     border-radius: 6px;
     box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
     position: fixed;
@@ -207,7 +219,7 @@ p > img[src*="https://images.unsplash.com/"] {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 90vw;
-    max-width: 450px;
+    max-width: 560px;
     max-height: 85vh;
     overflow-x: hidden;
     overflow-y: auto;
@@ -253,6 +265,10 @@ p > img[src*="https://images.unsplash.com/"] {
 .Button.green {
     background-color: #ddf3e4;
     color: #18794e;
+}
+.Button.red {
+    background-color: #f9d9d9;
+    color: #a71d2a;
 }
 .Button.green:hover {
     background-color: #ccebd7;
@@ -386,17 +402,71 @@ p > img[src*="https://images.unsplash.com/"] {
 .invisible + .secondary-toolbar {
     display: none;
 }
+.after\\:content-\\[\\'\\'\\]:after {
+    --tw-content: "";
+    content: var(--tw-content);
+}
+
+.after\\:transition-all:after {
+    content: var(--tw-content);
+    transition-duration: .15s;
+    transition-property: all;
+    transition-timing-function: cubic-bezier(.4,0,.2,1);
+}
+
+.after\\:bg-white:after {
+    --tw-bg-opacity: 1;
+    background-color: rgb(255 255 255/var(--tw-bg-opacity));
+    content: var(--tw-content);
+}
+
+.after\\:border-gray-300:after {
+    --tw-border-opacity: 1;
+    border-color: rgb(209 213 219/var(--tw-border-opacity));
+    content: var(--tw-content);
+}
+
+.after\\:border:after {
+    border-width: 1px;
+    content: var(--tw-content);
+}
+
+.after\\:rounded-full:after {
+    border-radius: 9999px;
+
+    content: var(--tw-content);
+}
+.after\\:w-4:after {
+    content: var(--tw-content);
+    width: 1rem
+}
+
+.after\\:h-4:after {
+    content: var(--tw-content);
+    height: 1rem;
+}
+
+.after\\:top-\\[2px\\]:after {
+    content: var(--tw-content);
+    top: 2px;
+}
+
+.after\\:left-\\[2px\\]:after {
+    content: var(--tw-content);
+    left: 2px;
+}
+
+.after\\:absolute:after {
+    content: var(--tw-content);
+    position: absolute;
+}
+
 .animate-fadeIn  {
     animation: fadeIn .3s;
 }
 
 .animate-slideUp  {
     animation: slideUp .3s;
-}
-
-.bg-gray-200 {
-    --tw-bg-opacity: 1;
-    background-color: rgb(229 231 235/var(--tw-bg-opacity));
 }
 
 .bg-blue-600 {
@@ -412,13 +482,22 @@ p > img[src*="https://images.unsplash.com/"] {
     cursor: help;
 }
 
+.dark .dark\\:bg-white\\/5 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(255 255 255 / 5%);
+}
+
 .dark .dark\\:border-gray-\\[\\#86858d\\] {
     border-color: #86858d;
 }
 
-.dark .dark\\:hover\\:bg-gray-700:hover {
-    --tw-bg-opacity: 1;
-    background-color: rgb(55 65 81/var(--tw-bg-opacity));
+.dark .dark\\:border-gray-600 {
+    --tw-border-opacity: 1;
+    border-color: rgb(75 85 99/var(--tw-border-opacity));
+}
+
+.empty\\:hidden:empty {
+    display: none;
 }
 
 .fill-current {
@@ -433,12 +512,40 @@ p > img[src*="https://images.unsplash.com/"] {
     height: 0.625rem;
 }
 
+.h-4 {
+    height: 1rem;
+}
+
+.h-5 {
+    height: 1.25rem;
+}
+
 .mr-8 {
     margin-right: 2rem;
 }
 
 .pb-0 {
     padding-bottom: 0;
+}
+
+.peer:checked~.peer-checked\\:bg-blue-600 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(28 100 242/var(--tw-bg-opacity));
+}
+
+.peer:checked~.peer-checked\\:after\\:border-white:after {
+    --tw-border-opacity: 1;
+    border-color: rgb(255 255 255/var(--tw-border-opacity));
+    content: var(--tw-content);
+}
+.peer:checked~.peer-checked\\:after\\:translate-x-full:after {
+    --tw-translate-x: 100%;
+    content: var(--tw-content);
+    transform: translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.pl-4 {
+    padding-left: 1rem;
 }
 
 .pr-8 {
@@ -463,6 +570,10 @@ p > img[src*="https://images.unsplash.com/"] {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.w-9 {
+    width: 2.25rem;
 }
 
 .whitespace-nowrap {
@@ -928,11 +1039,327 @@ var __publicField = (obj, key, value) => {
   var GM_setValue = /* @__PURE__ */ (() => monkeyWindow.GM_setValue)();
   var GM_deleteValue = /* @__PURE__ */ (() => monkeyWindow.GM_deleteValue)();
   var GM_getValue = /* @__PURE__ */ (() => monkeyWindow.GM_getValue)();
+  var dist = {};
+  var __assign$1 = commonjsGlobal && commonjsGlobal.__assign || function() {
+    __assign$1 = Object.assign || function(t2) {
+      for (var s2, i2 = 1, n2 = arguments.length; i2 < n2; i2++) {
+        s2 = arguments[i2];
+        for (var p2 in s2)
+          if (Object.prototype.hasOwnProperty.call(s2, p2))
+            t2[p2] = s2[p2];
+      }
+      return t2;
+    };
+    return __assign$1.apply(this, arguments);
+  };
+  Object.defineProperty(dist, "__esModule", { value: true });
+  dist.join = dist.subst = dist.query = void 0;
+  function urlcat(baseUrlOrTemplate, pathTemplateOrParams, maybeParams) {
+    if (maybeParams === void 0) {
+      maybeParams = {};
+    }
+    if (typeof pathTemplateOrParams === "string") {
+      var baseUrl2 = baseUrlOrTemplate;
+      var pathTemplate = pathTemplateOrParams;
+      var params = maybeParams;
+      return urlcatImpl(pathTemplate, params, baseUrl2);
+    } else {
+      var baseTemplate = baseUrlOrTemplate;
+      var params = pathTemplateOrParams;
+      return urlcatImpl(baseTemplate, params);
+    }
+  }
+  var _default = dist.default = urlcat;
+  function urlcatImpl(pathTemplate, params, baseUrl2) {
+    var _a = path$1(pathTemplate, params), renderedPath = _a.renderedPath, remainingParams = _a.remainingParams;
+    var cleanParams = removeNullOrUndef(remainingParams);
+    var renderedQuery = query(cleanParams);
+    var pathAndQuery = join$1(renderedPath, "?", renderedQuery);
+    return baseUrl2 ? join$1(baseUrl2, "/", pathAndQuery) : pathAndQuery;
+  }
+  function query(params) {
+    return new URLSearchParams(params).toString();
+  }
+  dist.query = query;
+  function subst(template, params) {
+    var renderedPath = path$1(template, params).renderedPath;
+    return renderedPath;
+  }
+  dist.subst = subst;
+  function path$1(template, params) {
+    var remainingParams = __assign$1({}, params);
+    var allowedTypes = ["boolean", "string", "number"];
+    var renderedPath = template.replace(/:\w+/g, function(p2) {
+      var key2 = p2.slice(1);
+      if (/^\d+$/.test(key2)) {
+        return p2;
+      }
+      if (!params.hasOwnProperty(key2)) {
+        throw new Error("Missing value for path parameter " + key2 + ".");
+      }
+      if (!allowedTypes.includes(typeof params[key2])) {
+        throw new TypeError("Path parameter " + key2 + " cannot be of type " + typeof params[key2] + ". " + ("Allowed types are: " + allowedTypes.join(", ") + "."));
+      }
+      if (typeof params[key2] === "string" && params[key2].trim() === "") {
+        throw new Error("Path parameter " + key2 + " cannot be an empty string.");
+      }
+      delete remainingParams[key2];
+      return encodeURIComponent(params[key2]);
+    });
+    return { renderedPath, remainingParams };
+  }
+  function join$1(part1, separator, part2) {
+    var p1 = part1.endsWith(separator) ? part1.slice(0, -separator.length) : part1;
+    var p2 = part2.startsWith(separator) ? part2.slice(separator.length) : part2;
+    return p1 === "" || p2 === "" ? p1 + p2 : p1 + separator + p2;
+  }
+  dist.join = join$1;
+  function removeNullOrUndef(params) {
+    return Object.keys(params).filter(function(k2) {
+      return notNullOrUndefined(params[k2]);
+    }).reduce(function(result, k2) {
+      result[k2] = params[k2];
+      return result;
+    }, {});
+  }
+  function notNullOrUndefined(v2) {
+    return v2 !== void 0 && v2 !== null;
+  }
   const baseUrl = "https://chat.openai.com";
   const LEGACY_KEY_FILENAME_FORMAT = "exporter-format";
   const KEY_FILENAME_FORMAT = "exporter:filename_format";
+  const KEY_TIMESTAMP_ENABLED = "exporter:enable_timestamp";
+  const KEY_TIMESTAMP_24H = "exporter:timestamp_24h";
   const KEY_META_ENABLED = "exporter:enable_meta";
   const KEY_META_LIST = "exporter:meta_list";
+  function getBase64FromImg(el) {
+    const canvas = document.createElement("canvas");
+    canvas.width = el.naturalWidth;
+    canvas.height = el.naturalHeight;
+    const ctx = canvas.getContext("2d");
+    if (!ctx)
+      return "";
+    ctx.drawImage(el, 0, 0);
+    return canvas.toDataURL("image/png");
+  }
+  async function getBase64FromImageUrl(url) {
+    const img = await loadImage(url);
+    return getBase64FromImg(img);
+  }
+  function loadImage(url) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = url;
+      img.crossOrigin = "anonymous";
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+    });
+  }
+  function getPageAccessToken() {
+    var _a, _b, _c;
+    return ((_c = (_b = (_a = unsafeWindow == null ? void 0 : unsafeWindow.__NEXT_DATA__) == null ? void 0 : _a.props) == null ? void 0 : _b.pageProps) == null ? void 0 : _c.accessToken) ?? null;
+  }
+  function getHistoryDisabled() {
+    var _a, _b, _c;
+    return ((_c = (_b = (_a = unsafeWindow == null ? void 0 : unsafeWindow.__NEXT_DATA__) == null ? void 0 : _a.props) == null ? void 0 : _b.pageProps) == null ? void 0 : _c.shouldDisableHistory) ?? false;
+  }
+  function getUserProfile() {
+    var _a, _b, _c;
+    const user = (_c = (_b = (_a = unsafeWindow == null ? void 0 : unsafeWindow.__NEXT_DATA__) == null ? void 0 : _a.props) == null ? void 0 : _b.pageProps) == null ? void 0 : _c.user;
+    if (!user)
+      throw new Error("No user found.");
+    return user;
+  }
+  function getChatIdFromUrl() {
+    const match = location.pathname.match(/^\/chat\/([a-z0-9-]+)$/i);
+    if (match)
+      return match[1];
+    return null;
+  }
+  function getConversationChoice() {
+    const conversationChoices = Array.from(document.querySelectorAll("main .group")).map((group) => group.querySelector(".flex.justify-center span.flex-grow")).map((span) => {
+      var _a;
+      return parseInt(((_a = span == null ? void 0 : span.textContent) == null ? void 0 : _a.trim().split(" / ")[0]) ?? "0") - 1;
+    }).map((x2) => x2 === -1 ? null : x2);
+    return conversationChoices;
+  }
+  const defaultAvatar = "data:image/svg+xml,%3csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20version=%271.1%27%20width=%2730%27%20height=%2730%27/%3e";
+  async function getUserAvatar() {
+    try {
+      const {
+        picture
+      } = getUserProfile();
+      if (picture)
+        return await getBase64FromImageUrl(picture);
+    } catch (e2) {
+      console.error(e2);
+    }
+    try {
+      const avatars = Array.from(document.querySelectorAll("img[alt]:not([aria-hidden])"));
+      const avatar = avatars.find((avatar2) => !avatar2.src.startsWith("data:"));
+      if (avatar)
+        return getBase64FromImg(avatar);
+    } catch (e2) {
+      console.error(e2);
+    }
+    return defaultAvatar;
+  }
+  function checkIfConversationStarted() {
+    return !!document.querySelector("main .group");
+  }
+  const apiUrl = `${baseUrl}/backend-api`;
+  const sessionApi = _default(baseUrl, "/api/auth/session");
+  const conversationApi = (id) => _default(apiUrl, "/conversation/:id", {
+    id
+  });
+  const conversationsApi = (offset, limit) => _default(apiUrl, "/conversations", {
+    offset,
+    limit
+  });
+  async function getCurrentChatId() {
+    const chatId = getChatIdFromUrl();
+    if (chatId)
+      return chatId;
+    const conversations = await fetchConversations();
+    if (conversations && conversations.items.length > 0) {
+      return conversations.items[0].id;
+    }
+    throw new Error("No chat id found.");
+  }
+  async function fetchConversation(chatId) {
+    const url = conversationApi(chatId);
+    const conversation = await fetchApi(url);
+    return {
+      id: chatId,
+      ...conversation
+    };
+  }
+  async function fetchConversations(offset = 0, limit = 20) {
+    const url = conversationsApi(offset, limit);
+    return fetchApi(url);
+  }
+  async function fetchAllConversations() {
+    const conversations = [];
+    const limit = 20;
+    let offset = 0;
+    while (true) {
+      const result = await fetchConversations(offset, limit);
+      conversations.push(...result.items);
+      if (offset + limit >= result.total)
+        break;
+      offset += limit;
+    }
+    return conversations;
+  }
+  async function deleteConversation(chatId) {
+    const url = conversationApi(chatId);
+    const {
+      success
+    } = await fetchApi(url, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        is_visible: false
+      })
+    });
+    return success;
+  }
+  async function fetchApi(url, options2) {
+    const accessToken = await getAccessToken();
+    const response = await fetch(url, {
+      ...options2,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        ...options2 == null ? void 0 : options2.headers
+      }
+    });
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+    return response.json();
+  }
+  async function getAccessToken() {
+    const _accessToken = getPageAccessToken();
+    if (_accessToken)
+      return _accessToken;
+    const session2 = await fetchSession();
+    return session2.accessToken;
+  }
+  let session = null;
+  async function fetchSession() {
+    if (session)
+      return session;
+    const response = await fetch(sessionApi);
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+    session = await response.json();
+    return session;
+  }
+  class LinkedListItem {
+    constructor(value) {
+      __publicField(this, "value");
+      __publicField(this, "child", null);
+      this.value = value;
+    }
+  }
+  const modelMapping = {
+    "text-davinci-002-render-sha": "GTP-3.5",
+    "text-davinci-002-render-paid": "GTP-3.5",
+    "gpt-4": "GPT-4"
+  };
+  function processConversation(conversation, conversationChoices = []) {
+    var _a, _b, _c, _d;
+    const title = conversation.title || "ChatGPT Conversation";
+    const createTime = conversation.create_time;
+    const modelSlug = ((_c = (_b = (_a = Object.values(conversation.mapping).find((node2) => {
+      var _a2, _b2;
+      return (_b2 = (_a2 = node2.message) == null ? void 0 : _a2.metadata) == null ? void 0 : _b2.model_slug;
+    })) == null ? void 0 : _a.message) == null ? void 0 : _b.metadata) == null ? void 0 : _c.model_slug) || "";
+    const model = modelSlug ? modelMapping[modelSlug] || "" : "";
+    const result = [];
+    const nodes = Object.values(conversation.mapping);
+    const root2 = nodes.find((node2) => !node2.parent);
+    if (!root2)
+      throw new Error("No root node found.");
+    const nodeMap = new Map(Object.entries(conversation.mapping));
+    const tail = new LinkedListItem(root2);
+    const queue = [tail];
+    let index2 = -1;
+    while (queue.length > 0) {
+      const current = queue.shift();
+      const node2 = nodeMap.get(current.value.id);
+      if (!node2)
+        throw new Error("No node found.");
+      const role = (_d = node2.message) == null ? void 0 : _d.author.role;
+      if (role === "assistant" || role === "user") {
+        result.push(node2);
+      }
+      if (node2.children.length === 0)
+        continue;
+      const _last = node2.children.length - 1;
+      const choice = conversationChoices[index2++] ?? _last;
+      const childId = node2.children[choice] ?? node2.children[_last];
+      if (!childId)
+        throw new Error("No child node found.");
+      const child = nodeMap.get(childId);
+      if (!child)
+        throw new Error("No child node found.");
+      const childItem = new LinkedListItem(child);
+      current.child = childItem;
+      queue.push(childItem);
+    }
+    return {
+      id: conversation.id,
+      title,
+      modelSlug,
+      model,
+      createTime,
+      conversationNodes: result
+    };
+  }
   function _extends() {
     _extends = Object.assign ? Object.assign.bind() : function(target) {
       for (var i2 = 1; i2 < arguments.length; i2++) {
@@ -3261,303 +3688,6 @@ var __publicField = (obj, key, value) => {
   const $cef8881cdc69808e$export$602eac185826482c = $cef8881cdc69808e$export$b384c6e0a789f88b;
   const $cef8881cdc69808e$export$7c6e2c02157bb7d2 = $cef8881cdc69808e$export$aa4724a5938c586;
   const $cef8881cdc69808e$export$21b07c8f274aebd5 = $cef8881cdc69808e$export$b9744d3e7456d806;
-  var dist = {};
-  var __assign$1 = commonjsGlobal && commonjsGlobal.__assign || function() {
-    __assign$1 = Object.assign || function(t2) {
-      for (var s2, i2 = 1, n2 = arguments.length; i2 < n2; i2++) {
-        s2 = arguments[i2];
-        for (var p2 in s2)
-          if (Object.prototype.hasOwnProperty.call(s2, p2))
-            t2[p2] = s2[p2];
-      }
-      return t2;
-    };
-    return __assign$1.apply(this, arguments);
-  };
-  Object.defineProperty(dist, "__esModule", { value: true });
-  dist.join = dist.subst = dist.query = void 0;
-  function urlcat(baseUrlOrTemplate, pathTemplateOrParams, maybeParams) {
-    if (maybeParams === void 0) {
-      maybeParams = {};
-    }
-    if (typeof pathTemplateOrParams === "string") {
-      var baseUrl2 = baseUrlOrTemplate;
-      var pathTemplate = pathTemplateOrParams;
-      var params = maybeParams;
-      return urlcatImpl(pathTemplate, params, baseUrl2);
-    } else {
-      var baseTemplate = baseUrlOrTemplate;
-      var params = pathTemplateOrParams;
-      return urlcatImpl(baseTemplate, params);
-    }
-  }
-  var _default = dist.default = urlcat;
-  function urlcatImpl(pathTemplate, params, baseUrl2) {
-    var _a = path$1(pathTemplate, params), renderedPath = _a.renderedPath, remainingParams = _a.remainingParams;
-    var cleanParams = removeNullOrUndef(remainingParams);
-    var renderedQuery = query(cleanParams);
-    var pathAndQuery = join$1(renderedPath, "?", renderedQuery);
-    return baseUrl2 ? join$1(baseUrl2, "/", pathAndQuery) : pathAndQuery;
-  }
-  function query(params) {
-    return new URLSearchParams(params).toString();
-  }
-  dist.query = query;
-  function subst(template, params) {
-    var renderedPath = path$1(template, params).renderedPath;
-    return renderedPath;
-  }
-  dist.subst = subst;
-  function path$1(template, params) {
-    var remainingParams = __assign$1({}, params);
-    var allowedTypes = ["boolean", "string", "number"];
-    var renderedPath = template.replace(/:\w+/g, function(p2) {
-      var key2 = p2.slice(1);
-      if (/^\d+$/.test(key2)) {
-        return p2;
-      }
-      if (!params.hasOwnProperty(key2)) {
-        throw new Error("Missing value for path parameter " + key2 + ".");
-      }
-      if (!allowedTypes.includes(typeof params[key2])) {
-        throw new TypeError("Path parameter " + key2 + " cannot be of type " + typeof params[key2] + ". " + ("Allowed types are: " + allowedTypes.join(", ") + "."));
-      }
-      if (typeof params[key2] === "string" && params[key2].trim() === "") {
-        throw new Error("Path parameter " + key2 + " cannot be an empty string.");
-      }
-      delete remainingParams[key2];
-      return encodeURIComponent(params[key2]);
-    });
-    return { renderedPath, remainingParams };
-  }
-  function join$1(part1, separator, part2) {
-    var p1 = part1.endsWith(separator) ? part1.slice(0, -separator.length) : part1;
-    var p2 = part2.startsWith(separator) ? part2.slice(separator.length) : part2;
-    return p1 === "" || p2 === "" ? p1 + p2 : p1 + separator + p2;
-  }
-  dist.join = join$1;
-  function removeNullOrUndef(params) {
-    return Object.keys(params).filter(function(k2) {
-      return notNullOrUndefined(params[k2]);
-    }).reduce(function(result, k2) {
-      result[k2] = params[k2];
-      return result;
-    }, {});
-  }
-  function notNullOrUndefined(v2) {
-    return v2 !== void 0 && v2 !== null;
-  }
-  function getBase64FromImg(el) {
-    const canvas = document.createElement("canvas");
-    canvas.width = el.naturalWidth;
-    canvas.height = el.naturalHeight;
-    const ctx = canvas.getContext("2d");
-    if (!ctx)
-      return "";
-    ctx.drawImage(el, 0, 0);
-    return canvas.toDataURL("image/png");
-  }
-  async function getBase64FromImageUrl(url) {
-    const img = await loadImage(url);
-    return getBase64FromImg(img);
-  }
-  function loadImage(url) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.src = url;
-      img.crossOrigin = "anonymous";
-      img.onload = () => resolve(img);
-      img.onerror = reject;
-    });
-  }
-  function getPageAccessToken() {
-    var _a, _b, _c;
-    return ((_c = (_b = (_a = unsafeWindow == null ? void 0 : unsafeWindow.__NEXT_DATA__) == null ? void 0 : _a.props) == null ? void 0 : _b.pageProps) == null ? void 0 : _c.accessToken) ?? null;
-  }
-  function getHistoryDisabled() {
-    var _a, _b, _c;
-    return ((_c = (_b = (_a = unsafeWindow == null ? void 0 : unsafeWindow.__NEXT_DATA__) == null ? void 0 : _a.props) == null ? void 0 : _b.pageProps) == null ? void 0 : _c.shouldDisableHistory) ?? false;
-  }
-  function getUserProfile() {
-    var _a, _b, _c;
-    const user = (_c = (_b = (_a = unsafeWindow == null ? void 0 : unsafeWindow.__NEXT_DATA__) == null ? void 0 : _a.props) == null ? void 0 : _b.pageProps) == null ? void 0 : _c.user;
-    if (!user)
-      throw new Error("No user found.");
-    return user;
-  }
-  function getChatIdFromUrl() {
-    const match = location.pathname.match(/^\/chat\/([a-z0-9-]+)$/i);
-    if (match)
-      return match[1];
-    return null;
-  }
-  function getConversationChoice() {
-    const conversationChoices = Array.from(document.querySelectorAll("main .group")).map((group) => group.querySelector(".flex.justify-center span.flex-grow")).map((span) => {
-      var _a;
-      return parseInt(((_a = span == null ? void 0 : span.textContent) == null ? void 0 : _a.trim().split(" / ")[0]) ?? "0") - 1;
-    }).map((x2) => x2 === -1 ? null : x2);
-    return conversationChoices;
-  }
-  const defaultAvatar = "data:image/svg+xml,%3csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20version=%271.1%27%20width=%2730%27%20height=%2730%27/%3e";
-  async function getUserAvatar() {
-    try {
-      const {
-        picture
-      } = getUserProfile();
-      if (picture)
-        return await getBase64FromImageUrl(picture);
-    } catch (e2) {
-      console.error(e2);
-    }
-    try {
-      const avatars = Array.from(document.querySelectorAll("img[alt]:not([aria-hidden])"));
-      const avatar = avatars.find((avatar2) => !avatar2.src.startsWith("data:"));
-      if (avatar)
-        return getBase64FromImg(avatar);
-    } catch (e2) {
-      console.error(e2);
-    }
-    return defaultAvatar;
-  }
-  function checkIfConversationStarted() {
-    return !!document.querySelector("main .group");
-  }
-  const apiUrl = `${baseUrl}/backend-api`;
-  const sessionApi = _default(baseUrl, "/api/auth/session");
-  const conversationApi = (id) => _default(apiUrl, "/conversation/:id", {
-    id
-  });
-  const conversationsApi = (offset, limit) => _default(apiUrl, "/conversations", {
-    offset,
-    limit
-  });
-  async function getCurrentChatId() {
-    const chatId = getChatIdFromUrl();
-    if (chatId)
-      return chatId;
-    const conversations = await fetchConversations();
-    if (conversations && conversations.items.length > 0) {
-      return conversations.items[0].id;
-    }
-    throw new Error("No chat id found.");
-  }
-  async function fetchConversation(chatId) {
-    const url = conversationApi(chatId);
-    const conversation = await fetchApi(url);
-    return {
-      id: chatId,
-      ...conversation
-    };
-  }
-  async function fetchConversations(offset = 0, limit = 20) {
-    const url = conversationsApi(offset, limit);
-    return fetchApi(url);
-  }
-  async function fetchAllConversations() {
-    const conversations = [];
-    const limit = 20;
-    let offset = 0;
-    while (true) {
-      const result = await fetchConversations(offset, limit);
-      conversations.push(...result.items);
-      if (offset + limit >= result.total)
-        break;
-      offset += limit;
-    }
-    return conversations;
-  }
-  async function fetchApi(url) {
-    const accessToken = await getAccessToken();
-    const response = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
-    });
-    if (!response.ok) {
-      throw new Error(response.statusText);
-    }
-    return response.json();
-  }
-  async function getAccessToken() {
-    const _accessToken = getPageAccessToken();
-    if (_accessToken)
-      return _accessToken;
-    const session2 = await fetchSession();
-    return session2.accessToken;
-  }
-  let session = null;
-  async function fetchSession() {
-    if (session)
-      return session;
-    const response = await fetch(sessionApi);
-    if (!response.ok) {
-      throw new Error(response.statusText);
-    }
-    session = await response.json();
-    return session;
-  }
-  class LinkedListItem {
-    constructor(value) {
-      __publicField(this, "value");
-      __publicField(this, "child", null);
-      this.value = value;
-    }
-  }
-  const modelMapping = {
-    "text-davinci-002-render-sha": "GTP-3.5",
-    "text-davinci-002-render-paid": "GTP-3.5",
-    "gpt-4": "GPT-4"
-  };
-  function processConversation(conversation, conversationChoices = []) {
-    var _a, _b, _c, _d;
-    const title = conversation.title || "ChatGPT Conversation";
-    const createTime = conversation.create_time;
-    const modelSlug = ((_c = (_b = (_a = Object.values(conversation.mapping).find((node2) => {
-      var _a2, _b2;
-      return (_b2 = (_a2 = node2.message) == null ? void 0 : _a2.metadata) == null ? void 0 : _b2.model_slug;
-    })) == null ? void 0 : _a.message) == null ? void 0 : _b.metadata) == null ? void 0 : _c.model_slug) || "";
-    const model = modelSlug ? modelMapping[modelSlug] || "" : "";
-    const result = [];
-    const nodes = Object.values(conversation.mapping);
-    const root2 = nodes.find((node2) => !node2.parent);
-    if (!root2)
-      throw new Error("No root node found.");
-    const nodeMap = new Map(Object.entries(conversation.mapping));
-    const tail = new LinkedListItem(root2);
-    const queue = [tail];
-    let index2 = -1;
-    while (queue.length > 0) {
-      const current = queue.shift();
-      const node2 = nodeMap.get(current.value.id);
-      if (!node2)
-        throw new Error("No node found.");
-      const role = (_d = node2.message) == null ? void 0 : _d.author.role;
-      if (role === "assistant" || role === "user") {
-        result.push(node2);
-      }
-      if (node2.children.length === 0)
-        continue;
-      const _last = node2.children.length - 1;
-      const choice = conversationChoices[index2++] ?? _last;
-      const childId = node2.children[choice] ?? node2.children[_last];
-      if (!childId)
-        throw new Error("No child node found.");
-      const child = nodeMap.get(childId);
-      if (!child)
-        throw new Error("No child node found.");
-      const childItem = new LinkedListItem(child);
-      current.child = childItem;
-      queue.push(childItem);
-    }
-    return {
-      id: conversation.id,
-      title,
-      modelSlug,
-      model,
-      createTime,
-      conversationNodes: result
-    };
-  }
   const templateHtml = `<!DOCTYPE html>
 <html lang="{{lang}}" data-theme="{{theme}}">
 <head>
@@ -6276,21 +6406,35 @@ var __publicField = (obj, key, value) => {
     }
     return results.join("");
   }
+  const emptyOptions = {};
   function toString(value, options2) {
-    const includeImageAlt = (options2 || {}).includeImageAlt;
-    return one$1(
-      value,
-      typeof includeImageAlt === "boolean" ? includeImageAlt : true
-    );
+    const settings = options2 || emptyOptions;
+    const includeImageAlt = typeof settings.includeImageAlt === "boolean" ? settings.includeImageAlt : true;
+    const includeHtml = typeof settings.includeHtml === "boolean" ? settings.includeHtml : true;
+    return one$1(value, includeImageAlt, includeHtml);
   }
-  function one$1(value, includeImageAlt) {
-    return node(value) && ("value" in value && value.value || includeImageAlt && "alt" in value && value.alt || "children" in value && all$1(value.children, includeImageAlt)) || Array.isArray(value) && all$1(value, includeImageAlt) || "";
+  function one$1(value, includeImageAlt, includeHtml) {
+    if (node(value)) {
+      if ("value" in value) {
+        return value.type === "html" && !includeHtml ? "" : value.value;
+      }
+      if (includeImageAlt && "alt" in value && value.alt) {
+        return value.alt;
+      }
+      if ("children" in value) {
+        return all$1(value.children, includeImageAlt, includeHtml);
+      }
+    }
+    if (Array.isArray(value)) {
+      return all$1(value, includeImageAlt, includeHtml);
+    }
+    return "";
   }
-  function all$1(values, includeImageAlt) {
+  function all$1(values, includeImageAlt, includeHtml) {
     const result = [];
     let index2 = -1;
     while (++index2 < values.length) {
-      result[index2] = one$1(values[index2], includeImageAlt);
+      result[index2] = one$1(values[index2], includeImageAlt, includeHtml);
     }
     return result.join("");
   }
@@ -14406,7 +14550,7 @@ var __publicField = (obj, key, value) => {
           end: self2.now()
         })
       );
-      if (id.charCodeAt(0) !== 94 || !defined.includes(id.slice(1))) {
+      if (id.codePointAt(0) !== 94 || !defined.includes(id.slice(1))) {
         return nok(code2);
       }
       effects.enter("gfmFootnoteCallLabelMarker");
@@ -14497,22 +14641,32 @@ var __publicField = (obj, key, value) => {
       return callData;
     }
     function callData(code2) {
-      let token;
-      if (code2 === null || code2 === 91 || size++ > 999) {
+      if (
+        // Too long.
+        size > 999 || // Closing brace with nothing.
+        code2 === 93 && !data || // Space or tab is not supported by GFM for some reason.
+        // `\n` and `[` not being supported makes sense.
+        code2 === null || code2 === 91 || markdownLineEndingOrSpace(code2)
+      ) {
         return nok(code2);
       }
       if (code2 === 93) {
-        if (!data) {
+        effects.exit("chunkString");
+        const token = effects.exit("gfmFootnoteCallString");
+        if (!defined.includes(normalizeIdentifier(self2.sliceSerialize(token)))) {
           return nok(code2);
         }
-        effects.exit("chunkString");
-        token = effects.exit("gfmFootnoteCallString");
-        return defined.includes(normalizeIdentifier(self2.sliceSerialize(token))) ? end(code2) : nok(code2);
+        effects.enter("gfmFootnoteCallLabelMarker");
+        effects.consume(code2);
+        effects.exit("gfmFootnoteCallLabelMarker");
+        effects.exit("gfmFootnoteCall");
+        return ok2;
       }
-      effects.consume(code2);
       if (!markdownLineEndingOrSpace(code2)) {
         data = true;
       }
+      size++;
+      effects.consume(code2);
       return code2 === 92 ? callEscape : callData;
     }
     function callEscape(code2) {
@@ -14522,13 +14676,6 @@ var __publicField = (obj, key, value) => {
         return callData;
       }
       return callData(code2);
-    }
-    function end(code2) {
-      effects.enter("gfmFootnoteCallLabelMarker");
-      effects.consume(code2);
-      effects.exit("gfmFootnoteCallLabelMarker");
-      effects.exit("gfmFootnoteCall");
-      return ok2;
     }
   }
   function tokenizeDefinitionStart(effects, ok2, nok) {
@@ -14544,28 +14691,32 @@ var __publicField = (obj, key, value) => {
       effects.enter("gfmFootnoteDefinitionLabelMarker");
       effects.consume(code2);
       effects.exit("gfmFootnoteDefinitionLabelMarker");
-      return labelStart;
+      return labelAtMarker;
     }
-    function labelStart(code2) {
+    function labelAtMarker(code2) {
       if (code2 === 94) {
         effects.enter("gfmFootnoteDefinitionMarker");
         effects.consume(code2);
         effects.exit("gfmFootnoteDefinitionMarker");
         effects.enter("gfmFootnoteDefinitionLabelString");
-        return atBreak;
+        effects.enter("chunkString").contentType = "string";
+        return labelInside;
       }
       return nok(code2);
     }
-    function atBreak(code2) {
-      let token;
-      if (code2 === null || code2 === 91 || size > 999) {
+    function labelInside(code2) {
+      if (
+        // Too long.
+        size > 999 || // Closing brace with nothing.
+        code2 === 93 && !data || // Space or tab is not supported by GFM for some reason.
+        // `\n` and `[` not being supported makes sense.
+        code2 === null || code2 === 91 || markdownLineEndingOrSpace(code2)
+      ) {
         return nok(code2);
       }
       if (code2 === 93) {
-        if (!data) {
-          return nok(code2);
-        }
-        token = effects.exit("gfmFootnoteDefinitionLabelString");
+        effects.exit("chunkString");
+        const token = effects.exit("gfmFootnoteDefinitionLabelString");
         identifier = normalizeIdentifier(self2.sliceSerialize(token));
         effects.enter("gfmFootnoteDefinitionLabelMarker");
         effects.consume(code2);
@@ -14573,49 +14724,38 @@ var __publicField = (obj, key, value) => {
         effects.exit("gfmFootnoteDefinitionLabel");
         return labelAfter;
       }
-      if (markdownLineEnding(code2)) {
-        effects.enter("lineEnding");
-        effects.consume(code2);
-        effects.exit("lineEnding");
-        size++;
-        return atBreak;
-      }
-      effects.enter("chunkString").contentType = "string";
-      return label(code2);
-    }
-    function label(code2) {
-      if (code2 === null || markdownLineEnding(code2) || code2 === 91 || code2 === 93 || size > 999) {
-        effects.exit("chunkString");
-        return atBreak(code2);
-      }
       if (!markdownLineEndingOrSpace(code2)) {
         data = true;
       }
       size++;
       effects.consume(code2);
-      return code2 === 92 ? labelEscape : label;
+      return code2 === 92 ? labelEscape : labelInside;
     }
     function labelEscape(code2) {
       if (code2 === 91 || code2 === 92 || code2 === 93) {
         effects.consume(code2);
         size++;
-        return label;
+        return labelInside;
       }
-      return label(code2);
+      return labelInside(code2);
     }
     function labelAfter(code2) {
       if (code2 === 58) {
         effects.enter("definitionMarker");
         effects.consume(code2);
         effects.exit("definitionMarker");
-        return factorySpace(effects, done, "gfmFootnoteDefinitionWhitespace");
+        if (!defined.includes(identifier)) {
+          defined.push(identifier);
+        }
+        return factorySpace(
+          effects,
+          whitespaceAfter,
+          "gfmFootnoteDefinitionWhitespace"
+        );
       }
       return nok(code2);
     }
-    function done(code2) {
-      if (!defined.includes(identifier)) {
-        defined.push(identifier);
-      }
+    function whitespaceAfter(code2) {
       return ok2(code2);
     }
   }
@@ -14638,8 +14778,9 @@ var __publicField = (obj, key, value) => {
       return tail && tail[1].type === "gfmFootnoteDefinitionIndent" && tail[2].sliceSerialize(tail[1], true).length === 4 ? ok2(code2) : nok(code2);
     }
   }
-  function gfmStrikethrough(options2 = {}) {
-    let single = options2.singleTilde;
+  function gfmStrikethrough(options2) {
+    const options_ = options2 || {};
+    let single = options_.singleTilde;
     const tokenizer = {
       tokenize: tokenizeStrikethrough,
       resolveAll: resolveAllStrikethrough
@@ -14684,16 +14825,16 @@ var __publicField = (obj, key, value) => {
                 ["exit", events[open][1], context],
                 ["enter", text2, context]
               ];
-              splice(
-                nextEvents,
-                nextEvents.length,
-                0,
-                resolveAll(
-                  context.parser.constructs.insideSpan.null,
-                  events.slice(open + 1, index2),
-                  context
-                )
-              );
+              const insideSpan2 = context.parser.constructs.insideSpan.null;
+              if (insideSpan2) {
+                splice(
+                  nextEvents,
+                  nextEvents.length,
+                  0,
+                  // @ts-expect-error: to do: update `mdast-util-types` to allow explicit `undefined`s.
+                  resolveAll(insideSpan2, events.slice(open + 1, index2), context)
+                );
+              }
               splice(nextEvents, nextEvents.length, 0, [
                 ["exit", text2, context],
                 ["enter", events[index2][1], context],
@@ -15211,29 +15352,30 @@ var __publicField = (obj, key, value) => {
         effects.consume(code2);
         effects.exit("taskListCheckMarker");
         effects.exit("taskListCheck");
+        return after;
+      }
+      return nok(code2);
+    }
+    function after(code2) {
+      if (markdownLineEnding(code2)) {
+        return ok2(code2);
+      }
+      if (markdownSpace(code2)) {
         return effects.check(
           {
             tokenize: spaceThenNonSpace
           },
           ok2,
           nok
-        );
+        )(code2);
       }
       return nok(code2);
     }
   }
   function spaceThenNonSpace(effects, ok2, nok) {
-    const self2 = this;
     return factorySpace(effects, after, "whitespace");
     function after(code2) {
-      const tail = self2.events[self2.events.length - 1];
-      return (
-        // We either found spaces…
-        (tail && tail[1].type === "whitespace" || // …or it was followed by a line ending, in which case, there has to be
-        // non-whitespace after that line ending, because otherwise we’d get an
-        // EOF as the content is closed with blank lines.
-        markdownLineEnding(code2)) && code2 !== null ? ok2(code2) : nok(code2)
-      );
+      return code2 === null ? nok(code2) : ok2(code2);
     }
   }
   function gfm(options2) {
@@ -15280,6 +15422,96 @@ var __publicField = (obj, key, value) => {
       return fn2(node2, i2, parent);
     }
     return transform(tree, 0, void 0)[0];
+  }
+  class GMStorage {
+    static get(key2) {
+      const item = GM_getValue(key2, "");
+      if (item) {
+        try {
+          return JSON.parse(item);
+        } catch {
+          return null;
+        }
+      }
+      return null;
+    }
+    static set(key2, value) {
+      const item = JSON.stringify(value);
+      GM_setValue(key2, item);
+    }
+    static delete(key2) {
+      GM_deleteValue(key2);
+    }
+  }
+  class LocalStorage {
+    static get(key2) {
+      const item = localStorage.getItem(key2);
+      if (item) {
+        try {
+          return JSON.parse(item);
+        } catch {
+          return null;
+        }
+      }
+      return null;
+    }
+    static set(key2, value) {
+      const item = JSON.stringify(value);
+      localStorage.setItem(key2, item);
+    }
+    static delete(key2) {
+      localStorage.removeItem(key2);
+    }
+  }
+  class MemoryStorage {
+    static get(key2) {
+      const item = this.map.get(key2);
+      if (!item)
+        return null;
+      return item;
+    }
+    static set(key2, value) {
+      this.map.set(key2, value);
+    }
+    static delete(key2) {
+      this.map.delete(key2);
+    }
+  }
+  __publicField(MemoryStorage, "map", /* @__PURE__ */ new Map());
+  class ScriptStorage {
+    static get(key2) {
+      try {
+        return GMStorage.get(key2);
+      } catch {
+        try {
+          return LocalStorage.get(key2);
+        } catch {
+          return MemoryStorage.get(key2);
+        }
+      }
+    }
+    static set(key2, value) {
+      try {
+        return GMStorage.set(key2, value);
+      } catch {
+        try {
+          return LocalStorage.set(key2, value);
+        } catch {
+          return MemoryStorage.set(key2, value);
+        }
+      }
+    }
+    static delete(key2) {
+      try {
+        return GMStorage.delete(key2);
+      } catch {
+        try {
+          return LocalStorage.delete(key2);
+        } catch {
+          return MemoryStorage.delete(key2);
+        }
+      }
+    }
   }
   function standardizeLineBreaks(text2) {
     return text2.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
@@ -15342,14 +15574,21 @@ var __publicField = (obj, key, value) => {
       } else {
         conversationContent = `<p>${escapeHtml(content2)}</p>`;
       }
+      const enableTimestamp = ScriptStorage.get(KEY_TIMESTAMP_ENABLED) ?? false;
+      const timeStamp24H = ScriptStorage.get(KEY_TIMESTAMP_24H) ?? false;
       const timestamp2 = ((_e = item.message) == null ? void 0 : _e.create_time) ?? "";
+      const showTimestamp = enableTimestamp && timestamp2;
       let conversationDate = "";
       let conversationTime = "";
-      if (timestamp2) {
+      if (showTimestamp) {
         const date2 = new Date(timestamp2 * 1e3);
         const isoStr = date2.toISOString();
         conversationDate = `${isoStr.split("T")[0]} ${isoStr.split("T")[1].split(".")[0]} UTC`;
-        conversationTime = date2.toLocaleTimeString("en-US", {
+        conversationTime = timeStamp24H ? date2.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false
+        }) : date2.toLocaleTimeString("en-US", {
           hour: "2-digit",
           minute: "2-digit"
         });
@@ -15364,7 +15603,7 @@ var __publicField = (obj, key, value) => {
             ${conversationContent}
         </div>
     </div>
-    ${timestamp2 ? `<div class="time" title="${conversationDate}">${conversationTime}</div>` : ""}
+    ${showTimestamp ? `<div class="time" title="${conversationDate}">${conversationTime}</div>` : ""}
 </div>`;
     }).join("\n\n");
     const date = dateStr();
@@ -17465,96 +17704,6 @@ ${message}`;
       })]
     });
   };
-  class GMStorage {
-    static get(key2) {
-      const item = GM_getValue(key2, "");
-      if (item) {
-        try {
-          return JSON.parse(item);
-        } catch {
-          return null;
-        }
-      }
-      return null;
-    }
-    static set(key2, value) {
-      const item = JSON.stringify(value);
-      GM_setValue(key2, item);
-    }
-    static delete(key2) {
-      GM_deleteValue(key2);
-    }
-  }
-  class LocalStorage {
-    static get(key2) {
-      const item = localStorage.getItem(key2);
-      if (item) {
-        try {
-          return JSON.parse(item);
-        } catch {
-          return null;
-        }
-      }
-      return null;
-    }
-    static set(key2, value) {
-      const item = JSON.stringify(value);
-      localStorage.setItem(key2, item);
-    }
-    static delete(key2) {
-      localStorage.removeItem(key2);
-    }
-  }
-  class MemoryStorage {
-    static get(key2) {
-      const item = this.map.get(key2);
-      if (!item)
-        return null;
-      return item;
-    }
-    static set(key2, value) {
-      this.map.set(key2, value);
-    }
-    static delete(key2) {
-      this.map.delete(key2);
-    }
-  }
-  __publicField(MemoryStorage, "map", /* @__PURE__ */ new Map());
-  class ScriptStorage {
-    static get(key2) {
-      try {
-        return GMStorage.get(key2);
-      } catch {
-        try {
-          return LocalStorage.get(key2);
-        } catch {
-          return MemoryStorage.get(key2);
-        }
-      }
-    }
-    static set(key2, value) {
-      try {
-        return GMStorage.set(key2, value);
-      } catch {
-        try {
-          return LocalStorage.set(key2, value);
-        } catch {
-          return MemoryStorage.set(key2, value);
-        }
-      }
-    }
-    static delete(key2) {
-      try {
-        return GMStorage.delete(key2);
-      } catch {
-        try {
-          return LocalStorage.delete(key2);
-        } catch {
-          return MemoryStorage.delete(key2);
-        }
-      }
-    }
-  }
   function useGMStorage(key2, initialValue) {
     const [storedValue, setStoredValue] = h$2(() => ScriptStorage.get(key2) ?? initialValue);
     const setValue = (value) => {
@@ -17563,6 +17712,7 @@ ${message}`;
     };
     return [storedValue, setValue];
   }
+  const defaultFormat = "ChatGPT-{title}";
   const defaultExportMetaList = [{
     name: "title",
     value: "{title}"
@@ -17570,30 +17720,56 @@ ${message}`;
     name: "source",
     value: "{source}"
   }];
-  const MetaContext = F$2({
+  const SettingContext = F$2({
+    format: defaultFormat,
+    setFormat: (_2) => {
+    },
+    enableTimestamp: false,
+    setEnableTimestamp: (_2) => {
+    },
+    timeStamp24H: false,
+    setTimeStamp24H: (_2) => {
+    },
     enableMeta: false,
     setEnableMeta: (_2) => {
     },
     exportMetaList: defaultExportMetaList,
     setExportMetaList: (_2) => {
+    },
+    resetDefault: () => {
     }
   });
-  const MetaDataProvider = ({
+  const SettingProvider = ({
     children
   }) => {
+    const [format, setFormat] = useGMStorage(KEY_FILENAME_FORMAT, defaultFormat);
+    const [enableTimestamp, setEnableTimestamp] = useGMStorage(KEY_TIMESTAMP_ENABLED, false);
+    const [timeStamp24H, setTimeStamp24H] = useGMStorage(KEY_TIMESTAMP_24H, false);
     const [enableMeta, setEnableMeta] = useGMStorage(KEY_META_ENABLED, false);
     const [exportMetaList, setExportMetaList] = useGMStorage(KEY_META_LIST, defaultExportMetaList);
-    return o(MetaContext.Provider, {
+    const resetDefault = T$3(() => {
+      setFormat(defaultFormat);
+      setEnableMeta(false);
+      setExportMetaList(defaultExportMetaList);
+    }, [setFormat, setEnableMeta, setExportMetaList]);
+    return o(SettingContext.Provider, {
       value: {
+        format,
+        setFormat,
+        enableTimestamp,
+        setEnableTimestamp,
+        timeStamp24H,
+        setTimeStamp24H,
         enableMeta,
         setEnableMeta,
         exportMetaList,
-        setExportMetaList
+        setExportMetaList,
+        resetDefault
       },
       children
     });
   };
-  const useMetaDataContext = () => q$1(MetaContext);
+  const useSettingContext = () => q$1(SettingContext);
   const exportAllOptions = [{
     label: "Markdown",
     callback: exportAllToMarkdown
@@ -17654,7 +17830,7 @@ ${message}`;
     const {
       enableMeta,
       exportMetaList
-    } = useMetaDataContext();
+    } = useSettingContext();
     const metaList = F$1(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList]);
     const [conversations, setConversations] = h$2([]);
     const [loading, setLoading] = h$2(false);
@@ -17664,6 +17840,7 @@ ${message}`;
     const [exportType, setExportType] = h$2(exportAllOptions[0].label);
     const disabled = loading || processing || !!error || selected.length === 0;
     const requestQueue = F$1(() => new RequestQueue(200, 1600), []);
+    const deleteQueue = F$1(() => new RequestQueue(200, 1600), []);
     const [progress, setProgress] = h$2({
       total: 0,
       completed: 0,
@@ -17678,6 +17855,13 @@ ${message}`;
       return () => off();
     }, [requestQueue]);
     p$3(() => {
+      const off = deleteQueue.on("progress", (progress2) => {
+        setProcessing(true);
+        setProgress(progress2);
+      });
+      return () => off();
+    }, [deleteQueue]);
+    p$3(() => {
       const off = requestQueue.on("done", (results) => {
         var _a;
         setProcessing(false);
@@ -17687,6 +17871,15 @@ ${message}`;
       });
       return () => off();
     }, [requestQueue, exportType, format, metaList]);
+    p$3(() => {
+      const off = deleteQueue.on("done", () => {
+        setProcessing(false);
+        setConversations(conversations.filter((c2) => !selected.some((s2) => s2.id === c2.id)));
+        setSelected([]);
+        alert("All selected conversations have been deleted. Please refresh the page to see the changes.");
+      });
+      return () => off();
+    }, [deleteQueue, conversations, selected]);
     const exportAll = T$3(() => {
       if (disabled)
         return;
@@ -17702,6 +17895,24 @@ ${message}`;
       });
       requestQueue.start();
     }, [disabled, selected, requestQueue]);
+    const deleteAll = T$3(() => {
+      if (disabled)
+        return;
+      const result = confirm("Are you sure you want to delete all selected conversations?");
+      if (!result)
+        return;
+      deleteQueue.clear();
+      selected.forEach(({
+        id,
+        title
+      }) => {
+        deleteQueue.add({
+          name: title,
+          request: () => deleteConversation(id)
+        });
+      });
+      deleteQueue.start();
+    }, [disabled, selected, deleteQueue]);
     p$3(() => {
       setLoading(true);
       fetchAllConversations().then(setConversations).catch(setError).finally(() => setLoading(false));
@@ -17743,8 +17954,15 @@ ${message}`;
                 value: label,
                 children: label
               }, label))
+            }), o("div", {
+              className: "flex flex-grow"
             }), o("button", {
-              className: "Button green",
+              className: "Button red",
+              disabled,
+              onClick: deleteAll,
+              children: "Delete"
+            }), o("button", {
+              className: "Button green ml-4",
               disabled,
               onClick: exportAll,
               children: "Export"
@@ -17779,25 +17997,6 @@ ${message}`;
       })]
     });
   };
-  const defaultFormat = "ChatGPT-{title}";
-  const FormatContext = F$2({
-    format: defaultFormat,
-    setFormat: (_2) => {
-    }
-  });
-  const FormatProvider = ({
-    children
-  }) => {
-    const [format, setFormat] = useGMStorage(KEY_FILENAME_FORMAT, defaultFormat);
-    return o(FormatContext.Provider, {
-      value: {
-        format,
-        setFormat
-      },
-      children
-    });
-  };
-  const useFormatContext = () => q$1(FormatContext);
   const TIMEOUT$1 = 2500;
   const MenuItem = ({
     text: text2,
@@ -17860,6 +18059,32 @@ ${message}`;
   function getSnapshot() {
     return document.title;
   }
+  const Toggle = (props) => {
+    const {
+      label = "",
+      checked = true,
+      onCheckedUpdate
+    } = props;
+    const handleChange = (e2) => {
+      if (!e2.target || !onCheckedUpdate)
+        return;
+      onCheckedUpdate(e2.target.checked);
+    };
+    return o("label", {
+      className: "relative inline-flex items-center cursor-pointer",
+      children: [o("input", {
+        type: "checkbox",
+        checked,
+        onChange: handleChange,
+        className: "sr-only peer"
+      }), o("div", {
+        className: "w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
+      }), o("span", {
+        className: "ml-3 text-sm font-medium text-gray-900 dark:text-gray-300 empty:hidden",
+        children: label
+      })]
+    });
+  };
   const Variable = ({
     name,
     title
@@ -17875,14 +18100,16 @@ ${message}`;
   }) => {
     const {
       format,
-      setFormat
-    } = useFormatContext();
-    const {
+      setFormat,
+      enableTimestamp,
+      setEnableTimestamp,
+      timeStamp24H,
+      setTimeStamp24H,
       enableMeta,
       setEnableMeta,
       exportMetaList,
       setExportMetaList
-    } = useMetaDataContext();
+    } = useSettingContext();
     const _title = useTitle();
     const date = dateStr();
     const timestamp$1 = timestamp();
@@ -17910,130 +18137,156 @@ ${message}`;
           }), o("dl", {
             className: "space-y-6",
             children: [o("div", {
-              children: [o("dt", {
-                children: o("label", {
-                  className: "text-sm font-medium text-gray-800 dark:text-white",
-                  htmlFor: "filename",
+              className: "relative flex bg-white dark:bg-white/5 rounded p-4",
+              children: o("div", {
+                children: [o("dt", {
+                  className: "text-md font-medium text-gray-800 dark:text-white",
                   children: "File Name"
-                })
-              }), o("dd", {
-                children: [o("p", {
-                  className: "mt-2 text-sm text-gray-700 dark:text-gray-300",
-                  children: ["Available variables: ", o(Variable, {
-                    name: "{title}",
-                    title
-                  }), ", ", o(Variable, {
-                    name: "{date}",
-                    title: date
-                  }), ", ", o(Variable, {
-                    name: "{timestamp}",
-                    title: timestamp$1
-                  }), ", ", o(Variable, {
-                    name: "{chat_id}",
-                    title: chatId
-                  })]
-                }), o("input", {
-                  className: "Input mt-1",
-                  id: "filename",
-                  value: format,
-                  onChange: (e2) => setFormat(e2.currentTarget.value)
-                }), o("p", {
-                  className: "mt-1 text-sm text-gray-700 dark:text-gray-300",
-                  children: ["Preview: ", o("span", {
-                    className: "select-all",
-                    style: {
-                      "text-decoration": "underline",
-                      "text-underline-offset": 4
-                    },
-                    children: preview
-                  })]
-                })]
-              })]
-            }), o("div", {
-              children: [o("dt", {
-                children: [o("div", {
-                  className: "text-sm font-medium text-gray-800 dark:text-white",
-                  children: "Export Metadata"
-                }), o("p", {
-                  className: "mt-1 text-sm text-gray-700 dark:text-gray-300",
-                  children: "Add metadata to exported Markdown and HTML files."
-                })]
-              }), o("dd", {
-                children: [o(CheckBox, {
-                  label: "Enable",
-                  className: "mt-2",
-                  checked: enableMeta,
-                  onCheckedChange: setEnableMeta
-                }), enableMeta && o(_$2, {
+                }), o("dd", {
                   children: [o("p", {
-                    className: "mt-2 text-sm text-gray-700 dark:text-gray-300",
-                    children: ["Available variables: ", o(Variable, {
+                    className: "text-sm text-gray-700 dark:text-gray-300",
+                    children: ["Available variables:", " ", o(Variable, {
                       name: "{title}",
                       title
-                    }), ", ", o(Variable, {
+                    }), ",", " ", o(Variable, {
                       name: "{date}",
                       title: date
-                    }), ", ", o(Variable, {
+                    }), ",", " ", o(Variable, {
                       name: "{timestamp}",
                       title: timestamp$1
-                    }), ", ", o(Variable, {
-                      name: "{source}",
-                      title: source
-                    }), ", ", o("br", {}), o(Variable, {
-                      name: "{model}",
-                      title: "ChatGPT-3.5"
-                    }), ", ", o(Variable, {
-                      name: "{model_name}",
-                      title: "text-davinci-002-render-sha"
+                    }), ",", " ", o(Variable, {
+                      name: "{chat_id}",
+                      title: chatId
                     })]
-                  }), exportMetaList.map((meta, i2) => o("div", {
-                    className: "flex items-center mt-2",
-                    children: [o("input", {
-                      className: "Input",
-                      value: meta.name,
-                      onChange: (e2) => {
-                        const list2 = [...exportMetaList];
-                        list2[i2] = {
-                          ...list2[i2],
-                          name: e2.currentTarget.value
-                        };
-                        setExportMetaList(list2);
-                      }
-                    }), o("span", {
-                      className: "mx-2",
-                      children: "→"
-                    }), o("input", {
-                      className: "Input",
-                      value: meta.value,
-                      onChange: (e2) => {
-                        const list2 = [...exportMetaList];
-                        list2[i2] = {
-                          ...list2[i2],
-                          value: e2.currentTarget.value
-                        };
-                        setExportMetaList(list2);
-                      }
-                    }), o("button", {
-                      className: "ml-2 rounded-full p-1 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition ease-in-out duration-150",
-                      "aria-label": "Remove",
-                      onClick: () => setExportMetaList(exportMetaList.filter((_2, j2) => j2 !== i2)),
-                      children: o(IconTrash, {
-                        className: "w-4 h-4"
-                      })
+                  }), o("input", {
+                    className: "Input mt-4",
+                    id: "filename",
+                    value: format,
+                    onChange: (e2) => setFormat(e2.currentTarget.value)
+                  }), o("p", {
+                    className: "mt-1 text-sm text-gray-700 dark:text-gray-300",
+                    children: ["Preview:", " ", o("span", {
+                      className: "select-all",
+                      style: {
+                        "text-decoration": "underline",
+                        "text-underline-offset": 4
+                      },
+                      children: preview
                     })]
-                  }, i2)), o("div", {
-                    className: "flex justify-center items-center mt-2 pr-8",
-                    children: o("button", {
-                      className: "w-full border border-[#6f6e77] dark:border-gray-[#86858d] rounded-md py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition ease-in-out duration-150",
-                      "aria-label": "Add",
-                      onClick: () => setExportMetaList([...exportMetaList, {
-                        name: "",
-                        value: ""
-                      }]),
-                      children: "+"
+                  })]
+                })]
+              })
+            }), o("div", {
+              className: "relative flex bg-white dark:bg-white/5 rounded p-4",
+              children: [o("div", {
+                children: [o("dt", {
+                  className: "text-md font-medium text-gray-800 dark:text-white",
+                  children: "Conversation Timestamp"
+                }), o("dd", {
+                  className: "text-sm text-gray-700 dark:text-gray-300",
+                  children: ["Will show on the page and HTML files.", enableTimestamp && o("div", {
+                    className: "mt-2",
+                    children: o(Toggle, {
+                      label: "Use 24-hour format (eg. 23:59)",
+                      checked: timeStamp24H,
+                      onCheckedUpdate: setTimeStamp24H
                     })
                   })]
                 })]
+              }), o("div", {
+                className: "absolute right-4",
+                children: o(Toggle, {
+                  label: "",
+                  checked: enableTimestamp,
+                  onCheckedUpdate: setEnableTimestamp
+                })
+              })]
+            }), o("div", {
+              className: "relative flex bg-white dark:bg-white/5 rounded p-4",
+              children: [o("div", {
+                children: [o("dt", {
+                  className: "text-md font-medium text-gray-800 dark:text-white",
+                  children: "Export Metadata"
+                }), o("dd", {
+                  className: "text-sm text-gray-700 dark:text-gray-300",
+                  children: ["Add metadata to exported Markdown and HTML files.", enableMeta && o(_$2, {
+                    children: [o("p", {
+                      className: "mt-2 text-sm text-gray-700 dark:text-gray-300",
+                      children: ["Available variables:", " ", o(Variable, {
+                        name: "{title}",
+                        title
+                      }), ",", " ", o(Variable, {
+                        name: "{date}",
+                        title: date
+                      }), ",", " ", o(Variable, {
+                        name: "{timestamp}",
+                        title: timestamp$1
+                      }), ",", " ", o(Variable, {
+                        name: "{source}",
+                        title: source
+                      }), ",", " ", o(Variable, {
+                        name: "{model}",
+                        title: "ChatGPT-3.5"
+                      }), ",", " ", o(Variable, {
+                        name: "{model_name}",
+                        title: "text-davinci-002-render-sha"
+                      })]
+                    }), exportMetaList.map((meta, i2) => o("div", {
+                      className: "flex items-center mt-2",
+                      children: [o("input", {
+                        className: "Input",
+                        value: meta.name,
+                        onChange: (e2) => {
+                          const list2 = [...exportMetaList];
+                          list2[i2] = {
+                            ...list2[i2],
+                            name: e2.currentTarget.value
+                          };
+                          setExportMetaList(list2);
+                        }
+                      }), o("span", {
+                        className: "mx-2",
+                        children: "→"
+                      }), o("input", {
+                        className: "Input",
+                        value: meta.value,
+                        onChange: (e2) => {
+                          const list2 = [...exportMetaList];
+                          list2[i2] = {
+                            ...list2[i2],
+                            value: e2.currentTarget.value
+                          };
+                          setExportMetaList(list2);
+                        }
+                      }), o("button", {
+                        className: "ml-2 rounded-full p-1 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition ease-in-out duration-150",
+                        "aria-label": "Remove",
+                        onClick: () => setExportMetaList(exportMetaList.filter((_2, j2) => j2 !== i2)),
+                        children: o(IconTrash, {
+                          className: "w-4 h-4"
+                        })
+                      })]
+                    }, i2)), o("div", {
+                      className: "flex justify-center items-center mt-2 pr-8",
+                      children: o("button", {
+                        className: "w-full border border-[#6f6e77] dark:border-gray-[#86858d] rounded-md py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition ease-in-out duration-150",
+                        "aria-label": "Add",
+                        onClick: () => setExportMetaList([...exportMetaList, {
+                          name: "",
+                          value: ""
+                        }]),
+                        children: "+"
+                      })
+                    })]
+                  })]
+                })]
+              }), o("div", {
+                className: "absolute right-4",
+                children: o(Toggle, {
+                  label: "",
+                  checked: enableMeta,
+                  onCheckedUpdate: setEnableMeta
+                })
               })]
             })]
           }), o("div", {
@@ -18073,12 +18326,20 @@ We all have to wait for them to bring it back.`;
     const [exportOpen, setExportOpen] = h$2(false);
     const [settingOpen, setSettingOpen] = h$2(false);
     const {
-      format
-    } = useFormatContext();
-    const {
+      format,
+      enableTimestamp,
+      timeStamp24H,
       enableMeta,
       exportMetaList
-    } = useMetaDataContext();
+    } = useSettingContext();
+    p$3(() => {
+      console.log("enableTimestamp", enableTimestamp, "timeStamp24H", timeStamp24H);
+      if (enableTimestamp) {
+        document.body.setAttribute("data-time-format", timeStamp24H ? "24" : "12");
+      } else {
+        document.body.removeAttribute("data-time-format");
+      }
+    }, [enableTimestamp, timeStamp24H]);
     const metaList = F$1(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList]);
     const onClickText = T$3(() => exportToText(), []);
     const onClickPng = T$3(() => exportToPng(format), [format]);
@@ -18102,7 +18363,7 @@ We all have to wait for them to bring it back.`;
         onClick: () => setOpen(false)
       }), o($cef8881cdc69808e$export$be92b6f5f03c0fe9, {
         openDelay: 0,
-        closeDelay: 200,
+        closeDelay: 300,
         open,
         onOpenChange: setOpen,
         children: [o($cef8881cdc69808e$export$41fb9f06171c75f4, {
@@ -18191,11 +18452,9 @@ We all have to wait for them to bring it back.`;
   function Menu({
     container
   }) {
-    return o(FormatProvider, {
-      children: o(MetaDataProvider, {
-        children: o(MenuInner, {
-          container
-        })
+    return o(SettingProvider, {
+      children: o(MenuInner, {
+        container
       })
     });
   }
@@ -18287,7 +18546,7 @@ We all have to wait for them to bring it back.`;
           xhr.send();
         }
       });
-      sentinel.on(".flex.justify-between", (node2) => {
+      sentinel.on("main .flex.justify-between", (node2) => {
         if (!node2.querySelector("button"))
           return;
         if (node2.closest("pre"))
@@ -18300,6 +18559,45 @@ We all have to wait for them to bring it back.`;
           index: index2
         }), secondaryToolbar);
         node2.append(secondaryToolbar);
+      });
+      let chatId = "";
+      sentinel.on("main .group", async () => {
+        const threadContents = Array.from(document.querySelectorAll("main .group > .text-base > .relative:nth-child(2)"));
+        const currentChatId = getChatIdFromUrl();
+        if (!currentChatId || currentChatId === chatId)
+          return;
+        chatId = currentChatId;
+        const rawConversation = await fetchConversation(chatId);
+        const conversationChoices = getConversationChoice();
+        const {
+          conversationNodes
+        } = processConversation(rawConversation, conversationChoices);
+        threadContents.forEach((thread, index2) => {
+          var _a;
+          const createTime = (_a = conversationNodes[index2].message) == null ? void 0 : _a.create_time;
+          if (!createTime)
+            return;
+          const date = new Date(createTime * 1e3);
+          const timestamp2 = document.createElement("time");
+          timestamp2.className = "text-gray-500 dark:text-gray-400 text-sm text-right";
+          timestamp2.dateTime = date.toISOString();
+          timestamp2.title = date.toLocaleString();
+          const hour12 = document.createElement("span");
+          hour12.setAttribute("data-time-format", "12");
+          hour12.textContent = date.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit"
+          });
+          const hour24 = document.createElement("span");
+          hour24.setAttribute("data-time-format", "24");
+          hour24.textContent = date.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false
+          });
+          timestamp2.append(hour12, hour24);
+          thread.append(timestamp2);
+        });
       });
     });
   }
