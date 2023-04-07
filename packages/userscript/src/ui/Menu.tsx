@@ -79,7 +79,7 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
 
             <HoverCard.Root
                 openDelay={0}
-                closeDelay={200}
+                closeDelay={300}
                 open={open}
                 onOpenChange={setOpen}
             >
