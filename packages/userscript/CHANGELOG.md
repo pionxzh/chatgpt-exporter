@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.6.0...userscript-v2.6.1) (2023-04-08)
+
+
+### Bug Fixes
+
+* fix toggle style in mobile view ([dcd9c97](https://github.com/pionxzh/chatgpt-exporter/commit/dcd9c970adefa6aaea699148b62b49274218e31a))
+
 ## [2.6.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.5.4...userscript-v2.6.0) (2023-04-07)
 
 
