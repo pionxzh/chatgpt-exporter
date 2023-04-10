@@ -25,13 +25,19 @@ export function getFileNameWithFormat(format: string, ext: string, {
     title = document.title,
     // chatId will be empty when exporting all conversations
     chatId = '',
+    createTime,
+    updateTime
 } = {}) {
     const _title = sanitize(title).replace(/\s+/g, '_')
+    const _createTime = unixTimestampToFormattedDashString(createTime)
+    const _updateTime = unixTimestampToFormattedDashString(updateTime)
 
     return format
         .replace('{title}', _title)
         .replace('{date}', dateStr())
         .replace('{timestamp}', timestamp())
         .replace('{chat_id}', chatId)
+	.replace("{create_time}", _createTime)
+	.replace("{update_time}", _updateTime)
         .concat(`.${ext}`)
 }

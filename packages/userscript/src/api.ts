@@ -193,6 +193,7 @@ const modelMapping: { [key in ModelSlug]: string } = {
 export function processConversation(conversation: ApiConversationWithId, conversationChoices: Array<number | null> = []): ConversationResult {
     const title = conversation.title || 'ChatGPT Conversation'
     const createTime = conversation.create_time
+    const updateTime = conversation.update_time
     const modelSlug = Object.values(conversation.mapping).find(node => node.message?.metadata?.model_slug)?.message?.metadata?.model_slug || ''
     const model = modelSlug ? (modelMapping[modelSlug] || '') : ''
 
@@ -236,6 +237,7 @@ export function processConversation(conversation: ApiConversationWithId, convers
         modelSlug,
         model,
         createTime,
+        updateTime,
         conversationNodes: result,
     }
 }

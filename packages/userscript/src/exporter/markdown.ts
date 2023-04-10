@@ -21,7 +21,7 @@ export async function exportToMarkdown(fileNameFormat: string, metaList: ExportM
     const conversation = processConversation(rawConversation, conversationChoices)
     const markdown = conversationToMarkdown(conversation, metaList)
 
-    const fileName = getFileNameWithFormat(fileNameFormat, 'md', { title: conversation.title, chatId })
+    const fileName = getFileNameWithFormat(fileNameFormat, 'md', { title: conversation.title, chatId, createTime: conversation.createTime, updateTime: conversation.updateTime })
     downloadFile(fileName, 'text/markdown', standardizeLineBreaks(markdown))
 
     return true
@@ -34,6 +34,8 @@ export async function exportAllToMarkdown(fileNameFormat: string, apiConversatio
         const fileName = getFileNameWithFormat(fileNameFormat, 'md', {
             title: conversation.title,
             chatId: conversation.id,
+            createTime: conversation.createTime,
+            updateTime: conversation.updateTime,
         })
         const content = conversationToMarkdown(conversation, metaList)
         zip.file(fileName, content)
@@ -58,7 +60,9 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
                 .replace('{timestamp}', timestamp())
                 .replace('{source}', source)
                 .replace('{model}', model)
-                .replace('{modelSlug}', modelSlug)
+                .replace('{model_name}', modelSlug)
+                .replace("{create_time}", unixTimestampToISOString(createTime))
+                .replace("{update_time}", unixTimestampToISOString(updateTime))
 
             return `${name}: ${val}`
         })

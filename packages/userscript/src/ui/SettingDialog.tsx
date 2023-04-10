@@ -36,7 +36,9 @@ export const SettingDialog: FC<SettingDialogProps> = ({
     const timestamp = _timestamp()
     const title = sanitize(_title).replace(/\s+/g, '_')
     const chatId = getChatIdFromUrl() || 'this-is-a-mock-chat-id'
-    const preview = getFileNameWithFormat(format, '{ext}', { title, chatId })
+    const createTime = Math.floor((new Date()).getTime() / 1000)
+    const updateTime = createTime
+    const preview = getFileNameWithFormat(format, '{ext}', { title, chatId, createTime, updateTime })
 
     const source = `${baseUrl}/${chatId}`
 
@@ -69,6 +71,10 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                                         <Variable name="{timestamp}" title={timestamp} />
                                         ,{' '}
                                         <Variable name="{chat_id}" title={chatId} />
+                                        ,{' '}
+                                        <Variable name="{create_time}" title={createTime} />
+                                        ,{' '}
+                                        <Variable name="{update_time}" title={updateTime} />
                                     </p>
                                     <input className="Input mt-4" id="filename" value={format} onChange={e => setFormat(e.currentTarget.value)} />
                                     <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">
@@ -123,6 +129,10 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                                                 <Variable name="{model}" title={'ChatGPT-3.5'} />
                                                 ,{' '}
                                                 <Variable name="{model_name}" title={'text-davinci-002-render-sha'} />
+                                                ,{' '}
+                                                <Variable name="{create_time}" title={'2023-04-10T21:45:35.027Z'} />
+                                                ,{' '}
+                                                <Variable name="{update_time}" title={'2023-04-10T21:45:35.027Z'} />
                                             </p>
                                             {exportMetaList.map((meta, i) => (
                                                 <div className="flex items-center mt-2" key={i}>

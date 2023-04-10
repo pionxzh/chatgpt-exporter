@@ -32,6 +32,8 @@ export async function exportAllToJson(fileNameFormat: string, apiConversations: 
         const fileName = getFileNameWithFormat(fileNameFormat, 'json', {
             title: conversation.title,
             chatId: conversation.id,
+            createTime: conversation.createTime,
+            updateTime: conversation.updateTime,
         })
         const content = conversationToJson(rawConversation)
         zip.file(fileName, content)

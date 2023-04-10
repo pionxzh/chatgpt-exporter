@@ -25,7 +25,7 @@ export async function exportToHtml(fileNameFormat: string, metaList: ExportMeta[
     const conversation = processConversation(rawConversation, conversationChoices)
     const html = conversationToHtml(conversation, userAvatar, metaList)
 
-    const fileName = getFileNameWithFormat(fileNameFormat, 'html', { title: conversation.title, chatId })
+    const fileName = getFileNameWithFormat(fileNameFormat, 'html', { title: conversation.title, chatId, createTime: conversation.createTime, updateTime: conversation.updateTime })
     downloadFile(fileName, 'text/html', standardizeLineBreaks(html))
 
     return true
@@ -40,6 +40,8 @@ export async function exportAllToHtml(fileNameFormat: string, apiConversations: 
         const fileName = getFileNameWithFormat(fileNameFormat, 'html', {
             title: conversation.title,
             chatId: conversation.id,
+            createTime: conversation.createTime,
+            updateTime: conversation.updateTime,
         })
         const content = conversationToHtml(conversation, userAvatar, metaList)
         zip.file(fileName, content)
@@ -52,7 +54,7 @@ export async function exportAllToHtml(fileNameFormat: string, apiConversations: 
 }
 
 function conversationToHtml(conversation: ConversationResult, avatar: string, metaList?: ExportMeta[]) {
-    const { id, title, model, modelSlug, conversationNodes } = conversation
+    const { id, title, model, modelSlug, createTime, updateTime, conversationNodes } = conversation
 
     const conversationHtml = conversationNodes.map((item) => {
         const author = item.message?.author.role === 'assistant' ? 'ChatGPT' : 'You'
@@ -120,6 +122,8 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
                 .replace('{source}', source)
                 .replace('{model}', model)
                 .replace('{mode_name}', modelSlug)
+                .replace("{create_time}", unixTimestampToISOString(createTime))
+                .replace("{update_time}", unixTimestampToISOString(updateTime))
 
             return [name, val] as const
         })
