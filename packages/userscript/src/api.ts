@@ -181,6 +181,7 @@ export interface ConversationResult {
     modelSlug: string
     model: string
     createTime: number
+    updateTime: number
     conversationNodes: ConversationNode[]
 }
 

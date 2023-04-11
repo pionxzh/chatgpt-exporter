@@ -5,7 +5,7 @@ import { checkIfConversationStarted, getConversationChoice } from '../page'
 import { downloadFile, getFileNameWithFormat } from '../utils/download'
 import { fromMarkdown, toMarkdown } from '../utils/markdown'
 import { standardizeLineBreaks } from '../utils/text'
-import { dateStr, timestamp } from '../utils/utils'
+import { dateStr, timestamp, unixTimestampToISOString } from '../utils/utils'
 import type { ApiConversationWithId, ConversationResult } from '../api'
 import type { ExportMeta } from '../ui/SettingContext'
 
@@ -48,7 +48,7 @@ export async function exportAllToMarkdown(fileNameFormat: string, apiConversatio
 }
 
 function conversationToMarkdown(conversation: ConversationResult, metaList?: ExportMeta[]) {
-    const { id, title, model, modelSlug, conversationNodes } = conversation
+    const { id, title, model, modelSlug, createTime, updateTime, conversationNodes } = conversation
     const source = `${baseUrl}/chat/${id}`
 
     const _metaList = metaList
@@ -61,8 +61,8 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
                 .replace('{source}', source)
                 .replace('{model}', model)
                 .replace('{model_name}', modelSlug)
-                .replace("{create_time}", unixTimestampToISOString(createTime))
-                .replace("{update_time}", unixTimestampToISOString(updateTime))
+                .replace('{create_time}', unixTimestampToISOString(createTime))
+                .replace('{update_time}', unixTimestampToISOString(updateTime))
 
             return `${name}: ${val}`
         })

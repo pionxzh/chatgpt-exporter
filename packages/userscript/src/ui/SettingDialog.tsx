@@ -4,7 +4,7 @@ import { baseUrl } from '../constants'
 import { useTitle } from '../hooks/useTitle'
 import { getChatIdFromUrl } from '../page'
 import { getFileNameWithFormat } from '../utils/download'
-import { timestamp as _timestamp, dateStr } from '../utils/utils'
+import { timestamp as _timestamp, dateStr, unixTimestampToISOString } from '../utils/utils'
 import { IconCross, IconTrash } from './Icons'
 import { useSettingContext } from './SettingContext'
 import { Toggle } from './Toggle'
@@ -36,8 +36,9 @@ export const SettingDialog: FC<SettingDialogProps> = ({
     const timestamp = _timestamp()
     const title = sanitize(_title).replace(/\s+/g, '_')
     const chatId = getChatIdFromUrl() || 'this-is-a-mock-chat-id'
-    const createTime = Math.floor((new Date()).getTime() / 1000)
-    const updateTime = createTime
+    const now = Date.now() / 1000
+    const createTime = now
+    const updateTime = now
     const preview = getFileNameWithFormat(format, '{ext}', { title, chatId, createTime, updateTime })
 
     const source = `${baseUrl}/${chatId}`
@@ -72,9 +73,9 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                                         ,{' '}
                                         <Variable name="{chat_id}" title={chatId} />
                                         ,{' '}
-                                        <Variable name="{create_time}" title={createTime} />
+                                        <Variable name="{create_time}" title={unixTimestampToISOString(createTime)} />
                                         ,{' '}
-                                        <Variable name="{update_time}" title={updateTime} />
+                                        <Variable name="{update_time}" title={unixTimestampToISOString(updateTime)} />
                                     </p>
                                     <input className="Input mt-4" id="filename" value={format} onChange={e => setFormat(e.currentTarget.value)} />
                                     <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">

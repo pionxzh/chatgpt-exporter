@@ -7,7 +7,7 @@ import { downloadFile, getFileNameWithFormat } from '../utils/download'
 import { fromMarkdown, toHtml } from '../utils/markdown'
 import { ScriptStorage } from '../utils/storage'
 import { standardizeLineBreaks } from '../utils/text'
-import { dateStr, getColorScheme, timestamp } from '../utils/utils'
+import { dateStr, getColorScheme, timestamp, unixTimestampToISOString } from '../utils/utils'
 import type { ApiConversationWithId, ConversationResult } from '../api'
 import type { ExportMeta } from '../ui/SettingContext'
 
@@ -122,8 +122,8 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
                 .replace('{source}', source)
                 .replace('{model}', model)
                 .replace('{mode_name}', modelSlug)
-                .replace("{create_time}", unixTimestampToISOString(createTime))
-                .replace("{update_time}", unixTimestampToISOString(updateTime))
+                .replace('{create_time}', unixTimestampToISOString(createTime))
+                .replace('{update_time}', unixTimestampToISOString(updateTime))
 
             return [name, val] as const
         })
