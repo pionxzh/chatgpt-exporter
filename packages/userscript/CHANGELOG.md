@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.6.1...userscript-v2.6.2) (2023-04-12)
+
+
+### Bug Fixes
+
+* handle `GM_*` function might be `undefined` ([77b52b1](https://github.com/pionxzh/chatgpt-exporter/commit/77b52b12fb52ab05c8ea7c49c65c965c99e6281b)), closes [#112](https://github.com/pionxzh/chatgpt-exporter/issues/112)
+
 ## [2.6.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.6.0...userscript-v2.6.1) (2023-04-08)
 
 
