@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.6.1
+// @version            2.6.2
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -15443,6 +15443,7 @@ var __publicField = (obj, key, value) => {
       GM_deleteValue(key2);
     }
   }
+  __publicField(GMStorage, "supported", typeof GM_getValue === "function" && typeof GM_setValue === "function" && typeof GM_deleteValue === "function");
   class LocalStorage {
     static get(key2) {
       const item = localStorage.getItem(key2);
@@ -15463,6 +15464,7 @@ var __publicField = (obj, key, value) => {
       localStorage.removeItem(key2);
     }
   }
+  __publicField(LocalStorage, "supported", typeof localStorage === "object");
   class MemoryStorage {
     static get(key2) {
       const item = this.map.get(key2);
@@ -15478,39 +15480,52 @@ var __publicField = (obj, key, value) => {
     }
   }
   __publicField(MemoryStorage, "map", /* @__PURE__ */ new Map());
+  __publicField(MemoryStorage, "supported", true);
   class ScriptStorage {
     static get(key2) {
-      try {
-        return GMStorage.get(key2);
-      } catch {
+      if (GMStorage.supported) {
+        try {
+          return GMStorage.get(key2);
+        } catch {
+        }
+      }
+      if (LocalStorage.supported) {
         try {
           return LocalStorage.get(key2);
         } catch {
-          return MemoryStorage.get(key2);
         }
       }
+      return MemoryStorage.get(key2);
     }
     static set(key2, value) {
-      try {
-        return GMStorage.set(key2, value);
-      } catch {
+      if (GMStorage.supported) {
+        try {
+          return GMStorage.set(key2, value);
+        } catch {
+        }
+      }
+      if (LocalStorage.supported) {
         try {
           return LocalStorage.set(key2, value);
         } catch {
-          return MemoryStorage.set(key2, value);
         }
       }
+      return MemoryStorage.set(key2, value);
     }
     static delete(key2) {
-      try {
-        return GMStorage.delete(key2);
-      } catch {
+      if (GMStorage.supported) {
+        try {
+          return GMStorage.delete(key2);
+        } catch {
+        }
+      }
+      if (LocalStorage.supported) {
         try {
           return LocalStorage.delete(key2);
         } catch {
-          return MemoryStorage.delete(key2);
         }
       }
+      return MemoryStorage.delete(key2);
     }
   }
   function standardizeLineBreaks(text2) {
@@ -18333,7 +18348,6 @@ We all have to wait for them to bring it back.`;
       exportMetaList
     } = useSettingContext();
     p$3(() => {
-      console.log("enableTimestamp", enableTimestamp, "timeStamp24H", timeStamp24H);
       if (enableTimestamp) {
         document.body.setAttribute("data-time-format", timeStamp24H ? "24" : "12");
       } else {
@@ -18501,14 +18515,18 @@ We all have to wait for them to bring it back.`;
     });
   };
   const missingTailwind = "";
-  const legacyFormat = GM_getValue(LEGACY_KEY_FILENAME_FORMAT, "");
-  const localLegacyFormat = localStorage.getItem(LEGACY_KEY_FILENAME_FORMAT);
-  if (legacyFormat) {
-    GM_deleteValue(LEGACY_KEY_FILENAME_FORMAT);
-    GM_setValue(KEY_FILENAME_FORMAT, JSON.stringify(legacyFormat));
-  } else if (localLegacyFormat) {
-    localStorage.removeItem(LEGACY_KEY_FILENAME_FORMAT);
-    localStorage.setItem(KEY_FILENAME_FORMAT, JSON.stringify(localLegacyFormat));
+  try {
+    const legacyFormat = GM_getValue == null ? void 0 : GM_getValue(LEGACY_KEY_FILENAME_FORMAT, "");
+    const localLegacyFormat = localStorage.getItem(LEGACY_KEY_FILENAME_FORMAT);
+    if (legacyFormat) {
+      GM_deleteValue == null ? void 0 : GM_deleteValue(LEGACY_KEY_FILENAME_FORMAT);
+      GM_setValue == null ? void 0 : GM_setValue(KEY_FILENAME_FORMAT, JSON.stringify(legacyFormat));
+    } else if (localLegacyFormat) {
+      localStorage.removeItem(LEGACY_KEY_FILENAME_FORMAT);
+      localStorage.setItem(KEY_FILENAME_FORMAT, JSON.stringify(localLegacyFormat));
+    }
+  } catch (error) {
+    console.error("Failed to migrate legacy filename format", error);
   }
   main();
   function main() {
