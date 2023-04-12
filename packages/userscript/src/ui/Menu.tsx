@@ -36,7 +36,6 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
     } = useSettingContext()
 
     useEffect(() => {
-        console.log('enableTimestamp', enableTimestamp, 'timeStamp24H', timeStamp24H)
         if (enableTimestamp) {
             document.body.setAttribute('data-time-format', timeStamp24H ? '24' : '12')
         }
