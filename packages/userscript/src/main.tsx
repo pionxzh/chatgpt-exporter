@@ -13,15 +13,20 @@ import './styles/missing-tailwind.css'
 /**
  * Migrate legacy filename format
  */
-const legacyFormat = GM_getValue(LEGACY_KEY_FILENAME_FORMAT, '')
-const localLegacyFormat = localStorage.getItem(LEGACY_KEY_FILENAME_FORMAT)
-if (legacyFormat) {
-    GM_deleteValue(LEGACY_KEY_FILENAME_FORMAT)
-    GM_setValue(KEY_FILENAME_FORMAT, JSON.stringify(legacyFormat))
+try {
+    const legacyFormat = GM_getValue?.(LEGACY_KEY_FILENAME_FORMAT, '')
+    const localLegacyFormat = localStorage.getItem(LEGACY_KEY_FILENAME_FORMAT)
+    if (legacyFormat) {
+        GM_deleteValue?.(LEGACY_KEY_FILENAME_FORMAT)
+        GM_setValue?.(KEY_FILENAME_FORMAT, JSON.stringify(legacyFormat))
+    }
+    else if (localLegacyFormat) {
+        localStorage.removeItem(LEGACY_KEY_FILENAME_FORMAT)
+        localStorage.setItem(KEY_FILENAME_FORMAT, JSON.stringify(localLegacyFormat))
+    }
 }
-else if (localLegacyFormat) {
-    localStorage.removeItem(LEGACY_KEY_FILENAME_FORMAT)
-    localStorage.setItem(KEY_FILENAME_FORMAT, JSON.stringify(localLegacyFormat))
+catch (error) {
+    console.error('Failed to migrate legacy filename format', error)
 }
 
 main()
