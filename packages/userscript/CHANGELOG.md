@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.6.3](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.6.2...userscript-v2.6.3) (2023-04-13)
+
+
+### Bug Fixes
+
+* add missing css `ml-4` ([f5974d4](https://github.com/pionxzh/chatgpt-exporter/commit/f5974d4bd8bd63c2df18387ac4401d64f4b256ba))
+* handling same chat name in export all ([aa513b1](https://github.com/pionxzh/chatgpt-exporter/commit/aa513b1bdde84a12d96d92956501ceec2c270a26)), closes [#117](https://github.com/pionxzh/chatgpt-exporter/issues/117)
+
 ## [2.6.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.6.1...userscript-v2.6.2) (2023-04-12)
 
 
