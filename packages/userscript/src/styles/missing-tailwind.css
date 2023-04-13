@@ -116,6 +116,10 @@
     height: 1.25rem;
 }
 
+.ml-4 {
+    margin-left: 1rem;
+}
+
 .mr-8 {
     margin-right: 2rem;
 }
