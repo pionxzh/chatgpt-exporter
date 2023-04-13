@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.6.2
+// @version            2.6.3
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -518,6 +518,10 @@ body[data-time-format="24"] span[data-time-format="24"] {
 
 .h-5 {
     height: 1.25rem;
+}
+
+.ml-4 {
+    margin-left: 1rem;
 }
 
 .mr-8 {
@@ -15552,12 +15556,20 @@ var __publicField = (obj, key, value) => {
   async function exportAllToHtml(fileNameFormat, apiConversations, metaList) {
     const userAvatar = await getUserAvatar();
     const zip = new JSZip2();
+    const filenameMap = /* @__PURE__ */ new Map();
     const conversations = apiConversations.map((x2) => processConversation(x2));
     conversations.forEach((conversation) => {
-      const fileName = getFileNameWithFormat(fileNameFormat, "html", {
+      let fileName = getFileNameWithFormat(fileNameFormat, "html", {
         title: conversation.title,
         chatId: conversation.id
       });
+      if (filenameMap.has(fileName)) {
+        const count = filenameMap.get(fileName) ?? 1;
+        filenameMap.set(fileName, count + 1);
+        fileName = `${fileName.slice(0, -5)} (${count}).html`;
+      } else {
+        filenameMap.set(fileName, 1);
+      }
       const content2 = conversationToHtml(conversation, userAvatar, metaList);
       zip.file(fileName, content2);
     });
@@ -15772,6 +15784,7 @@ var __publicField = (obj, key, value) => {
   }
   async function exportAllToJson(fileNameFormat, apiConversations) {
     const zip = new JSZip2();
+    const filenameMap = /* @__PURE__ */ new Map();
     const conversations = apiConversations.map((x2) => ({
       conversation: processConversation(x2),
       rawConversation: x2
@@ -15780,10 +15793,17 @@ var __publicField = (obj, key, value) => {
       conversation,
       rawConversation
     }) => {
-      const fileName = getFileNameWithFormat(fileNameFormat, "json", {
+      let fileName = getFileNameWithFormat(fileNameFormat, "json", {
         title: conversation.title,
         chatId: conversation.id
       });
+      if (filenameMap.has(fileName)) {
+        const count = filenameMap.get(fileName) ?? 1;
+        filenameMap.set(fileName, count + 1);
+        fileName = `${fileName.slice(0, -5)} (${count}).json`;
+      } else {
+        filenameMap.set(fileName, 1);
+      }
       const content2 = conversationToJson(rawConversation);
       zip.file(fileName, content2);
     });
@@ -15815,12 +15835,20 @@ var __publicField = (obj, key, value) => {
   }
   async function exportAllToMarkdown(fileNameFormat, apiConversations, metaList) {
     const zip = new JSZip2();
+    const filenameMap = /* @__PURE__ */ new Map();
     const conversations = apiConversations.map((x2) => processConversation(x2));
     conversations.forEach((conversation) => {
-      const fileName = getFileNameWithFormat(fileNameFormat, "md", {
+      let fileName = getFileNameWithFormat(fileNameFormat, "md", {
         title: conversation.title,
         chatId: conversation.id
       });
+      if (filenameMap.has(fileName)) {
+        const count = filenameMap.get(fileName) ?? 1;
+        filenameMap.set(fileName, count + 1);
+        fileName = `${fileName.slice(0, -3)} (${count}).md`;
+      } else {
+        filenameMap.set(fileName, 1);
+      }
       const content2 = conversationToMarkdown(conversation, metaList);
       zip.file(fileName, content2);
     });
