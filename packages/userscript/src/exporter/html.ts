@@ -35,12 +35,21 @@ export async function exportAllToHtml(fileNameFormat: string, apiConversations: 
     const userAvatar = await getUserAvatar()
 
     const zip = new JSZip()
+    const filenameMap = new Map<string, number>()
     const conversations = apiConversations.map(x => processConversation(x))
     conversations.forEach((conversation) => {
-        const fileName = getFileNameWithFormat(fileNameFormat, 'html', {
+        let fileName = getFileNameWithFormat(fileNameFormat, 'html', {
             title: conversation.title,
             chatId: conversation.id,
         })
+        if (filenameMap.has(fileName)) {
+            const count = filenameMap.get(fileName) ?? 1
+            filenameMap.set(fileName, count + 1)
+            fileName = `${fileName.slice(0, -5)} (${count}).html`
+        }
+        else {
+            filenameMap.set(fileName, 1)
+        }
         const content = conversationToHtml(conversation, userAvatar, metaList)
         zip.file(fileName, content)
     })

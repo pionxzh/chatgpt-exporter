@@ -29,12 +29,21 @@ export async function exportToMarkdown(fileNameFormat: string, metaList: ExportM
 
 export async function exportAllToMarkdown(fileNameFormat: string, apiConversations: ApiConversationWithId[], metaList?: ExportMeta[]) {
     const zip = new JSZip()
+    const filenameMap = new Map<string, number>()
     const conversations = apiConversations.map(x => processConversation(x))
     conversations.forEach((conversation) => {
-        const fileName = getFileNameWithFormat(fileNameFormat, 'md', {
+        let fileName = getFileNameWithFormat(fileNameFormat, 'md', {
             title: conversation.title,
             chatId: conversation.id,
         })
+        if (filenameMap.has(fileName)) {
+            const count = filenameMap.get(fileName) ?? 1
+            filenameMap.set(fileName, count + 1)
+            fileName = `${fileName.slice(0, -3)} (${count}).md`
+        }
+        else {
+            filenameMap.set(fileName, 1)
+        }
         const content = conversationToMarkdown(conversation, metaList)
         zip.file(fileName, content)
     })

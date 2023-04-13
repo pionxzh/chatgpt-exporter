@@ -24,15 +24,24 @@ export async function exportToJson(fileNameFormat: string) {
 
 export async function exportAllToJson(fileNameFormat: string, apiConversations: ApiConversationWithId[]) {
     const zip = new JSZip()
+    const filenameMap = new Map<string, number>()
     const conversations = apiConversations.map(x => ({
         conversation: processConversation(x),
         rawConversation: x,
     }))
     conversations.forEach(({ conversation, rawConversation }) => {
-        const fileName = getFileNameWithFormat(fileNameFormat, 'json', {
+        let fileName = getFileNameWithFormat(fileNameFormat, 'json', {
             title: conversation.title,
             chatId: conversation.id,
         })
+        if (filenameMap.has(fileName)) {
+            const count = filenameMap.get(fileName) ?? 1
+            filenameMap.set(fileName, count + 1)
+            fileName = `${fileName.slice(0, -5)} (${count}).json`
+        }
+        else {
+            filenameMap.set(fileName, 1)
+        }
         const content = conversationToJson(rawConversation)
         zip.file(fileName, content)
     })
