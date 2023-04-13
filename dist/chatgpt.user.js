@@ -13,6 +13,7 @@
 // @match              https://chat.openai.com/chat
 // @match              https://chat.openai.com/chat?*
 // @match              https://chat.openai.com/chat/*
+// @match              https://chat.openai.com/c/*
 // @require            https://cdn.jsdelivr.net/npm/jszip@3.9.1/dist/jszip.min.js
 // @require            https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js
 // @grant              GM_deleteValue
