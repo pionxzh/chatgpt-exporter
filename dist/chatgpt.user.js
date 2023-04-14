@@ -3,14 +3,14 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.6.4
+// @version            2.6.5
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
 // @description:zh-TW  輕鬆匯出 ChatGPT 聊天紀錄，以便進一步分析或分享。
 // @license            MIT
 // @icon               https://chat.openai.com/favicon.ico
-// @match              https://chat.openai.com
+// @match              https://chat.openai.com/
 // @match              https://chat.openai.com/c?*
 // @match              https://chat.openai.com/c/*
 // @require            https://cdn.jsdelivr.net/npm/jszip@3.9.1/dist/jszip.min.js
