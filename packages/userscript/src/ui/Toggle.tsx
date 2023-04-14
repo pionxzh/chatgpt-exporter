@@ -1,25 +1,31 @@
+import { Switch } from '@headlessui/react'
+
 interface ToggleProps {
     label?: string
     checked?: boolean
     onCheckedUpdate?: (checked: boolean) => void
 }
 
-export const Toggle = (props: ToggleProps) => {
-    const { label = '', checked = true, onCheckedUpdate } = props
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (!e.target || !onCheckedUpdate) return
-        onCheckedUpdate((e.target as HTMLInputElement).checked)
-    }
+/**
+ * Mimics the style of OpenAI's
+ */
+export const Toggle = ({ label, checked = true, onCheckedUpdate }: ToggleProps) => {
     return (
-        <label className="relative inline-flex items-center cursor-pointer">
-            <input
-                type="checkbox"
+        <div className="inline-flex items-center">
+            <Switch
                 checked={checked}
-                onChange={handleChange}
-                className="sr-only peer"
-            />
-            <div className="relative shrink-0 w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-            <span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300 empty:hidden">{label}</span>
-        </label>
+                onChange={onCheckedUpdate}
+                className={`${
+                    checked ? 'bg-green-600' : 'bg-gray-200'
+                } relative inline-flex flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-0 h-6 w-11`}
+            >
+                <span className="sr-only">Use setting</span>
+                <span className={`${checked ? 'translate-x-5' : 'translate-x-0'} pointer-events-none relative inline-block transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out h-5 w-5`}>
+                    <span className="opacity-0 duration-100 ease-out absolute inset-0 flex h-full w-full items-center justify-center transition-opacity" aria-hidden="true"></span>
+                    <span className="opacity-100 duration-200 ease-in absolute inset-0 flex h-full w-full items-center justify-center transition-opacity" aria-hidden="true"></span>
+                </span>
+            </Switch>
+            {label && <span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">{label}</span>}
+        </div>
     )
 }

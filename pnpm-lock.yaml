@@ -35,6 +35,7 @@ importers:
 
   packages/userscript:
     specifiers:
+      '@headlessui/react': ^1.7.14
       '@preact/preset-vite': ^2.5.0
       '@radix-ui/colors': ^0.1.8
       '@radix-ui/react-dialog': ^1.0.3
@@ -59,6 +60,7 @@ importers:
       vite: ^4.2.1
       vite-plugin-monkey: ^2.12.1
     dependencies:
+      '@headlessui/react': 1.7.14_biqbaboplfbrettd7655fr4n2y
       '@radix-ui/colors': 0.1.8
       '@radix-ui/react-dialog': 1.0.3_biqbaboplfbrettd7655fr4n2y
       '@radix-ui/react-hover-card': 1.0.5_biqbaboplfbrettd7655fr4n2y
@@ -752,6 +754,18 @@ packages:
       use-isomorphic-layout-effect: 1.1.2_react@18.2.0
     transitivePeerDependencies:
       - '@types/react'
+    dev: false
+
+  /@headlessui/react/1.7.14_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-znzdq9PG8rkwcu9oQ2FwIy0ZFtP9Z7ycS+BAqJ3R5EIqC/0bJGvhT7193rFf+45i9nnPsYvCQVW4V/bB9Xc+gA==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      react: ^16 || ^17 || ^18
+      react-dom: ^16 || ^17 || ^18
+    dependencies:
+      client-only: 0.0.1
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
     dev: false
 
   /@humanwhocodes/config-array/0.11.8:
@@ -1831,6 +1845,10 @@ packages:
       slice-ansi: 5.0.0
       string-width: 5.1.2
     dev: true
+
+  /client-only/0.0.1:
+    resolution: {integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==}
+    dev: false
 
   /cliui/8.0.1:
     resolution: {integrity: sha512-BSeNnyus75C4//NQ9gQt1/csTXyo/8Sb+afLAkzAptFuMsod9HFokGNudZpi/oQV73hnVK+sR+5PVRMd+Dr7YQ==}

@@ -1,62 +1,3 @@
-.after\:content-\[\'\'\]:after {
-    --tw-content: "";
-    content: var(--tw-content);
-}
-
-.after\:transition-all:after {
-    content: var(--tw-content);
-    transition-duration: .15s;
-    transition-property: all;
-    transition-timing-function: cubic-bezier(.4,0,.2,1);
-}
-
-.after\:bg-white:after {
-    --tw-bg-opacity: 1;
-    background-color: rgb(255 255 255/var(--tw-bg-opacity));
-    content: var(--tw-content);
-}
-
-.after\:border-gray-300:after {
-    --tw-border-opacity: 1;
-    border-color: rgb(209 213 219/var(--tw-border-opacity));
-    content: var(--tw-content);
-}
-
-.after\:border:after {
-    border-width: 1px;
-    content: var(--tw-content);
-}
-
-.after\:rounded-full:after {
-    border-radius: 9999px;
-
-    content: var(--tw-content);
-}
-.after\:w-4:after {
-    content: var(--tw-content);
-    width: 1rem
-}
-
-.after\:h-4:after {
-    content: var(--tw-content);
-    height: 1rem;
-}
-
-.after\:top-\[2px\]:after {
-    content: var(--tw-content);
-    top: 2px;
-}
-
-.after\:left-\[2px\]:after {
-    content: var(--tw-content);
-    left: 2px;
-}
-
-.after\:absolute:after {
-    content: var(--tw-content);
-    position: absolute;
-}
-
 .animate-fadeIn  {
     animation: fadeIn .3s;
 }
@@ -87,14 +28,6 @@
     border-color: #86858d;
 }
 
-.dark .dark\:border-gray-600 {
-    --tw-border-opacity: 1;
-    border-color: rgb(75 85 99/var(--tw-border-opacity));
-}
-
-.empty\:hidden:empty {
-    display: none;
-}
 
 .fill-current {
     fill: currentColor;
@@ -116,6 +49,10 @@
     height: 1.25rem;
 }
 
+.ml-3 {
+    margin-left: 0.75rem;
+}
+
 .ml-4 {
     margin-left: 1rem;
 }
@@ -126,26 +63,6 @@
 
 .pb-0 {
     padding-bottom: 0;
-}
-
-.peer:checked~.peer-checked\:bg-blue-600 {
-    --tw-bg-opacity: 1;
-    background-color: rgb(28 100 242/var(--tw-bg-opacity));
-}
-
-.peer:checked~.peer-checked\:after\:border-white:after {
-    --tw-border-opacity: 1;
-    border-color: rgb(255 255 255/var(--tw-border-opacity));
-    content: var(--tw-content);
-}
-.peer:checked~.peer-checked\:after\:translate-x-full:after {
-    --tw-translate-x: 100%;
-    content: var(--tw-content);
-    transform: translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
-
-.pl-4 {
-    padding-left: 1rem;
 }
 
 .pr-8 {
@@ -170,10 +87,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
-
-.w-9 {
-    width: 2.25rem;
 }
 
 .whitespace-nowrap {
