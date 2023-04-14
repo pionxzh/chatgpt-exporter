@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.5](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.6.4...userscript-v2.6.5) (2023-04-14)
+
+
+### Bug Fixes
+
+* [@match](https://github.com/match) url should have a tralling `/` at the end ([f0f64d4](https://github.com/pionxzh/chatgpt-exporter/commit/f0f64d49963946bd8aab3a6f213cfa5df980139c))
+
 ## [2.6.4](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.6.3...userscript-v2.6.4) (2023-04-14)
 
 
