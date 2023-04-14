@@ -1,4 +1,5 @@
 import html2canvas from 'html2canvas'
+import i18n from '../i18n'
 import { checkIfConversationStarted, getChatIdFromUrl } from '../page'
 import { downloadUrl, getFileNameWithFormat } from '../utils/download'
 import { Effect } from '../utils/effect'
@@ -11,7 +12,7 @@ function fnIgnoreElements(el: any) {
 
 export async function exportToPng(fileNameFormat: string) {
     if (!checkIfConversationStarted()) {
-        alert('Please start a conversation first.')
+        alert(i18n.t('Please start a conversation first'))
         return false
     }
 

@@ -1,6 +1,7 @@
 import JSZip from 'jszip'
 import { fetchConversation, getCurrentChatId, processConversation } from '../api'
 import { KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, baseUrl } from '../constants'
+import i18n from '../i18n'
 import { checkIfConversationStarted, getConversationChoice, getUserAvatar } from '../page'
 import templateHtml from '../template.html?raw'
 import { downloadFile, getFileNameWithFormat } from '../utils/download'
@@ -13,7 +14,7 @@ import type { ExportMeta } from '../ui/SettingContext'
 
 export async function exportToHtml(fileNameFormat: string, metaList: ExportMeta[]) {
     if (!checkIfConversationStarted()) {
-        alert('Please start a conversation first.')
+        alert(i18n.t('Please start a conversation first'))
         return false
     }
 

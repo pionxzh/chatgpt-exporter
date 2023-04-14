@@ -8,6 +8,7 @@
   },
   "include": [
     "src",
+    "src/locales/*.json",
     "package.json",
     "vite.config.ts"
   ]

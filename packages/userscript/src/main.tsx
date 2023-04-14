@@ -8,6 +8,7 @@ import { Menu } from './ui/Menu'
 import { SecondaryToolbar } from './ui/SecondaryToolbar'
 import { onloadSafe } from './utils/utils'
 
+import './i18n'
 import './styles/missing-tailwind.css'
 
 /**

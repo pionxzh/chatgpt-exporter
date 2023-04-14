@@ -1,7 +1,9 @@
 import * as Dialog from '@radix-ui/react-dialog'
+import { useTranslation } from 'react-i18next'
 import sanitize from 'sanitize-filename'
 import { baseUrl } from '../constants'
 import { useTitle } from '../hooks/useTitle'
+import { LOCALES } from '../i18n'
 import { getChatIdFromUrl } from '../page'
 import { getFileNameWithFormat } from '../utils/download'
 import { timestamp as _timestamp, dateStr } from '../utils/utils'
@@ -31,6 +33,7 @@ export const SettingDialog: FC<SettingDialogProps> = ({
         enableMeta, setEnableMeta,
         exportMetaList, setExportMetaList,
     } = useSettingContext()
+    const { t, i18n } = useTranslation()
     const _title = useTitle()
     const date = dateStr()
     const timestamp = _timestamp()
@@ -51,17 +54,35 @@ export const SettingDialog: FC<SettingDialogProps> = ({
             <Dialog.Portal>
                 <Dialog.Overlay className="DialogOverlay" />
                 <Dialog.Content className="DialogContent">
-                    <Dialog.Title className="DialogTitle">Exporter Setting</Dialog.Title>
+                    <Dialog.Title className="DialogTitle">{t('Exporter Settings')}</Dialog.Title>
 
                     <dl className="space-y-6">
                         <div className="relative flex bg-white dark:bg-white/5 rounded p-4">
                             <div>
                                 <dt className="text-md font-medium text-gray-800 dark:text-white">
-                                    File Name
+                                    {`${t('Language')} 🌐`}
+                                </dt>
+                                <dd>
+                                    <select
+                                        className="Select mt-3"
+                                        value={i18n.language}
+                                        onChange={e => i18n.changeLanguage(e.currentTarget.value)}
+                                    >
+                                        {LOCALES.map(({ name, code }) => (
+                                            <option key={code} value={code}>{name}</option>
+                                        ))}
+                                    </select>
+                                </dd>
+                            </div>
+                        </div>
+                        <div className="relative flex bg-white dark:bg-white/5 rounded p-4">
+                            <div>
+                                <dt className="text-md font-medium text-gray-800 dark:text-white">
+                                    {t('File Name')}
                                 </dt>
                                 <dd>
                                     <p className="text-sm text-gray-700 dark:text-gray-300">
-                                        Available variables:{' '}
+                                        {t('Available variables')}:{' '}
                                         <Variable name="{title}" title={title} />
                                         ,{' '}
                                         <Variable name="{date}" title={date} />
@@ -72,7 +93,7 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                                     </p>
                                     <input className="Input mt-4" id="filename" value={format} onChange={e => setFormat(e.currentTarget.value)} />
                                     <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">
-                                        Preview:{' '}
+                                        {t('Preview')}:{' '}
                                         <span className="select-all" style={{ 'text-decoration': 'underline', 'text-underline-offset': 4 }}>{preview}</span>
                                     </p>
                                 </dd>
@@ -81,14 +102,14 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                         <div className="relative flex bg-white dark:bg-white/5 rounded p-4">
                             <div>
                                 <dt className="text-md font-medium text-gray-800 dark:text-white">
-                                    Conversation Timestamp
+                                    {t('Conversation Timestamp')}
                                 </dt>
                                 <dd className="text-sm text-gray-700 dark:text-gray-300">
-                                    Will show on the page and HTML files.
+                                    {t('Conversation Timestamp Description')}
                                     {enableTimestamp && (
                                         <div className="mt-2">
                                             <Toggle
-                                                label="Use 24-hour format (eg. 23:59)"
+                                                label={t('Use 24-hour format')}
                                                 checked={timeStamp24H}
                                                 onCheckedUpdate={setTimeStamp24H}
                                             />
@@ -103,15 +124,15 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                         <div className="relative flex bg-white dark:bg-white/5 rounded p-4">
                             <div>
                                 <dt className="text-md font-medium text-gray-800 dark:text-white">
-                                    Export Metadata
+                                    {t('Export Metadata')}
                                 </dt>
                                 <dd className="text-sm text-gray-700 dark:text-gray-300">
-                                    Add metadata to exported Markdown and HTML files.
+                                    {t('Export Metadata Description')}
 
                                     {enableMeta && (
                                         <>
                                             <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-                                                Available variables:{' '}
+                                                {t('Available variables')}:{' '}
                                                 <Variable name="{title}" title={title} />
                                                 ,{' '}
                                                 <Variable name="{date}" title={date} />
@@ -174,7 +195,7 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                     </dl>
                     <div className="flex mt-6" style={{ justifyContent: 'flex-end' }}>
                         <Dialog.Close asChild>
-                            <button className="Button green">Save</button>
+                            <button className="Button green font-bold">{t('Save')}</button>
                         </Dialog.Close>
                     </div>
                     <Dialog.Close asChild>

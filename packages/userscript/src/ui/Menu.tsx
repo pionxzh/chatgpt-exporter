@@ -1,5 +1,6 @@
 import * as HoverCard from '@radix-ui/react-hover-card'
 import { useCallback, useEffect, useMemo, useState } from 'preact/hooks'
+import { useTranslation } from 'react-i18next'
 import { exportToHtml } from '../exporter/html'
 import { exportToPng } from '../exporter/image'
 import { exportToJson } from '../exporter/json'
@@ -21,6 +22,7 @@ But History feature is disabled by OpenAI temporarily.
 We all have to wait for them to bring it back.`
 
 function MenuInner({ container }: { container: HTMLDivElement }) {
+    const { t } = useTranslation()
     const disabled = getHistoryDisabled()
 
     const [open, setOpen] = useState(false)
@@ -85,7 +87,7 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                 <HoverCard.Trigger>
                     <MenuItem
                         className="mt-1"
-                        text="Export"
+                        text={t('ExportHelper')}
                         icon={IconArrowRightFromBracket}
                         onClick={() => {
                             setOpen(true)
@@ -116,37 +118,37 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                             onOpenChange={setSettingOpen}
                         >
                             <div className="row-full">
-                                <MenuItem text="Setting" icon={IconSetting} />
+                                <MenuItem text={t('Setting')} icon={IconSetting} />
                             </div>
                         </SettingDialog>
 
                         <MenuItem
-                            text="Copy Text"
-                            successText="Copied!"
+                            text={t('Copy Text')}
+                            successText={t('Copied!')}
                             icon={() => <IconCopy className="w-4 h-4" />}
                             className="row-full"
                             onClick={onClickText}
                         />
                         <MenuItem
-                            text="Screenshot"
+                            text={t('Screenshot')}
                             icon={IconCamera}
                             className="row-half"
                             onClick={onClickPng}
                         />
                         <MenuItem
-                            text="Markdown"
+                            text={t('Markdown')}
                             icon={IconMarkdown}
                             className="row-half"
                             onClick={onClickMarkdown}
                         />
                         <MenuItem
-                            text="HTML"
+                            text={t('HTML')}
                             icon={FileCode}
                             className="row-half"
                             onClick={onClickHtml}
                         />
                         <MenuItem
-                            text="JSON"
+                            text={t('JSON')}
                             icon={IconJSON}
                             className="row-half"
                             onClick={onClickJSON}
@@ -158,7 +160,7 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                         >
                             <div className="row-full">
                                 <MenuItem
-                                    text="Export All"
+                                    text={t('Export All')}
                                     icon={IconZip}
                                 />
                             </div>

@@ -1,4 +1,5 @@
 import { fetchConversation, getCurrentChatId, processConversation } from '../api'
+import i18n from '../i18n'
 import { checkIfConversationStarted, getConversationChoice } from '../page'
 import { copyToClipboard } from '../utils/clipboard'
 import { flatMap, fromMarkdown, toMarkdown } from '../utils/markdown'
@@ -7,7 +8,7 @@ import type { Emphasis, Strong } from 'mdast'
 
 export async function exportToText() {
     if (!checkIfConversationStarted()) {
-        alert('Please start a conversation first.')
+        alert(i18n.t('Please start a conversation first'))
         return false
     }
 
@@ -43,7 +44,7 @@ export async function exportToText() {
 
 export async function exportToTextFromIndex(index: number) {
     if (!checkIfConversationStarted()) {
-        alert('Please start a conversation first.')
+        alert(i18n.t('Please start a conversation first'))
         return false
     }
 

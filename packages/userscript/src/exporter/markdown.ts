@@ -1,6 +1,7 @@
 import JSZip from 'jszip'
 import { fetchConversation, getCurrentChatId, processConversation } from '../api'
 import { baseUrl } from '../constants'
+import i18n from '../i18n'
 import { checkIfConversationStarted, getConversationChoice } from '../page'
 import { downloadFile, getFileNameWithFormat } from '../utils/download'
 import { fromMarkdown, toMarkdown } from '../utils/markdown'
@@ -11,7 +12,7 @@ import type { ExportMeta } from '../ui/SettingContext'
 
 export async function exportToMarkdown(fileNameFormat: string, metaList: ExportMeta[]) {
     if (!checkIfConversationStarted()) {
-        alert('Please start a conversation first.')
+        alert(i18n.t('Please start a conversation first'))
         return false
     }
 

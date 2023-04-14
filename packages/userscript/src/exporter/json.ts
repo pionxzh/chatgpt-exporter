@@ -1,12 +1,13 @@
 import JSZip from 'jszip'
 import { fetchConversation, getCurrentChatId, processConversation } from '../api'
+import i18n from '../i18n'
 import { checkIfConversationStarted, getConversationChoice } from '../page'
 import { downloadFile, getFileNameWithFormat } from '../utils/download'
 import type { ApiConversationWithId } from '../api'
 
 export async function exportToJson(fileNameFormat: string) {
     if (!checkIfConversationStarted()) {
-        alert('Please start a conversation first.')
+        alert(i18n.t('Please start a conversation first'))
         return false
     }
 

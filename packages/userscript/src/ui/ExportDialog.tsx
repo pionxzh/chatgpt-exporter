@@ -1,5 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { useCallback, useEffect, useMemo, useState } from 'preact/hooks'
+import { useTranslation } from 'react-i18next'
 import { deleteConversation, fetchAllConversations, fetchConversation } from '../api'
 import { exportAllToHtml } from '../exporter/html'
 import { exportAllToJson } from '../exporter/json'
@@ -34,11 +35,13 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
     loading,
     error,
 }) => {
+    const { t } = useTranslation()
+
     return (
         <>
             <div className="SelectToolbar">
                 <CheckBox
-                    label="Select All"
+                    label={t('Select All')}
                     disabled={disabled}
                     checked={selected.length === conversations.length}
                     onCheckedChange={(checked) => {
@@ -47,8 +50,8 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
                 />
             </div>
             <ul className="SelectList">
-                {loading && <li className="SelectItem">Loading...</li>}
-                {error && <li className="SelectItem">Error: {error}</li>}
+                {loading && <li className="SelectItem">{t('Loading')}...</li>}
+                {error && <li className="SelectItem">{t('Error')}: {error}</li>}
                 {conversations.map(c => (
                     <li className="SelectItem" key={c.id}>
                         <CheckBox
@@ -76,6 +79,7 @@ interface ExportDialogProps {
 }
 
 export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange, children }) => {
+    const { t } = useTranslation()
     const { enableMeta, exportMetaList } = useSettingContext()
     const metaList = useMemo(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList])
 
@@ -129,10 +133,10 @@ export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange
             setProcessing(false)
             setConversations(conversations.filter(c => !selected.some(s => s.id === c.id)))
             setSelected([])
-            alert('All selected conversations have been deleted. Please refresh the page to see the changes.')
+            alert(t('Conversation Deleted Message'))
         })
         return () => off()
-    }, [deleteQueue, conversations, selected])
+    }, [deleteQueue, conversations, selected, t])
 
     const exportAll = useCallback(() => {
         if (disabled) return
@@ -152,7 +156,7 @@ export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange
     const deleteAll = useCallback(() => {
         if (disabled) return
 
-        const result = confirm('Are you sure you want to delete all selected conversations?')
+        const result = confirm(t('Conversation Delete Alert'))
         if (!result) return
 
         deleteQueue.clear()
@@ -165,7 +169,7 @@ export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange
         })
 
         deleteQueue.start()
-    }, [disabled, selected, deleteQueue])
+    }, [disabled, selected, deleteQueue, t])
 
     useEffect(() => {
         setLoading(true)
@@ -186,7 +190,7 @@ export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange
             <Dialog.Portal>
                 <Dialog.Overlay className="DialogOverlay" />
                 <Dialog.Content className="DialogContent">
-                    <Dialog.Title className="DialogTitle">Export Conversations</Dialog.Title>
+                    <Dialog.Title className="DialogTitle">{t('Export Dialog Title')}</Dialog.Title>
 
                     <ConversationSelect
                         conversations={conversations}
@@ -199,15 +203,15 @@ export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange
                     <div className="flex mt-6" style={{ justifyContent: 'space-between' }}>
                         <select className="Select" disabled={processing} value={exportType} onChange={e => setExportType(e.currentTarget.value)}>
                             {exportAllOptions.map(({ label }) => (
-                                <option key={label} value={label}>{label}</option>
+                                <option key={t(label)} value={label}>{label}</option>
                             ))}
                         </select>
                         <div className="flex flex-grow"></div>
                         <button className="Button red" disabled={disabled} onClick={deleteAll}>
-                            Delete
+                            {t('Delete')}
                         </button>
                         <button className="Button green ml-4" disabled={disabled} onClick={exportAll}>
-                            Export
+                            {t('Export')}
                         </button>
                     </div>
                     {processing && (
