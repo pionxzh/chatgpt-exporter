@@ -115,7 +115,7 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
 
     const date = dateStr()
     const time = new Date().toISOString()
-    const source = `${baseUrl}/chat/${id}`
+    const source = `${baseUrl}/c/${id}`
     const lang = document.documentElement.lang ?? 'en'
     const theme = getColorScheme()
 

@@ -42,7 +42,7 @@ function getUserProfile() {
 }
 
 export function getChatIdFromUrl() {
-    const match = location.pathname.match(/^\/chat\/([a-z0-9-]+)$/i)
+    const match = location.pathname.match(/^\/c\/([a-z0-9-]+)$/i)
     if (match) return match[1]
     return null
 }

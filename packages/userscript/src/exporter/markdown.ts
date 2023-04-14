@@ -56,7 +56,7 @@ export async function exportAllToMarkdown(fileNameFormat: string, apiConversatio
 
 function conversationToMarkdown(conversation: ConversationResult, metaList?: ExportMeta[]) {
     const { id, title, model, modelSlug, conversationNodes } = conversation
-    const source = `${baseUrl}/chat/${id}`
+    const source = `${baseUrl}/c/${id}`
 
     const _metaList = metaList
         ?.filter(x => !!x.name)
