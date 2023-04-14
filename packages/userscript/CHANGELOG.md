@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.4](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.6.3...userscript-v2.6.4) (2023-04-14)
+
+
+### Bug Fixes
+
+* update chat url to /c/* ([96ec23e](https://github.com/pionxzh/chatgpt-exporter/commit/96ec23e7bd63c8b8e92d5c4e6e7527bb6420f2c3))
+
 ## [2.6.3](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.6.2...userscript-v2.6.3) (2023-04-13)
 
 
