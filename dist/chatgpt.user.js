@@ -3,16 +3,15 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.6.3
+// @version            2.6.4
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
 // @description:zh-TW  輕鬆匯出 ChatGPT 聊天紀錄，以便進一步分析或分享。
 // @license            MIT
 // @icon               https://chat.openai.com/favicon.ico
-// @match              https://chat.openai.com/chat
-// @match              https://chat.openai.com/chat?*
-// @match              https://chat.openai.com/chat/*
+// @match              https://chat.openai.com
+// @match              https://chat.openai.com/c?*
 // @match              https://chat.openai.com/c/*
 // @require            https://cdn.jsdelivr.net/npm/jszip@3.9.1/dist/jszip.min.js
 // @require            https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js
@@ -1176,7 +1175,7 @@ var __publicField = (obj, key, value) => {
     return user;
   }
   function getChatIdFromUrl() {
-    const match = location.pathname.match(/^\/chat\/([a-z0-9-]+)$/i);
+    const match = location.pathname.match(/^\/c\/([a-z0-9-]+)$/i);
     if (match)
       return match[1];
     return null;
@@ -15636,7 +15635,7 @@ var __publicField = (obj, key, value) => {
     }).join("\n\n");
     const date = dateStr();
     const time = (/* @__PURE__ */ new Date()).toISOString();
-    const source = `${baseUrl}/chat/${id}`;
+    const source = `${baseUrl}/c/${id}`;
     const lang = document.documentElement.lang ?? "en";
     const theme = getColorScheme();
     const _metaList = (metaList == null ? void 0 : metaList.filter((x2) => !!x2.name).map(({
@@ -15867,7 +15866,7 @@ var __publicField = (obj, key, value) => {
       modelSlug,
       conversationNodes
     } = conversation;
-    const source = `${baseUrl}/chat/${id}`;
+    const source = `${baseUrl}/c/${id}`;
     const _metaList = (metaList == null ? void 0 : metaList.filter((x2) => !!x2.name).map(({
       name,
       value
