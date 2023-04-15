@@ -3,6 +3,7 @@ import { initReactI18next } from 'react-i18next'
 import { KEY_LANGUAGE } from './constants'
 import en_US from './locales/en.json'
 import ja_JP from './locales/jp.json'
+import tr_TR from './locales/tr.json'
 import zh_Hans from './locales/zh-Hans.json'
 import zh_Hant from './locales/zh-Hant.json'
 import { ScriptStorage } from './utils/storage'
@@ -33,6 +34,12 @@ const JA_JP = {
     resource: ja_JP,
 }
 
+const TR_TR = {
+    name: 'Türkçe',
+    code: 'tr-TR',
+    resource: tr_TR,
+}
+
 const ZH_Hans = {
     name: '简体中文',
     code: 'zh-Hans',
@@ -48,6 +55,7 @@ const ZH_Hant = {
 export const LOCALES: Locale[] = [
     EN_US,
     JA_JP,
+    TR_TR,
     ZH_Hans,
     ZH_Hant,
 ]
@@ -58,6 +66,9 @@ const LanguageMapping: Record<string, string> = {
 
     'ja': JA_JP.code,
     'ja-JP': JA_JP.code,
+
+    'tr': TR_TR.code,
+    'tr-TR': TR_TR.code,
 
     'zh': ZH_Hans.code,
     'zh-CN': ZH_Hans.code,
