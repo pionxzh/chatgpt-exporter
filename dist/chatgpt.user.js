@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.6.5
+// @version            2.7.0
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -259,7 +259,6 @@ body[data-time-format="24"] span[data-time-format="24"] {
     padding: 0 15px;
     font-size: 15px;
     line-height: 1;
-    font-weight: 500;
     height: 35px;
 }
 .Button.green {
@@ -402,65 +401,6 @@ body[data-time-format="24"] span[data-time-format="24"] {
 .invisible + .secondary-toolbar {
     display: none;
 }
-.after\\:content-\\[\\'\\'\\]:after {
-    --tw-content: "";
-    content: var(--tw-content);
-}
-
-.after\\:transition-all:after {
-    content: var(--tw-content);
-    transition-duration: .15s;
-    transition-property: all;
-    transition-timing-function: cubic-bezier(.4,0,.2,1);
-}
-
-.after\\:bg-white:after {
-    --tw-bg-opacity: 1;
-    background-color: rgb(255 255 255/var(--tw-bg-opacity));
-    content: var(--tw-content);
-}
-
-.after\\:border-gray-300:after {
-    --tw-border-opacity: 1;
-    border-color: rgb(209 213 219/var(--tw-border-opacity));
-    content: var(--tw-content);
-}
-
-.after\\:border:after {
-    border-width: 1px;
-    content: var(--tw-content);
-}
-
-.after\\:rounded-full:after {
-    border-radius: 9999px;
-
-    content: var(--tw-content);
-}
-.after\\:w-4:after {
-    content: var(--tw-content);
-    width: 1rem
-}
-
-.after\\:h-4:after {
-    content: var(--tw-content);
-    height: 1rem;
-}
-
-.after\\:top-\\[2px\\]:after {
-    content: var(--tw-content);
-    top: 2px;
-}
-
-.after\\:left-\\[2px\\]:after {
-    content: var(--tw-content);
-    left: 2px;
-}
-
-.after\\:absolute:after {
-    content: var(--tw-content);
-    position: absolute;
-}
-
 .animate-fadeIn  {
     animation: fadeIn .3s;
 }
@@ -491,14 +431,6 @@ body[data-time-format="24"] span[data-time-format="24"] {
     border-color: #86858d;
 }
 
-.dark .dark\\:border-gray-600 {
-    --tw-border-opacity: 1;
-    border-color: rgb(75 85 99/var(--tw-border-opacity));
-}
-
-.empty\\:hidden:empty {
-    display: none;
-}
 
 .fill-current {
     fill: currentColor;
@@ -520,6 +452,10 @@ body[data-time-format="24"] span[data-time-format="24"] {
     height: 1.25rem;
 }
 
+.ml-3 {
+    margin-left: 0.75rem;
+}
+
 .ml-4 {
     margin-left: 1rem;
 }
@@ -530,26 +466,6 @@ body[data-time-format="24"] span[data-time-format="24"] {
 
 .pb-0 {
     padding-bottom: 0;
-}
-
-.peer:checked~.peer-checked\\:bg-blue-600 {
-    --tw-bg-opacity: 1;
-    background-color: rgb(28 100 242/var(--tw-bg-opacity));
-}
-
-.peer:checked~.peer-checked\\:after\\:border-white:after {
-    --tw-border-opacity: 1;
-    border-color: rgb(255 255 255/var(--tw-border-opacity));
-    content: var(--tw-content);
-}
-.peer:checked~.peer-checked\\:after\\:translate-x-full:after {
-    --tw-translate-x: 100%;
-    content: var(--tw-content);
-    transform: translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
-
-.pl-4 {
-    padding-left: 1rem;
 }
 
 .pr-8 {
@@ -574,10 +490,6 @@ body[data-time-format="24"] span[data-time-format="24"] {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
-
-.w-9 {
-    width: 2.25rem;
 }
 
 .whitespace-nowrap {
@@ -607,30 +519,30 @@ var __publicField = (obj, key, value) => {
 };
 (function(JSZip2, html2canvas2) {
   "use strict";
-  var n$2, l$3, u$3, t$2, r$3, o$4, f$3, e$2, c$3 = {}, s$3 = [], a$3 = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i;
-  function h$3(n2, l2) {
+  var n$2, l$5, u$6, t$3, r$5, o$9, f$4, e$4, c$5 = {}, s$7 = [], a$4 = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i;
+  function h$5(n2, l2) {
     for (var u2 in l2)
       n2[u2] = l2[u2];
     return n2;
   }
-  function v$2(n2) {
+  function v$3(n2) {
     var l2 = n2.parentNode;
     l2 && l2.removeChild(n2);
   }
-  function y$3(l2, u2, i2) {
+  function y$6(l2, u2, i2) {
     var t2, r2, o2, f2 = {};
     for (o2 in u2)
       "key" == o2 ? t2 = u2[o2] : "ref" == o2 ? r2 = u2[o2] : f2[o2] = u2[o2];
     if (arguments.length > 2 && (f2.children = arguments.length > 3 ? n$2.call(arguments, 2) : i2), "function" == typeof l2 && null != l2.defaultProps)
       for (o2 in l2.defaultProps)
         void 0 === f2[o2] && (f2[o2] = l2.defaultProps[o2]);
-    return p$4(l2, f2, t2, r2, null);
+    return p$7(l2, f2, t2, r2, null);
   }
-  function p$4(n2, i2, t2, r2, o2) {
-    var f2 = { type: n2, props: i2, key: t2, ref: r2, __k: null, __: null, __b: 0, __e: null, __d: void 0, __c: null, __h: null, constructor: void 0, __v: null == o2 ? ++u$3 : o2 };
-    return null == o2 && null != l$3.vnode && l$3.vnode(f2), f2;
+  function p$7(n2, i2, t2, r2, o2) {
+    var f2 = { type: n2, props: i2, key: t2, ref: r2, __k: null, __: null, __b: 0, __e: null, __d: void 0, __c: null, __h: null, constructor: void 0, __v: null == o2 ? ++u$6 : o2 };
+    return null == o2 && null != l$5.vnode && l$5.vnode(f2), f2;
   }
-  function d$3() {
+  function d$6() {
     return { current: null };
   }
   function _$2(n2) {
@@ -639,15 +551,15 @@ var __publicField = (obj, key, value) => {
   function k$3(n2, l2) {
     this.props = n2, this.context = l2;
   }
-  function b$3(n2, l2) {
+  function b$4(n2, l2) {
     if (null == l2)
-      return n2.__ ? b$3(n2.__, n2.__.__k.indexOf(n2) + 1) : null;
+      return n2.__ ? b$4(n2.__, n2.__.__k.indexOf(n2) + 1) : null;
     for (var u2; l2 < n2.__k.length; l2++)
       if (null != (u2 = n2.__k[l2]) && null != u2.__e)
         return u2.__e;
-    return "function" == typeof n2.type ? b$3(n2) : null;
+    return "function" == typeof n2.type ? b$4(n2) : null;
   }
-  function g$4(n2) {
+  function g$5(n2) {
     var l2, u2;
     if (null != (n2 = n2.__) && null != n2.__c) {
       for (n2.__e = n2.__c.base = null, l2 = 0; l2 < n2.__k.length; l2++)
@@ -655,22 +567,22 @@ var __publicField = (obj, key, value) => {
           n2.__e = n2.__c.base = u2.__e;
           break;
         }
-      return g$4(n2);
+      return g$5(n2);
     }
   }
   function m$3(n2) {
-    (!n2.__d && (n2.__d = true) && t$2.push(n2) && !w$3.__r++ || r$3 !== l$3.debounceRendering) && ((r$3 = l$3.debounceRendering) || o$4)(w$3);
+    (!n2.__d && (n2.__d = true) && t$3.push(n2) && !w$4.__r++ || r$5 !== l$5.debounceRendering) && ((r$5 = l$5.debounceRendering) || o$9)(w$4);
   }
-  function w$3() {
+  function w$4() {
     var n2, l2, u2, i2, r2, o2, e2, c2;
-    for (t$2.sort(f$3); n2 = t$2.shift(); )
-      n2.__d && (l2 = t$2.length, i2 = void 0, r2 = void 0, e2 = (o2 = (u2 = n2).__v).__e, (c2 = u2.__P) && (i2 = [], (r2 = h$3({}, o2)).__v = o2.__v + 1, L$3(c2, o2, r2, u2.__n, void 0 !== c2.ownerSVGElement, null != o2.__h ? [e2] : null, i2, null == e2 ? b$3(o2) : e2, o2.__h), M$1(i2, o2), o2.__e != e2 && g$4(o2)), t$2.length > l2 && t$2.sort(f$3));
-    w$3.__r = 0;
+    for (t$3.sort(f$4); n2 = t$3.shift(); )
+      n2.__d && (l2 = t$3.length, i2 = void 0, r2 = void 0, e2 = (o2 = (u2 = n2).__v).__e, (c2 = u2.__P) && (i2 = [], (r2 = h$5({}, o2)).__v = o2.__v + 1, L$3(c2, o2, r2, u2.__n, void 0 !== c2.ownerSVGElement, null != o2.__h ? [e2] : null, i2, null == e2 ? b$4(o2) : e2, o2.__h), M$3(i2, o2), o2.__e != e2 && g$5(o2)), t$3.length > l2 && t$3.sort(f$4));
+    w$4.__r = 0;
   }
   function x$4(n2, l2, u2, i2, t2, r2, o2, f2, e2, a2) {
-    var h2, v2, y2, d2, k2, g2, m2, w2 = i2 && i2.__k || s$3, x2 = w2.length;
+    var h2, v2, y2, d2, k2, g2, m2, w2 = i2 && i2.__k || s$7, x2 = w2.length;
     for (u2.__k = [], h2 = 0; h2 < l2.length; h2++)
-      if (null != (d2 = u2.__k[h2] = null == (d2 = l2[h2]) || "boolean" == typeof d2 || "function" == typeof d2 ? null : "string" == typeof d2 || "number" == typeof d2 || "bigint" == typeof d2 ? p$4(null, d2, null, null, d2) : Array.isArray(d2) ? p$4(_$2, { children: d2 }, null, null, null) : d2.__b > 0 ? p$4(d2.type, d2.props, d2.key, d2.ref ? d2.ref : null, d2.__v) : d2)) {
+      if (null != (d2 = u2.__k[h2] = null == (d2 = l2[h2]) || "boolean" == typeof d2 || "function" == typeof d2 ? null : "string" == typeof d2 || "number" == typeof d2 || "bigint" == typeof d2 ? p$7(null, d2, null, null, d2) : Array.isArray(d2) ? p$7(_$2, { children: d2 }, null, null, null) : d2.__b > 0 ? p$7(d2.type, d2.props, d2.key, d2.ref ? d2.ref : null, d2.__v) : d2)) {
         if (d2.__ = u2, d2.__b = u2.__b + 1, null === (y2 = w2[h2]) || y2 && d2.key == y2.key && d2.type === y2.type)
           w2[h2] = void 0;
         else
@@ -681,17 +593,17 @@ var __publicField = (obj, key, value) => {
             }
             y2 = null;
           }
-        L$3(n2, d2, y2 = y2 || c$3, t2, r2, o2, f2, e2, a2), k2 = d2.__e, (v2 = d2.ref) && y2.ref != v2 && (m2 || (m2 = []), y2.ref && m2.push(y2.ref, null, d2), m2.push(v2, d2.__c || k2, d2)), null != k2 ? (null == g2 && (g2 = k2), "function" == typeof d2.type && d2.__k === y2.__k ? d2.__d = e2 = A$3(d2, e2, n2) : e2 = C$2(n2, d2, y2, w2, k2, e2), "function" == typeof u2.type && (u2.__d = e2)) : e2 && y2.__e == e2 && e2.parentNode != n2 && (e2 = b$3(y2));
+        L$3(n2, d2, y2 = y2 || c$5, t2, r2, o2, f2, e2, a2), k2 = d2.__e, (v2 = d2.ref) && y2.ref != v2 && (m2 || (m2 = []), y2.ref && m2.push(y2.ref, null, d2), m2.push(v2, d2.__c || k2, d2)), null != k2 ? (null == g2 && (g2 = k2), "function" == typeof d2.type && d2.__k === y2.__k ? d2.__d = e2 = A$4(d2, e2, n2) : e2 = C$2(n2, d2, y2, w2, k2, e2), "function" == typeof u2.type && (u2.__d = e2)) : e2 && y2.__e == e2 && e2.parentNode != n2 && (e2 = b$4(y2));
       }
     for (u2.__e = g2, h2 = x2; h2--; )
-      null != w2[h2] && ("function" == typeof u2.type && null != w2[h2].__e && w2[h2].__e == u2.__d && (u2.__d = $$1(i2).nextSibling), S$1(w2[h2], w2[h2]));
+      null != w2[h2] && ("function" == typeof u2.type && null != w2[h2].__e && w2[h2].__e == u2.__d && (u2.__d = $$1(i2).nextSibling), S$3(w2[h2], w2[h2]));
     if (m2)
       for (h2 = 0; h2 < m2.length; h2++)
         O$2(m2[h2], m2[++h2], m2[++h2]);
   }
-  function A$3(n2, l2, u2) {
+  function A$4(n2, l2, u2) {
     for (var i2, t2 = n2.__k, r2 = 0; t2 && r2 < t2.length; r2++)
-      (i2 = t2[r2]) && (i2.__ = n2, l2 = "function" == typeof i2.type ? A$3(i2, l2, u2) : C$2(u2, i2, i2, t2, i2.__e, l2));
+      (i2 = t2[r2]) && (i2.__ = n2, l2 = "function" == typeof i2.type ? A$4(i2, l2, u2) : C$2(u2, i2, i2, t2, i2.__e, l2));
     return l2;
   }
   function P$3(n2, l2) {
@@ -726,17 +638,17 @@ var __publicField = (obj, key, value) => {
     }
     return null;
   }
-  function H$2(n2, l2, u2, i2, t2) {
+  function H$3(n2, l2, u2, i2, t2) {
     var r2;
     for (r2 in u2)
-      "children" === r2 || "key" === r2 || r2 in l2 || T$4(n2, r2, null, u2[r2], i2);
+      "children" === r2 || "key" === r2 || r2 in l2 || T$5(n2, r2, null, u2[r2], i2);
     for (r2 in l2)
-      t2 && "function" != typeof l2[r2] || "children" === r2 || "key" === r2 || "value" === r2 || "checked" === r2 || u2[r2] === l2[r2] || T$4(n2, r2, l2[r2], u2[r2], i2);
+      t2 && "function" != typeof l2[r2] || "children" === r2 || "key" === r2 || "value" === r2 || "checked" === r2 || u2[r2] === l2[r2] || T$5(n2, r2, l2[r2], u2[r2], i2);
   }
-  function I$1(n2, l2, u2) {
-    "-" === l2[0] ? n2.setProperty(l2, null == u2 ? "" : u2) : n2[l2] = null == u2 ? "" : "number" != typeof u2 || a$3.test(l2) ? u2 : u2 + "px";
+  function I$2(n2, l2, u2) {
+    "-" === l2[0] ? n2.setProperty(l2, null == u2 ? "" : u2) : n2[l2] = null == u2 ? "" : "number" != typeof u2 || a$4.test(l2) ? u2 : u2 + "px";
   }
-  function T$4(n2, l2, u2, i2, t2) {
+  function T$5(n2, l2, u2, i2, t2) {
     var r2;
     n:
       if ("style" === l2)
@@ -745,13 +657,13 @@ var __publicField = (obj, key, value) => {
         else {
           if ("string" == typeof i2 && (n2.style.cssText = i2 = ""), i2)
             for (l2 in i2)
-              u2 && l2 in u2 || I$1(n2.style, l2, "");
+              u2 && l2 in u2 || I$2(n2.style, l2, "");
           if (u2)
             for (l2 in u2)
-              i2 && u2[l2] === i2[l2] || I$1(n2.style, l2, u2[l2]);
+              i2 && u2[l2] === i2[l2] || I$2(n2.style, l2, u2[l2]);
         }
       else if ("o" === l2[0] && "n" === l2[1])
-        r2 = l2 !== (l2 = l2.replace(/Capture$/, "")), l2 = l2.toLowerCase() in n2 ? l2.toLowerCase().slice(2) : l2.slice(2), n2.l || (n2.l = {}), n2.l[l2 + r2] = u2, u2 ? i2 || n2.addEventListener(l2, r2 ? z$3 : j$2, r2) : n2.removeEventListener(l2, r2 ? z$3 : j$2, r2);
+        r2 = l2 !== (l2 = l2.replace(/Capture$/, "")), l2 = l2.toLowerCase() in n2 ? l2.toLowerCase().slice(2) : l2.slice(2), n2.l || (n2.l = {}), n2.l[l2 + r2] = u2, u2 ? i2 || n2.addEventListener(l2, r2 ? z$3 : j$3, r2) : n2.removeEventListener(l2, r2 ? z$3 : j$3, r2);
       else if ("dangerouslySetInnerHTML" !== l2) {
         if (t2)
           l2 = l2.replace(/xlink(H|:h)/, "h").replace(/sName$/, "s");
@@ -764,21 +676,21 @@ var __publicField = (obj, key, value) => {
         "function" == typeof u2 || (null == u2 || false === u2 && "-" !== l2[4] ? n2.removeAttribute(l2) : n2.setAttribute(l2, u2));
       }
   }
-  function j$2(n2) {
-    return this.l[n2.type + false](l$3.event ? l$3.event(n2) : n2);
+  function j$3(n2) {
+    return this.l[n2.type + false](l$5.event ? l$5.event(n2) : n2);
   }
   function z$3(n2) {
-    return this.l[n2.type + true](l$3.event ? l$3.event(n2) : n2);
+    return this.l[n2.type + true](l$5.event ? l$5.event(n2) : n2);
   }
   function L$3(n2, u2, i2, t2, r2, o2, f2, e2, c2) {
     var s2, a2, v2, y2, p2, d2, b2, g2, m2, w2, A2, P2, C2, $2, H2, I2 = u2.type;
     if (void 0 !== u2.constructor)
       return null;
-    null != i2.__h && (c2 = i2.__h, e2 = u2.__e = i2.__e, u2.__h = null, o2 = [e2]), (s2 = l$3.__b) && s2(u2);
+    null != i2.__h && (c2 = i2.__h, e2 = u2.__e = i2.__e, u2.__h = null, o2 = [e2]), (s2 = l$5.__b) && s2(u2);
     try {
       n:
         if ("function" == typeof I2) {
-          if (g2 = u2.props, m2 = (s2 = I2.contextType) && t2[s2.__c], w2 = s2 ? m2 ? m2.props.value : s2.__ : t2, i2.__c ? b2 = (a2 = u2.__c = i2.__c).__ = a2.__E : ("prototype" in I2 && I2.prototype.render ? u2.__c = a2 = new I2(g2, w2) : (u2.__c = a2 = new k$3(g2, w2), a2.constructor = I2, a2.render = q$2), m2 && m2.sub(a2), a2.props = g2, a2.state || (a2.state = {}), a2.context = w2, a2.__n = t2, v2 = a2.__d = true, a2.__h = [], a2._sb = []), null == a2.__s && (a2.__s = a2.state), null != I2.getDerivedStateFromProps && (a2.__s == a2.state && (a2.__s = h$3({}, a2.__s)), h$3(a2.__s, I2.getDerivedStateFromProps(g2, a2.__s))), y2 = a2.props, p2 = a2.state, a2.__v = u2, v2)
+          if (g2 = u2.props, m2 = (s2 = I2.contextType) && t2[s2.__c], w2 = s2 ? m2 ? m2.props.value : s2.__ : t2, i2.__c ? b2 = (a2 = u2.__c = i2.__c).__ = a2.__E : ("prototype" in I2 && I2.prototype.render ? u2.__c = a2 = new I2(g2, w2) : (u2.__c = a2 = new k$3(g2, w2), a2.constructor = I2, a2.render = q$2), m2 && m2.sub(a2), a2.props = g2, a2.state || (a2.state = {}), a2.context = w2, a2.__n = t2, v2 = a2.__d = true, a2.__h = [], a2._sb = []), null == a2.__s && (a2.__s = a2.state), null != I2.getDerivedStateFromProps && (a2.__s == a2.state && (a2.__s = h$5({}, a2.__s)), h$5(a2.__s, I2.getDerivedStateFromProps(g2, a2.__s))), y2 = a2.props, p2 = a2.state, a2.__v = u2, v2)
             null == I2.getDerivedStateFromProps && null != a2.componentWillMount && a2.componentWillMount(), null != a2.componentDidMount && a2.__h.push(a2.componentDidMount);
           else {
             if (null == I2.getDerivedStateFromProps && g2 !== y2 && null != a2.componentWillReceiveProps && a2.componentWillReceiveProps(g2, w2), !a2.__e && null != a2.shouldComponentUpdate && false === a2.shouldComponentUpdate(g2, a2.__s, w2) || u2.__v === i2.__v) {
@@ -793,7 +705,7 @@ var __publicField = (obj, key, value) => {
               a2.componentDidUpdate(y2, p2, d2);
             });
           }
-          if (a2.context = w2, a2.props = g2, a2.__P = n2, P2 = l$3.__r, C2 = 0, "prototype" in I2 && I2.prototype.render) {
+          if (a2.context = w2, a2.props = g2, a2.__P = n2, P2 = l$5.__r, C2 = 0, "prototype" in I2 && I2.prototype.render) {
             for (a2.state = a2.__s, a2.__d = false, P2 && P2(u2), s2 = a2.render(a2.props, a2.state, a2.context), $2 = 0; $2 < a2._sb.length; $2++)
               a2.__h.push(a2._sb[$2]);
             a2._sb = [];
@@ -801,26 +713,26 @@ var __publicField = (obj, key, value) => {
             do {
               a2.__d = false, P2 && P2(u2), s2 = a2.render(a2.props, a2.state, a2.context), a2.state = a2.__s;
             } while (a2.__d && ++C2 < 25);
-          a2.state = a2.__s, null != a2.getChildContext && (t2 = h$3(h$3({}, t2), a2.getChildContext())), v2 || null == a2.getSnapshotBeforeUpdate || (d2 = a2.getSnapshotBeforeUpdate(y2, p2)), H2 = null != s2 && s2.type === _$2 && null == s2.key ? s2.props.children : s2, x$4(n2, Array.isArray(H2) ? H2 : [H2], u2, i2, t2, r2, o2, f2, e2, c2), a2.base = u2.__e, u2.__h = null, a2.__h.length && f2.push(a2), b2 && (a2.__E = a2.__ = null), a2.__e = false;
+          a2.state = a2.__s, null != a2.getChildContext && (t2 = h$5(h$5({}, t2), a2.getChildContext())), v2 || null == a2.getSnapshotBeforeUpdate || (d2 = a2.getSnapshotBeforeUpdate(y2, p2)), H2 = null != s2 && s2.type === _$2 && null == s2.key ? s2.props.children : s2, x$4(n2, Array.isArray(H2) ? H2 : [H2], u2, i2, t2, r2, o2, f2, e2, c2), a2.base = u2.__e, u2.__h = null, a2.__h.length && f2.push(a2), b2 && (a2.__E = a2.__ = null), a2.__e = false;
         } else
-          null == o2 && u2.__v === i2.__v ? (u2.__k = i2.__k, u2.__e = i2.__e) : u2.__e = N$2(i2.__e, u2, i2, t2, r2, o2, f2, c2);
-      (s2 = l$3.diffed) && s2(u2);
+          null == o2 && u2.__v === i2.__v ? (u2.__k = i2.__k, u2.__e = i2.__e) : u2.__e = N$3(i2.__e, u2, i2, t2, r2, o2, f2, c2);
+      (s2 = l$5.diffed) && s2(u2);
     } catch (n3) {
-      u2.__v = null, (c2 || null != o2) && (u2.__e = e2, u2.__h = !!c2, o2[o2.indexOf(e2)] = null), l$3.__e(n3, u2, i2);
+      u2.__v = null, (c2 || null != o2) && (u2.__e = e2, u2.__h = !!c2, o2[o2.indexOf(e2)] = null), l$5.__e(n3, u2, i2);
     }
   }
-  function M$1(n2, u2) {
-    l$3.__c && l$3.__c(u2, n2), n2.some(function(u3) {
+  function M$3(n2, u2) {
+    l$5.__c && l$5.__c(u2, n2), n2.some(function(u3) {
       try {
         n2 = u3.__h, u3.__h = [], n2.some(function(n3) {
           n3.call(u3);
         });
       } catch (n3) {
-        l$3.__e(n3, u3.__v);
+        l$5.__e(n3, u3.__v);
       }
     });
   }
-  function N$2(l2, u2, i2, t2, r2, o2, f2, e2) {
+  function N$3(l2, u2, i2, t2, r2, o2, f2, e2) {
     var s2, a2, h2, y2 = i2.props, p2 = u2.props, d2 = u2.type, _2 = 0;
     if ("svg" === d2 && (r2 = true), null != o2) {
       for (; _2 < o2.length; _2++)
@@ -837,18 +749,18 @@ var __publicField = (obj, key, value) => {
     if (null === d2)
       y2 === p2 || e2 && l2.data === p2 || (l2.data = p2);
     else {
-      if (o2 = o2 && n$2.call(l2.childNodes), a2 = (y2 = i2.props || c$3).dangerouslySetInnerHTML, h2 = p2.dangerouslySetInnerHTML, !e2) {
+      if (o2 = o2 && n$2.call(l2.childNodes), a2 = (y2 = i2.props || c$5).dangerouslySetInnerHTML, h2 = p2.dangerouslySetInnerHTML, !e2) {
         if (null != o2)
           for (y2 = {}, _2 = 0; _2 < l2.attributes.length; _2++)
             y2[l2.attributes[_2].name] = l2.attributes[_2].value;
         (h2 || a2) && (h2 && (a2 && h2.__html == a2.__html || h2.__html === l2.innerHTML) || (l2.innerHTML = h2 && h2.__html || ""));
       }
-      if (H$2(l2, p2, y2, r2, e2), h2)
+      if (H$3(l2, p2, y2, r2, e2), h2)
         u2.__k = [];
-      else if (_2 = u2.props.children, x$4(l2, Array.isArray(_2) ? _2 : [_2], u2, i2, t2, r2 && "foreignObject" !== d2, o2, f2, o2 ? o2[0] : i2.__k && b$3(i2, 0), e2), null != o2)
+      else if (_2 = u2.props.children, x$4(l2, Array.isArray(_2) ? _2 : [_2], u2, i2, t2, r2 && "foreignObject" !== d2, o2, f2, o2 ? o2[0] : i2.__k && b$4(i2, 0), e2), null != o2)
         for (_2 = o2.length; _2--; )
-          null != o2[_2] && v$2(o2[_2]);
-      e2 || ("value" in p2 && void 0 !== (_2 = p2.value) && (_2 !== l2.value || "progress" === d2 && !_2 || "option" === d2 && _2 !== y2.value) && T$4(l2, "value", _2, y2.value, false), "checked" in p2 && void 0 !== (_2 = p2.checked) && _2 !== l2.checked && T$4(l2, "checked", _2, y2.checked, false));
+          null != o2[_2] && v$3(o2[_2]);
+      e2 || ("value" in p2 && void 0 !== (_2 = p2.value) && (_2 !== l2.value || "progress" === d2 && !_2 || "option" === d2 && _2 !== y2.value) && T$5(l2, "value", _2, y2.value, false), "checked" in p2 && void 0 !== (_2 = p2.checked) && _2 !== l2.checked && T$5(l2, "checked", _2, y2.checked, false));
     }
     return l2;
   }
@@ -856,43 +768,43 @@ var __publicField = (obj, key, value) => {
     try {
       "function" == typeof n2 ? n2(u2) : n2.current = u2;
     } catch (n3) {
-      l$3.__e(n3, i2);
+      l$5.__e(n3, i2);
     }
   }
-  function S$1(n2, u2, i2) {
+  function S$3(n2, u2, i2) {
     var t2, r2;
-    if (l$3.unmount && l$3.unmount(n2), (t2 = n2.ref) && (t2.current && t2.current !== n2.__e || O$2(t2, null, u2)), null != (t2 = n2.__c)) {
+    if (l$5.unmount && l$5.unmount(n2), (t2 = n2.ref) && (t2.current && t2.current !== n2.__e || O$2(t2, null, u2)), null != (t2 = n2.__c)) {
       if (t2.componentWillUnmount)
         try {
           t2.componentWillUnmount();
         } catch (n3) {
-          l$3.__e(n3, u2);
+          l$5.__e(n3, u2);
         }
       t2.base = t2.__P = null, n2.__c = void 0;
     }
     if (t2 = n2.__k)
       for (r2 = 0; r2 < t2.length; r2++)
-        t2[r2] && S$1(t2[r2], u2, i2 || "function" != typeof n2.type);
-    i2 || null == n2.__e || v$2(n2.__e), n2.__ = n2.__e = n2.__d = void 0;
+        t2[r2] && S$3(t2[r2], u2, i2 || "function" != typeof n2.type);
+    i2 || null == n2.__e || v$3(n2.__e), n2.__ = n2.__e = n2.__d = void 0;
   }
   function q$2(n2, l2, u2) {
     return this.constructor(n2, u2);
   }
   function B$2(u2, i2, t2) {
     var r2, o2, f2;
-    l$3.__ && l$3.__(u2, i2), o2 = (r2 = "function" == typeof t2) ? null : t2 && t2.__k || i2.__k, f2 = [], L$3(i2, u2 = (!r2 && t2 || i2).__k = y$3(_$2, null, [u2]), o2 || c$3, c$3, void 0 !== i2.ownerSVGElement, !r2 && t2 ? [t2] : o2 ? null : i2.firstChild ? n$2.call(i2.childNodes) : null, f2, !r2 && t2 ? t2 : o2 ? o2.__e : i2.firstChild, r2), M$1(f2, u2);
+    l$5.__ && l$5.__(u2, i2), o2 = (r2 = "function" == typeof t2) ? null : t2 && t2.__k || i2.__k, f2 = [], L$3(i2, u2 = (!r2 && t2 || i2).__k = y$6(_$2, null, [u2]), o2 || c$5, c$5, void 0 !== i2.ownerSVGElement, !r2 && t2 ? [t2] : o2 ? null : i2.firstChild ? n$2.call(i2.childNodes) : null, f2, !r2 && t2 ? t2 : o2 ? o2.__e : i2.firstChild, r2), M$3(f2, u2);
   }
-  function D$3(n2, l2) {
-    B$2(n2, l2, D$3);
+  function D$4(n2, l2) {
+    B$2(n2, l2, D$4);
   }
   function E$2(l2, u2, i2) {
-    var t2, r2, o2, f2 = h$3({}, l2.props);
+    var t2, r2, o2, f2 = h$5({}, l2.props);
     for (o2 in u2)
       "key" == o2 ? t2 = u2[o2] : "ref" == o2 ? r2 = u2[o2] : f2[o2] = u2[o2];
-    return arguments.length > 2 && (f2.children = arguments.length > 3 ? n$2.call(arguments, 2) : i2), p$4(l2.type, f2, t2 || l2.key, r2 || l2.ref, null);
+    return arguments.length > 2 && (f2.children = arguments.length > 3 ? n$2.call(arguments, 2) : i2), p$7(l2.type, f2, t2 || l2.key, r2 || l2.ref, null);
   }
   function F$2(n2, l2) {
-    var u2 = { __c: l2 = "__cC" + e$2++, __: n2, Consumer: function(n3, l3) {
+    var u2 = { __c: l2 = "__cC" + e$4++, __: n2, Consumer: function(n3, l3) {
       return n3.children(l3);
     }, Provider: function(n3) {
       var u3, i2;
@@ -912,7 +824,7 @@ var __publicField = (obj, key, value) => {
     } };
     return u2.Provider.__ = u2.Consumer.contextType = u2;
   }
-  n$2 = s$3.slice, l$3 = { __e: function(n2, l2, u2, i2) {
+  n$2 = s$7.slice, l$5 = { __e: function(n2, l2, u2, i2) {
     for (var t2, r2, o2; l2 = l2.__; )
       if ((t2 = l2.__c) && !t2.__)
         try {
@@ -922,14 +834,14 @@ var __publicField = (obj, key, value) => {
           n2 = l3;
         }
     throw n2;
-  } }, u$3 = 0, k$3.prototype.setState = function(n2, l2) {
+  } }, u$6 = 0, k$3.prototype.setState = function(n2, l2) {
     var u2;
-    u2 = null != this.__s && this.__s !== this.state ? this.__s : this.__s = h$3({}, this.state), "function" == typeof n2 && (n2 = n2(h$3({}, u2), this.props)), n2 && h$3(u2, n2), null != n2 && this.__v && (l2 && this._sb.push(l2), m$3(this));
+    u2 = null != this.__s && this.__s !== this.state ? this.__s : this.__s = h$5({}, this.state), "function" == typeof n2 && (n2 = n2(h$5({}, u2), this.props)), n2 && h$5(u2, n2), null != n2 && this.__v && (l2 && this._sb.push(l2), m$3(this));
   }, k$3.prototype.forceUpdate = function(n2) {
     this.__v && (this.__e = true, n2 && this.__h.push(n2), m$3(this));
-  }, k$3.prototype.render = _$2, t$2 = [], o$4 = "function" == typeof Promise ? Promise.prototype.then.bind(Promise.resolve()) : setTimeout, f$3 = function(n2, l2) {
+  }, k$3.prototype.render = _$2, t$3 = [], o$9 = "function" == typeof Promise ? Promise.prototype.then.bind(Promise.resolve()) : setTimeout, f$4 = function(n2, l2) {
     return n2.__v.__b - l2.__v.__b;
-  }, w$3.__r = 0, e$2 = 0;
+  }, w$4.__r = 0, e$4 = 0;
   var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
   var sentinel_umdExports = {};
   var sentinel_umd = {
@@ -1131,6 +1043,7 @@ var __publicField = (obj, key, value) => {
   }
   const baseUrl = "https://chat.openai.com";
   const LEGACY_KEY_FILENAME_FORMAT = "exporter-format";
+  const KEY_LANGUAGE = "exporter:language";
   const KEY_FILENAME_FORMAT = "exporter:filename_format";
   const KEY_TIMESTAMP_ENABLED = "exporter:enable_timestamp";
   const KEY_TIMESTAMP_24H = "exporter:timestamp_24h";
@@ -1316,7 +1229,7 @@ var __publicField = (obj, key, value) => {
   };
   function processConversation(conversation, conversationChoices = []) {
     var _a, _b, _c, _d;
-    const title = conversation.title || "ChatGPT Conversation";
+    const title2 = conversation.title || "ChatGPT Conversation";
     const createTime = conversation.create_time;
     const modelSlug = ((_c = (_b = (_a = Object.values(conversation.mapping).find((node2) => {
       var _a2, _b2;
@@ -1357,7 +1270,7 @@ var __publicField = (obj, key, value) => {
     }
     return {
       id: conversation.id,
-      title,
+      title: title2,
       modelSlug,
       model,
       createTime,
@@ -1378,21 +1291,21 @@ var __publicField = (obj, key, value) => {
     };
     return _extends.apply(this, arguments);
   }
-  var t$1, r$2, u$2, i$2, o$3 = 0, f$2 = [], c$2 = [], e$1 = l$3.__b, a$2 = l$3.__r, v$1 = l$3.diffed, l$2 = l$3.__c, m$2 = l$3.unmount;
-  function d$2(t2, u2) {
-    l$3.__h && l$3.__h(r$2, t2, o$3 || u2), o$3 = 0;
-    var i2 = r$2.__H || (r$2.__H = { __: [], __h: [] });
-    return t2 >= i2.__.length && i2.__.push({ __V: c$2 }), i2.__[t2];
+  var t$2, r$4, u$5, i$5, o$8 = 0, f$3 = [], c$4 = [], e$3 = l$5.__b, a$3 = l$5.__r, v$2 = l$5.diffed, l$4 = l$5.__c, m$2 = l$5.unmount;
+  function d$5(t2, u2) {
+    l$5.__h && l$5.__h(r$4, t2, o$8 || u2), o$8 = 0;
+    var i2 = r$4.__H || (r$4.__H = { __: [], __h: [] });
+    return t2 >= i2.__.length && i2.__.push({ __V: c$4 }), i2.__[t2];
   }
-  function h$2(n2) {
-    return o$3 = 1, s$2(B$1, n2);
+  function h$4(n2) {
+    return o$8 = 1, s$6(B$1, n2);
   }
-  function s$2(n2, u2, i2) {
-    var o2 = d$2(t$1++, 2);
+  function s$6(n2, u2, i2) {
+    var o2 = d$5(t$2++, 2);
     if (o2.t = n2, !o2.__c && (o2.__ = [i2 ? i2(u2) : B$1(void 0, u2), function(n3) {
       var t2 = o2.__N ? o2.__N[0] : o2.__[0], r2 = o2.t(t2, n3);
       t2 !== r2 && (o2.__N = [r2, o2.__[1]], o2.__c.setState({}));
-    }], o2.__c = r$2, !r$2.u)) {
+    }], o2.__c = r$4, !r$4.u)) {
       var f2 = function(n3, t2, r2) {
         if (!o2.__c.__H)
           return true;
@@ -1411,33 +1324,33 @@ var __publicField = (obj, key, value) => {
           }
         }), !(!i3 && o2.__c.props === n3) && (!c2 || c2.call(this, n3, t2, r2));
       };
-      r$2.u = true;
-      var c2 = r$2.shouldComponentUpdate, e2 = r$2.componentWillUpdate;
-      r$2.componentWillUpdate = function(n3, t2, r2) {
+      r$4.u = true;
+      var c2 = r$4.shouldComponentUpdate, e2 = r$4.componentWillUpdate;
+      r$4.componentWillUpdate = function(n3, t2, r2) {
         if (this.__e) {
           var u3 = c2;
           c2 = void 0, f2(n3, t2, r2), c2 = u3;
         }
         e2 && e2.call(this, n3, t2, r2);
-      }, r$2.shouldComponentUpdate = f2;
+      }, r$4.shouldComponentUpdate = f2;
     }
     return o2.__N || o2.__;
   }
-  function p$3(u2, i2) {
-    var o2 = d$2(t$1++, 3);
-    !l$3.__s && z$2(o2.__H, i2) && (o2.__ = u2, o2.i = i2, r$2.__H.__h.push(o2));
+  function p$6(u2, i2) {
+    var o2 = d$5(t$2++, 3);
+    !l$5.__s && z$2(o2.__H, i2) && (o2.__ = u2, o2.i = i2, r$4.__H.__h.push(o2));
   }
-  function y$2(u2, i2) {
-    var o2 = d$2(t$1++, 4);
-    !l$3.__s && z$2(o2.__H, i2) && (o2.__ = u2, o2.i = i2, r$2.__h.push(o2));
+  function y$5(u2, i2) {
+    var o2 = d$5(t$2++, 4);
+    !l$5.__s && z$2(o2.__H, i2) && (o2.__ = u2, o2.i = i2, r$4.__h.push(o2));
   }
   function _$1(n2) {
-    return o$3 = 5, F$1(function() {
+    return o$8 = 5, F$1(function() {
       return { current: n2 };
     }, []);
   }
-  function A$2(n2, t2, r2) {
-    o$3 = 6, y$2(function() {
+  function A$3(n2, t2, r2) {
+    o$8 = 6, y$5(function() {
       return "function" == typeof n2 ? (n2(t2()), function() {
         return n2(null);
       }) : n2 ? (n2.current = t2(), function() {
@@ -1446,75 +1359,75 @@ var __publicField = (obj, key, value) => {
     }, null == r2 ? r2 : r2.concat(n2));
   }
   function F$1(n2, r2) {
-    var u2 = d$2(t$1++, 7);
+    var u2 = d$5(t$2++, 7);
     return z$2(u2.__H, r2) ? (u2.__V = n2(), u2.i = r2, u2.__h = n2, u2.__V) : u2.__;
   }
-  function T$3(n2, t2) {
-    return o$3 = 8, F$1(function() {
+  function T$4(n2, t2) {
+    return o$8 = 8, F$1(function() {
       return n2;
     }, t2);
   }
   function q$1(n2) {
-    var u2 = r$2.context[n2.__c], i2 = d$2(t$1++, 9);
-    return i2.c = n2, u2 ? (null == i2.__ && (i2.__ = true, u2.sub(r$2)), u2.props.value) : n2.__;
+    var u2 = r$4.context[n2.__c], i2 = d$5(t$2++, 9);
+    return i2.c = n2, u2 ? (null == i2.__ && (i2.__ = true, u2.sub(r$4)), u2.props.value) : n2.__;
   }
   function x$3(t2, r2) {
-    l$3.useDebugValue && l$3.useDebugValue(r2 ? r2(t2) : t2);
+    l$5.useDebugValue && l$5.useDebugValue(r2 ? r2(t2) : t2);
   }
   function P$2(n2) {
-    var u2 = d$2(t$1++, 10), i2 = h$2();
-    return u2.__ = n2, r$2.componentDidCatch || (r$2.componentDidCatch = function(n3, t2) {
+    var u2 = d$5(t$2++, 10), i2 = h$4();
+    return u2.__ = n2, r$4.componentDidCatch || (r$4.componentDidCatch = function(n3, t2) {
       u2.__ && u2.__(n3, t2), i2[1](n3);
     }), [i2[0], function() {
       i2[1](void 0);
     }];
   }
   function V$1() {
-    var n2 = d$2(t$1++, 11);
+    var n2 = d$5(t$2++, 11);
     if (!n2.__) {
-      for (var u2 = r$2.__v; null !== u2 && !u2.__m && null !== u2.__; )
+      for (var u2 = r$4.__v; null !== u2 && !u2.__m && null !== u2.__; )
         u2 = u2.__;
       var i2 = u2.__m || (u2.__m = [0, 0]);
       n2.__ = "P" + i2[0] + "-" + i2[1]++;
     }
     return n2.__;
   }
-  function b$2() {
-    for (var t2; t2 = f$2.shift(); )
+  function b$3() {
+    for (var t2; t2 = f$3.shift(); )
       if (t2.__P && t2.__H)
         try {
-          t2.__H.__h.forEach(k$2), t2.__H.__h.forEach(w$2), t2.__H.__h = [];
+          t2.__H.__h.forEach(k$2), t2.__H.__h.forEach(w$3), t2.__H.__h = [];
         } catch (r2) {
-          t2.__H.__h = [], l$3.__e(r2, t2.__v);
+          t2.__H.__h = [], l$5.__e(r2, t2.__v);
         }
   }
-  l$3.__b = function(n2) {
-    r$2 = null, e$1 && e$1(n2);
-  }, l$3.__r = function(n2) {
-    a$2 && a$2(n2), t$1 = 0;
-    var i2 = (r$2 = n2.__c).__H;
-    i2 && (u$2 === r$2 ? (i2.__h = [], r$2.__h = [], i2.__.forEach(function(n3) {
-      n3.__N && (n3.__ = n3.__N), n3.__V = c$2, n3.__N = n3.i = void 0;
-    })) : (i2.__h.forEach(k$2), i2.__h.forEach(w$2), i2.__h = [])), u$2 = r$2;
-  }, l$3.diffed = function(t2) {
-    v$1 && v$1(t2);
+  l$5.__b = function(n2) {
+    r$4 = null, e$3 && e$3(n2);
+  }, l$5.__r = function(n2) {
+    a$3 && a$3(n2), t$2 = 0;
+    var i2 = (r$4 = n2.__c).__H;
+    i2 && (u$5 === r$4 ? (i2.__h = [], r$4.__h = [], i2.__.forEach(function(n3) {
+      n3.__N && (n3.__ = n3.__N), n3.__V = c$4, n3.__N = n3.i = void 0;
+    })) : (i2.__h.forEach(k$2), i2.__h.forEach(w$3), i2.__h = [])), u$5 = r$4;
+  }, l$5.diffed = function(t2) {
+    v$2 && v$2(t2);
     var o2 = t2.__c;
-    o2 && o2.__H && (o2.__H.__h.length && (1 !== f$2.push(o2) && i$2 === l$3.requestAnimationFrame || ((i$2 = l$3.requestAnimationFrame) || j$1)(b$2)), o2.__H.__.forEach(function(n2) {
-      n2.i && (n2.__H = n2.i), n2.__V !== c$2 && (n2.__ = n2.__V), n2.i = void 0, n2.__V = c$2;
-    })), u$2 = r$2 = null;
-  }, l$3.__c = function(t2, r2) {
+    o2 && o2.__H && (o2.__H.__h.length && (1 !== f$3.push(o2) && i$5 === l$5.requestAnimationFrame || ((i$5 = l$5.requestAnimationFrame) || j$2)(b$3)), o2.__H.__.forEach(function(n2) {
+      n2.i && (n2.__H = n2.i), n2.__V !== c$4 && (n2.__ = n2.__V), n2.i = void 0, n2.__V = c$4;
+    })), u$5 = r$4 = null;
+  }, l$5.__c = function(t2, r2) {
     r2.some(function(t3) {
       try {
         t3.__h.forEach(k$2), t3.__h = t3.__h.filter(function(n2) {
-          return !n2.__ || w$2(n2);
+          return !n2.__ || w$3(n2);
         });
       } catch (u2) {
         r2.some(function(n2) {
           n2.__h && (n2.__h = []);
-        }), r2 = [], l$3.__e(u2, t3.__v);
+        }), r2 = [], l$5.__e(u2, t3.__v);
       }
-    }), l$2 && l$2(t2, r2);
-  }, l$3.unmount = function(t2) {
+    }), l$4 && l$4(t2, r2);
+  }, l$5.unmount = function(t2) {
     m$2 && m$2(t2);
     var r2, u2 = t2.__c;
     u2 && u2.__H && (u2.__H.__.forEach(function(n2) {
@@ -1523,22 +1436,22 @@ var __publicField = (obj, key, value) => {
       } catch (n3) {
         r2 = n3;
       }
-    }), u2.__H = void 0, r2 && l$3.__e(r2, u2.__v));
+    }), u2.__H = void 0, r2 && l$5.__e(r2, u2.__v));
   };
-  var g$3 = "function" == typeof requestAnimationFrame;
-  function j$1(n2) {
+  var g$4 = "function" == typeof requestAnimationFrame;
+  function j$2(n2) {
     var t2, r2 = function() {
-      clearTimeout(u2), g$3 && cancelAnimationFrame(t2), setTimeout(n2);
+      clearTimeout(u2), g$4 && cancelAnimationFrame(t2), setTimeout(n2);
     }, u2 = setTimeout(r2, 100);
-    g$3 && (t2 = requestAnimationFrame(r2));
+    g$4 && (t2 = requestAnimationFrame(r2));
   }
   function k$2(n2) {
-    var t2 = r$2, u2 = n2.__c;
-    "function" == typeof u2 && (n2.__c = void 0, u2()), r$2 = t2;
+    var t2 = r$4, u2 = n2.__c;
+    "function" == typeof u2 && (n2.__c = void 0, u2()), r$4 = t2;
   }
-  function w$2(n2) {
-    var t2 = r$2;
-    n2.__c = n2.__(), r$2 = t2;
+  function w$3(n2) {
+    var t2 = r$4;
+    n2.__c = n2.__(), r$4 = t2;
   }
   function z$2(n2, t2) {
     return !n2 || n2.length !== t2.length || t2.some(function(t3, r2) {
@@ -1548,7 +1461,7 @@ var __publicField = (obj, key, value) => {
   function B$1(n2, t2) {
     return "function" == typeof t2 ? t2(n2) : t2;
   }
-  function g$2(n2, t2) {
+  function g$3(n2, t2) {
     for (var e2 in t2)
       n2[e2] = t2[e2];
     return n2;
@@ -1565,7 +1478,7 @@ var __publicField = (obj, key, value) => {
   function E$1(n2, t2) {
     return n2 === t2 && (0 !== n2 || 1 / n2 == 1 / t2) || n2 != n2 && t2 != t2;
   }
-  function w$1(n2) {
+  function w$2(n2) {
     this.props = n2;
   }
   function x$2(n2, e2) {
@@ -1574,48 +1487,48 @@ var __publicField = (obj, key, value) => {
       return !r3 && t2 && (t2.call ? t2(null) : t2.current = null), e2 ? !e2(this.props, n3) || !r3 : C$1(this.props, n3);
     }
     function u2(e3) {
-      return this.shouldComponentUpdate = r2, y$3(n2, e3);
+      return this.shouldComponentUpdate = r2, y$6(n2, e3);
     }
     return u2.displayName = "Memo(" + (n2.displayName || n2.name) + ")", u2.prototype.isReactComponent = true, u2.__f = true, u2;
   }
-  (w$1.prototype = new k$3()).isPureReactComponent = true, w$1.prototype.shouldComponentUpdate = function(n2, t2) {
+  (w$2.prototype = new k$3()).isPureReactComponent = true, w$2.prototype.shouldComponentUpdate = function(n2, t2) {
     return C$1(this.props, n2) || C$1(this.state, t2);
   };
-  var R$2 = l$3.__b;
-  l$3.__b = function(n2) {
-    n2.type && n2.type.__f && n2.ref && (n2.props.ref = n2.ref, n2.ref = null), R$2 && R$2(n2);
+  var R$3 = l$5.__b;
+  l$5.__b = function(n2) {
+    n2.type && n2.type.__f && n2.ref && (n2.props.ref = n2.ref, n2.ref = null), R$3 && R$3(n2);
   };
-  var N$1 = "undefined" != typeof Symbol && Symbol.for && Symbol.for("react.forward_ref") || 3911;
+  var N$2 = "undefined" != typeof Symbol && Symbol.for && Symbol.for("react.forward_ref") || 3911;
   function k$1(n2) {
     function t2(t3) {
-      var e2 = g$2({}, t3);
+      var e2 = g$3({}, t3);
       return delete e2.ref, n2(e2, t3.ref || null);
     }
-    return t2.$$typeof = N$1, t2.render = t2, t2.prototype.isReactComponent = t2.__f = true, t2.displayName = "ForwardRef(" + (n2.displayName || n2.name) + ")", t2;
+    return t2.$$typeof = N$2, t2.render = t2, t2.prototype.isReactComponent = t2.__f = true, t2.displayName = "ForwardRef(" + (n2.displayName || n2.name) + ")", t2;
   }
-  var A$1 = function(n2, t2) {
+  var A$2 = function(n2, t2) {
     return null == n2 ? null : P$3(P$3(n2).map(t2));
-  }, O$1 = { map: A$1, forEach: A$1, count: function(n2) {
+  }, O$1 = { map: A$2, forEach: A$2, count: function(n2) {
     return n2 ? P$3(n2).length : 0;
   }, only: function(n2) {
     var t2 = P$3(n2);
     if (1 !== t2.length)
       throw "Children.only";
     return t2[0];
-  }, toArray: P$3 }, T$2 = l$3.__e;
-  l$3.__e = function(n2, t2, e2, r2) {
+  }, toArray: P$3 }, T$3 = l$5.__e;
+  l$5.__e = function(n2, t2, e2, r2) {
     if (n2.then) {
       for (var u2, o2 = t2; o2 = o2.__; )
         if ((u2 = o2.__c) && u2.__c)
           return null == t2.__e && (t2.__e = e2.__e, t2.__k = e2.__k), u2.__c(n2, t2);
     }
-    T$2(n2, t2, e2, r2);
+    T$3(n2, t2, e2, r2);
   };
-  var I = l$3.unmount;
+  var I$1 = l$5.unmount;
   function L$2(n2, t2, e2) {
     return n2 && (n2.__c && n2.__c.__H && (n2.__c.__H.__.forEach(function(n3) {
       "function" == typeof n3.__c && n3.__c();
-    }), n2.__c.__H = null), null != (n2 = g$2({}, n2)).__c && (n2.__c.__P === e2 && (n2.__c.__P = t2), n2.__c = null), n2.__k = n2.__k && n2.__k.map(function(n3) {
+    }), n2.__c.__H = null), null != (n2 = g$3({}, n2)).__c && (n2.__c.__P === e2 && (n2.__c.__P = t2), n2.__c = null), n2.__k = n2.__k && n2.__k.map(function(n3) {
       return L$2(n3, t2, e2);
     })), n2;
   }
@@ -1624,14 +1537,14 @@ var __publicField = (obj, key, value) => {
       return U(n3, t2, e2);
     }), n2.__c && n2.__c.__P === t2 && (n2.__e && e2.insertBefore(n2.__e, n2.__d), n2.__c.__e = true, n2.__c.__P = e2)), n2;
   }
-  function D$2() {
+  function D$3() {
     this.__u = 0, this.t = null, this.__b = null;
   }
   function F(n2) {
     var t2 = n2.__.__c;
     return t2 && t2.__a && t2.__a(n2);
   }
-  function M(n2) {
+  function M$2(n2) {
     var e2, r2, u2;
     function o2(o3) {
       if (e2 || (e2 = n2()).then(function(n3) {
@@ -1642,17 +1555,17 @@ var __publicField = (obj, key, value) => {
         throw u2;
       if (!r2)
         throw e2;
-      return y$3(r2, o3);
+      return y$6(r2, o3);
     }
     return o2.displayName = "Lazy", o2.__f = true, o2;
   }
   function V() {
     this.u = null, this.o = null;
   }
-  l$3.unmount = function(n2) {
+  l$5.unmount = function(n2) {
     var t2 = n2.__c;
-    t2 && t2.__R && t2.__R(), t2 && true === n2.__h && (n2.type = null), I && I(n2);
-  }, (D$2.prototype = new k$3()).__c = function(n2, t2) {
+    t2 && t2.__R && t2.__R(), t2 && true === n2.__h && (n2.type = null), I$1 && I$1(n2);
+  }, (D$3.prototype = new k$3()).__c = function(n2, t2) {
     var e2 = t2.__c, r2 = this;
     null == r2.t && (r2.t = []), r2.t.push(e2);
     var u2 = F(r2.__v), o2 = false, i2 = function() {
@@ -1671,9 +1584,9 @@ var __publicField = (obj, key, value) => {
       }
     }, c2 = true === t2.__h;
     r2.__u++ || c2 || r2.setState({ __a: r2.__b = r2.__v.__k[0] }), n2.then(i2, i2);
-  }, D$2.prototype.componentWillUnmount = function() {
+  }, D$3.prototype.componentWillUnmount = function() {
     this.t = [];
-  }, D$2.prototype.render = function(n2, e2) {
+  }, D$3.prototype.render = function(n2, e2) {
     if (this.__b) {
       if (this.__v.__k) {
         var r2 = document.createElement("div"), o2 = this.__v.__k[0].__c;
@@ -1681,8 +1594,8 @@ var __publicField = (obj, key, value) => {
       }
       this.__b = null;
     }
-    var i2 = e2.__a && y$3(_$2, null, n2.fallback);
-    return i2 && (i2.__h = null), [y$3(_$2, null, e2.__a ? null : n2.children), i2];
+    var i2 = e2.__a && y$6(_$2, null, n2.fallback);
+    return i2 && (i2.__h = null), [y$6(_$2, null, e2.__a ? null : n2.children), i2];
   };
   var W$1 = function(n2, t2, e2) {
     if (++e2[1] === e2[0] && n2.o.delete(t2), n2.props.revealOrder && ("t" !== n2.props.revealOrder[0] || !n2.o.size))
@@ -1699,7 +1612,7 @@ var __publicField = (obj, key, value) => {
       return n2.context;
     }, n2.children;
   }
-  function j(n2) {
+  function j$1(n2) {
     var e2 = this, r2 = n2.i;
     e2.componentWillUnmount = function() {
       B$2(null, e2.l), e2.l = null, e2.i = null;
@@ -1709,10 +1622,10 @@ var __publicField = (obj, key, value) => {
       this.childNodes.push(n3), e2.i.appendChild(n3);
     }, removeChild: function(n3) {
       this.childNodes.splice(this.childNodes.indexOf(n3) >>> 1, 1), e2.i.removeChild(n3);
-    } }), B$2(y$3(P$1, { context: e2.context }, n2.__v), e2.l)) : e2.l && e2.componentWillUnmount();
+    } }), B$2(y$6(P$1, { context: e2.context }, n2.__v), e2.l)) : e2.l && e2.componentWillUnmount();
   }
   function z$1(n2, e2) {
-    var r2 = y$3(j, { __v: n2, i: e2 });
+    var r2 = y$6(j$1, { __v: n2, i: e2 });
     return r2.containerInfo = e2, r2;
   }
   (V.prototype = new k$3()).__a = function(n2) {
@@ -1736,14 +1649,14 @@ var __publicField = (obj, key, value) => {
       W$1(n2, e2, t2);
     });
   };
-  var B = "undefined" != typeof Symbol && Symbol.for && Symbol.for("react.element") || 60103, H$1 = /^(?:accent|alignment|arabic|baseline|cap|clip(?!PathU)|color|dominant|fill|flood|font|glyph(?!R)|horiz|image|letter|lighting|marker(?!H|W|U)|overline|paint|pointer|shape|stop|strikethrough|stroke|text(?!L)|transform|underline|unicode|units|v|vector|vert|word|writing|x(?!C))[A-Z]/, Z = /^on(Ani|Tra|Tou|BeforeInp|Compo)/, Y = /[A-Z0-9]/g, $ = "undefined" != typeof document, q = function(n2) {
+  var B = "undefined" != typeof Symbol && Symbol.for && Symbol.for("react.element") || 60103, H$2 = /^(?:accent|alignment|arabic|baseline|cap|clip(?!PathU)|color|dominant|fill|flood|font|glyph(?!R)|horiz|image|letter|lighting|marker(?!H|W|U)|overline|paint|pointer|shape|stop|strikethrough|stroke|text(?!L)|transform|underline|unicode|units|v|vector|vert|word|writing|x(?!C))[A-Z]/, Z$1 = /^on(Ani|Tra|Tou|BeforeInp|Compo)/, Y$1 = /[A-Z0-9]/g, $ = "undefined" != typeof document, q = function(n2) {
     return ("undefined" != typeof Symbol && "symbol" == typeof Symbol() ? /fil|che|rad/ : /fil|che|ra/).test(n2);
   };
   function G(n2, t2, e2) {
     return null == t2.__k && (t2.textContent = ""), B$2(n2, t2), "function" == typeof e2 && e2(), n2 ? n2.__c : null;
   }
   function J(n2, t2, e2) {
-    return D$3(n2, t2), "function" == typeof e2 && e2(), n2 ? n2.__c : null;
+    return D$4(n2, t2), "function" == typeof e2 && e2(), n2 ? n2.__c : null;
   }
   k$3.prototype.isReactComponent = {}, ["componentWillMount", "componentWillReceiveProps", "componentWillUpdate"].forEach(function(t2) {
     Object.defineProperty(k$3.prototype, t2, { configurable: true, get: function() {
@@ -1752,29 +1665,29 @@ var __publicField = (obj, key, value) => {
       Object.defineProperty(this, t2, { configurable: true, writable: true, value: n2 });
     } });
   });
-  var K = l$3.event;
+  var K = l$5.event;
   function Q() {
   }
-  function X() {
+  function X$1() {
     return this.cancelBubble;
   }
   function nn() {
     return this.defaultPrevented;
   }
-  l$3.event = function(n2) {
-    return K && (n2 = K(n2)), n2.persist = Q, n2.isPropagationStopped = X, n2.isDefaultPrevented = nn, n2.nativeEvent = n2;
+  l$5.event = function(n2) {
+    return K && (n2 = K(n2)), n2.persist = Q, n2.isPropagationStopped = X$1, n2.isDefaultPrevented = nn, n2.nativeEvent = n2;
   };
   var tn, en = { enumerable: false, configurable: true, get: function() {
     return this.class;
-  } }, rn = l$3.vnode;
-  l$3.vnode = function(n2) {
+  } }, rn = l$5.vnode;
+  l$5.vnode = function(n2) {
     "string" == typeof n2.type && function(n3) {
       var t2 = n3.props, e2 = n3.type, u2 = {};
       for (var o2 in t2) {
         var i2 = t2[o2];
         if (!("value" === o2 && "defaultValue" in t2 && null == i2 || $ && "children" === o2 && "noscript" === e2 || "class" === o2 || "className" === o2)) {
           var l2 = o2.toLowerCase();
-          "defaultValue" === o2 && "value" in t2 && null == t2.value ? o2 = "value" : "download" === o2 && true === i2 ? i2 = "" : "ondoubleclick" === l2 ? o2 = "ondblclick" : "onchange" !== l2 || "input" !== e2 && "textarea" !== e2 || q(t2.type) ? "onfocus" === l2 ? o2 = "onfocusin" : "onblur" === l2 ? o2 = "onfocusout" : Z.test(o2) ? o2 = l2 : -1 === e2.indexOf("-") && H$1.test(o2) ? o2 = o2.replace(Y, "-$&").toLowerCase() : null === i2 && (i2 = void 0) : l2 = o2 = "oninput", "oninput" === l2 && u2[o2 = l2] && (o2 = "oninputCapture"), u2[o2] = i2;
+          "defaultValue" === o2 && "value" in t2 && null == t2.value ? o2 = "value" : "download" === o2 && true === i2 ? i2 = "" : "ondoubleclick" === l2 ? o2 = "ondblclick" : "onchange" !== l2 || "input" !== e2 && "textarea" !== e2 || q(t2.type) ? "onfocus" === l2 ? o2 = "onfocusin" : "onblur" === l2 ? o2 = "onfocusout" : Z$1.test(o2) ? o2 = l2 : -1 === e2.indexOf("-") && H$2.test(o2) ? o2 = o2.replace(Y$1, "-$&").toLowerCase() : null === i2 && (i2 = void 0) : l2 = o2 = "oninput", "oninput" === l2 && u2[o2 = l2] && (o2 = "oninputCapture"), u2[o2] = i2;
         }
       }
       "select" == e2 && u2.multiple && Array.isArray(u2.value) && (u2.value = P$3(t2.children).forEach(function(n4) {
@@ -1784,12 +1697,12 @@ var __publicField = (obj, key, value) => {
       })), t2.class && !t2.className ? (u2.class = t2.class, Object.defineProperty(u2, "className", en)) : (t2.className && !t2.class || t2.class && t2.className) && (u2.class = u2.className = t2.className), n3.props = u2;
     }(n2), n2.$$typeof = B, rn && rn(n2);
   };
-  var un = l$3.__r;
-  l$3.__r = function(n2) {
+  var un = l$5.__r;
+  l$5.__r = function(n2) {
     un && un(n2), tn = n2.__c;
   };
-  var on = l$3.diffed;
-  l$3.diffed = function(n2) {
+  var on = l$5.diffed;
+  l$5.diffed = function(n2) {
     on && on(n2);
     var t2 = n2.props, e2 = n2.__e;
     null != e2 && "textarea" === n2.type && "value" in t2 && t2.value !== e2.value && (e2.value = null == t2.value ? "" : t2.value), tn = null;
@@ -1798,7 +1711,7 @@ var __publicField = (obj, key, value) => {
     return tn.__n[n2.__c].props.value;
   } } } }, cn = "17.0.2";
   function fn(n2) {
-    return y$3.bind(null, n2);
+    return y$6.bind(null, n2);
   }
   function an(n2) {
     return !!n2 && n2.$$typeof === B;
@@ -1826,60 +1739,60 @@ var __publicField = (obj, key, value) => {
   function bn() {
     return [false, yn];
   }
-  var Sn = y$2;
+  var Sn = y$5;
   function gn(n2, t2) {
-    var e2 = t2(), r2 = h$2({ h: { __: e2, v: t2 } }), u2 = r2[0].h, o2 = r2[1];
-    return y$2(function() {
+    var e2 = t2(), r2 = h$4({ h: { __: e2, v: t2 } }), u2 = r2[0].h, o2 = r2[1];
+    return y$5(function() {
       u2.__ = e2, u2.v = t2, E$1(u2.__, t2()) || o2({ h: u2 });
-    }, [n2, e2, t2]), p$3(function() {
+    }, [n2, e2, t2]), p$6(function() {
       return E$1(u2.__, u2.v()) || o2({ h: u2 }), n2(function() {
         E$1(u2.__, u2.v()) || o2({ h: u2 });
       });
     }, [n2]), e2;
   }
-  var Cn = { useState: h$2, useId: V$1, useReducer: s$2, useEffect: p$3, useLayoutEffect: y$2, useInsertionEffect: Sn, useTransition: bn, useDeferredValue: _n, useSyncExternalStore: gn, startTransition: yn, useRef: _$1, useImperativeHandle: A$2, useMemo: F$1, useCallback: T$3, useContext: q$1, useDebugValue: x$3, version: "17.0.2", Children: O$1, render: G, hydrate: J, unmountComponentAtNode: hn, createPortal: z$1, createElement: y$3, createContext: F$2, createFactory: fn, cloneElement: sn, createRef: d$3, Fragment: _$2, isValidElement: an, findDOMNode: vn, Component: k$3, PureComponent: w$1, memo: x$2, forwardRef: k$1, flushSync: pn, unstable_batchedUpdates: dn, StrictMode: mn, Suspense: D$2, SuspenseList: V, lazy: M, __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: ln };
-  const $2AODx$react = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  var Cn = { useState: h$4, useId: V$1, useReducer: s$6, useEffect: p$6, useLayoutEffect: y$5, useInsertionEffect: Sn, useTransition: bn, useDeferredValue: _n, useSyncExternalStore: gn, startTransition: yn, useRef: _$1, useImperativeHandle: A$3, useMemo: F$1, useCallback: T$4, useContext: q$1, useDebugValue: x$3, version: "17.0.2", Children: O$1, render: G, hydrate: J, unmountComponentAtNode: hn, createPortal: z$1, createElement: y$6, createContext: F$2, createFactory: fn, cloneElement: sn, createRef: d$6, Fragment: _$2, isValidElement: an, findDOMNode: vn, Component: k$3, PureComponent: w$2, memo: x$2, forwardRef: k$1, flushSync: pn, unstable_batchedUpdates: dn, StrictMode: mn, Suspense: D$3, SuspenseList: V, lazy: M$2, __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: ln };
+  const e$2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
     __proto__: null,
     Children: O$1,
     Component: k$3,
     Fragment: _$2,
-    PureComponent: w$1,
+    PureComponent: w$2,
     StrictMode: mn,
-    Suspense: D$2,
+    Suspense: D$3,
     SuspenseList: V,
     __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: ln,
     cloneElement: sn,
     createContext: F$2,
-    createElement: y$3,
+    createElement: y$6,
     createFactory: fn,
     createPortal: z$1,
-    createRef: d$3,
+    createRef: d$6,
     default: Cn,
     findDOMNode: vn,
     flushSync: pn,
     forwardRef: k$1,
     hydrate: J,
     isValidElement: an,
-    lazy: M,
+    lazy: M$2,
     memo: x$2,
     render: G,
     startTransition: yn,
     unmountComponentAtNode: hn,
     unstable_batchedUpdates: dn,
-    useCallback: T$3,
+    useCallback: T$4,
     useContext: q$1,
     useDebugValue: x$3,
     useDeferredValue: _n,
-    useEffect: p$3,
+    useEffect: p$6,
     useErrorBoundary: P$2,
     useId: V$1,
-    useImperativeHandle: A$2,
+    useImperativeHandle: A$3,
     useInsertionEffect: Sn,
-    useLayoutEffect: y$2,
+    useLayoutEffect: y$5,
     useMemo: F$1,
-    useReducer: s$2,
+    useReducer: s$6,
     useRef: _$1,
-    useState: h$2,
+    useState: h$4,
     useSyncExternalStore: gn,
     useTransition: bn,
     version: cn
@@ -1907,7 +1820,7 @@ var __publicField = (obj, key, value) => {
           () => context,
           Object.values(context)
         );
-        return /* @__PURE__ */ y$3(Context.Provider, {
+        return /* @__PURE__ */ y$6(Context.Provider, {
           value
         }, children);
       }
@@ -1987,7 +1900,7 @@ var __publicField = (obj, key, value) => {
   }
   function $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(callback) {
     const callbackRef = _$1(callback);
-    p$3(() => {
+    p$6(() => {
       callbackRef.current = callback;
     });
     return F$1(
@@ -2007,7 +1920,7 @@ var __publicField = (obj, key, value) => {
     const isControlled = prop !== void 0;
     const value1 = isControlled ? prop : uncontrolledProp;
     const handleChange = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onChange);
-    const setValue = T$3((nextValue) => {
+    const setValue = T$4((nextValue) => {
       if (isControlled) {
         const setter = nextValue;
         const value = typeof nextValue === "function" ? setter(prop) : nextValue;
@@ -2027,11 +1940,11 @@ var __publicField = (obj, key, value) => {
     ];
   }
   function $71cd76cc60e0454e$var$useUncontrolledState({ defaultProp, onChange }) {
-    const uncontrolledState = h$2(defaultProp);
+    const uncontrolledState = h$4(defaultProp);
     const [value] = uncontrolledState;
     const prevValueRef = _$1(value);
     const handleChange = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onChange);
-    p$3(() => {
+    p$6(() => {
       if (prevValueRef.current !== value) {
         handleChange(value);
         prevValueRef.current = value;
@@ -2055,25 +1968,25 @@ var __publicField = (obj, key, value) => {
     );
   }
   function $6ed0406888f73fc4$export$c7b2cbe3552a0d05(...refs) {
-    return T$3($6ed0406888f73fc4$export$43e446d32b3d21af(...refs), refs);
+    return T$4($6ed0406888f73fc4$export$43e446d32b3d21af(...refs), refs);
   }
-  function t(t2) {
+  function t$1(t2) {
     return t2.split("-")[0];
   }
-  function e(t2) {
+  function e$1(t2) {
     return t2.split("-")[1];
   }
   function n$1(e2) {
-    return ["top", "bottom"].includes(t(e2)) ? "x" : "y";
+    return ["top", "bottom"].includes(t$1(e2)) ? "x" : "y";
   }
-  function r$1(t2) {
+  function r$3(t2) {
     return "y" === t2 ? "height" : "width";
   }
-  function i$1(i2, o2, a2) {
+  function i$4(i2, o2, a2) {
     let { reference: l2, floating: s2 } = i2;
-    const c2 = l2.x + l2.width / 2 - s2.width / 2, f2 = l2.y + l2.height / 2 - s2.height / 2, u2 = n$1(o2), m2 = r$1(u2), g2 = l2[m2] / 2 - s2[m2] / 2, d2 = "x" === u2;
+    const c2 = l2.x + l2.width / 2 - s2.width / 2, f2 = l2.y + l2.height / 2 - s2.height / 2, u2 = n$1(o2), m2 = r$3(u2), g2 = l2[m2] / 2 - s2[m2] / 2, d2 = "x" === u2;
     let p2;
-    switch (t(o2)) {
+    switch (t$1(o2)) {
       case "top":
         p2 = { x: c2, y: l2.y - s2.height };
         break;
@@ -2089,7 +2002,7 @@ var __publicField = (obj, key, value) => {
       default:
         p2 = { x: l2.x, y: l2.y };
     }
-    switch (e(o2)) {
+    switch (e$1(o2)) {
       case "start":
         p2[u2] -= g2 * (a2 && d2 ? -1 : 1);
         break;
@@ -2098,68 +2011,68 @@ var __publicField = (obj, key, value) => {
     }
     return p2;
   }
-  const o$2 = async (t2, e2, n2) => {
+  const o$7 = async (t2, e2, n2) => {
     const { placement: r2 = "bottom", strategy: o2 = "absolute", middleware: a2 = [], platform: l2 } = n2, s2 = await (null == l2.isRTL ? void 0 : l2.isRTL(e2));
-    let c2 = await l2.getElementRects({ reference: t2, floating: e2, strategy: o2 }), { x: f2, y: u2 } = i$1(c2, r2, s2), m2 = r2, g2 = {}, d2 = 0;
+    let c2 = await l2.getElementRects({ reference: t2, floating: e2, strategy: o2 }), { x: f2, y: u2 } = i$4(c2, r2, s2), m2 = r2, g2 = {}, d2 = 0;
     for (let n3 = 0; n3 < a2.length; n3++) {
       const { name: p2, fn: h2 } = a2[n3], { x: y2, y: x2, data: w2, reset: v2 } = await h2({ x: f2, y: u2, initialPlacement: r2, placement: m2, strategy: o2, middlewareData: g2, rects: c2, platform: l2, elements: { reference: t2, floating: e2 } });
-      f2 = null != y2 ? y2 : f2, u2 = null != x2 ? x2 : u2, g2 = { ...g2, [p2]: { ...g2[p2], ...w2 } }, v2 && d2 <= 50 && (d2++, "object" == typeof v2 && (v2.placement && (m2 = v2.placement), v2.rects && (c2 = true === v2.rects ? await l2.getElementRects({ reference: t2, floating: e2, strategy: o2 }) : v2.rects), { x: f2, y: u2 } = i$1(c2, m2, s2)), n3 = -1);
+      f2 = null != y2 ? y2 : f2, u2 = null != x2 ? x2 : u2, g2 = { ...g2, [p2]: { ...g2[p2], ...w2 } }, v2 && d2 <= 50 && (d2++, "object" == typeof v2 && (v2.placement && (m2 = v2.placement), v2.rects && (c2 = true === v2.rects ? await l2.getElementRects({ reference: t2, floating: e2, strategy: o2 }) : v2.rects), { x: f2, y: u2 } = i$4(c2, m2, s2)), n3 = -1);
     }
     return { x: f2, y: u2, placement: m2, strategy: o2, middlewareData: g2 };
   };
-  function a$1(t2) {
+  function a$2(t2) {
     return "number" != typeof t2 ? function(t3) {
       return { top: 0, right: 0, bottom: 0, left: 0, ...t3 };
     }(t2) : { top: t2, right: t2, bottom: t2, left: t2 };
   }
-  function l$1(t2) {
+  function l$3(t2) {
     return { ...t2, top: t2.y, left: t2.x, right: t2.x + t2.width, bottom: t2.y + t2.height };
   }
-  async function s$1(t2, e2) {
+  async function s$5(t2, e2) {
     var n2;
     void 0 === e2 && (e2 = {});
-    const { x: r2, y: i2, platform: o2, rects: s2, elements: c2, strategy: f2 } = t2, { boundary: u2 = "clippingAncestors", rootBoundary: m2 = "viewport", elementContext: g2 = "floating", altBoundary: d2 = false, padding: p2 = 0 } = e2, h2 = a$1(p2), y2 = c2[d2 ? "floating" === g2 ? "reference" : "floating" : g2], x2 = l$1(await o2.getClippingRect({ element: null == (n2 = await (null == o2.isElement ? void 0 : o2.isElement(y2))) || n2 ? y2 : y2.contextElement || await (null == o2.getDocumentElement ? void 0 : o2.getDocumentElement(c2.floating)), boundary: u2, rootBoundary: m2, strategy: f2 })), w2 = l$1(o2.convertOffsetParentRelativeRectToViewportRelativeRect ? await o2.convertOffsetParentRelativeRectToViewportRelativeRect({ rect: "floating" === g2 ? { ...s2.floating, x: r2, y: i2 } : s2.reference, offsetParent: await (null == o2.getOffsetParent ? void 0 : o2.getOffsetParent(c2.floating)), strategy: f2 }) : s2[g2]);
+    const { x: r2, y: i2, platform: o2, rects: s2, elements: c2, strategy: f2 } = t2, { boundary: u2 = "clippingAncestors", rootBoundary: m2 = "viewport", elementContext: g2 = "floating", altBoundary: d2 = false, padding: p2 = 0 } = e2, h2 = a$2(p2), y2 = c2[d2 ? "floating" === g2 ? "reference" : "floating" : g2], x2 = l$3(await o2.getClippingRect({ element: null == (n2 = await (null == o2.isElement ? void 0 : o2.isElement(y2))) || n2 ? y2 : y2.contextElement || await (null == o2.getDocumentElement ? void 0 : o2.getDocumentElement(c2.floating)), boundary: u2, rootBoundary: m2, strategy: f2 })), w2 = l$3(o2.convertOffsetParentRelativeRectToViewportRelativeRect ? await o2.convertOffsetParentRelativeRectToViewportRelativeRect({ rect: "floating" === g2 ? { ...s2.floating, x: r2, y: i2 } : s2.reference, offsetParent: await (null == o2.getOffsetParent ? void 0 : o2.getOffsetParent(c2.floating)), strategy: f2 }) : s2[g2]);
     return { top: x2.top - w2.top + h2.top, bottom: w2.bottom - x2.bottom + h2.bottom, left: x2.left - w2.left + h2.left, right: w2.right - x2.right + h2.right };
   }
-  const c$1 = Math.min, f$1 = Math.max;
-  function u$1(t2, e2, n2) {
-    return f$1(t2, c$1(e2, n2));
+  const c$3 = Math.min, f$2 = Math.max;
+  function u$4(t2, e2, n2) {
+    return f$2(t2, c$3(e2, n2));
   }
   const m$1 = (t2) => ({ name: "arrow", options: t2, async fn(i2) {
     const { element: o2, padding: l2 = 0 } = null != t2 ? t2 : {}, { x: s2, y: c2, placement: f2, rects: m2, platform: g2 } = i2;
     if (null == o2)
       return {};
-    const d2 = a$1(l2), p2 = { x: s2, y: c2 }, h2 = n$1(f2), y2 = e(f2), x2 = r$1(h2), w2 = await g2.getDimensions(o2), v2 = "y" === h2 ? "top" : "left", b2 = "y" === h2 ? "bottom" : "right", R2 = m2.reference[x2] + m2.reference[h2] - p2[h2] - m2.floating[x2], A2 = p2[h2] - m2.reference[h2], P2 = await (null == g2.getOffsetParent ? void 0 : g2.getOffsetParent(o2));
+    const d2 = a$2(l2), p2 = { x: s2, y: c2 }, h2 = n$1(f2), y2 = e$1(f2), x2 = r$3(h2), w2 = await g2.getDimensions(o2), v2 = "y" === h2 ? "top" : "left", b2 = "y" === h2 ? "bottom" : "right", R2 = m2.reference[x2] + m2.reference[h2] - p2[h2] - m2.floating[x2], A2 = p2[h2] - m2.reference[h2], P2 = await (null == g2.getOffsetParent ? void 0 : g2.getOffsetParent(o2));
     let T2 = P2 ? "y" === h2 ? P2.clientHeight || 0 : P2.clientWidth || 0 : 0;
     0 === T2 && (T2 = m2.floating[x2]);
-    const O2 = R2 / 2 - A2 / 2, D2 = d2[v2], L2 = T2 - w2[x2] - d2[b2], k2 = T2 / 2 - w2[x2] / 2 + O2, E2 = u$1(D2, k2, L2), C2 = ("start" === y2 ? d2[v2] : d2[b2]) > 0 && k2 !== E2 && m2.reference[x2] <= m2.floating[x2];
+    const O2 = R2 / 2 - A2 / 2, D2 = d2[v2], L2 = T2 - w2[x2] - d2[b2], k2 = T2 / 2 - w2[x2] / 2 + O2, E2 = u$4(D2, k2, L2), C2 = ("start" === y2 ? d2[v2] : d2[b2]) > 0 && k2 !== E2 && m2.reference[x2] <= m2.floating[x2];
     return { [h2]: p2[h2] - (C2 ? k2 < D2 ? D2 - k2 : L2 - k2 : 0), data: { [h2]: E2, centerOffset: k2 - E2 } };
-  } }), g$1 = { left: "right", right: "left", bottom: "top", top: "bottom" };
-  function d$1(t2) {
-    return t2.replace(/left|right|bottom|top/g, (t3) => g$1[t3]);
+  } }), g$2 = { left: "right", right: "left", bottom: "top", top: "bottom" };
+  function d$4(t2) {
+    return t2.replace(/left|right|bottom|top/g, (t3) => g$2[t3]);
   }
-  function p$2(t2, i2, o2) {
+  function p$5(t2, i2, o2) {
     void 0 === o2 && (o2 = false);
-    const a2 = e(t2), l2 = n$1(t2), s2 = r$1(l2);
+    const a2 = e$1(t2), l2 = n$1(t2), s2 = r$3(l2);
     let c2 = "x" === l2 ? a2 === (o2 ? "end" : "start") ? "right" : "left" : "start" === a2 ? "bottom" : "top";
-    return i2.reference[s2] > i2.floating[s2] && (c2 = d$1(c2)), { main: c2, cross: d$1(c2) };
+    return i2.reference[s2] > i2.floating[s2] && (c2 = d$4(c2)), { main: c2, cross: d$4(c2) };
   }
-  const h$1 = { start: "end", end: "start" };
-  function y$1(t2) {
-    return t2.replace(/start|end/g, (t3) => h$1[t3]);
+  const h$3 = { start: "end", end: "start" };
+  function y$4(t2) {
+    return t2.replace(/start|end/g, (t3) => h$3[t3]);
   }
   const x$1 = ["top", "right", "bottom", "left"];
   x$1.reduce((t2, e2) => t2.concat(e2, e2 + "-start", e2 + "-end"), []);
-  const b$1 = function(e2) {
+  const b$2 = function(e2) {
     return void 0 === e2 && (e2 = {}), { name: "flip", options: e2, async fn(n2) {
       var r2;
-      const { placement: i2, middlewareData: o2, rects: a2, initialPlacement: l2, platform: c2, elements: f2 } = n2, { mainAxis: u2 = true, crossAxis: m2 = true, fallbackPlacements: g2, fallbackStrategy: h2 = "bestFit", flipAlignment: x2 = true, ...w2 } = e2, v2 = t(i2), b2 = g2 || (v2 === l2 || !x2 ? [d$1(l2)] : function(t2) {
-        const e3 = d$1(t2);
-        return [y$1(t2), e3, y$1(e3)];
-      }(l2)), R2 = [l2, ...b2], A2 = await s$1(n2, w2), P2 = [];
+      const { placement: i2, middlewareData: o2, rects: a2, initialPlacement: l2, platform: c2, elements: f2 } = n2, { mainAxis: u2 = true, crossAxis: m2 = true, fallbackPlacements: g2, fallbackStrategy: h2 = "bestFit", flipAlignment: x2 = true, ...w2 } = e2, v2 = t$1(i2), b2 = g2 || (v2 === l2 || !x2 ? [d$4(l2)] : function(t2) {
+        const e3 = d$4(t2);
+        return [y$4(t2), e3, y$4(e3)];
+      }(l2)), R2 = [l2, ...b2], A2 = await s$5(n2, w2), P2 = [];
       let T2 = (null == (r2 = o2.flip) ? void 0 : r2.overflows) || [];
       if (u2 && P2.push(A2[v2]), m2) {
-        const { main: t2, cross: e3 } = p$2(i2, a2, await (null == c2.isRTL ? void 0 : c2.isRTL(f2.floating)));
+        const { main: t2, cross: e3 } = p$5(i2, a2, await (null == c2.isRTL ? void 0 : c2.isRTL(f2.floating)));
         P2.push(A2[t2], A2[e3]);
       }
       if (T2 = [...T2, { placement: i2, overflows: P2 }], !P2.every((t2) => t2 <= 0)) {
@@ -2184,10 +2097,10 @@ var __publicField = (obj, key, value) => {
       return {};
     } };
   };
-  function R$1(t2, e2) {
+  function R$2(t2, e2) {
     return { top: t2.top - e2.height, right: t2.right - e2.width, bottom: t2.bottom - e2.height, left: t2.left - e2.width };
   }
-  function A(t2) {
+  function A$1(t2) {
     return x$1.some((e2) => t2[e2] >= 0);
   }
   const P = function(t2) {
@@ -2196,22 +2109,22 @@ var __publicField = (obj, key, value) => {
       const { rects: r2 } = t3;
       switch (e2) {
         case "referenceHidden": {
-          const e3 = R$1(await s$1(t3, { ...n2, elementContext: "reference" }), r2.reference);
-          return { data: { referenceHiddenOffsets: e3, referenceHidden: A(e3) } };
+          const e3 = R$2(await s$5(t3, { ...n2, elementContext: "reference" }), r2.reference);
+          return { data: { referenceHiddenOffsets: e3, referenceHidden: A$1(e3) } };
         }
         case "escaped": {
-          const e3 = R$1(await s$1(t3, { ...n2, altBoundary: true }), r2.floating);
-          return { data: { escapedOffsets: e3, escaped: A(e3) } };
+          const e3 = R$2(await s$5(t3, { ...n2, altBoundary: true }), r2.floating);
+          return { data: { escapedOffsets: e3, escaped: A$1(e3) } };
         }
         default:
           return {};
       }
     } };
   };
-  const T$1 = function(r2) {
+  const T$2 = function(r2) {
     return void 0 === r2 && (r2 = 0), { name: "offset", options: r2, async fn(i2) {
       const { x: o2, y: a2 } = i2, l2 = await async function(r3, i3) {
-        const { placement: o3, platform: a3, elements: l3 } = r3, s2 = await (null == a3.isRTL ? void 0 : a3.isRTL(l3.floating)), c2 = t(o3), f2 = e(o3), u2 = "x" === n$1(o3), m2 = ["left", "top"].includes(c2) ? -1 : 1, g2 = s2 && u2 ? -1 : 1, d2 = "function" == typeof i3 ? i3(r3) : i3;
+        const { placement: o3, platform: a3, elements: l3 } = r3, s2 = await (null == a3.isRTL ? void 0 : a3.isRTL(l3.floating)), c2 = t$1(o3), f2 = e$1(o3), u2 = "x" === n$1(o3), m2 = ["left", "top"].includes(c2) ? -1 : 1, g2 = s2 && u2 ? -1 : 1, d2 = "function" == typeof i3 ? i3(r3) : i3;
         let { mainAxis: p2, crossAxis: h2, alignmentAxis: y2 } = "number" == typeof d2 ? { mainAxis: d2, crossAxis: 0, alignmentAxis: null } : { mainAxis: 0, crossAxis: 0, alignmentAxis: null, ...d2 };
         return f2 && "number" == typeof y2 && (h2 = "end" === f2 ? -1 * y2 : y2), u2 ? { x: h2 * g2, y: p2 * m2 } : { x: p2 * m2, y: h2 * g2 };
       }(i2, r2);
@@ -2221,20 +2134,20 @@ var __publicField = (obj, key, value) => {
   function O(t2) {
     return "x" === t2 ? "y" : "x";
   }
-  const D$1 = function(e2) {
+  const D$2 = function(e2) {
     return void 0 === e2 && (e2 = {}), { name: "shift", options: e2, async fn(r2) {
       const { x: i2, y: o2, placement: a2 } = r2, { mainAxis: l2 = true, crossAxis: c2 = false, limiter: f2 = { fn: (t2) => {
         let { x: e3, y: n2 } = t2;
         return { x: e3, y: n2 };
-      } }, ...m2 } = e2, g2 = { x: i2, y: o2 }, d2 = await s$1(r2, m2), p2 = n$1(t(a2)), h2 = O(p2);
+      } }, ...m2 } = e2, g2 = { x: i2, y: o2 }, d2 = await s$5(r2, m2), p2 = n$1(t$1(a2)), h2 = O(p2);
       let y2 = g2[p2], x2 = g2[h2];
       if (l2) {
         const t2 = "y" === p2 ? "bottom" : "right";
-        y2 = u$1(y2 + d2["y" === p2 ? "top" : "left"], y2, y2 - d2[t2]);
+        y2 = u$4(y2 + d2["y" === p2 ? "top" : "left"], y2, y2 - d2[t2]);
       }
       if (c2) {
         const t2 = "y" === h2 ? "bottom" : "right";
-        x2 = u$1(x2 + d2["y" === h2 ? "top" : "left"], x2, x2 - d2[t2]);
+        x2 = u$4(x2 + d2["y" === h2 ? "top" : "left"], x2, x2 - d2[t2]);
       }
       const w2 = f2.fn({ ...r2, [p2]: y2, [h2]: x2 });
       return { ...w2, data: { x: w2.x - i2, y: w2.y - o2 } };
@@ -2250,17 +2163,17 @@ var __publicField = (obj, key, value) => {
       }
       if (u2) {
         var w2, v2, b2, R2;
-        const e3 = "y" === g2 ? "width" : "height", n2 = ["top", "left"].includes(t(a2)), r3 = l2.reference[d2] - l2.floating[e3] + (n2 && null != (w2 = null == (v2 = s2.offset) ? void 0 : v2[d2]) ? w2 : 0) + (n2 ? 0 : x2.crossAxis), i3 = l2.reference[d2] + l2.reference[e3] + (n2 ? 0 : null != (b2 = null == (R2 = s2.offset) ? void 0 : R2[d2]) ? b2 : 0) - (n2 ? x2.crossAxis : 0);
+        const e3 = "y" === g2 ? "width" : "height", n2 = ["top", "left"].includes(t$1(a2)), r3 = l2.reference[d2] - l2.floating[e3] + (n2 && null != (w2 = null == (v2 = s2.offset) ? void 0 : v2[d2]) ? w2 : 0) + (n2 ? 0 : x2.crossAxis), i3 = l2.reference[d2] + l2.reference[e3] + (n2 ? 0 : null != (b2 = null == (R2 = s2.offset) ? void 0 : R2[d2]) ? b2 : 0) - (n2 ? x2.crossAxis : 0);
         h2 < r3 ? h2 = r3 : h2 > i3 && (h2 = i3);
       }
       return { [g2]: p2, [d2]: h2 };
     } };
   }, k = function(n2) {
     return void 0 === n2 && (n2 = {}), { name: "size", options: n2, async fn(r2) {
-      const { placement: i2, rects: o2, platform: a2, elements: l2 } = r2, { apply: c2, ...u2 } = n2, m2 = await s$1(r2, u2), g2 = t(i2), d2 = e(i2);
+      const { placement: i2, rects: o2, platform: a2, elements: l2 } = r2, { apply: c2, ...u2 } = n2, m2 = await s$5(r2, u2), g2 = t$1(i2), d2 = e$1(i2);
       let p2, h2;
       "top" === g2 || "bottom" === g2 ? (p2 = g2, h2 = d2 === (await (null == a2.isRTL ? void 0 : a2.isRTL(l2.floating)) ? "start" : "end") ? "left" : "right") : (h2 = g2, p2 = "end" === d2 ? "top" : "bottom");
-      const y2 = f$1(m2.left, 0), x2 = f$1(m2.right, 0), w2 = f$1(m2.top, 0), v2 = f$1(m2.bottom, 0), b2 = { availableHeight: o2.floating.height - (["left", "right"].includes(i2) ? 2 * (0 !== w2 || 0 !== v2 ? w2 + v2 : f$1(m2.top, m2.bottom)) : m2[p2]), availableWidth: o2.floating.width - (["top", "bottom"].includes(i2) ? 2 * (0 !== y2 || 0 !== x2 ? y2 + x2 : f$1(m2.left, m2.right)) : m2[h2]) }, R2 = await a2.getDimensions(l2.floating);
+      const y2 = f$2(m2.left, 0), x2 = f$2(m2.right, 0), w2 = f$2(m2.top, 0), v2 = f$2(m2.bottom, 0), b2 = { availableHeight: o2.floating.height - (["left", "right"].includes(i2) ? 2 * (0 !== w2 || 0 !== v2 ? w2 + v2 : f$2(m2.top, m2.bottom)) : m2[p2]), availableWidth: o2.floating.width - (["top", "bottom"].includes(i2) ? 2 * (0 !== y2 || 0 !== x2 ? y2 + x2 : f$2(m2.left, m2.right)) : m2[h2]) }, R2 = await a2.getDimensions(l2.floating);
       null == c2 || c2({ ...r2, ...b2 });
       const A2 = await a2.getDimensions(l2.floating);
       return R2.width !== A2.width || R2.height !== A2.height ? { reset: { rects: true } } : {};
@@ -2269,7 +2182,7 @@ var __publicField = (obj, key, value) => {
   function n(t2) {
     return t2 && t2.document && t2.location && t2.alert && t2.setInterval;
   }
-  function o$1(t2) {
+  function o$6(t2) {
     if (null == t2)
       return window;
     if (!n(t2)) {
@@ -2278,91 +2191,91 @@ var __publicField = (obj, key, value) => {
     }
     return t2;
   }
-  function i(t2) {
-    return o$1(t2).getComputedStyle(t2);
+  function i$3(t2) {
+    return o$6(t2).getComputedStyle(t2);
   }
-  function r(t2) {
+  function r$2(t2) {
     return n(t2) ? "" : t2 ? (t2.nodeName || "").toLowerCase() : "";
   }
-  function l() {
+  function l$2() {
     const t2 = navigator.userAgentData;
     return null != t2 && t2.brands ? t2.brands.map((t3) => t3.brand + "/" + t3.version).join(" ") : navigator.userAgent;
   }
-  function c(t2) {
-    return t2 instanceof o$1(t2).HTMLElement;
+  function c$2(t2) {
+    return t2 instanceof o$6(t2).HTMLElement;
   }
-  function f(t2) {
-    return t2 instanceof o$1(t2).Element;
+  function f$1(t2) {
+    return t2 instanceof o$6(t2).Element;
   }
-  function s(t2) {
+  function s$4(t2) {
     if ("undefined" == typeof ShadowRoot)
       return false;
-    return t2 instanceof o$1(t2).ShadowRoot || t2 instanceof ShadowRoot;
+    return t2 instanceof o$6(t2).ShadowRoot || t2 instanceof ShadowRoot;
   }
-  function u(t2) {
-    const { overflow: e2, overflowX: n2, overflowY: o2 } = i(t2);
+  function u$3(t2) {
+    const { overflow: e2, overflowX: n2, overflowY: o2 } = i$3(t2);
     return /auto|scroll|overlay|hidden/.test(e2 + o2 + n2);
   }
-  function d(t2) {
-    return ["table", "td", "th"].includes(r(t2));
+  function d$3(t2) {
+    return ["table", "td", "th"].includes(r$2(t2));
   }
-  function h(t2) {
-    const e2 = /firefox/i.test(l()), n2 = i(t2);
+  function h$2(t2) {
+    const e2 = /firefox/i.test(l$2()), n2 = i$3(t2);
     return "none" !== n2.transform || "none" !== n2.perspective || "paint" === n2.contain || ["transform", "perspective"].includes(n2.willChange) || e2 && "filter" === n2.willChange || e2 && !!n2.filter && "none" !== n2.filter;
   }
-  function a() {
-    return !/^((?!chrome|android).)*safari/i.test(l());
+  function a$1() {
+    return !/^((?!chrome|android).)*safari/i.test(l$2());
   }
-  const g = Math.min, p$1 = Math.max, m = Math.round;
-  function w(t2, e2, n2) {
+  const g$1 = Math.min, p$4 = Math.max, m = Math.round;
+  function w$1(t2, e2, n2) {
     var i2, r2, l2, s2;
     void 0 === e2 && (e2 = false), void 0 === n2 && (n2 = false);
     const u2 = t2.getBoundingClientRect();
     let d2 = 1, h2 = 1;
-    e2 && c(t2) && (d2 = t2.offsetWidth > 0 && m(u2.width) / t2.offsetWidth || 1, h2 = t2.offsetHeight > 0 && m(u2.height) / t2.offsetHeight || 1);
-    const g2 = f(t2) ? o$1(t2) : window, p2 = !a() && n2, w2 = (u2.left + (p2 && null != (i2 = null == (r2 = g2.visualViewport) ? void 0 : r2.offsetLeft) ? i2 : 0)) / d2, v2 = (u2.top + (p2 && null != (l2 = null == (s2 = g2.visualViewport) ? void 0 : s2.offsetTop) ? l2 : 0)) / h2, y2 = u2.width / d2, x2 = u2.height / h2;
+    e2 && c$2(t2) && (d2 = t2.offsetWidth > 0 && m(u2.width) / t2.offsetWidth || 1, h2 = t2.offsetHeight > 0 && m(u2.height) / t2.offsetHeight || 1);
+    const g2 = f$1(t2) ? o$6(t2) : window, p2 = !a$1() && n2, w2 = (u2.left + (p2 && null != (i2 = null == (r2 = g2.visualViewport) ? void 0 : r2.offsetLeft) ? i2 : 0)) / d2, v2 = (u2.top + (p2 && null != (l2 = null == (s2 = g2.visualViewport) ? void 0 : s2.offsetTop) ? l2 : 0)) / h2, y2 = u2.width / d2, x2 = u2.height / h2;
     return { width: y2, height: x2, top: v2, right: w2 + y2, bottom: v2 + x2, left: w2, x: w2, y: v2 };
   }
-  function v(t2) {
-    return (e2 = t2, (e2 instanceof o$1(e2).Node ? t2.ownerDocument : t2.document) || window.document).documentElement;
+  function v$1(t2) {
+    return (e2 = t2, (e2 instanceof o$6(e2).Node ? t2.ownerDocument : t2.document) || window.document).documentElement;
     var e2;
   }
-  function y(t2) {
-    return f(t2) ? { scrollLeft: t2.scrollLeft, scrollTop: t2.scrollTop } : { scrollLeft: t2.pageXOffset, scrollTop: t2.pageYOffset };
+  function y$3(t2) {
+    return f$1(t2) ? { scrollLeft: t2.scrollLeft, scrollTop: t2.scrollTop } : { scrollLeft: t2.pageXOffset, scrollTop: t2.pageYOffset };
   }
   function x(t2) {
-    return w(v(t2)).left + y(t2).scrollLeft;
+    return w$1(v$1(t2)).left + y$3(t2).scrollLeft;
   }
-  function b(t2, e2, n2) {
-    const o2 = c(e2), i2 = v(e2), l2 = w(t2, o2 && function(t3) {
-      const e3 = w(t3);
+  function b$1(t2, e2, n2) {
+    const o2 = c$2(e2), i2 = v$1(e2), l2 = w$1(t2, o2 && function(t3) {
+      const e3 = w$1(t3);
       return m(e3.width) !== t3.offsetWidth || m(e3.height) !== t3.offsetHeight;
     }(e2), "fixed" === n2);
     let f2 = { scrollLeft: 0, scrollTop: 0 };
     const s2 = { x: 0, y: 0 };
     if (o2 || !o2 && "fixed" !== n2)
-      if (("body" !== r(e2) || u(i2)) && (f2 = y(e2)), c(e2)) {
-        const t3 = w(e2, true);
+      if (("body" !== r$2(e2) || u$3(i2)) && (f2 = y$3(e2)), c$2(e2)) {
+        const t3 = w$1(e2, true);
         s2.x = t3.x + e2.clientLeft, s2.y = t3.y + e2.clientTop;
       } else
         i2 && (s2.x = x(i2));
     return { x: l2.left + f2.scrollLeft - s2.x, y: l2.top + f2.scrollTop - s2.y, width: l2.width, height: l2.height };
   }
   function L(t2) {
-    return "html" === r(t2) ? t2 : t2.assignedSlot || t2.parentNode || (s(t2) ? t2.host : null) || v(t2);
+    return "html" === r$2(t2) ? t2 : t2.assignedSlot || t2.parentNode || (s$4(t2) ? t2.host : null) || v$1(t2);
   }
-  function R(t2) {
-    return c(t2) && "fixed" !== getComputedStyle(t2).position ? t2.offsetParent : null;
+  function R$1(t2) {
+    return c$2(t2) && "fixed" !== getComputedStyle(t2).position ? t2.offsetParent : null;
   }
-  function T(t2) {
-    const e2 = o$1(t2);
-    let n2 = R(t2);
-    for (; n2 && d(n2) && "static" === getComputedStyle(n2).position; )
-      n2 = R(n2);
-    return n2 && ("html" === r(n2) || "body" === r(n2) && "static" === getComputedStyle(n2).position && !h(n2)) ? e2 : n2 || function(t3) {
+  function T$1(t2) {
+    const e2 = o$6(t2);
+    let n2 = R$1(t2);
+    for (; n2 && d$3(n2) && "static" === getComputedStyle(n2).position; )
+      n2 = R$1(n2);
+    return n2 && ("html" === r$2(n2) || "body" === r$2(n2) && "static" === getComputedStyle(n2).position && !h$2(n2)) ? e2 : n2 || function(t3) {
       let e3 = L(t3);
-      for (s(e3) && (e3 = e3.host); c(e3) && !["html", "body"].includes(r(e3)); ) {
-        if (h(e3))
+      for (s$4(e3) && (e3 = e3.host); c$2(e3) && !["html", "body"].includes(r$2(e3)); ) {
+        if (h$2(e3))
           return e3;
         e3 = e3.parentNode;
       }
@@ -2370,49 +2283,49 @@ var __publicField = (obj, key, value) => {
     }(t2) || e2;
   }
   function W(t2) {
-    if (c(t2))
+    if (c$2(t2))
       return { width: t2.offsetWidth, height: t2.offsetHeight };
-    const e2 = w(t2);
+    const e2 = w$1(t2);
     return { width: e2.width, height: e2.height };
   }
   function E(t2) {
     const e2 = L(t2);
-    return ["html", "body", "#document"].includes(r(e2)) ? t2.ownerDocument.body : c(e2) && u(e2) ? e2 : E(e2);
+    return ["html", "body", "#document"].includes(r$2(e2)) ? t2.ownerDocument.body : c$2(e2) && u$3(e2) ? e2 : E(e2);
   }
-  function H(t2, e2) {
+  function H$1(t2, e2) {
     var n2;
     void 0 === e2 && (e2 = []);
-    const i2 = E(t2), r2 = i2 === (null == (n2 = t2.ownerDocument) ? void 0 : n2.body), l2 = o$1(i2), c2 = r2 ? [l2].concat(l2.visualViewport || [], u(i2) ? i2 : []) : i2, f2 = e2.concat(c2);
-    return r2 ? f2 : f2.concat(H(c2));
+    const i2 = E(t2), r2 = i2 === (null == (n2 = t2.ownerDocument) ? void 0 : n2.body), l2 = o$6(i2), c2 = r2 ? [l2].concat(l2.visualViewport || [], u$3(i2) ? i2 : []) : i2, f2 = e2.concat(c2);
+    return r2 ? f2 : f2.concat(H$1(c2));
   }
   function C(e2, n2, r2) {
-    return "viewport" === n2 ? l$1(function(t2, e3) {
-      const n3 = o$1(t2), i2 = v(t2), r3 = n3.visualViewport;
+    return "viewport" === n2 ? l$3(function(t2, e3) {
+      const n3 = o$6(t2), i2 = v$1(t2), r3 = n3.visualViewport;
       let l2 = i2.clientWidth, c2 = i2.clientHeight, f2 = 0, s2 = 0;
       if (r3) {
         l2 = r3.width, c2 = r3.height;
-        const t3 = a();
+        const t3 = a$1();
         (t3 || !t3 && "fixed" === e3) && (f2 = r3.offsetLeft, s2 = r3.offsetTop);
       }
       return { width: l2, height: c2, x: f2, y: s2 };
-    }(e2, r2)) : f(n2) ? function(t2, e3) {
-      const n3 = w(t2, false, "fixed" === e3), o2 = n3.top + t2.clientTop, i2 = n3.left + t2.clientLeft;
+    }(e2, r2)) : f$1(n2) ? function(t2, e3) {
+      const n3 = w$1(t2, false, "fixed" === e3), o2 = n3.top + t2.clientTop, i2 = n3.left + t2.clientLeft;
       return { top: o2, left: i2, x: i2, y: o2, right: i2 + t2.clientWidth, bottom: o2 + t2.clientHeight, width: t2.clientWidth, height: t2.clientHeight };
-    }(n2, r2) : l$1(function(t2) {
+    }(n2, r2) : l$3(function(t2) {
       var e3;
-      const n3 = v(t2), o2 = y(t2), r3 = null == (e3 = t2.ownerDocument) ? void 0 : e3.body, l2 = p$1(n3.scrollWidth, n3.clientWidth, r3 ? r3.scrollWidth : 0, r3 ? r3.clientWidth : 0), c2 = p$1(n3.scrollHeight, n3.clientHeight, r3 ? r3.scrollHeight : 0, r3 ? r3.clientHeight : 0);
+      const n3 = v$1(t2), o2 = y$3(t2), r3 = null == (e3 = t2.ownerDocument) ? void 0 : e3.body, l2 = p$4(n3.scrollWidth, n3.clientWidth, r3 ? r3.scrollWidth : 0, r3 ? r3.clientWidth : 0), c2 = p$4(n3.scrollHeight, n3.clientHeight, r3 ? r3.scrollHeight : 0, r3 ? r3.clientHeight : 0);
       let f2 = -o2.scrollLeft + x(t2);
       const s2 = -o2.scrollTop;
-      return "rtl" === i(r3 || n3).direction && (f2 += p$1(n3.clientWidth, r3 ? r3.clientWidth : 0) - l2), { width: l2, height: c2, x: f2, y: s2 };
-    }(v(e2)));
+      return "rtl" === i$3(r3 || n3).direction && (f2 += p$4(n3.clientWidth, r3 ? r3.clientWidth : 0) - l2), { width: l2, height: c2, x: f2, y: s2 };
+    }(v$1(e2)));
   }
-  function S(t2) {
-    const e2 = H(t2), n2 = ["absolute", "fixed"].includes(i(t2).position) && c(t2) ? T(t2) : t2;
-    return f(n2) ? e2.filter((t3) => f(t3) && function(t4, e3) {
+  function S$2(t2) {
+    const e2 = H$1(t2), n2 = ["absolute", "fixed"].includes(i$3(t2).position) && c$2(t2) ? T$1(t2) : t2;
+    return f$1(n2) ? e2.filter((t3) => f$1(t3) && function(t4, e3) {
       const n3 = null == e3.getRootNode ? void 0 : e3.getRootNode();
       if (t4.contains(e3))
         return true;
-      if (n3 && s(n3)) {
+      if (n3 && s$4(n3)) {
         let n4 = e3;
         do {
           if (n4 && t4 === n4)
@@ -2421,34 +2334,34 @@ var __publicField = (obj, key, value) => {
         } while (n4);
       }
       return false;
-    }(t3, n2) && "body" !== r(t3)) : [];
+    }(t3, n2) && "body" !== r$2(t3)) : [];
   }
-  const D = { getClippingRect: function(t2) {
+  const D$1 = { getClippingRect: function(t2) {
     let { element: e2, boundary: n2, rootBoundary: o2, strategy: i2 } = t2;
-    const r2 = [..."clippingAncestors" === n2 ? S(e2) : [].concat(n2), o2], l2 = r2[0], c2 = r2.reduce((t3, n3) => {
+    const r2 = [..."clippingAncestors" === n2 ? S$2(e2) : [].concat(n2), o2], l2 = r2[0], c2 = r2.reduce((t3, n3) => {
       const o3 = C(e2, n3, i2);
-      return t3.top = p$1(o3.top, t3.top), t3.right = g(o3.right, t3.right), t3.bottom = g(o3.bottom, t3.bottom), t3.left = p$1(o3.left, t3.left), t3;
+      return t3.top = p$4(o3.top, t3.top), t3.right = g$1(o3.right, t3.right), t3.bottom = g$1(o3.bottom, t3.bottom), t3.left = p$4(o3.left, t3.left), t3;
     }, C(e2, l2, i2));
     return { width: c2.right - c2.left, height: c2.bottom - c2.top, x: c2.left, y: c2.top };
   }, convertOffsetParentRelativeRectToViewportRelativeRect: function(t2) {
     let { rect: e2, offsetParent: n2, strategy: o2 } = t2;
-    const i2 = c(n2), l2 = v(n2);
+    const i2 = c$2(n2), l2 = v$1(n2);
     if (n2 === l2)
       return e2;
     let f2 = { scrollLeft: 0, scrollTop: 0 };
     const s2 = { x: 0, y: 0 };
-    if ((i2 || !i2 && "fixed" !== o2) && (("body" !== r(n2) || u(l2)) && (f2 = y(n2)), c(n2))) {
-      const t3 = w(n2, true);
+    if ((i2 || !i2 && "fixed" !== o2) && (("body" !== r$2(n2) || u$3(l2)) && (f2 = y$3(n2)), c$2(n2))) {
+      const t3 = w$1(n2, true);
       s2.x = t3.x + n2.clientLeft, s2.y = t3.y + n2.clientTop;
     }
     return { ...e2, x: e2.x - f2.scrollLeft + s2.x, y: e2.y - f2.scrollTop + s2.y };
-  }, isElement: f, getDimensions: W, getOffsetParent: T, getDocumentElement: v, getElementRects: (t2) => {
+  }, isElement: f$1, getDimensions: W, getOffsetParent: T$1, getDocumentElement: v$1, getElementRects: (t2) => {
     let { reference: e2, floating: n2, strategy: o2 } = t2;
-    return { reference: b(e2, T(n2), o2), floating: { ...W(n2), x: 0, y: 0 } };
-  }, getClientRects: (t2) => Array.from(t2.getClientRects()), isRTL: (t2) => "rtl" === i(t2).direction };
-  function N(t2, e2, n2, o2) {
+    return { reference: b$1(e2, T$1(n2), o2), floating: { ...W(n2), x: 0, y: 0 } };
+  }, getClientRects: (t2) => Array.from(t2.getClientRects()), isRTL: (t2) => "rtl" === i$3(t2).direction };
+  function N$1(t2, e2, n2, o2) {
     void 0 === o2 && (o2 = {});
-    const { ancestorScroll: i2 = true, ancestorResize: r2 = true, elementResize: l2 = true, animationFrame: c2 = false } = o2, s2 = i2 && !c2, u2 = r2 && !c2, d2 = s2 || u2 ? [...f(t2) ? H(t2) : [], ...H(e2)] : [];
+    const { ancestorScroll: i2 = true, ancestorResize: r2 = true, elementResize: l2 = true, animationFrame: c2 = false } = o2, s2 = i2 && !c2, u2 = r2 && !c2, d2 = s2 || u2 ? [...f$1(t2) ? H$1(t2) : [], ...H$1(e2)] : [];
     d2.forEach((t3) => {
       s2 && t3.addEventListener("scroll", n2, { passive: true }), u2 && t3.addEventListener("resize", n2);
     });
@@ -2457,11 +2370,11 @@ var __publicField = (obj, key, value) => {
       let o3 = true;
       a2 = new ResizeObserver(() => {
         o3 || n2(), o3 = false;
-      }), f(t2) && !c2 && a2.observe(t2), a2.observe(e2);
+      }), f$1(t2) && !c2 && a2.observe(t2), a2.observe(e2);
     }
-    let g2 = c2 ? w(t2) : null;
+    let g2 = c2 ? w$1(t2) : null;
     return c2 && function e3() {
-      const o3 = w(t2);
+      const o3 = w$1(t2);
       !g2 || o3.x === g2.x && o3.y === g2.y && o3.width === g2.width && o3.height === g2.height || n2();
       g2 = o3, h2 = requestAnimationFrame(e3);
     }(), n2(), () => {
@@ -2471,8 +2384,8 @@ var __publicField = (obj, key, value) => {
       }), null == (t3 = a2) || t3.disconnect(), a2 = null, c2 && cancelAnimationFrame(h2);
     };
   }
-  const z = (t2, n2, o2) => o$2(t2, n2, { platform: D, ...o2 });
-  var index$1 = typeof document !== "undefined" ? y$2 : p$3;
+  const z = (t2, n2, o2) => o$7(t2, n2, { platform: D$1, ...o2 });
+  var index$1 = typeof document !== "undefined" ? y$5 : p$6;
   function deepEqual(a2, b2) {
     if (a2 === b2) {
       return true;
@@ -2537,7 +2450,7 @@ var __publicField = (obj, key, value) => {
     const floating = _$1(null);
     const whileElementsMountedRef = useLatestRef(whileElementsMounted);
     const cleanupRef = _$1(null);
-    const [data, setData] = h$2({
+    const [data, setData] = h$4({
       // Setting these to `null` will allow the consumer to determine if
       // `computePosition()` has run yet
       x: null,
@@ -2546,7 +2459,7 @@ var __publicField = (obj, key, value) => {
       placement,
       middlewareData: {}
     });
-    const [latestMiddleware, setLatestMiddleware] = h$2(middleware);
+    const [latestMiddleware, setLatestMiddleware] = h$4(middleware);
     if (!deepEqual(latestMiddleware == null ? void 0 : latestMiddleware.map((_ref) => {
       let {
         options: options2
@@ -2560,7 +2473,7 @@ var __publicField = (obj, key, value) => {
     }))) {
       setLatestMiddleware(middleware);
     }
-    const update = T$3(() => {
+    const update = T$4(() => {
       if (!reference.current || !floating.current) {
         return;
       }
@@ -2588,7 +2501,7 @@ var __publicField = (obj, key, value) => {
         isMountedRef.current = false;
       };
     }, []);
-    const runElementMountCallback = T$3(() => {
+    const runElementMountCallback = T$4(() => {
       if (typeof cleanupRef.current === "function") {
         cleanupRef.current();
         cleanupRef.current = null;
@@ -2602,11 +2515,11 @@ var __publicField = (obj, key, value) => {
         }
       }
     }, [update, whileElementsMountedRef]);
-    const setReference = T$3((node2) => {
+    const setReference = T$4((node2) => {
       reference.current = node2;
       runElementMountCallback();
     }, [runElementMountCallback]);
-    const setFloating = T$3((node2) => {
+    const setFloating = T$4((node2) => {
       floating.current = node2;
       runElementMountCallback();
     }, [runElementMountCallback]);
@@ -2666,11 +2579,11 @@ var __publicField = (obj, key, value) => {
         } else
           return child;
       });
-      return /* @__PURE__ */ y$3($5e63c961fc1ce211$var$SlotClone, _extends({}, slotProps, {
+      return /* @__PURE__ */ y$6($5e63c961fc1ce211$var$SlotClone, _extends({}, slotProps, {
         ref: forwardedRef
       }), /* @__PURE__ */ an(newElement) ? /* @__PURE__ */ sn(newElement, void 0, newChildren) : null);
     }
-    return /* @__PURE__ */ y$3($5e63c961fc1ce211$var$SlotClone, _extends({}, slotProps, {
+    return /* @__PURE__ */ y$6($5e63c961fc1ce211$var$SlotClone, _extends({}, slotProps, {
       ref: forwardedRef
     }), children);
   });
@@ -2686,7 +2599,7 @@ var __publicField = (obj, key, value) => {
   });
   $5e63c961fc1ce211$var$SlotClone.displayName = "SlotClone";
   const $5e63c961fc1ce211$export$d9f1ccf0bdb05d45 = ({ children }) => {
-    return /* @__PURE__ */ y$3(_$2, null, children);
+    return /* @__PURE__ */ y$6(_$2, null, children);
   };
   function $5e63c961fc1ce211$var$isSlottable(child) {
     return /* @__PURE__ */ an(child) && child.type === $5e63c961fc1ce211$export$d9f1ccf0bdb05d45;
@@ -2745,10 +2658,10 @@ var __publicField = (obj, key, value) => {
     const Node = /* @__PURE__ */ k$1((props, forwardedRef) => {
       const { asChild, ...primitiveProps } = props;
       const Comp = asChild ? $5e63c961fc1ce211$export$8c6ed5c666ac1360 : node2;
-      p$3(() => {
+      p$6(() => {
         window[Symbol.for("radix-ui")] = true;
       }, []);
-      return /* @__PURE__ */ y$3(Comp, _extends({}, primitiveProps, {
+      return /* @__PURE__ */ y$6(Comp, _extends({}, primitiveProps, {
         ref: forwardedRef
       }));
     });
@@ -2766,21 +2679,21 @@ var __publicField = (obj, key, value) => {
   }
   const $7e8f5cd07187803e$export$21b07c8f274aebd5 = /* @__PURE__ */ k$1((props, forwardedRef) => {
     const { children, width = 10, height = 5, ...arrowProps } = props;
-    return /* @__PURE__ */ y$3($8927f6f2acc4f386$export$250ffa63cdc0d034.svg, _extends({}, arrowProps, {
+    return /* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.svg, _extends({}, arrowProps, {
       ref: forwardedRef,
       width,
       height,
       viewBox: "0 0 30 10",
       preserveAspectRatio: "none"
-    }), props.asChild ? children : /* @__PURE__ */ y$3("polygon", {
+    }), props.asChild ? children : /* @__PURE__ */ y$6("polygon", {
       points: "0,0 30,0 15,10"
     }));
   });
   const $7e8f5cd07187803e$export$be92b6f5f03c0fe9 = $7e8f5cd07187803e$export$21b07c8f274aebd5;
-  const $9f79659886946c16$export$e5c5a5f917a5871c = Boolean(globalThis === null || globalThis === void 0 ? void 0 : globalThis.document) ? y$2 : () => {
+  const $9f79659886946c16$export$e5c5a5f917a5871c = Boolean(globalThis === null || globalThis === void 0 ? void 0 : globalThis.document) ? y$5 : () => {
   };
   function $db6c3485150b8e66$export$1ab7ae714698c4b8(element2) {
-    const [size, setSize] = h$2(void 0);
+    const [size, setSize] = h$4(void 0);
     $9f79659886946c16$export$e5c5a5f917a5871c(() => {
       if (element2) {
         setSize({
@@ -2825,8 +2738,8 @@ var __publicField = (obj, key, value) => {
   const [$cf1ac5d9fe0e8206$var$PopperProvider, $cf1ac5d9fe0e8206$var$usePopperContext] = $cf1ac5d9fe0e8206$var$createPopperContext($cf1ac5d9fe0e8206$var$POPPER_NAME);
   const $cf1ac5d9fe0e8206$export$badac9ada3a0bdf9 = (props) => {
     const { __scopePopper, children } = props;
-    const [anchor, setAnchor] = h$2(null);
-    return /* @__PURE__ */ y$3($cf1ac5d9fe0e8206$var$PopperProvider, {
+    const [anchor, setAnchor] = h$4(null);
+    return /* @__PURE__ */ y$6($cf1ac5d9fe0e8206$var$PopperProvider, {
       scope: __scopePopper,
       anchor,
       onAnchorChange: setAnchor
@@ -2838,10 +2751,10 @@ var __publicField = (obj, key, value) => {
     const context = $cf1ac5d9fe0e8206$var$usePopperContext($cf1ac5d9fe0e8206$var$ANCHOR_NAME, __scopePopper);
     const ref = _$1(null);
     const composedRefs = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(forwardedRef, ref);
-    p$3(() => {
+    p$6(() => {
       context.onAnchorChange((virtualRef === null || virtualRef === void 0 ? void 0 : virtualRef.current) || ref.current);
     });
-    return virtualRef ? null : /* @__PURE__ */ y$3($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({}, anchorProps, {
+    return virtualRef ? null : /* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({}, anchorProps, {
       ref: composedRefs
     }));
   });
@@ -2855,12 +2768,12 @@ var __publicField = (obj, key, value) => {
     var _arrowSize$width, _arrowSize$height, _middlewareData$arrow, _middlewareData$arrow2, _middlewareData$arrow3, _middlewareData$hide, _middlewareData$trans, _middlewareData$trans2;
     const { __scopePopper, side = "bottom", sideOffset = 0, align = "center", alignOffset = 0, arrowPadding = 0, collisionBoundary = [], collisionPadding: collisionPaddingProp = 0, sticky = "partial", hideWhenDetached = false, avoidCollisions = true, onPlaced, ...contentProps } = props;
     const context = $cf1ac5d9fe0e8206$var$usePopperContext($cf1ac5d9fe0e8206$var$CONTENT_NAME, __scopePopper);
-    const [content2, setContent] = h$2(null);
+    const [content2, setContent] = h$4(null);
     const composedRefs = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(
       forwardedRef,
       (node2) => setContent(node2)
     );
-    const [arrow$1, setArrow] = h$2(null);
+    const [arrow$1, setArrow] = h$4(null);
     const arrowSize = $db6c3485150b8e66$export$1ab7ae714698c4b8(arrow$1);
     const arrowWidth = (_arrowSize$width = arrowSize === null || arrowSize === void 0 ? void 0 : arrowSize.width) !== null && _arrowSize$width !== void 0 ? _arrowSize$width : 0;
     const arrowHeight = (_arrowSize$height = arrowSize === null || arrowSize === void 0 ? void 0 : arrowSize.height) !== null && _arrowSize$height !== void 0 ? _arrowSize$height : 0;
@@ -2886,14 +2799,14 @@ var __publicField = (obj, key, value) => {
       // default to `fixed` strategy so users don't have to pick and we also avoid focus scroll issues
       strategy: "fixed",
       placement: desiredPlacement,
-      whileElementsMounted: N,
+      whileElementsMounted: N$1,
       middleware: [
         $cf1ac5d9fe0e8206$var$anchorCssProperties(),
-        T$1({
+        T$2({
           mainAxis: sideOffset + arrowHeight,
           alignmentAxis: alignOffset
         }),
-        avoidCollisions ? D$1({
+        avoidCollisions ? D$2({
           mainAxis: true,
           crossAxis: false,
           limiter: sticky === "partial" ? L$1() : void 0,
@@ -2903,7 +2816,7 @@ var __publicField = (obj, key, value) => {
           element: arrow$1,
           padding: arrowPadding
         }) : void 0,
-        avoidCollisions ? b$1({
+        avoidCollisions ? b$2({
           ...detectOverflowOptions
         }) : void 0,
         k({
@@ -2941,7 +2854,7 @@ var __publicField = (obj, key, value) => {
     const arrowX = (_middlewareData$arrow = middlewareData.arrow) === null || _middlewareData$arrow === void 0 ? void 0 : _middlewareData$arrow.x;
     const arrowY = (_middlewareData$arrow2 = middlewareData.arrow) === null || _middlewareData$arrow2 === void 0 ? void 0 : _middlewareData$arrow2.y;
     const cannotCenterArrow = ((_middlewareData$arrow3 = middlewareData.arrow) === null || _middlewareData$arrow3 === void 0 ? void 0 : _middlewareData$arrow3.centerOffset) !== 0;
-    const [contentZIndex, setContentZIndex] = h$2();
+    const [contentZIndex, setContentZIndex] = h$4();
     $9f79659886946c16$export$e5c5a5f917a5871c(() => {
       if (content2)
         setContentZIndex(window.getComputedStyle(content2).zIndex);
@@ -2950,7 +2863,7 @@ var __publicField = (obj, key, value) => {
     ]);
     const { hasParent, positionUpdateFns } = $cf1ac5d9fe0e8206$var$usePositionContext($cf1ac5d9fe0e8206$var$CONTENT_NAME, __scopePopper);
     const isRoot = !hasParent;
-    y$2(() => {
+    y$5(() => {
       if (!isRoot) {
         positionUpdateFns.add(update);
         return () => {
@@ -2986,7 +2899,7 @@ var __publicField = (obj, key, value) => {
         opacity: (_middlewareData$hide = middlewareData.hide) !== null && _middlewareData$hide !== void 0 && _middlewareData$hide.referenceHidden ? 0 : void 0
       }
     };
-    return /* @__PURE__ */ y$3("div", {
+    return /* @__PURE__ */ y$6("div", {
       ref: floating,
       "data-radix-popper-content-wrapper": "",
       style: {
@@ -3003,18 +2916,18 @@ var __publicField = (obj, key, value) => {
         ].join(" ")
       },
       dir: props.dir
-    }, /* @__PURE__ */ y$3($cf1ac5d9fe0e8206$var$PopperContentProvider, {
+    }, /* @__PURE__ */ y$6($cf1ac5d9fe0e8206$var$PopperContentProvider, {
       scope: __scopePopper,
       placedSide,
       onArrowChange: setArrow,
       arrowX,
       arrowY,
       shouldHideArrow: cannotCenterArrow
-    }, isRoot ? /* @__PURE__ */ y$3($cf1ac5d9fe0e8206$var$PositionContextProvider, {
+    }, isRoot ? /* @__PURE__ */ y$6($cf1ac5d9fe0e8206$var$PositionContextProvider, {
       scope: __scopePopper,
       hasParent: true,
       positionUpdateFns
-    }, /* @__PURE__ */ y$3($8927f6f2acc4f386$export$250ffa63cdc0d034.div, commonProps)) : /* @__PURE__ */ y$3($8927f6f2acc4f386$export$250ffa63cdc0d034.div, commonProps)));
+    }, /* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.div, commonProps)) : /* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.div, commonProps)));
   });
   const $cf1ac5d9fe0e8206$var$ARROW_NAME = "PopperArrow";
   const $cf1ac5d9fe0e8206$var$OPPOSITE_SIDE = {
@@ -3031,7 +2944,7 @@ var __publicField = (obj, key, value) => {
       // we have to use an extra wrapper because `ResizeObserver` (used by `useSize`)
       // doesn't report size as we'd expect on SVG elements.
       // it reports their bounding box which is effectively the largest path inside the SVG.
-      /* @__PURE__ */ y$3("span", {
+      /* @__PURE__ */ y$6("span", {
         ref: contentContext.onArrowChange,
         style: {
           position: "absolute",
@@ -3052,7 +2965,7 @@ var __publicField = (obj, key, value) => {
           }[contentContext.placedSide],
           visibility: contentContext.shouldHideArrow ? "hidden" : void 0
         }
-      }, /* @__PURE__ */ y$3($7e8f5cd07187803e$export$be92b6f5f03c0fe9, _extends({}, arrowProps, {
+      }, /* @__PURE__ */ y$6($7e8f5cd07187803e$export$be92b6f5f03c0fe9, _extends({}, arrowProps, {
         ref: forwardedRef,
         style: {
           ...arrowProps.style,
@@ -3133,12 +3046,12 @@ var __publicField = (obj, key, value) => {
   const $f1701beae083dbae$export$602eac185826482c = /* @__PURE__ */ k$1((props, forwardedRef) => {
     var _globalThis$document;
     const { container = globalThis === null || globalThis === void 0 ? void 0 : (_globalThis$document = globalThis.document) === null || _globalThis$document === void 0 ? void 0 : _globalThis$document.body, ...portalProps } = props;
-    return container ? /* @__PURE__ */ Cn.createPortal(/* @__PURE__ */ y$3($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({}, portalProps, {
+    return container ? /* @__PURE__ */ Cn.createPortal(/* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({}, portalProps, {
       ref: forwardedRef
     })), container) : null;
   });
   function $fe963b355347cc68$export$3e6543de14f8614f(initialState, machine) {
-    return s$2((state, event) => {
+    return s$6((state, event) => {
       const nextState = machine[state][event];
       return nextState !== null && nextState !== void 0 ? nextState : state;
     }, initialState);
@@ -3157,7 +3070,7 @@ var __publicField = (obj, key, value) => {
   };
   $921a889cee6df7e8$export$99c2b779aa4e8b8b.displayName = "Presence";
   function $921a889cee6df7e8$var$usePresence(present) {
-    const [node1, setNode] = h$2();
+    const [node1, setNode] = h$4();
     const stylesRef = _$1({});
     const prevPresentRef = _$1(present);
     const prevAnimationNameRef = _$1("none");
@@ -3175,7 +3088,7 @@ var __publicField = (obj, key, value) => {
         MOUNT: "mounted"
       }
     });
-    p$3(() => {
+    p$6(() => {
       const currentAnimationName = $921a889cee6df7e8$var$getAnimationName(stylesRef.current);
       prevAnimationNameRef.current = state === "mounted" ? currentAnimationName : "none";
     }, [
@@ -3238,7 +3151,7 @@ var __publicField = (obj, key, value) => {
         "mounted",
         "unmountSuspended"
       ].includes(state),
-      ref: T$3((node2) => {
+      ref: T$4((node2) => {
         if (node2)
           stylesRef.current = getComputedStyle(node2);
         setNode(node2);
@@ -3250,7 +3163,7 @@ var __publicField = (obj, key, value) => {
   }
   function $addc16e1bbe58fd0$export$3a72a57244d6e765(onEscapeKeyDownProp, ownerDocument = globalThis === null || globalThis === void 0 ? void 0 : globalThis.document) {
     const onEscapeKeyDown = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onEscapeKeyDownProp);
-    p$3(() => {
+    p$6(() => {
       const handleKeyDown = (event) => {
         if (event.key === "Escape")
           onEscapeKeyDown(event);
@@ -3275,9 +3188,9 @@ var __publicField = (obj, key, value) => {
     var _node$ownerDocument;
     const { disableOutsidePointerEvents = false, onEscapeKeyDown, onPointerDownOutside, onFocusOutside, onInteractOutside, onDismiss, ...layerProps } = props;
     const context = q$1($5cb92bef7577960e$var$DismissableLayerContext);
-    const [node1, setNode] = h$2(null);
+    const [node1, setNode] = h$4(null);
     const ownerDocument = (_node$ownerDocument = node1 === null || node1 === void 0 ? void 0 : node1.ownerDocument) !== null && _node$ownerDocument !== void 0 ? _node$ownerDocument : globalThis === null || globalThis === void 0 ? void 0 : globalThis.document;
-    const [, force] = h$2({});
+    const [, force] = h$4({});
     const composedRefs = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(
       forwardedRef,
       (node2) => setNode(node2)
@@ -3328,7 +3241,7 @@ var __publicField = (obj, key, value) => {
         onDismiss();
       }
     }, ownerDocument);
-    p$3(() => {
+    p$6(() => {
       if (!node1)
         return;
       if (disableOutsidePointerEvents) {
@@ -3350,7 +3263,7 @@ var __publicField = (obj, key, value) => {
       disableOutsidePointerEvents,
       context
     ]);
-    p$3(() => {
+    p$6(() => {
       return () => {
         if (!node1)
           return;
@@ -3362,12 +3275,12 @@ var __publicField = (obj, key, value) => {
       node1,
       context
     ]);
-    p$3(() => {
+    p$6(() => {
       const handleUpdate = () => force({});
       document.addEventListener($5cb92bef7577960e$var$CONTEXT_UPDATE, handleUpdate);
       return () => document.removeEventListener($5cb92bef7577960e$var$CONTEXT_UPDATE, handleUpdate);
     }, []);
-    return /* @__PURE__ */ y$3($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({}, layerProps, {
+    return /* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({}, layerProps, {
       ref: composedRefs,
       style: {
         pointerEvents: isBodyPointerEventsDisabled ? isPointerEventsEnabled ? "auto" : "none" : void 0,
@@ -3383,7 +3296,7 @@ var __publicField = (obj, key, value) => {
     const isPointerInsideReactTreeRef = _$1(false);
     const handleClickRef = _$1(() => {
     });
-    p$3(() => {
+    p$6(() => {
       const handlePointerDown = (event) => {
         if (event.target && !isPointerInsideReactTreeRef.current) {
           let handleAndDispatchPointerDownOutsideEvent = function() {
@@ -3425,7 +3338,7 @@ var __publicField = (obj, key, value) => {
   function $5cb92bef7577960e$var$useFocusOutside(onFocusOutside, ownerDocument = globalThis === null || globalThis === void 0 ? void 0 : globalThis.document) {
     const handleFocusOutside = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onFocusOutside);
     const isFocusInsideReactTreeRef = _$1(false);
-    p$3(() => {
+    p$6(() => {
       const handleFocus = (event) => {
         if (event.target && !isFocusInsideReactTreeRef.current) {
           const eventDetail = {
@@ -3486,7 +3399,7 @@ var __publicField = (obj, key, value) => {
       defaultProp: defaultOpen,
       onChange: onOpenChange
     });
-    const handleOpen = T$3(() => {
+    const handleOpen = T$4(() => {
       clearTimeout(closeTimerRef.current);
       openTimerRef.current = window.setTimeout(
         () => setOpen(true),
@@ -3496,7 +3409,7 @@ var __publicField = (obj, key, value) => {
       openDelay,
       setOpen
     ]);
-    const handleClose = T$3(() => {
+    const handleClose = T$4(() => {
       clearTimeout(openTimerRef.current);
       if (!hasSelectionRef.current && !isPointerDownOnContentRef.current)
         closeTimerRef.current = window.setTimeout(
@@ -3507,19 +3420,19 @@ var __publicField = (obj, key, value) => {
       closeDelay,
       setOpen
     ]);
-    const handleDismiss = T$3(
+    const handleDismiss = T$4(
       () => setOpen(false),
       [
         setOpen
       ]
     );
-    p$3(() => {
+    p$6(() => {
       return () => {
         clearTimeout(openTimerRef.current);
         clearTimeout(closeTimerRef.current);
       };
     }, []);
-    return /* @__PURE__ */ y$3($cef8881cdc69808e$var$HoverCardProvider, {
+    return /* @__PURE__ */ y$6($cef8881cdc69808e$var$HoverCardProvider, {
       scope: __scopeHoverCard,
       open,
       onOpenChange: setOpen,
@@ -3528,16 +3441,16 @@ var __publicField = (obj, key, value) => {
       onDismiss: handleDismiss,
       hasSelectionRef,
       isPointerDownOnContentRef
-    }, /* @__PURE__ */ y$3($cf1ac5d9fe0e8206$export$be92b6f5f03c0fe9, popperScope, children));
+    }, /* @__PURE__ */ y$6($cf1ac5d9fe0e8206$export$be92b6f5f03c0fe9, popperScope, children));
   };
   const $cef8881cdc69808e$var$TRIGGER_NAME = "HoverCardTrigger";
   const $cef8881cdc69808e$export$ef9f7fd8e4ba882f = /* @__PURE__ */ k$1((props, forwardedRef) => {
     const { __scopeHoverCard, ...triggerProps } = props;
     const context = $cef8881cdc69808e$var$useHoverCardContext($cef8881cdc69808e$var$TRIGGER_NAME, __scopeHoverCard);
     const popperScope = $cef8881cdc69808e$var$usePopperScope(__scopeHoverCard);
-    return /* @__PURE__ */ y$3($cf1ac5d9fe0e8206$export$b688253958b8dfe7, _extends({
+    return /* @__PURE__ */ y$6($cf1ac5d9fe0e8206$export$b688253958b8dfe7, _extends({
       asChild: true
-    }, popperScope), /* @__PURE__ */ y$3($8927f6f2acc4f386$export$250ffa63cdc0d034.a, _extends({
+    }, popperScope), /* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.a, _extends({
       "data-state": context.open ? "open" : "closed"
     }, triggerProps, {
       ref: forwardedRef,
@@ -3558,12 +3471,12 @@ var __publicField = (obj, key, value) => {
   const $cef8881cdc69808e$export$b384c6e0a789f88b = (props) => {
     const { __scopeHoverCard, forceMount, children, container } = props;
     const context = $cef8881cdc69808e$var$useHoverCardContext($cef8881cdc69808e$var$PORTAL_NAME, __scopeHoverCard);
-    return /* @__PURE__ */ y$3($cef8881cdc69808e$var$PortalProvider, {
+    return /* @__PURE__ */ y$6($cef8881cdc69808e$var$PortalProvider, {
       scope: __scopeHoverCard,
       forceMount
-    }, /* @__PURE__ */ y$3($921a889cee6df7e8$export$99c2b779aa4e8b8b, {
+    }, /* @__PURE__ */ y$6($921a889cee6df7e8$export$99c2b779aa4e8b8b, {
       present: forceMount || context.open
-    }, /* @__PURE__ */ y$3($f1701beae083dbae$export$602eac185826482c, {
+    }, /* @__PURE__ */ y$6($f1701beae083dbae$export$602eac185826482c, {
       asChild: true,
       container
     }, children)));
@@ -3573,9 +3486,9 @@ var __publicField = (obj, key, value) => {
     const portalContext = $cef8881cdc69808e$var$usePortalContext($cef8881cdc69808e$var$CONTENT_NAME, props.__scopeHoverCard);
     const { forceMount = portalContext.forceMount, ...contentProps } = props;
     const context = $cef8881cdc69808e$var$useHoverCardContext($cef8881cdc69808e$var$CONTENT_NAME, props.__scopeHoverCard);
-    return /* @__PURE__ */ y$3($921a889cee6df7e8$export$99c2b779aa4e8b8b, {
+    return /* @__PURE__ */ y$6($921a889cee6df7e8$export$99c2b779aa4e8b8b, {
       present: forceMount || context.open
-    }, /* @__PURE__ */ y$3($cef8881cdc69808e$var$HoverCardContentImpl, _extends({
+    }, /* @__PURE__ */ y$6($cef8881cdc69808e$var$HoverCardContentImpl, _extends({
       "data-state": context.open ? "open" : "closed"
     }, contentProps, {
       onPointerEnter: $e42e1063c40fb3ef$export$b9ecd428b558ff10(props.onPointerEnter, $cef8881cdc69808e$var$excludeTouch(context.onOpen)),
@@ -3589,8 +3502,8 @@ var __publicField = (obj, key, value) => {
     const popperScope = $cef8881cdc69808e$var$usePopperScope(__scopeHoverCard);
     const ref = _$1(null);
     const composedRefs = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(forwardedRef, ref);
-    const [containSelection, setContainSelection] = h$2(false);
-    p$3(() => {
+    const [containSelection, setContainSelection] = h$4(false);
+    p$6(() => {
       if (containSelection) {
         const body2 = document.body;
         $cef8881cdc69808e$var$originalBodyUserSelect = body2.style.userSelect || body2.style.webkitUserSelect;
@@ -3604,7 +3517,7 @@ var __publicField = (obj, key, value) => {
     }, [
       containSelection
     ]);
-    p$3(() => {
+    p$6(() => {
       if (ref.current) {
         const handlePointerUp = () => {
           setContainSelection(false);
@@ -3627,7 +3540,7 @@ var __publicField = (obj, key, value) => {
       context.isPointerDownOnContentRef,
       context.hasSelectionRef
     ]);
-    p$3(() => {
+    p$6(() => {
       if (ref.current) {
         const tabbables = $cef8881cdc69808e$var$getTabbableNodes(ref.current);
         tabbables.forEach(
@@ -3635,7 +3548,7 @@ var __publicField = (obj, key, value) => {
         );
       }
     });
-    return /* @__PURE__ */ y$3($5cb92bef7577960e$export$177fb62ff3ec1f22, {
+    return /* @__PURE__ */ y$6($5cb92bef7577960e$export$177fb62ff3ec1f22, {
       asChild: true,
       disableOutsidePointerEvents: false,
       onInteractOutside,
@@ -3645,7 +3558,7 @@ var __publicField = (obj, key, value) => {
         event.preventDefault();
       }),
       onDismiss: context.onDismiss
-    }, /* @__PURE__ */ y$3($cf1ac5d9fe0e8206$export$7c6e2c02157bb7d2, _extends({}, popperScope, contentProps, {
+    }, /* @__PURE__ */ y$6($cf1ac5d9fe0e8206$export$7c6e2c02157bb7d2, _extends({}, popperScope, contentProps, {
       onPointerDown: $e42e1063c40fb3ef$export$b9ecd428b558ff10(contentProps.onPointerDown, (event) => {
         if (event.currentTarget.contains(event.target))
           setContainSelection(true);
@@ -3669,7 +3582,7 @@ var __publicField = (obj, key, value) => {
   const $cef8881cdc69808e$export$b9744d3e7456d806 = /* @__PURE__ */ k$1((props, forwardedRef) => {
     const { __scopeHoverCard, ...arrowProps } = props;
     const popperScope = $cef8881cdc69808e$var$usePopperScope(__scopeHoverCard);
-    return /* @__PURE__ */ y$3($cf1ac5d9fe0e8206$export$21b07c8f274aebd5, _extends({}, popperScope, arrowProps, {
+    return /* @__PURE__ */ y$6($cf1ac5d9fe0e8206$export$21b07c8f274aebd5, _extends({}, popperScope, arrowProps, {
       ref: forwardedRef
     }));
   });
@@ -3692,6 +3605,3797 @@ var __publicField = (obj, key, value) => {
   const $cef8881cdc69808e$export$602eac185826482c = $cef8881cdc69808e$export$b384c6e0a789f88b;
   const $cef8881cdc69808e$export$7c6e2c02157bb7d2 = $cef8881cdc69808e$export$aa4724a5938c586;
   const $cef8881cdc69808e$export$21b07c8f274aebd5 = $cef8881cdc69808e$export$b9744d3e7456d806;
+  function _typeof(obj) {
+    "@babel/helpers - typeof";
+    return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(obj2) {
+      return typeof obj2;
+    } : function(obj2) {
+      return obj2 && "function" == typeof Symbol && obj2.constructor === Symbol && obj2 !== Symbol.prototype ? "symbol" : typeof obj2;
+    }, _typeof(obj);
+  }
+  function _toPrimitive(input, hint) {
+    if (_typeof(input) !== "object" || input === null)
+      return input;
+    var prim = input[Symbol.toPrimitive];
+    if (prim !== void 0) {
+      var res = prim.call(input, hint || "default");
+      if (_typeof(res) !== "object")
+        return res;
+      throw new TypeError("@@toPrimitive must return a primitive value.");
+    }
+    return (hint === "string" ? String : Number)(input);
+  }
+  function _toPropertyKey(arg) {
+    var key2 = _toPrimitive(arg, "string");
+    return _typeof(key2) === "symbol" ? key2 : String(key2);
+  }
+  function _defineProperty(obj, key2, value) {
+    key2 = _toPropertyKey(key2);
+    if (key2 in obj) {
+      Object.defineProperty(obj, key2, {
+        value,
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
+    } else {
+      obj[key2] = value;
+    }
+    return obj;
+  }
+  function warn() {
+    if (console && console.warn) {
+      var _console;
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+      if (typeof args[0] === "string")
+        args[0] = "react-i18next:: ".concat(args[0]);
+      (_console = console).warn.apply(_console, args);
+    }
+  }
+  var alreadyWarned = {};
+  function warnOnce() {
+    for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      args[_key2] = arguments[_key2];
+    }
+    if (typeof args[0] === "string" && alreadyWarned[args[0]])
+      return;
+    if (typeof args[0] === "string")
+      alreadyWarned[args[0]] = /* @__PURE__ */ new Date();
+    warn.apply(void 0, args);
+  }
+  function loadNamespaces(i18n, ns, cb) {
+    i18n.loadNamespaces(ns, function() {
+      if (i18n.isInitialized) {
+        cb();
+      } else {
+        var initialized = function initialized2() {
+          setTimeout(function() {
+            i18n.off("initialized", initialized2);
+          }, 0);
+          cb();
+        };
+        i18n.on("initialized", initialized);
+      }
+    });
+  }
+  function oldI18nextHasLoadedNamespace(ns, i18n) {
+    var options2 = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : {};
+    var lng = i18n.languages[0];
+    var fallbackLng = i18n.options ? i18n.options.fallbackLng : false;
+    var lastLng = i18n.languages[i18n.languages.length - 1];
+    if (lng.toLowerCase() === "cimode")
+      return true;
+    var loadNotPending = function loadNotPending2(l2, n2) {
+      var loadState = i18n.services.backendConnector.state["".concat(l2, "|").concat(n2)];
+      return loadState === -1 || loadState === 2;
+    };
+    if (options2.bindI18n && options2.bindI18n.indexOf("languageChanging") > -1 && i18n.services.backendConnector.backend && i18n.isLanguageChangingTo && !loadNotPending(i18n.isLanguageChangingTo, ns))
+      return false;
+    if (i18n.hasResourceBundle(lng, ns))
+      return true;
+    if (!i18n.services.backendConnector.backend || i18n.options.resources && !i18n.options.partialBundledLanguages)
+      return true;
+    if (loadNotPending(lng, ns) && (!fallbackLng || loadNotPending(lastLng, ns)))
+      return true;
+    return false;
+  }
+  function hasLoadedNamespace(ns, i18n) {
+    var options2 = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : {};
+    if (!i18n.languages || !i18n.languages.length) {
+      warnOnce("i18n.languages were undefined or empty", i18n.languages);
+      return true;
+    }
+    var isNewerI18next = i18n.options.ignoreJSONStructure !== void 0;
+    if (!isNewerI18next) {
+      return oldI18nextHasLoadedNamespace(ns, i18n, options2);
+    }
+    return i18n.hasLoadedNamespace(ns, {
+      precheck: function precheck(i18nInstance2, loadNotPending) {
+        if (options2.bindI18n && options2.bindI18n.indexOf("languageChanging") > -1 && i18nInstance2.services.backendConnector.backend && i18nInstance2.isLanguageChangingTo && !loadNotPending(i18nInstance2.isLanguageChangingTo, ns))
+          return false;
+      }
+    });
+  }
+  var matchHtmlEntity = /&(?:amp|#38|lt|#60|gt|#62|apos|#39|quot|#34|nbsp|#160|copy|#169|reg|#174|hellip|#8230|#x2F|#47);/g;
+  var htmlEntities = {
+    "&amp;": "&",
+    "&#38;": "&",
+    "&lt;": "<",
+    "&#60;": "<",
+    "&gt;": ">",
+    "&#62;": ">",
+    "&apos;": "'",
+    "&#39;": "'",
+    "&quot;": '"',
+    "&#34;": '"',
+    "&nbsp;": " ",
+    "&#160;": " ",
+    "&copy;": "©",
+    "&#169;": "©",
+    "&reg;": "®",
+    "&#174;": "®",
+    "&hellip;": "…",
+    "&#8230;": "…",
+    "&#x2F;": "/",
+    "&#47;": "/"
+  };
+  var unescapeHtmlEntity = function unescapeHtmlEntity2(m2) {
+    return htmlEntities[m2];
+  };
+  var unescape = function unescape2(text2) {
+    return text2.replace(matchHtmlEntity, unescapeHtmlEntity);
+  };
+  function ownKeys$8(object, enumerableOnly) {
+    var keys = Object.keys(object);
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+      if (enumerableOnly) {
+        symbols = symbols.filter(function(sym) {
+          return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+        });
+      }
+      keys.push.apply(keys, symbols);
+    }
+    return keys;
+  }
+  function _objectSpread$8(target) {
+    for (var i2 = 1; i2 < arguments.length; i2++) {
+      var source = arguments[i2] != null ? arguments[i2] : {};
+      if (i2 % 2) {
+        ownKeys$8(Object(source), true).forEach(function(key2) {
+          _defineProperty(target, key2, source[key2]);
+        });
+      } else if (Object.getOwnPropertyDescriptors) {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+      } else {
+        ownKeys$8(Object(source)).forEach(function(key2) {
+          Object.defineProperty(target, key2, Object.getOwnPropertyDescriptor(source, key2));
+        });
+      }
+    }
+    return target;
+  }
+  var defaultOptions = {
+    bindI18n: "languageChanged",
+    bindI18nStore: "",
+    transEmptyNodeValue: "",
+    transSupportBasicHtmlNodes: true,
+    transWrapTextNodes: "",
+    transKeepBasicHtmlNodesFor: ["br", "strong", "i", "p"],
+    useSuspense: true,
+    unescape
+  };
+  function setDefaults() {
+    var options2 = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : {};
+    defaultOptions = _objectSpread$8(_objectSpread$8({}, defaultOptions), options2);
+  }
+  function getDefaults() {
+    return defaultOptions;
+  }
+  var i18nInstance;
+  function setI18n(instance2) {
+    i18nInstance = instance2;
+  }
+  function getI18n() {
+    return i18nInstance;
+  }
+  function _classCallCheck(instance2, Constructor) {
+    if (!(instance2 instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+  function _defineProperties(target, props) {
+    for (var i2 = 0; i2 < props.length; i2++) {
+      var descriptor = props[i2];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor)
+        descriptor.writable = true;
+      Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor);
+    }
+  }
+  function _createClass(Constructor, protoProps, staticProps) {
+    if (protoProps)
+      _defineProperties(Constructor.prototype, protoProps);
+    if (staticProps)
+      _defineProperties(Constructor, staticProps);
+    Object.defineProperty(Constructor, "prototype", {
+      writable: false
+    });
+    return Constructor;
+  }
+  var initReactI18next = {
+    type: "3rdParty",
+    init: function init(instance2) {
+      setDefaults(instance2.options.react);
+      setI18n(instance2);
+    }
+  };
+  var I18nContext = F$2();
+  var ReportNamespaces = function() {
+    function ReportNamespaces2() {
+      _classCallCheck(this, ReportNamespaces2);
+      this.usedNamespaces = {};
+    }
+    _createClass(ReportNamespaces2, [{
+      key: "addUsedNamespaces",
+      value: function addUsedNamespaces(namespaces) {
+        var _this = this;
+        namespaces.forEach(function(ns) {
+          if (!_this.usedNamespaces[ns])
+            _this.usedNamespaces[ns] = true;
+        });
+      }
+    }, {
+      key: "getUsedNamespaces",
+      value: function getUsedNamespaces() {
+        return Object.keys(this.usedNamespaces);
+      }
+    }]);
+    return ReportNamespaces2;
+  }();
+  function _arrayWithHoles(arr) {
+    if (Array.isArray(arr))
+      return arr;
+  }
+  function _iterableToArrayLimit(arr, i2) {
+    var _i = null == arr ? null : "undefined" != typeof Symbol && arr[Symbol.iterator] || arr["@@iterator"];
+    if (null != _i) {
+      var _s, _e, _x, _r, _arr = [], _n2 = true, _d = false;
+      try {
+        if (_x = (_i = _i.call(arr)).next, 0 === i2) {
+          if (Object(_i) !== _i)
+            return;
+          _n2 = false;
+        } else
+          for (; !(_n2 = (_s = _x.call(_i)).done) && (_arr.push(_s.value), _arr.length !== i2); _n2 = true)
+            ;
+      } catch (err) {
+        _d = true, _e = err;
+      } finally {
+        try {
+          if (!_n2 && null != _i["return"] && (_r = _i["return"](), Object(_r) !== _r))
+            return;
+        } finally {
+          if (_d)
+            throw _e;
+        }
+      }
+      return _arr;
+    }
+  }
+  function _arrayLikeToArray(arr, len) {
+    if (len == null || len > arr.length)
+      len = arr.length;
+    for (var i2 = 0, arr2 = new Array(len); i2 < len; i2++)
+      arr2[i2] = arr[i2];
+    return arr2;
+  }
+  function _unsupportedIterableToArray(o2, minLen) {
+    if (!o2)
+      return;
+    if (typeof o2 === "string")
+      return _arrayLikeToArray(o2, minLen);
+    var n2 = Object.prototype.toString.call(o2).slice(8, -1);
+    if (n2 === "Object" && o2.constructor)
+      n2 = o2.constructor.name;
+    if (n2 === "Map" || n2 === "Set")
+      return Array.from(o2);
+    if (n2 === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n2))
+      return _arrayLikeToArray(o2, minLen);
+  }
+  function _nonIterableRest() {
+    throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
+  function _slicedToArray(arr, i2) {
+    return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i2) || _unsupportedIterableToArray(arr, i2) || _nonIterableRest();
+  }
+  function ownKeys$7(object, enumerableOnly) {
+    var keys = Object.keys(object);
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+      if (enumerableOnly) {
+        symbols = symbols.filter(function(sym) {
+          return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+        });
+      }
+      keys.push.apply(keys, symbols);
+    }
+    return keys;
+  }
+  function _objectSpread$7(target) {
+    for (var i2 = 1; i2 < arguments.length; i2++) {
+      var source = arguments[i2] != null ? arguments[i2] : {};
+      if (i2 % 2) {
+        ownKeys$7(Object(source), true).forEach(function(key2) {
+          _defineProperty(target, key2, source[key2]);
+        });
+      } else if (Object.getOwnPropertyDescriptors) {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+      } else {
+        ownKeys$7(Object(source)).forEach(function(key2) {
+          Object.defineProperty(target, key2, Object.getOwnPropertyDescriptor(source, key2));
+        });
+      }
+    }
+    return target;
+  }
+  var usePrevious = function usePrevious2(value, ignore2) {
+    var ref = _$1();
+    p$6(function() {
+      ref.current = ignore2 ? ref.current : value;
+    }, [value, ignore2]);
+    return ref.current;
+  };
+  function useTranslation(ns) {
+    var props = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
+    var i18nFromProps = props.i18n;
+    var _ref = q$1(I18nContext) || {}, i18nFromContext = _ref.i18n, defaultNSFromContext = _ref.defaultNS;
+    var i18n = i18nFromProps || i18nFromContext || getI18n();
+    if (i18n && !i18n.reportNamespaces)
+      i18n.reportNamespaces = new ReportNamespaces();
+    if (!i18n) {
+      warnOnce("You will need to pass in an i18next instance by using initReactI18next");
+      var notReadyT = function notReadyT2(k2, optsOrDefaultValue) {
+        if (typeof optsOrDefaultValue === "string")
+          return optsOrDefaultValue;
+        if (optsOrDefaultValue && _typeof(optsOrDefaultValue) === "object" && typeof optsOrDefaultValue.defaultValue === "string")
+          return optsOrDefaultValue.defaultValue;
+        return Array.isArray(k2) ? k2[k2.length - 1] : k2;
+      };
+      var retNotReady = [notReadyT, {}, false];
+      retNotReady.t = notReadyT;
+      retNotReady.i18n = {};
+      retNotReady.ready = false;
+      return retNotReady;
+    }
+    if (i18n.options.react && i18n.options.react.wait !== void 0)
+      warnOnce("It seems you are still using the old wait option, you may migrate to the new useSuspense behaviour.");
+    var i18nOptions = _objectSpread$7(_objectSpread$7(_objectSpread$7({}, getDefaults()), i18n.options.react), props);
+    var useSuspense = i18nOptions.useSuspense, keyPrefix = i18nOptions.keyPrefix;
+    var namespaces = ns || defaultNSFromContext || i18n.options && i18n.options.defaultNS;
+    namespaces = typeof namespaces === "string" ? [namespaces] : namespaces || ["translation"];
+    if (i18n.reportNamespaces.addUsedNamespaces)
+      i18n.reportNamespaces.addUsedNamespaces(namespaces);
+    var ready = (i18n.isInitialized || i18n.initializedStoreOnce) && namespaces.every(function(n2) {
+      return hasLoadedNamespace(n2, i18n, i18nOptions);
+    });
+    function getT() {
+      return i18n.getFixedT(null, i18nOptions.nsMode === "fallback" ? namespaces : namespaces[0], keyPrefix);
+    }
+    var _useState = h$4(getT), _useState2 = _slicedToArray(_useState, 2), t2 = _useState2[0], setT = _useState2[1];
+    var joinedNS = namespaces.join();
+    var previousJoinedNS = usePrevious(joinedNS);
+    var isMounted = _$1(true);
+    p$6(function() {
+      var bindI18n = i18nOptions.bindI18n, bindI18nStore = i18nOptions.bindI18nStore;
+      isMounted.current = true;
+      if (!ready && !useSuspense) {
+        loadNamespaces(i18n, namespaces, function() {
+          if (isMounted.current)
+            setT(getT);
+        });
+      }
+      if (ready && previousJoinedNS && previousJoinedNS !== joinedNS && isMounted.current) {
+        setT(getT);
+      }
+      function boundReset() {
+        if (isMounted.current)
+          setT(getT);
+      }
+      if (bindI18n && i18n)
+        i18n.on(bindI18n, boundReset);
+      if (bindI18nStore && i18n)
+        i18n.store.on(bindI18nStore, boundReset);
+      return function() {
+        isMounted.current = false;
+        if (bindI18n && i18n)
+          bindI18n.split(" ").forEach(function(e2) {
+            return i18n.off(e2, boundReset);
+          });
+        if (bindI18nStore && i18n)
+          bindI18nStore.split(" ").forEach(function(e2) {
+            return i18n.store.off(e2, boundReset);
+          });
+      };
+    }, [i18n, joinedNS]);
+    var isInitial = _$1(true);
+    p$6(function() {
+      if (isMounted.current && !isInitial.current) {
+        setT(getT);
+      }
+      isInitial.current = false;
+    }, [i18n, keyPrefix]);
+    var ret = [t2, i18n, ready];
+    ret.t = t2;
+    ret.i18n = i18n;
+    ret.ready = ready;
+    if (ready)
+      return ret;
+    if (!ready && !useSuspense)
+      return ret;
+    throw new Promise(function(resolve) {
+      loadNamespaces(i18n, namespaces, function() {
+        resolve();
+      });
+    });
+  }
+  function _assertThisInitialized(self2) {
+    if (self2 === void 0) {
+      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+    }
+    return self2;
+  }
+  function _setPrototypeOf(o2, p2) {
+    _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf2(o3, p3) {
+      o3.__proto__ = p3;
+      return o3;
+    };
+    return _setPrototypeOf(o2, p2);
+  }
+  function _inherits(subClass, superClass) {
+    if (typeof superClass !== "function" && superClass !== null) {
+      throw new TypeError("Super expression must either be null or a function");
+    }
+    subClass.prototype = Object.create(superClass && superClass.prototype, {
+      constructor: {
+        value: subClass,
+        writable: true,
+        configurable: true
+      }
+    });
+    Object.defineProperty(subClass, "prototype", {
+      writable: false
+    });
+    if (superClass)
+      _setPrototypeOf(subClass, superClass);
+  }
+  function _possibleConstructorReturn(self2, call) {
+    if (call && (_typeof(call) === "object" || typeof call === "function")) {
+      return call;
+    } else if (call !== void 0) {
+      throw new TypeError("Derived constructors may only return object or undefined");
+    }
+    return _assertThisInitialized(self2);
+  }
+  function _getPrototypeOf(o2) {
+    _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf2(o3) {
+      return o3.__proto__ || Object.getPrototypeOf(o3);
+    };
+    return _getPrototypeOf(o2);
+  }
+  function _iterableToArray(iter) {
+    if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null)
+      return Array.from(iter);
+  }
+  function _toArray(arr) {
+    return _arrayWithHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableRest();
+  }
+  function ownKeys$6(object, enumerableOnly) {
+    var keys = Object.keys(object);
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+      enumerableOnly && (symbols = symbols.filter(function(sym) {
+        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+      })), keys.push.apply(keys, symbols);
+    }
+    return keys;
+  }
+  function _objectSpread$6(target) {
+    for (var i2 = 1; i2 < arguments.length; i2++) {
+      var source = null != arguments[i2] ? arguments[i2] : {};
+      i2 % 2 ? ownKeys$6(Object(source), true).forEach(function(key2) {
+        _defineProperty(target, key2, source[key2]);
+      }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys$6(Object(source)).forEach(function(key2) {
+        Object.defineProperty(target, key2, Object.getOwnPropertyDescriptor(source, key2));
+      });
+    }
+    return target;
+  }
+  var consoleLogger = {
+    type: "logger",
+    log: function log(args) {
+      this.output("log", args);
+    },
+    warn: function warn2(args) {
+      this.output("warn", args);
+    },
+    error: function error(args) {
+      this.output("error", args);
+    },
+    output: function output(type, args) {
+      if (console && console[type])
+        console[type].apply(console, args);
+    }
+  };
+  var Logger = function() {
+    function Logger2(concreteLogger) {
+      var options2 = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
+      _classCallCheck(this, Logger2);
+      this.init(concreteLogger, options2);
+    }
+    _createClass(Logger2, [{
+      key: "init",
+      value: function init(concreteLogger) {
+        var options2 = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
+        this.prefix = options2.prefix || "i18next:";
+        this.logger = concreteLogger || consoleLogger;
+        this.options = options2;
+        this.debug = options2.debug;
+      }
+    }, {
+      key: "setDebug",
+      value: function setDebug(bool) {
+        this.debug = bool;
+      }
+    }, {
+      key: "log",
+      value: function log() {
+        for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+          args[_key] = arguments[_key];
+        }
+        return this.forward(args, "log", "", true);
+      }
+    }, {
+      key: "warn",
+      value: function warn2() {
+        for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+          args[_key2] = arguments[_key2];
+        }
+        return this.forward(args, "warn", "", true);
+      }
+    }, {
+      key: "error",
+      value: function error() {
+        for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+          args[_key3] = arguments[_key3];
+        }
+        return this.forward(args, "error", "");
+      }
+    }, {
+      key: "deprecate",
+      value: function deprecate() {
+        for (var _len4 = arguments.length, args = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+          args[_key4] = arguments[_key4];
+        }
+        return this.forward(args, "warn", "WARNING DEPRECATED: ", true);
+      }
+    }, {
+      key: "forward",
+      value: function forward(args, lvl, prefix, debugOnly) {
+        if (debugOnly && !this.debug)
+          return null;
+        if (typeof args[0] === "string")
+          args[0] = "".concat(prefix).concat(this.prefix, " ").concat(args[0]);
+        return this.logger[lvl](args);
+      }
+    }, {
+      key: "create",
+      value: function create2(moduleName) {
+        return new Logger2(this.logger, _objectSpread$6(_objectSpread$6({}, {
+          prefix: "".concat(this.prefix, ":").concat(moduleName, ":")
+        }), this.options));
+      }
+    }, {
+      key: "clone",
+      value: function clone(options2) {
+        options2 = options2 || this.options;
+        options2.prefix = options2.prefix || this.prefix;
+        return new Logger2(this.logger, options2);
+      }
+    }]);
+    return Logger2;
+  }();
+  var baseLogger = new Logger();
+  var EventEmitter$1 = function() {
+    function EventEmitter2() {
+      _classCallCheck(this, EventEmitter2);
+      this.observers = {};
+    }
+    _createClass(EventEmitter2, [{
+      key: "on",
+      value: function on2(events, listener) {
+        var _this = this;
+        events.split(" ").forEach(function(event) {
+          _this.observers[event] = _this.observers[event] || [];
+          _this.observers[event].push(listener);
+        });
+        return this;
+      }
+    }, {
+      key: "off",
+      value: function off(event, listener) {
+        if (!this.observers[event])
+          return;
+        if (!listener) {
+          delete this.observers[event];
+          return;
+        }
+        this.observers[event] = this.observers[event].filter(function(l2) {
+          return l2 !== listener;
+        });
+      }
+    }, {
+      key: "emit",
+      value: function emit(event) {
+        for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+          args[_key - 1] = arguments[_key];
+        }
+        if (this.observers[event]) {
+          var cloned = [].concat(this.observers[event]);
+          cloned.forEach(function(observer) {
+            observer.apply(void 0, args);
+          });
+        }
+        if (this.observers["*"]) {
+          var _cloned = [].concat(this.observers["*"]);
+          _cloned.forEach(function(observer) {
+            observer.apply(observer, [event].concat(args));
+          });
+        }
+      }
+    }]);
+    return EventEmitter2;
+  }();
+  function defer() {
+    var res;
+    var rej;
+    var promise = new Promise(function(resolve, reject) {
+      res = resolve;
+      rej = reject;
+    });
+    promise.resolve = res;
+    promise.reject = rej;
+    return promise;
+  }
+  function makeString(object) {
+    if (object == null)
+      return "";
+    return "" + object;
+  }
+  function copy(a2, s2, t2) {
+    a2.forEach(function(m2) {
+      if (s2[m2])
+        t2[m2] = s2[m2];
+    });
+  }
+  function getLastOfPath(object, path2, Empty) {
+    function cleanKey(key3) {
+      return key3 && key3.indexOf("###") > -1 ? key3.replace(/###/g, ".") : key3;
+    }
+    function canNotTraverseDeeper() {
+      return !object || typeof object === "string";
+    }
+    var stack = typeof path2 !== "string" ? [].concat(path2) : path2.split(".");
+    while (stack.length > 1) {
+      if (canNotTraverseDeeper())
+        return {};
+      var key2 = cleanKey(stack.shift());
+      if (!object[key2] && Empty)
+        object[key2] = new Empty();
+      if (Object.prototype.hasOwnProperty.call(object, key2)) {
+        object = object[key2];
+      } else {
+        object = {};
+      }
+    }
+    if (canNotTraverseDeeper())
+      return {};
+    return {
+      obj: object,
+      k: cleanKey(stack.shift())
+    };
+  }
+  function setPath(object, path2, newValue) {
+    var _getLastOfPath = getLastOfPath(object, path2, Object), obj = _getLastOfPath.obj, k2 = _getLastOfPath.k;
+    obj[k2] = newValue;
+  }
+  function pushPath(object, path2, newValue, concat) {
+    var _getLastOfPath2 = getLastOfPath(object, path2, Object), obj = _getLastOfPath2.obj, k2 = _getLastOfPath2.k;
+    obj[k2] = obj[k2] || [];
+    if (concat)
+      obj[k2] = obj[k2].concat(newValue);
+    if (!concat)
+      obj[k2].push(newValue);
+  }
+  function getPath(object, path2) {
+    var _getLastOfPath3 = getLastOfPath(object, path2), obj = _getLastOfPath3.obj, k2 = _getLastOfPath3.k;
+    if (!obj)
+      return void 0;
+    return obj[k2];
+  }
+  function getPathWithDefaults(data, defaultData, key2) {
+    var value = getPath(data, key2);
+    if (value !== void 0) {
+      return value;
+    }
+    return getPath(defaultData, key2);
+  }
+  function deepExtend(target, source, overwrite) {
+    for (var prop in source) {
+      if (prop !== "__proto__" && prop !== "constructor") {
+        if (prop in target) {
+          if (typeof target[prop] === "string" || target[prop] instanceof String || typeof source[prop] === "string" || source[prop] instanceof String) {
+            if (overwrite)
+              target[prop] = source[prop];
+          } else {
+            deepExtend(target[prop], source[prop], overwrite);
+          }
+        } else {
+          target[prop] = source[prop];
+        }
+      }
+    }
+    return target;
+  }
+  function regexEscape(str) {
+    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+  }
+  var _entityMap = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+    "/": "&#x2F;"
+  };
+  function escape(data) {
+    if (typeof data === "string") {
+      return data.replace(/[&<>"'\/]/g, function(s2) {
+        return _entityMap[s2];
+      });
+    }
+    return data;
+  }
+  var isIE10 = typeof window !== "undefined" && window.navigator && typeof window.navigator.userAgentData === "undefined" && window.navigator.userAgent && window.navigator.userAgent.indexOf("MSIE") > -1;
+  var chars = [" ", ",", "?", "!", ";"];
+  function looksLikeObjectPath(key2, nsSeparator, keySeparator) {
+    nsSeparator = nsSeparator || "";
+    keySeparator = keySeparator || "";
+    var possibleChars = chars.filter(function(c2) {
+      return nsSeparator.indexOf(c2) < 0 && keySeparator.indexOf(c2) < 0;
+    });
+    if (possibleChars.length === 0)
+      return true;
+    var r2 = new RegExp("(".concat(possibleChars.map(function(c2) {
+      return c2 === "?" ? "\\?" : c2;
+    }).join("|"), ")"));
+    var matched = !r2.test(key2);
+    if (!matched) {
+      var ki = key2.indexOf(keySeparator);
+      if (ki > 0 && !r2.test(key2.substring(0, ki))) {
+        matched = true;
+      }
+    }
+    return matched;
+  }
+  function deepFind(obj, path2) {
+    var keySeparator = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : ".";
+    if (!obj)
+      return void 0;
+    if (obj[path2])
+      return obj[path2];
+    var paths = path2.split(keySeparator);
+    var current = obj;
+    for (var i2 = 0; i2 < paths.length; ++i2) {
+      if (!current)
+        return void 0;
+      if (typeof current[paths[i2]] === "string" && i2 + 1 < paths.length) {
+        return void 0;
+      }
+      if (current[paths[i2]] === void 0) {
+        var j2 = 2;
+        var p2 = paths.slice(i2, i2 + j2).join(keySeparator);
+        var mix = current[p2];
+        while (mix === void 0 && paths.length > i2 + j2) {
+          j2++;
+          p2 = paths.slice(i2, i2 + j2).join(keySeparator);
+          mix = current[p2];
+        }
+        if (mix === void 0)
+          return void 0;
+        if (mix === null)
+          return null;
+        if (path2.endsWith(p2)) {
+          if (typeof mix === "string")
+            return mix;
+          if (p2 && typeof mix[p2] === "string")
+            return mix[p2];
+        }
+        var joinedPath = paths.slice(i2 + j2).join(keySeparator);
+        if (joinedPath)
+          return deepFind(mix, joinedPath, keySeparator);
+        return void 0;
+      }
+      current = current[paths[i2]];
+    }
+    return current;
+  }
+  function ownKeys$5(object, enumerableOnly) {
+    var keys = Object.keys(object);
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+      enumerableOnly && (symbols = symbols.filter(function(sym) {
+        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+      })), keys.push.apply(keys, symbols);
+    }
+    return keys;
+  }
+  function _objectSpread$5(target) {
+    for (var i2 = 1; i2 < arguments.length; i2++) {
+      var source = null != arguments[i2] ? arguments[i2] : {};
+      i2 % 2 ? ownKeys$5(Object(source), true).forEach(function(key2) {
+        _defineProperty(target, key2, source[key2]);
+      }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys$5(Object(source)).forEach(function(key2) {
+        Object.defineProperty(target, key2, Object.getOwnPropertyDescriptor(source, key2));
+      });
+    }
+    return target;
+  }
+  function _createSuper$3(Derived) {
+    var hasNativeReflectConstruct = _isNativeReflectConstruct$3();
+    return function _createSuperInternal() {
+      var Super = _getPrototypeOf(Derived), result;
+      if (hasNativeReflectConstruct) {
+        var NewTarget = _getPrototypeOf(this).constructor;
+        result = Reflect.construct(Super, arguments, NewTarget);
+      } else {
+        result = Super.apply(this, arguments);
+      }
+      return _possibleConstructorReturn(this, result);
+    };
+  }
+  function _isNativeReflectConstruct$3() {
+    if (typeof Reflect === "undefined" || !Reflect.construct)
+      return false;
+    if (Reflect.construct.sham)
+      return false;
+    if (typeof Proxy === "function")
+      return true;
+    try {
+      Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function() {
+      }));
+      return true;
+    } catch (e2) {
+      return false;
+    }
+  }
+  var ResourceStore = function(_EventEmitter) {
+    _inherits(ResourceStore2, _EventEmitter);
+    var _super = _createSuper$3(ResourceStore2);
+    function ResourceStore2(data) {
+      var _this;
+      var options2 = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {
+        ns: ["translation"],
+        defaultNS: "translation"
+      };
+      _classCallCheck(this, ResourceStore2);
+      _this = _super.call(this);
+      if (isIE10) {
+        EventEmitter$1.call(_assertThisInitialized(_this));
+      }
+      _this.data = data || {};
+      _this.options = options2;
+      if (_this.options.keySeparator === void 0) {
+        _this.options.keySeparator = ".";
+      }
+      if (_this.options.ignoreJSONStructure === void 0) {
+        _this.options.ignoreJSONStructure = true;
+      }
+      return _this;
+    }
+    _createClass(ResourceStore2, [{
+      key: "addNamespaces",
+      value: function addNamespaces(ns) {
+        if (this.options.ns.indexOf(ns) < 0) {
+          this.options.ns.push(ns);
+        }
+      }
+    }, {
+      key: "removeNamespaces",
+      value: function removeNamespaces(ns) {
+        var index2 = this.options.ns.indexOf(ns);
+        if (index2 > -1) {
+          this.options.ns.splice(index2, 1);
+        }
+      }
+    }, {
+      key: "getResource",
+      value: function getResource(lng, ns, key2) {
+        var options2 = arguments.length > 3 && arguments[3] !== void 0 ? arguments[3] : {};
+        var keySeparator = options2.keySeparator !== void 0 ? options2.keySeparator : this.options.keySeparator;
+        var ignoreJSONStructure = options2.ignoreJSONStructure !== void 0 ? options2.ignoreJSONStructure : this.options.ignoreJSONStructure;
+        var path2 = [lng, ns];
+        if (key2 && typeof key2 !== "string")
+          path2 = path2.concat(key2);
+        if (key2 && typeof key2 === "string")
+          path2 = path2.concat(keySeparator ? key2.split(keySeparator) : key2);
+        if (lng.indexOf(".") > -1) {
+          path2 = lng.split(".");
+        }
+        var result = getPath(this.data, path2);
+        if (result || !ignoreJSONStructure || typeof key2 !== "string")
+          return result;
+        return deepFind(this.data && this.data[lng] && this.data[lng][ns], key2, keySeparator);
+      }
+    }, {
+      key: "addResource",
+      value: function addResource(lng, ns, key2, value) {
+        var options2 = arguments.length > 4 && arguments[4] !== void 0 ? arguments[4] : {
+          silent: false
+        };
+        var keySeparator = this.options.keySeparator;
+        if (keySeparator === void 0)
+          keySeparator = ".";
+        var path2 = [lng, ns];
+        if (key2)
+          path2 = path2.concat(keySeparator ? key2.split(keySeparator) : key2);
+        if (lng.indexOf(".") > -1) {
+          path2 = lng.split(".");
+          value = ns;
+          ns = path2[1];
+        }
+        this.addNamespaces(ns);
+        setPath(this.data, path2, value);
+        if (!options2.silent)
+          this.emit("added", lng, ns, key2, value);
+      }
+    }, {
+      key: "addResources",
+      value: function addResources(lng, ns, resources2) {
+        var options2 = arguments.length > 3 && arguments[3] !== void 0 ? arguments[3] : {
+          silent: false
+        };
+        for (var m2 in resources2) {
+          if (typeof resources2[m2] === "string" || Object.prototype.toString.apply(resources2[m2]) === "[object Array]")
+            this.addResource(lng, ns, m2, resources2[m2], {
+              silent: true
+            });
+        }
+        if (!options2.silent)
+          this.emit("added", lng, ns, resources2);
+      }
+    }, {
+      key: "addResourceBundle",
+      value: function addResourceBundle(lng, ns, resources2, deep, overwrite) {
+        var options2 = arguments.length > 5 && arguments[5] !== void 0 ? arguments[5] : {
+          silent: false
+        };
+        var path2 = [lng, ns];
+        if (lng.indexOf(".") > -1) {
+          path2 = lng.split(".");
+          deep = resources2;
+          resources2 = ns;
+          ns = path2[1];
+        }
+        this.addNamespaces(ns);
+        var pack = getPath(this.data, path2) || {};
+        if (deep) {
+          deepExtend(pack, resources2, overwrite);
+        } else {
+          pack = _objectSpread$5(_objectSpread$5({}, pack), resources2);
+        }
+        setPath(this.data, path2, pack);
+        if (!options2.silent)
+          this.emit("added", lng, ns, resources2);
+      }
+    }, {
+      key: "removeResourceBundle",
+      value: function removeResourceBundle(lng, ns) {
+        if (this.hasResourceBundle(lng, ns)) {
+          delete this.data[lng][ns];
+        }
+        this.removeNamespaces(ns);
+        this.emit("removed", lng, ns);
+      }
+    }, {
+      key: "hasResourceBundle",
+      value: function hasResourceBundle(lng, ns) {
+        return this.getResource(lng, ns) !== void 0;
+      }
+    }, {
+      key: "getResourceBundle",
+      value: function getResourceBundle(lng, ns) {
+        if (!ns)
+          ns = this.options.defaultNS;
+        if (this.options.compatibilityAPI === "v1")
+          return _objectSpread$5(_objectSpread$5({}, {}), this.getResource(lng, ns));
+        return this.getResource(lng, ns);
+      }
+    }, {
+      key: "getDataByLanguage",
+      value: function getDataByLanguage(lng) {
+        return this.data[lng];
+      }
+    }, {
+      key: "hasLanguageSomeTranslations",
+      value: function hasLanguageSomeTranslations(lng) {
+        var data = this.getDataByLanguage(lng);
+        var n2 = data && Object.keys(data) || [];
+        return !!n2.find(function(v2) {
+          return data[v2] && Object.keys(data[v2]).length > 0;
+        });
+      }
+    }, {
+      key: "toJSON",
+      value: function toJSON() {
+        return this.data;
+      }
+    }]);
+    return ResourceStore2;
+  }(EventEmitter$1);
+  var postProcessor = {
+    processors: {},
+    addPostProcessor: function addPostProcessor(module) {
+      this.processors[module.name] = module;
+    },
+    handle: function handle2(processors, value, key2, options2, translator) {
+      var _this = this;
+      processors.forEach(function(processor) {
+        if (_this.processors[processor])
+          value = _this.processors[processor].process(value, key2, options2, translator);
+      });
+      return value;
+    }
+  };
+  function ownKeys$4(object, enumerableOnly) {
+    var keys = Object.keys(object);
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+      enumerableOnly && (symbols = symbols.filter(function(sym) {
+        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+      })), keys.push.apply(keys, symbols);
+    }
+    return keys;
+  }
+  function _objectSpread$4(target) {
+    for (var i2 = 1; i2 < arguments.length; i2++) {
+      var source = null != arguments[i2] ? arguments[i2] : {};
+      i2 % 2 ? ownKeys$4(Object(source), true).forEach(function(key2) {
+        _defineProperty(target, key2, source[key2]);
+      }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys$4(Object(source)).forEach(function(key2) {
+        Object.defineProperty(target, key2, Object.getOwnPropertyDescriptor(source, key2));
+      });
+    }
+    return target;
+  }
+  function _createSuper$2(Derived) {
+    var hasNativeReflectConstruct = _isNativeReflectConstruct$2();
+    return function _createSuperInternal() {
+      var Super = _getPrototypeOf(Derived), result;
+      if (hasNativeReflectConstruct) {
+        var NewTarget = _getPrototypeOf(this).constructor;
+        result = Reflect.construct(Super, arguments, NewTarget);
+      } else {
+        result = Super.apply(this, arguments);
+      }
+      return _possibleConstructorReturn(this, result);
+    };
+  }
+  function _isNativeReflectConstruct$2() {
+    if (typeof Reflect === "undefined" || !Reflect.construct)
+      return false;
+    if (Reflect.construct.sham)
+      return false;
+    if (typeof Proxy === "function")
+      return true;
+    try {
+      Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function() {
+      }));
+      return true;
+    } catch (e2) {
+      return false;
+    }
+  }
+  var checkedLoadedFor = {};
+  var Translator = function(_EventEmitter) {
+    _inherits(Translator2, _EventEmitter);
+    var _super = _createSuper$2(Translator2);
+    function Translator2(services) {
+      var _this;
+      var options2 = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
+      _classCallCheck(this, Translator2);
+      _this = _super.call(this);
+      if (isIE10) {
+        EventEmitter$1.call(_assertThisInitialized(_this));
+      }
+      copy(["resourceStore", "languageUtils", "pluralResolver", "interpolator", "backendConnector", "i18nFormat", "utils"], services, _assertThisInitialized(_this));
+      _this.options = options2;
+      if (_this.options.keySeparator === void 0) {
+        _this.options.keySeparator = ".";
+      }
+      _this.logger = baseLogger.create("translator");
+      return _this;
+    }
+    _createClass(Translator2, [{
+      key: "changeLanguage",
+      value: function changeLanguage(lng) {
+        if (lng)
+          this.language = lng;
+      }
+    }, {
+      key: "exists",
+      value: function exists(key2) {
+        var options2 = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {
+          interpolation: {}
+        };
+        if (key2 === void 0 || key2 === null) {
+          return false;
+        }
+        var resolved = this.resolve(key2, options2);
+        return resolved && resolved.res !== void 0;
+      }
+    }, {
+      key: "extractFromKey",
+      value: function extractFromKey(key2, options2) {
+        var nsSeparator = options2.nsSeparator !== void 0 ? options2.nsSeparator : this.options.nsSeparator;
+        if (nsSeparator === void 0)
+          nsSeparator = ":";
+        var keySeparator = options2.keySeparator !== void 0 ? options2.keySeparator : this.options.keySeparator;
+        var namespaces = options2.ns || this.options.defaultNS || [];
+        var wouldCheckForNsInKey = nsSeparator && key2.indexOf(nsSeparator) > -1;
+        var seemsNaturalLanguage = !this.options.userDefinedKeySeparator && !options2.keySeparator && !this.options.userDefinedNsSeparator && !options2.nsSeparator && !looksLikeObjectPath(key2, nsSeparator, keySeparator);
+        if (wouldCheckForNsInKey && !seemsNaturalLanguage) {
+          var m2 = key2.match(this.interpolator.nestingRegexp);
+          if (m2 && m2.length > 0) {
+            return {
+              key: key2,
+              namespaces
+            };
+          }
+          var parts = key2.split(nsSeparator);
+          if (nsSeparator !== keySeparator || nsSeparator === keySeparator && this.options.ns.indexOf(parts[0]) > -1)
+            namespaces = parts.shift();
+          key2 = parts.join(keySeparator);
+        }
+        if (typeof namespaces === "string")
+          namespaces = [namespaces];
+        return {
+          key: key2,
+          namespaces
+        };
+      }
+    }, {
+      key: "translate",
+      value: function translate(keys, options2, lastKey) {
+        var _this2 = this;
+        if (_typeof(options2) !== "object" && this.options.overloadTranslationOptionHandler) {
+          options2 = this.options.overloadTranslationOptionHandler(arguments);
+        }
+        if (!options2)
+          options2 = {};
+        if (keys === void 0 || keys === null)
+          return "";
+        if (!Array.isArray(keys))
+          keys = [String(keys)];
+        var returnDetails = options2.returnDetails !== void 0 ? options2.returnDetails : this.options.returnDetails;
+        var keySeparator = options2.keySeparator !== void 0 ? options2.keySeparator : this.options.keySeparator;
+        var _this$extractFromKey = this.extractFromKey(keys[keys.length - 1], options2), key2 = _this$extractFromKey.key, namespaces = _this$extractFromKey.namespaces;
+        var namespace = namespaces[namespaces.length - 1];
+        var lng = options2.lng || this.language;
+        var appendNamespaceToCIMode = options2.appendNamespaceToCIMode || this.options.appendNamespaceToCIMode;
+        if (lng && lng.toLowerCase() === "cimode") {
+          if (appendNamespaceToCIMode) {
+            var nsSeparator = options2.nsSeparator || this.options.nsSeparator;
+            if (returnDetails) {
+              return {
+                res: "".concat(namespace).concat(nsSeparator).concat(key2),
+                usedKey: key2,
+                exactUsedKey: key2,
+                usedLng: lng,
+                usedNS: namespace
+              };
+            }
+            return "".concat(namespace).concat(nsSeparator).concat(key2);
+          }
+          if (returnDetails) {
+            return {
+              res: key2,
+              usedKey: key2,
+              exactUsedKey: key2,
+              usedLng: lng,
+              usedNS: namespace
+            };
+          }
+          return key2;
+        }
+        var resolved = this.resolve(keys, options2);
+        var res = resolved && resolved.res;
+        var resUsedKey = resolved && resolved.usedKey || key2;
+        var resExactUsedKey = resolved && resolved.exactUsedKey || key2;
+        var resType = Object.prototype.toString.apply(res);
+        var noObject = ["[object Number]", "[object Function]", "[object RegExp]"];
+        var joinArrays = options2.joinArrays !== void 0 ? options2.joinArrays : this.options.joinArrays;
+        var handleAsObjectInI18nFormat = !this.i18nFormat || this.i18nFormat.handleAsObject;
+        var handleAsObject = typeof res !== "string" && typeof res !== "boolean" && typeof res !== "number";
+        if (handleAsObjectInI18nFormat && res && handleAsObject && noObject.indexOf(resType) < 0 && !(typeof joinArrays === "string" && resType === "[object Array]")) {
+          if (!options2.returnObjects && !this.options.returnObjects) {
+            if (!this.options.returnedObjectHandler) {
+              this.logger.warn("accessing an object - but returnObjects options is not enabled!");
+            }
+            var r2 = this.options.returnedObjectHandler ? this.options.returnedObjectHandler(resUsedKey, res, _objectSpread$4(_objectSpread$4({}, options2), {}, {
+              ns: namespaces
+            })) : "key '".concat(key2, " (").concat(this.language, ")' returned an object instead of string.");
+            if (returnDetails) {
+              resolved.res = r2;
+              return resolved;
+            }
+            return r2;
+          }
+          if (keySeparator) {
+            var resTypeIsArray = resType === "[object Array]";
+            var copy2 = resTypeIsArray ? [] : {};
+            var newKeyToUse = resTypeIsArray ? resExactUsedKey : resUsedKey;
+            for (var m2 in res) {
+              if (Object.prototype.hasOwnProperty.call(res, m2)) {
+                var deepKey = "".concat(newKeyToUse).concat(keySeparator).concat(m2);
+                copy2[m2] = this.translate(deepKey, _objectSpread$4(_objectSpread$4({}, options2), {
+                  joinArrays: false,
+                  ns: namespaces
+                }));
+                if (copy2[m2] === deepKey)
+                  copy2[m2] = res[m2];
+              }
+            }
+            res = copy2;
+          }
+        } else if (handleAsObjectInI18nFormat && typeof joinArrays === "string" && resType === "[object Array]") {
+          res = res.join(joinArrays);
+          if (res)
+            res = this.extendTranslation(res, keys, options2, lastKey);
+        } else {
+          var usedDefault = false;
+          var usedKey = false;
+          var needsPluralHandling = options2.count !== void 0 && typeof options2.count !== "string";
+          var hasDefaultValue = Translator2.hasDefaultValue(options2);
+          var defaultValueSuffix = needsPluralHandling ? this.pluralResolver.getSuffix(lng, options2.count, options2) : "";
+          var defaultValue = options2["defaultValue".concat(defaultValueSuffix)] || options2.defaultValue;
+          if (!this.isValidLookup(res) && hasDefaultValue) {
+            usedDefault = true;
+            res = defaultValue;
+          }
+          if (!this.isValidLookup(res)) {
+            usedKey = true;
+            res = key2;
+          }
+          var missingKeyNoValueFallbackToKey = options2.missingKeyNoValueFallbackToKey || this.options.missingKeyNoValueFallbackToKey;
+          var resForMissing = missingKeyNoValueFallbackToKey && usedKey ? void 0 : res;
+          var updateMissing = hasDefaultValue && defaultValue !== res && this.options.updateMissing;
+          if (usedKey || usedDefault || updateMissing) {
+            this.logger.log(updateMissing ? "updateKey" : "missingKey", lng, namespace, key2, updateMissing ? defaultValue : res);
+            if (keySeparator) {
+              var fk = this.resolve(key2, _objectSpread$4(_objectSpread$4({}, options2), {}, {
+                keySeparator: false
+              }));
+              if (fk && fk.res)
+                this.logger.warn("Seems the loaded translations were in flat JSON format instead of nested. Either set keySeparator: false on init or make sure your translations are published in nested format.");
+            }
+            var lngs = [];
+            var fallbackLngs = this.languageUtils.getFallbackCodes(this.options.fallbackLng, options2.lng || this.language);
+            if (this.options.saveMissingTo === "fallback" && fallbackLngs && fallbackLngs[0]) {
+              for (var i2 = 0; i2 < fallbackLngs.length; i2++) {
+                lngs.push(fallbackLngs[i2]);
+              }
+            } else if (this.options.saveMissingTo === "all") {
+              lngs = this.languageUtils.toResolveHierarchy(options2.lng || this.language);
+            } else {
+              lngs.push(options2.lng || this.language);
+            }
+            var send = function send2(l2, k2, specificDefaultValue) {
+              var defaultForMissing = hasDefaultValue && specificDefaultValue !== res ? specificDefaultValue : resForMissing;
+              if (_this2.options.missingKeyHandler) {
+                _this2.options.missingKeyHandler(l2, namespace, k2, defaultForMissing, updateMissing, options2);
+              } else if (_this2.backendConnector && _this2.backendConnector.saveMissing) {
+                _this2.backendConnector.saveMissing(l2, namespace, k2, defaultForMissing, updateMissing, options2);
+              }
+              _this2.emit("missingKey", l2, namespace, k2, res);
+            };
+            if (this.options.saveMissing) {
+              if (this.options.saveMissingPlurals && needsPluralHandling) {
+                lngs.forEach(function(language) {
+                  _this2.pluralResolver.getSuffixes(language, options2).forEach(function(suffix) {
+                    send([language], key2 + suffix, options2["defaultValue".concat(suffix)] || defaultValue);
+                  });
+                });
+              } else {
+                send(lngs, key2, defaultValue);
+              }
+            }
+          }
+          res = this.extendTranslation(res, keys, options2, resolved, lastKey);
+          if (usedKey && res === key2 && this.options.appendNamespaceToMissingKey)
+            res = "".concat(namespace, ":").concat(key2);
+          if ((usedKey || usedDefault) && this.options.parseMissingKeyHandler) {
+            if (this.options.compatibilityAPI !== "v1") {
+              res = this.options.parseMissingKeyHandler(this.options.appendNamespaceToMissingKey ? "".concat(namespace, ":").concat(key2) : key2, usedDefault ? res : void 0);
+            } else {
+              res = this.options.parseMissingKeyHandler(res);
+            }
+          }
+        }
+        if (returnDetails) {
+          resolved.res = res;
+          return resolved;
+        }
+        return res;
+      }
+    }, {
+      key: "extendTranslation",
+      value: function extendTranslation(res, key2, options2, resolved, lastKey) {
+        var _this3 = this;
+        if (this.i18nFormat && this.i18nFormat.parse) {
+          res = this.i18nFormat.parse(res, _objectSpread$4(_objectSpread$4({}, this.options.interpolation.defaultVariables), options2), resolved.usedLng, resolved.usedNS, resolved.usedKey, {
+            resolved
+          });
+        } else if (!options2.skipInterpolation) {
+          if (options2.interpolation)
+            this.interpolator.init(_objectSpread$4(_objectSpread$4({}, options2), {
+              interpolation: _objectSpread$4(_objectSpread$4({}, this.options.interpolation), options2.interpolation)
+            }));
+          var skipOnVariables = typeof res === "string" && (options2 && options2.interpolation && options2.interpolation.skipOnVariables !== void 0 ? options2.interpolation.skipOnVariables : this.options.interpolation.skipOnVariables);
+          var nestBef;
+          if (skipOnVariables) {
+            var nb = res.match(this.interpolator.nestingRegexp);
+            nestBef = nb && nb.length;
+          }
+          var data = options2.replace && typeof options2.replace !== "string" ? options2.replace : options2;
+          if (this.options.interpolation.defaultVariables)
+            data = _objectSpread$4(_objectSpread$4({}, this.options.interpolation.defaultVariables), data);
+          res = this.interpolator.interpolate(res, data, options2.lng || this.language, options2);
+          if (skipOnVariables) {
+            var na = res.match(this.interpolator.nestingRegexp);
+            var nestAft = na && na.length;
+            if (nestBef < nestAft)
+              options2.nest = false;
+          }
+          if (!options2.lng && this.options.compatibilityAPI !== "v1" && resolved && resolved.res)
+            options2.lng = resolved.usedLng;
+          if (options2.nest !== false)
+            res = this.interpolator.nest(res, function() {
+              for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+                args[_key] = arguments[_key];
+              }
+              if (lastKey && lastKey[0] === args[0] && !options2.context) {
+                _this3.logger.warn("It seems you are nesting recursively key: ".concat(args[0], " in key: ").concat(key2[0]));
+                return null;
+              }
+              return _this3.translate.apply(_this3, args.concat([key2]));
+            }, options2);
+          if (options2.interpolation)
+            this.interpolator.reset();
+        }
+        var postProcess = options2.postProcess || this.options.postProcess;
+        var postProcessorNames = typeof postProcess === "string" ? [postProcess] : postProcess;
+        if (res !== void 0 && res !== null && postProcessorNames && postProcessorNames.length && options2.applyPostProcessor !== false) {
+          res = postProcessor.handle(postProcessorNames, res, key2, this.options && this.options.postProcessPassResolved ? _objectSpread$4({
+            i18nResolved: resolved
+          }, options2) : options2, this);
+        }
+        return res;
+      }
+    }, {
+      key: "resolve",
+      value: function resolve(keys) {
+        var _this4 = this;
+        var options2 = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
+        var found;
+        var usedKey;
+        var exactUsedKey;
+        var usedLng;
+        var usedNS;
+        if (typeof keys === "string")
+          keys = [keys];
+        keys.forEach(function(k2) {
+          if (_this4.isValidLookup(found))
+            return;
+          var extracted = _this4.extractFromKey(k2, options2);
+          var key2 = extracted.key;
+          usedKey = key2;
+          var namespaces = extracted.namespaces;
+          if (_this4.options.fallbackNS)
+            namespaces = namespaces.concat(_this4.options.fallbackNS);
+          var needsPluralHandling = options2.count !== void 0 && typeof options2.count !== "string";
+          var needsZeroSuffixLookup = needsPluralHandling && !options2.ordinal && options2.count === 0 && _this4.pluralResolver.shouldUseIntlApi();
+          var needsContextHandling = options2.context !== void 0 && (typeof options2.context === "string" || typeof options2.context === "number") && options2.context !== "";
+          var codes = options2.lngs ? options2.lngs : _this4.languageUtils.toResolveHierarchy(options2.lng || _this4.language, options2.fallbackLng);
+          namespaces.forEach(function(ns) {
+            if (_this4.isValidLookup(found))
+              return;
+            usedNS = ns;
+            if (!checkedLoadedFor["".concat(codes[0], "-").concat(ns)] && _this4.utils && _this4.utils.hasLoadedNamespace && !_this4.utils.hasLoadedNamespace(usedNS)) {
+              checkedLoadedFor["".concat(codes[0], "-").concat(ns)] = true;
+              _this4.logger.warn('key "'.concat(usedKey, '" for languages "').concat(codes.join(", "), `" won't get resolved as namespace "`).concat(usedNS, '" was not yet loaded'), "This means something IS WRONG in your setup. You access the t function before i18next.init / i18next.loadNamespace / i18next.changeLanguage was done. Wait for the callback or Promise to resolve before accessing it!!!");
+            }
+            codes.forEach(function(code2) {
+              if (_this4.isValidLookup(found))
+                return;
+              usedLng = code2;
+              var finalKeys = [key2];
+              if (_this4.i18nFormat && _this4.i18nFormat.addLookupKeys) {
+                _this4.i18nFormat.addLookupKeys(finalKeys, key2, code2, ns, options2);
+              } else {
+                var pluralSuffix;
+                if (needsPluralHandling)
+                  pluralSuffix = _this4.pluralResolver.getSuffix(code2, options2.count, options2);
+                var zeroSuffix = "".concat(_this4.options.pluralSeparator, "zero");
+                if (needsPluralHandling) {
+                  finalKeys.push(key2 + pluralSuffix);
+                  if (needsZeroSuffixLookup) {
+                    finalKeys.push(key2 + zeroSuffix);
+                  }
+                }
+                if (needsContextHandling) {
+                  var contextKey = "".concat(key2).concat(_this4.options.contextSeparator).concat(options2.context);
+                  finalKeys.push(contextKey);
+                  if (needsPluralHandling) {
+                    finalKeys.push(contextKey + pluralSuffix);
+                    if (needsZeroSuffixLookup) {
+                      finalKeys.push(contextKey + zeroSuffix);
+                    }
+                  }
+                }
+              }
+              var possibleKey;
+              while (possibleKey = finalKeys.pop()) {
+                if (!_this4.isValidLookup(found)) {
+                  exactUsedKey = possibleKey;
+                  found = _this4.getResource(code2, ns, possibleKey, options2);
+                }
+              }
+            });
+          });
+        });
+        return {
+          res: found,
+          usedKey,
+          exactUsedKey,
+          usedLng,
+          usedNS
+        };
+      }
+    }, {
+      key: "isValidLookup",
+      value: function isValidLookup(res) {
+        return res !== void 0 && !(!this.options.returnNull && res === null) && !(!this.options.returnEmptyString && res === "");
+      }
+    }, {
+      key: "getResource",
+      value: function getResource(code2, ns, key2) {
+        var options2 = arguments.length > 3 && arguments[3] !== void 0 ? arguments[3] : {};
+        if (this.i18nFormat && this.i18nFormat.getResource)
+          return this.i18nFormat.getResource(code2, ns, key2, options2);
+        return this.resourceStore.getResource(code2, ns, key2, options2);
+      }
+    }], [{
+      key: "hasDefaultValue",
+      value: function hasDefaultValue(options2) {
+        var prefix = "defaultValue";
+        for (var option2 in options2) {
+          if (Object.prototype.hasOwnProperty.call(options2, option2) && prefix === option2.substring(0, prefix.length) && void 0 !== options2[option2]) {
+            return true;
+          }
+        }
+        return false;
+      }
+    }]);
+    return Translator2;
+  }(EventEmitter$1);
+  function capitalize(string2) {
+    return string2.charAt(0).toUpperCase() + string2.slice(1);
+  }
+  var LanguageUtil = function() {
+    function LanguageUtil2(options2) {
+      _classCallCheck(this, LanguageUtil2);
+      this.options = options2;
+      this.supportedLngs = this.options.supportedLngs || false;
+      this.logger = baseLogger.create("languageUtils");
+    }
+    _createClass(LanguageUtil2, [{
+      key: "getScriptPartFromCode",
+      value: function getScriptPartFromCode(code2) {
+        if (!code2 || code2.indexOf("-") < 0)
+          return null;
+        var p2 = code2.split("-");
+        if (p2.length === 2)
+          return null;
+        p2.pop();
+        if (p2[p2.length - 1].toLowerCase() === "x")
+          return null;
+        return this.formatLanguageCode(p2.join("-"));
+      }
+    }, {
+      key: "getLanguagePartFromCode",
+      value: function getLanguagePartFromCode(code2) {
+        if (!code2 || code2.indexOf("-") < 0)
+          return code2;
+        var p2 = code2.split("-");
+        return this.formatLanguageCode(p2[0]);
+      }
+    }, {
+      key: "formatLanguageCode",
+      value: function formatLanguageCode(code2) {
+        if (typeof code2 === "string" && code2.indexOf("-") > -1) {
+          var specialCases = ["hans", "hant", "latn", "cyrl", "cans", "mong", "arab"];
+          var p2 = code2.split("-");
+          if (this.options.lowerCaseLng) {
+            p2 = p2.map(function(part) {
+              return part.toLowerCase();
+            });
+          } else if (p2.length === 2) {
+            p2[0] = p2[0].toLowerCase();
+            p2[1] = p2[1].toUpperCase();
+            if (specialCases.indexOf(p2[1].toLowerCase()) > -1)
+              p2[1] = capitalize(p2[1].toLowerCase());
+          } else if (p2.length === 3) {
+            p2[0] = p2[0].toLowerCase();
+            if (p2[1].length === 2)
+              p2[1] = p2[1].toUpperCase();
+            if (p2[0] !== "sgn" && p2[2].length === 2)
+              p2[2] = p2[2].toUpperCase();
+            if (specialCases.indexOf(p2[1].toLowerCase()) > -1)
+              p2[1] = capitalize(p2[1].toLowerCase());
+            if (specialCases.indexOf(p2[2].toLowerCase()) > -1)
+              p2[2] = capitalize(p2[2].toLowerCase());
+          }
+          return p2.join("-");
+        }
+        return this.options.cleanCode || this.options.lowerCaseLng ? code2.toLowerCase() : code2;
+      }
+    }, {
+      key: "isSupportedCode",
+      value: function isSupportedCode(code2) {
+        if (this.options.load === "languageOnly" || this.options.nonExplicitSupportedLngs) {
+          code2 = this.getLanguagePartFromCode(code2);
+        }
+        return !this.supportedLngs || !this.supportedLngs.length || this.supportedLngs.indexOf(code2) > -1;
+      }
+    }, {
+      key: "getBestMatchFromCodes",
+      value: function getBestMatchFromCodes(codes) {
+        var _this = this;
+        if (!codes)
+          return null;
+        var found;
+        codes.forEach(function(code2) {
+          if (found)
+            return;
+          var cleanedLng = _this.formatLanguageCode(code2);
+          if (!_this.options.supportedLngs || _this.isSupportedCode(cleanedLng))
+            found = cleanedLng;
+        });
+        if (!found && this.options.supportedLngs) {
+          codes.forEach(function(code2) {
+            if (found)
+              return;
+            var lngOnly = _this.getLanguagePartFromCode(code2);
+            if (_this.isSupportedCode(lngOnly))
+              return found = lngOnly;
+            found = _this.options.supportedLngs.find(function(supportedLng) {
+              if (supportedLng === lngOnly)
+                return supportedLng;
+              if (supportedLng.indexOf("-") < 0 && lngOnly.indexOf("-") < 0)
+                return;
+              if (supportedLng.indexOf(lngOnly) === 0)
+                return supportedLng;
+            });
+          });
+        }
+        if (!found)
+          found = this.getFallbackCodes(this.options.fallbackLng)[0];
+        return found;
+      }
+    }, {
+      key: "getFallbackCodes",
+      value: function getFallbackCodes(fallbacks, code2) {
+        if (!fallbacks)
+          return [];
+        if (typeof fallbacks === "function")
+          fallbacks = fallbacks(code2);
+        if (typeof fallbacks === "string")
+          fallbacks = [fallbacks];
+        if (Object.prototype.toString.apply(fallbacks) === "[object Array]")
+          return fallbacks;
+        if (!code2)
+          return fallbacks["default"] || [];
+        var found = fallbacks[code2];
+        if (!found)
+          found = fallbacks[this.getScriptPartFromCode(code2)];
+        if (!found)
+          found = fallbacks[this.formatLanguageCode(code2)];
+        if (!found)
+          found = fallbacks[this.getLanguagePartFromCode(code2)];
+        if (!found)
+          found = fallbacks["default"];
+        return found || [];
+      }
+    }, {
+      key: "toResolveHierarchy",
+      value: function toResolveHierarchy(code2, fallbackCode) {
+        var _this2 = this;
+        var fallbackCodes = this.getFallbackCodes(fallbackCode || this.options.fallbackLng || [], code2);
+        var codes = [];
+        var addCode = function addCode2(c2) {
+          if (!c2)
+            return;
+          if (_this2.isSupportedCode(c2)) {
+            codes.push(c2);
+          } else {
+            _this2.logger.warn("rejecting language code not found in supportedLngs: ".concat(c2));
+          }
+        };
+        if (typeof code2 === "string" && code2.indexOf("-") > -1) {
+          if (this.options.load !== "languageOnly")
+            addCode(this.formatLanguageCode(code2));
+          if (this.options.load !== "languageOnly" && this.options.load !== "currentOnly")
+            addCode(this.getScriptPartFromCode(code2));
+          if (this.options.load !== "currentOnly")
+            addCode(this.getLanguagePartFromCode(code2));
+        } else if (typeof code2 === "string") {
+          addCode(this.formatLanguageCode(code2));
+        }
+        fallbackCodes.forEach(function(fc) {
+          if (codes.indexOf(fc) < 0)
+            addCode(_this2.formatLanguageCode(fc));
+        });
+        return codes;
+      }
+    }]);
+    return LanguageUtil2;
+  }();
+  var sets = [{
+    lngs: ["ach", "ak", "am", "arn", "br", "fil", "gun", "ln", "mfe", "mg", "mi", "oc", "pt", "pt-BR", "tg", "tl", "ti", "tr", "uz", "wa"],
+    nr: [1, 2],
+    fc: 1
+  }, {
+    lngs: ["af", "an", "ast", "az", "bg", "bn", "ca", "da", "de", "dev", "el", "en", "eo", "es", "et", "eu", "fi", "fo", "fur", "fy", "gl", "gu", "ha", "hi", "hu", "hy", "ia", "it", "kk", "kn", "ku", "lb", "mai", "ml", "mn", "mr", "nah", "nap", "nb", "ne", "nl", "nn", "no", "nso", "pa", "pap", "pms", "ps", "pt-PT", "rm", "sco", "se", "si", "so", "son", "sq", "sv", "sw", "ta", "te", "tk", "ur", "yo"],
+    nr: [1, 2],
+    fc: 2
+  }, {
+    lngs: ["ay", "bo", "cgg", "fa", "ht", "id", "ja", "jbo", "ka", "km", "ko", "ky", "lo", "ms", "sah", "su", "th", "tt", "ug", "vi", "wo", "zh"],
+    nr: [1],
+    fc: 3
+  }, {
+    lngs: ["be", "bs", "cnr", "dz", "hr", "ru", "sr", "uk"],
+    nr: [1, 2, 5],
+    fc: 4
+  }, {
+    lngs: ["ar"],
+    nr: [0, 1, 2, 3, 11, 100],
+    fc: 5
+  }, {
+    lngs: ["cs", "sk"],
+    nr: [1, 2, 5],
+    fc: 6
+  }, {
+    lngs: ["csb", "pl"],
+    nr: [1, 2, 5],
+    fc: 7
+  }, {
+    lngs: ["cy"],
+    nr: [1, 2, 3, 8],
+    fc: 8
+  }, {
+    lngs: ["fr"],
+    nr: [1, 2],
+    fc: 9
+  }, {
+    lngs: ["ga"],
+    nr: [1, 2, 3, 7, 11],
+    fc: 10
+  }, {
+    lngs: ["gd"],
+    nr: [1, 2, 3, 20],
+    fc: 11
+  }, {
+    lngs: ["is"],
+    nr: [1, 2],
+    fc: 12
+  }, {
+    lngs: ["jv"],
+    nr: [0, 1],
+    fc: 13
+  }, {
+    lngs: ["kw"],
+    nr: [1, 2, 3, 4],
+    fc: 14
+  }, {
+    lngs: ["lt"],
+    nr: [1, 2, 10],
+    fc: 15
+  }, {
+    lngs: ["lv"],
+    nr: [1, 2, 0],
+    fc: 16
+  }, {
+    lngs: ["mk"],
+    nr: [1, 2],
+    fc: 17
+  }, {
+    lngs: ["mnk"],
+    nr: [0, 1, 2],
+    fc: 18
+  }, {
+    lngs: ["mt"],
+    nr: [1, 2, 11, 20],
+    fc: 19
+  }, {
+    lngs: ["or"],
+    nr: [2, 1],
+    fc: 2
+  }, {
+    lngs: ["ro"],
+    nr: [1, 2, 20],
+    fc: 20
+  }, {
+    lngs: ["sl"],
+    nr: [5, 1, 2, 3],
+    fc: 21
+  }, {
+    lngs: ["he", "iw"],
+    nr: [1, 2, 20, 21],
+    fc: 22
+  }];
+  var _rulesPluralsTypes = {
+    1: function _2(n2) {
+      return Number(n2 > 1);
+    },
+    2: function _2(n2) {
+      return Number(n2 != 1);
+    },
+    3: function _2(n2) {
+      return 0;
+    },
+    4: function _2(n2) {
+      return Number(n2 % 10 == 1 && n2 % 100 != 11 ? 0 : n2 % 10 >= 2 && n2 % 10 <= 4 && (n2 % 100 < 10 || n2 % 100 >= 20) ? 1 : 2);
+    },
+    5: function _2(n2) {
+      return Number(n2 == 0 ? 0 : n2 == 1 ? 1 : n2 == 2 ? 2 : n2 % 100 >= 3 && n2 % 100 <= 10 ? 3 : n2 % 100 >= 11 ? 4 : 5);
+    },
+    6: function _2(n2) {
+      return Number(n2 == 1 ? 0 : n2 >= 2 && n2 <= 4 ? 1 : 2);
+    },
+    7: function _2(n2) {
+      return Number(n2 == 1 ? 0 : n2 % 10 >= 2 && n2 % 10 <= 4 && (n2 % 100 < 10 || n2 % 100 >= 20) ? 1 : 2);
+    },
+    8: function _2(n2) {
+      return Number(n2 == 1 ? 0 : n2 == 2 ? 1 : n2 != 8 && n2 != 11 ? 2 : 3);
+    },
+    9: function _2(n2) {
+      return Number(n2 >= 2);
+    },
+    10: function _2(n2) {
+      return Number(n2 == 1 ? 0 : n2 == 2 ? 1 : n2 < 7 ? 2 : n2 < 11 ? 3 : 4);
+    },
+    11: function _2(n2) {
+      return Number(n2 == 1 || n2 == 11 ? 0 : n2 == 2 || n2 == 12 ? 1 : n2 > 2 && n2 < 20 ? 2 : 3);
+    },
+    12: function _2(n2) {
+      return Number(n2 % 10 != 1 || n2 % 100 == 11);
+    },
+    13: function _2(n2) {
+      return Number(n2 !== 0);
+    },
+    14: function _2(n2) {
+      return Number(n2 == 1 ? 0 : n2 == 2 ? 1 : n2 == 3 ? 2 : 3);
+    },
+    15: function _2(n2) {
+      return Number(n2 % 10 == 1 && n2 % 100 != 11 ? 0 : n2 % 10 >= 2 && (n2 % 100 < 10 || n2 % 100 >= 20) ? 1 : 2);
+    },
+    16: function _2(n2) {
+      return Number(n2 % 10 == 1 && n2 % 100 != 11 ? 0 : n2 !== 0 ? 1 : 2);
+    },
+    17: function _2(n2) {
+      return Number(n2 == 1 || n2 % 10 == 1 && n2 % 100 != 11 ? 0 : 1);
+    },
+    18: function _2(n2) {
+      return Number(n2 == 0 ? 0 : n2 == 1 ? 1 : 2);
+    },
+    19: function _2(n2) {
+      return Number(n2 == 1 ? 0 : n2 == 0 || n2 % 100 > 1 && n2 % 100 < 11 ? 1 : n2 % 100 > 10 && n2 % 100 < 20 ? 2 : 3);
+    },
+    20: function _2(n2) {
+      return Number(n2 == 1 ? 0 : n2 == 0 || n2 % 100 > 0 && n2 % 100 < 20 ? 1 : 2);
+    },
+    21: function _2(n2) {
+      return Number(n2 % 100 == 1 ? 1 : n2 % 100 == 2 ? 2 : n2 % 100 == 3 || n2 % 100 == 4 ? 3 : 0);
+    },
+    22: function _2(n2) {
+      return Number(n2 == 1 ? 0 : n2 == 2 ? 1 : (n2 < 0 || n2 > 10) && n2 % 10 == 0 ? 2 : 3);
+    }
+  };
+  var deprecatedJsonVersions = ["v1", "v2", "v3"];
+  var suffixesOrder = {
+    zero: 0,
+    one: 1,
+    two: 2,
+    few: 3,
+    many: 4,
+    other: 5
+  };
+  function createRules() {
+    var rules = {};
+    sets.forEach(function(set) {
+      set.lngs.forEach(function(l2) {
+        rules[l2] = {
+          numbers: set.nr,
+          plurals: _rulesPluralsTypes[set.fc]
+        };
+      });
+    });
+    return rules;
+  }
+  var PluralResolver = function() {
+    function PluralResolver2(languageUtils) {
+      var options2 = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
+      _classCallCheck(this, PluralResolver2);
+      this.languageUtils = languageUtils;
+      this.options = options2;
+      this.logger = baseLogger.create("pluralResolver");
+      if ((!this.options.compatibilityJSON || this.options.compatibilityJSON === "v4") && (typeof Intl === "undefined" || !Intl.PluralRules)) {
+        this.options.compatibilityJSON = "v3";
+        this.logger.error("Your environment seems not to be Intl API compatible, use an Intl.PluralRules polyfill. Will fallback to the compatibilityJSON v3 format handling.");
+      }
+      this.rules = createRules();
+    }
+    _createClass(PluralResolver2, [{
+      key: "addRule",
+      value: function addRule(lng, obj) {
+        this.rules[lng] = obj;
+      }
+    }, {
+      key: "getRule",
+      value: function getRule(code2) {
+        var options2 = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
+        if (this.shouldUseIntlApi()) {
+          try {
+            return new Intl.PluralRules(code2, {
+              type: options2.ordinal ? "ordinal" : "cardinal"
+            });
+          } catch (_unused) {
+            return;
+          }
+        }
+        return this.rules[code2] || this.rules[this.languageUtils.getLanguagePartFromCode(code2)];
+      }
+    }, {
+      key: "needsPlural",
+      value: function needsPlural(code2) {
+        var options2 = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
+        var rule = this.getRule(code2, options2);
+        if (this.shouldUseIntlApi()) {
+          return rule && rule.resolvedOptions().pluralCategories.length > 1;
+        }
+        return rule && rule.numbers.length > 1;
+      }
+    }, {
+      key: "getPluralFormsOfKey",
+      value: function getPluralFormsOfKey(code2, key2) {
+        var options2 = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : {};
+        return this.getSuffixes(code2, options2).map(function(suffix) {
+          return "".concat(key2).concat(suffix);
+        });
+      }
+    }, {
+      key: "getSuffixes",
+      value: function getSuffixes(code2) {
+        var _this = this;
+        var options2 = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
+        var rule = this.getRule(code2, options2);
+        if (!rule) {
+          return [];
+        }
+        if (this.shouldUseIntlApi()) {
+          return rule.resolvedOptions().pluralCategories.sort(function(pluralCategory1, pluralCategory2) {
+            return suffixesOrder[pluralCategory1] - suffixesOrder[pluralCategory2];
+          }).map(function(pluralCategory) {
+            return "".concat(_this.options.prepend).concat(pluralCategory);
+          });
+        }
+        return rule.numbers.map(function(number2) {
+          return _this.getSuffix(code2, number2, options2);
+        });
+      }
+    }, {
+      key: "getSuffix",
+      value: function getSuffix(code2, count) {
+        var options2 = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : {};
+        var rule = this.getRule(code2, options2);
+        if (rule) {
+          if (this.shouldUseIntlApi()) {
+            return "".concat(this.options.prepend).concat(rule.select(count));
+          }
+          return this.getSuffixRetroCompatible(rule, count);
+        }
+        this.logger.warn("no plural rule found for: ".concat(code2));
+        return "";
+      }
+    }, {
+      key: "getSuffixRetroCompatible",
+      value: function getSuffixRetroCompatible(rule, count) {
+        var _this2 = this;
+        var idx = rule.noAbs ? rule.plurals(count) : rule.plurals(Math.abs(count));
+        var suffix = rule.numbers[idx];
+        if (this.options.simplifyPluralSuffix && rule.numbers.length === 2 && rule.numbers[0] === 1) {
+          if (suffix === 2) {
+            suffix = "plural";
+          } else if (suffix === 1) {
+            suffix = "";
+          }
+        }
+        var returnSuffix = function returnSuffix2() {
+          return _this2.options.prepend && suffix.toString() ? _this2.options.prepend + suffix.toString() : suffix.toString();
+        };
+        if (this.options.compatibilityJSON === "v1") {
+          if (suffix === 1)
+            return "";
+          if (typeof suffix === "number")
+            return "_plural_".concat(suffix.toString());
+          return returnSuffix();
+        } else if (this.options.compatibilityJSON === "v2") {
+          return returnSuffix();
+        } else if (this.options.simplifyPluralSuffix && rule.numbers.length === 2 && rule.numbers[0] === 1) {
+          return returnSuffix();
+        }
+        return this.options.prepend && idx.toString() ? this.options.prepend + idx.toString() : idx.toString();
+      }
+    }, {
+      key: "shouldUseIntlApi",
+      value: function shouldUseIntlApi() {
+        return !deprecatedJsonVersions.includes(this.options.compatibilityJSON);
+      }
+    }]);
+    return PluralResolver2;
+  }();
+  function ownKeys$3(object, enumerableOnly) {
+    var keys = Object.keys(object);
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+      enumerableOnly && (symbols = symbols.filter(function(sym) {
+        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+      })), keys.push.apply(keys, symbols);
+    }
+    return keys;
+  }
+  function _objectSpread$3(target) {
+    for (var i2 = 1; i2 < arguments.length; i2++) {
+      var source = null != arguments[i2] ? arguments[i2] : {};
+      i2 % 2 ? ownKeys$3(Object(source), true).forEach(function(key2) {
+        _defineProperty(target, key2, source[key2]);
+      }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys$3(Object(source)).forEach(function(key2) {
+        Object.defineProperty(target, key2, Object.getOwnPropertyDescriptor(source, key2));
+      });
+    }
+    return target;
+  }
+  function deepFindWithDefaults(data, defaultData, key2) {
+    var keySeparator = arguments.length > 3 && arguments[3] !== void 0 ? arguments[3] : ".";
+    var ignoreJSONStructure = arguments.length > 4 && arguments[4] !== void 0 ? arguments[4] : true;
+    var path2 = getPathWithDefaults(data, defaultData, key2);
+    if (!path2 && ignoreJSONStructure && typeof key2 === "string") {
+      path2 = deepFind(data, key2, keySeparator);
+      if (path2 === void 0)
+        path2 = deepFind(defaultData, key2, keySeparator);
+    }
+    return path2;
+  }
+  var Interpolator = function() {
+    function Interpolator2() {
+      var options2 = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : {};
+      _classCallCheck(this, Interpolator2);
+      this.logger = baseLogger.create("interpolator");
+      this.options = options2;
+      this.format = options2.interpolation && options2.interpolation.format || function(value) {
+        return value;
+      };
+      this.init(options2);
+    }
+    _createClass(Interpolator2, [{
+      key: "init",
+      value: function init() {
+        var options2 = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : {};
+        if (!options2.interpolation)
+          options2.interpolation = {
+            escapeValue: true
+          };
+        var iOpts = options2.interpolation;
+        this.escape = iOpts.escape !== void 0 ? iOpts.escape : escape;
+        this.escapeValue = iOpts.escapeValue !== void 0 ? iOpts.escapeValue : true;
+        this.useRawValueToEscape = iOpts.useRawValueToEscape !== void 0 ? iOpts.useRawValueToEscape : false;
+        this.prefix = iOpts.prefix ? regexEscape(iOpts.prefix) : iOpts.prefixEscaped || "{{";
+        this.suffix = iOpts.suffix ? regexEscape(iOpts.suffix) : iOpts.suffixEscaped || "}}";
+        this.formatSeparator = iOpts.formatSeparator ? iOpts.formatSeparator : iOpts.formatSeparator || ",";
+        this.unescapePrefix = iOpts.unescapeSuffix ? "" : iOpts.unescapePrefix || "-";
+        this.unescapeSuffix = this.unescapePrefix ? "" : iOpts.unescapeSuffix || "";
+        this.nestingPrefix = iOpts.nestingPrefix ? regexEscape(iOpts.nestingPrefix) : iOpts.nestingPrefixEscaped || regexEscape("$t(");
+        this.nestingSuffix = iOpts.nestingSuffix ? regexEscape(iOpts.nestingSuffix) : iOpts.nestingSuffixEscaped || regexEscape(")");
+        this.nestingOptionsSeparator = iOpts.nestingOptionsSeparator ? iOpts.nestingOptionsSeparator : iOpts.nestingOptionsSeparator || ",";
+        this.maxReplaces = iOpts.maxReplaces ? iOpts.maxReplaces : 1e3;
+        this.alwaysFormat = iOpts.alwaysFormat !== void 0 ? iOpts.alwaysFormat : false;
+        this.resetRegExp();
+      }
+    }, {
+      key: "reset",
+      value: function reset() {
+        if (this.options)
+          this.init(this.options);
+      }
+    }, {
+      key: "resetRegExp",
+      value: function resetRegExp() {
+        var regexpStr = "".concat(this.prefix, "(.+?)").concat(this.suffix);
+        this.regexp = new RegExp(regexpStr, "g");
+        var regexpUnescapeStr = "".concat(this.prefix).concat(this.unescapePrefix, "(.+?)").concat(this.unescapeSuffix).concat(this.suffix);
+        this.regexpUnescape = new RegExp(regexpUnescapeStr, "g");
+        var nestingRegexpStr = "".concat(this.nestingPrefix, "(.+?)").concat(this.nestingSuffix);
+        this.nestingRegexp = new RegExp(nestingRegexpStr, "g");
+      }
+    }, {
+      key: "interpolate",
+      value: function interpolate(str, data, lng, options2) {
+        var _this = this;
+        var match;
+        var value;
+        var replaces;
+        var defaultData = this.options && this.options.interpolation && this.options.interpolation.defaultVariables || {};
+        function regexSafe(val) {
+          return val.replace(/\$/g, "$$$$");
+        }
+        var handleFormat = function handleFormat2(key2) {
+          if (key2.indexOf(_this.formatSeparator) < 0) {
+            var path2 = deepFindWithDefaults(data, defaultData, key2, _this.options.keySeparator, _this.options.ignoreJSONStructure);
+            return _this.alwaysFormat ? _this.format(path2, void 0, lng, _objectSpread$3(_objectSpread$3(_objectSpread$3({}, options2), data), {}, {
+              interpolationkey: key2
+            })) : path2;
+          }
+          var p2 = key2.split(_this.formatSeparator);
+          var k2 = p2.shift().trim();
+          var f2 = p2.join(_this.formatSeparator).trim();
+          return _this.format(deepFindWithDefaults(data, defaultData, k2, _this.options.keySeparator, _this.options.ignoreJSONStructure), f2, lng, _objectSpread$3(_objectSpread$3(_objectSpread$3({}, options2), data), {}, {
+            interpolationkey: k2
+          }));
+        };
+        this.resetRegExp();
+        var missingInterpolationHandler = options2 && options2.missingInterpolationHandler || this.options.missingInterpolationHandler;
+        var skipOnVariables = options2 && options2.interpolation && options2.interpolation.skipOnVariables !== void 0 ? options2.interpolation.skipOnVariables : this.options.interpolation.skipOnVariables;
+        var todos = [{
+          regex: this.regexpUnescape,
+          safeValue: function safeValue(val) {
+            return regexSafe(val);
+          }
+        }, {
+          regex: this.regexp,
+          safeValue: function safeValue(val) {
+            return _this.escapeValue ? regexSafe(_this.escape(val)) : regexSafe(val);
+          }
+        }];
+        todos.forEach(function(todo) {
+          replaces = 0;
+          while (match = todo.regex.exec(str)) {
+            var matchedVar = match[1].trim();
+            value = handleFormat(matchedVar);
+            if (value === void 0) {
+              if (typeof missingInterpolationHandler === "function") {
+                var temp = missingInterpolationHandler(str, match, options2);
+                value = typeof temp === "string" ? temp : "";
+              } else if (options2 && Object.prototype.hasOwnProperty.call(options2, matchedVar)) {
+                value = "";
+              } else if (skipOnVariables) {
+                value = match[0];
+                continue;
+              } else {
+                _this.logger.warn("missed to pass in variable ".concat(matchedVar, " for interpolating ").concat(str));
+                value = "";
+              }
+            } else if (typeof value !== "string" && !_this.useRawValueToEscape) {
+              value = makeString(value);
+            }
+            var safeValue = todo.safeValue(value);
+            str = str.replace(match[0], safeValue);
+            if (skipOnVariables) {
+              todo.regex.lastIndex += value.length;
+              todo.regex.lastIndex -= match[0].length;
+            } else {
+              todo.regex.lastIndex = 0;
+            }
+            replaces++;
+            if (replaces >= _this.maxReplaces) {
+              break;
+            }
+          }
+        });
+        return str;
+      }
+    }, {
+      key: "nest",
+      value: function nest(str, fc) {
+        var _this2 = this;
+        var options2 = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : {};
+        var match;
+        var value;
+        var clonedOptions;
+        function handleHasOptions(key2, inheritedOptions) {
+          var sep = this.nestingOptionsSeparator;
+          if (key2.indexOf(sep) < 0)
+            return key2;
+          var c2 = key2.split(new RegExp("".concat(sep, "[ ]*{")));
+          var optionsString = "{".concat(c2[1]);
+          key2 = c2[0];
+          optionsString = this.interpolate(optionsString, clonedOptions);
+          var matchedSingleQuotes = optionsString.match(/'/g);
+          var matchedDoubleQuotes = optionsString.match(/"/g);
+          if (matchedSingleQuotes && matchedSingleQuotes.length % 2 === 0 && !matchedDoubleQuotes || matchedDoubleQuotes.length % 2 !== 0) {
+            optionsString = optionsString.replace(/'/g, '"');
+          }
+          try {
+            clonedOptions = JSON.parse(optionsString);
+            if (inheritedOptions)
+              clonedOptions = _objectSpread$3(_objectSpread$3({}, inheritedOptions), clonedOptions);
+          } catch (e2) {
+            this.logger.warn("failed parsing options string in nesting for key ".concat(key2), e2);
+            return "".concat(key2).concat(sep).concat(optionsString);
+          }
+          delete clonedOptions.defaultValue;
+          return key2;
+        }
+        while (match = this.nestingRegexp.exec(str)) {
+          var formatters = [];
+          clonedOptions = _objectSpread$3({}, options2);
+          clonedOptions = clonedOptions.replace && typeof clonedOptions.replace !== "string" ? clonedOptions.replace : clonedOptions;
+          clonedOptions.applyPostProcessor = false;
+          delete clonedOptions.defaultValue;
+          var doReduce = false;
+          if (match[0].indexOf(this.formatSeparator) !== -1 && !/{.*}/.test(match[1])) {
+            var r2 = match[1].split(this.formatSeparator).map(function(elem) {
+              return elem.trim();
+            });
+            match[1] = r2.shift();
+            formatters = r2;
+            doReduce = true;
+          }
+          value = fc(handleHasOptions.call(this, match[1].trim(), clonedOptions), clonedOptions);
+          if (value && match[0] === str && typeof value !== "string")
+            return value;
+          if (typeof value !== "string")
+            value = makeString(value);
+          if (!value) {
+            this.logger.warn("missed to resolve ".concat(match[1], " for nesting ").concat(str));
+            value = "";
+          }
+          if (doReduce) {
+            value = formatters.reduce(function(v2, f2) {
+              return _this2.format(v2, f2, options2.lng, _objectSpread$3(_objectSpread$3({}, options2), {}, {
+                interpolationkey: match[1].trim()
+              }));
+            }, value.trim());
+          }
+          str = str.replace(match[0], value);
+          this.regexp.lastIndex = 0;
+        }
+        return str;
+      }
+    }]);
+    return Interpolator2;
+  }();
+  function ownKeys$2(object, enumerableOnly) {
+    var keys = Object.keys(object);
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+      enumerableOnly && (symbols = symbols.filter(function(sym) {
+        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+      })), keys.push.apply(keys, symbols);
+    }
+    return keys;
+  }
+  function _objectSpread$2(target) {
+    for (var i2 = 1; i2 < arguments.length; i2++) {
+      var source = null != arguments[i2] ? arguments[i2] : {};
+      i2 % 2 ? ownKeys$2(Object(source), true).forEach(function(key2) {
+        _defineProperty(target, key2, source[key2]);
+      }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys$2(Object(source)).forEach(function(key2) {
+        Object.defineProperty(target, key2, Object.getOwnPropertyDescriptor(source, key2));
+      });
+    }
+    return target;
+  }
+  function parseFormatStr(formatStr) {
+    var formatName = formatStr.toLowerCase().trim();
+    var formatOptions = {};
+    if (formatStr.indexOf("(") > -1) {
+      var p2 = formatStr.split("(");
+      formatName = p2[0].toLowerCase().trim();
+      var optStr = p2[1].substring(0, p2[1].length - 1);
+      if (formatName === "currency" && optStr.indexOf(":") < 0) {
+        if (!formatOptions.currency)
+          formatOptions.currency = optStr.trim();
+      } else if (formatName === "relativetime" && optStr.indexOf(":") < 0) {
+        if (!formatOptions.range)
+          formatOptions.range = optStr.trim();
+      } else {
+        var opts = optStr.split(";");
+        opts.forEach(function(opt) {
+          if (!opt)
+            return;
+          var _opt$split = opt.split(":"), _opt$split2 = _toArray(_opt$split), key2 = _opt$split2[0], rest = _opt$split2.slice(1);
+          var val = rest.join(":").trim().replace(/^'+|'+$/g, "");
+          if (!formatOptions[key2.trim()])
+            formatOptions[key2.trim()] = val;
+          if (val === "false")
+            formatOptions[key2.trim()] = false;
+          if (val === "true")
+            formatOptions[key2.trim()] = true;
+          if (!isNaN(val))
+            formatOptions[key2.trim()] = parseInt(val, 10);
+        });
+      }
+    }
+    return {
+      formatName,
+      formatOptions
+    };
+  }
+  function createCachedFormatter(fn2) {
+    var cache = {};
+    return function invokeFormatter(val, lng, options2) {
+      var key2 = lng + JSON.stringify(options2);
+      var formatter = cache[key2];
+      if (!formatter) {
+        formatter = fn2(lng, options2);
+        cache[key2] = formatter;
+      }
+      return formatter(val);
+    };
+  }
+  var Formatter = function() {
+    function Formatter2() {
+      var options2 = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : {};
+      _classCallCheck(this, Formatter2);
+      this.logger = baseLogger.create("formatter");
+      this.options = options2;
+      this.formats = {
+        number: createCachedFormatter(function(lng, opt) {
+          var formatter = new Intl.NumberFormat(lng, _objectSpread$2({}, opt));
+          return function(val) {
+            return formatter.format(val);
+          };
+        }),
+        currency: createCachedFormatter(function(lng, opt) {
+          var formatter = new Intl.NumberFormat(lng, _objectSpread$2(_objectSpread$2({}, opt), {}, {
+            style: "currency"
+          }));
+          return function(val) {
+            return formatter.format(val);
+          };
+        }),
+        datetime: createCachedFormatter(function(lng, opt) {
+          var formatter = new Intl.DateTimeFormat(lng, _objectSpread$2({}, opt));
+          return function(val) {
+            return formatter.format(val);
+          };
+        }),
+        relativetime: createCachedFormatter(function(lng, opt) {
+          var formatter = new Intl.RelativeTimeFormat(lng, _objectSpread$2({}, opt));
+          return function(val) {
+            return formatter.format(val, opt.range || "day");
+          };
+        }),
+        list: createCachedFormatter(function(lng, opt) {
+          var formatter = new Intl.ListFormat(lng, _objectSpread$2({}, opt));
+          return function(val) {
+            return formatter.format(val);
+          };
+        })
+      };
+      this.init(options2);
+    }
+    _createClass(Formatter2, [{
+      key: "init",
+      value: function init(services) {
+        var options2 = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {
+          interpolation: {}
+        };
+        var iOpts = options2.interpolation;
+        this.formatSeparator = iOpts.formatSeparator ? iOpts.formatSeparator : iOpts.formatSeparator || ",";
+      }
+    }, {
+      key: "add",
+      value: function add(name, fc) {
+        this.formats[name.toLowerCase().trim()] = fc;
+      }
+    }, {
+      key: "addCached",
+      value: function addCached(name, fc) {
+        this.formats[name.toLowerCase().trim()] = createCachedFormatter(fc);
+      }
+    }, {
+      key: "format",
+      value: function format(value, _format, lng) {
+        var _this = this;
+        var options2 = arguments.length > 3 && arguments[3] !== void 0 ? arguments[3] : {};
+        var formats = _format.split(this.formatSeparator);
+        var result = formats.reduce(function(mem, f2) {
+          var _parseFormatStr = parseFormatStr(f2), formatName = _parseFormatStr.formatName, formatOptions = _parseFormatStr.formatOptions;
+          if (_this.formats[formatName]) {
+            var formatted = mem;
+            try {
+              var valOptions = options2 && options2.formatParams && options2.formatParams[options2.interpolationkey] || {};
+              var l2 = valOptions.locale || valOptions.lng || options2.locale || options2.lng || lng;
+              formatted = _this.formats[formatName](mem, l2, _objectSpread$2(_objectSpread$2(_objectSpread$2({}, formatOptions), options2), valOptions));
+            } catch (error) {
+              _this.logger.warn(error);
+            }
+            return formatted;
+          } else {
+            _this.logger.warn("there was no format function for ".concat(formatName));
+          }
+          return mem;
+        }, value);
+        return result;
+      }
+    }]);
+    return Formatter2;
+  }();
+  function ownKeys$1(object, enumerableOnly) {
+    var keys = Object.keys(object);
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+      enumerableOnly && (symbols = symbols.filter(function(sym) {
+        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+      })), keys.push.apply(keys, symbols);
+    }
+    return keys;
+  }
+  function _objectSpread$1(target) {
+    for (var i2 = 1; i2 < arguments.length; i2++) {
+      var source = null != arguments[i2] ? arguments[i2] : {};
+      i2 % 2 ? ownKeys$1(Object(source), true).forEach(function(key2) {
+        _defineProperty(target, key2, source[key2]);
+      }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys$1(Object(source)).forEach(function(key2) {
+        Object.defineProperty(target, key2, Object.getOwnPropertyDescriptor(source, key2));
+      });
+    }
+    return target;
+  }
+  function _createSuper$1(Derived) {
+    var hasNativeReflectConstruct = _isNativeReflectConstruct$1();
+    return function _createSuperInternal() {
+      var Super = _getPrototypeOf(Derived), result;
+      if (hasNativeReflectConstruct) {
+        var NewTarget = _getPrototypeOf(this).constructor;
+        result = Reflect.construct(Super, arguments, NewTarget);
+      } else {
+        result = Super.apply(this, arguments);
+      }
+      return _possibleConstructorReturn(this, result);
+    };
+  }
+  function _isNativeReflectConstruct$1() {
+    if (typeof Reflect === "undefined" || !Reflect.construct)
+      return false;
+    if (Reflect.construct.sham)
+      return false;
+    if (typeof Proxy === "function")
+      return true;
+    try {
+      Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function() {
+      }));
+      return true;
+    } catch (e2) {
+      return false;
+    }
+  }
+  function removePending(q2, name) {
+    if (q2.pending[name] !== void 0) {
+      delete q2.pending[name];
+      q2.pendingCount--;
+    }
+  }
+  var Connector = function(_EventEmitter) {
+    _inherits(Connector2, _EventEmitter);
+    var _super = _createSuper$1(Connector2);
+    function Connector2(backend, store, services) {
+      var _this;
+      var options2 = arguments.length > 3 && arguments[3] !== void 0 ? arguments[3] : {};
+      _classCallCheck(this, Connector2);
+      _this = _super.call(this);
+      if (isIE10) {
+        EventEmitter$1.call(_assertThisInitialized(_this));
+      }
+      _this.backend = backend;
+      _this.store = store;
+      _this.services = services;
+      _this.languageUtils = services.languageUtils;
+      _this.options = options2;
+      _this.logger = baseLogger.create("backendConnector");
+      _this.waitingReads = [];
+      _this.maxParallelReads = options2.maxParallelReads || 10;
+      _this.readingCalls = 0;
+      _this.maxRetries = options2.maxRetries >= 0 ? options2.maxRetries : 5;
+      _this.retryTimeout = options2.retryTimeout >= 1 ? options2.retryTimeout : 350;
+      _this.state = {};
+      _this.queue = [];
+      if (_this.backend && _this.backend.init) {
+        _this.backend.init(services, options2.backend, options2);
+      }
+      return _this;
+    }
+    _createClass(Connector2, [{
+      key: "queueLoad",
+      value: function queueLoad(languages, namespaces, options2, callback) {
+        var _this2 = this;
+        var toLoad = {};
+        var pending = {};
+        var toLoadLanguages = {};
+        var toLoadNamespaces = {};
+        languages.forEach(function(lng) {
+          var hasAllNamespaces = true;
+          namespaces.forEach(function(ns) {
+            var name = "".concat(lng, "|").concat(ns);
+            if (!options2.reload && _this2.store.hasResourceBundle(lng, ns)) {
+              _this2.state[name] = 2;
+            } else if (_this2.state[name] < 0)
+              ;
+            else if (_this2.state[name] === 1) {
+              if (pending[name] === void 0)
+                pending[name] = true;
+            } else {
+              _this2.state[name] = 1;
+              hasAllNamespaces = false;
+              if (pending[name] === void 0)
+                pending[name] = true;
+              if (toLoad[name] === void 0)
+                toLoad[name] = true;
+              if (toLoadNamespaces[ns] === void 0)
+                toLoadNamespaces[ns] = true;
+            }
+          });
+          if (!hasAllNamespaces)
+            toLoadLanguages[lng] = true;
+        });
+        if (Object.keys(toLoad).length || Object.keys(pending).length) {
+          this.queue.push({
+            pending,
+            pendingCount: Object.keys(pending).length,
+            loaded: {},
+            errors: [],
+            callback
+          });
+        }
+        return {
+          toLoad: Object.keys(toLoad),
+          pending: Object.keys(pending),
+          toLoadLanguages: Object.keys(toLoadLanguages),
+          toLoadNamespaces: Object.keys(toLoadNamespaces)
+        };
+      }
+    }, {
+      key: "loaded",
+      value: function loaded(name, err, data) {
+        var s2 = name.split("|");
+        var lng = s2[0];
+        var ns = s2[1];
+        if (err)
+          this.emit("failedLoading", lng, ns, err);
+        if (data) {
+          this.store.addResourceBundle(lng, ns, data);
+        }
+        this.state[name] = err ? -1 : 2;
+        var loaded2 = {};
+        this.queue.forEach(function(q2) {
+          pushPath(q2.loaded, [lng], ns);
+          removePending(q2, name);
+          if (err)
+            q2.errors.push(err);
+          if (q2.pendingCount === 0 && !q2.done) {
+            Object.keys(q2.loaded).forEach(function(l2) {
+              if (!loaded2[l2])
+                loaded2[l2] = {};
+              var loadedKeys = q2.loaded[l2];
+              if (loadedKeys.length) {
+                loadedKeys.forEach(function(n2) {
+                  if (loaded2[l2][n2] === void 0)
+                    loaded2[l2][n2] = true;
+                });
+              }
+            });
+            q2.done = true;
+            if (q2.errors.length) {
+              q2.callback(q2.errors);
+            } else {
+              q2.callback();
+            }
+          }
+        });
+        this.emit("loaded", loaded2);
+        this.queue = this.queue.filter(function(q2) {
+          return !q2.done;
+        });
+      }
+    }, {
+      key: "read",
+      value: function read(lng, ns, fcName) {
+        var _this3 = this;
+        var tried = arguments.length > 3 && arguments[3] !== void 0 ? arguments[3] : 0;
+        var wait = arguments.length > 4 && arguments[4] !== void 0 ? arguments[4] : this.retryTimeout;
+        var callback = arguments.length > 5 ? arguments[5] : void 0;
+        if (!lng.length)
+          return callback(null, {});
+        if (this.readingCalls >= this.maxParallelReads) {
+          this.waitingReads.push({
+            lng,
+            ns,
+            fcName,
+            tried,
+            wait,
+            callback
+          });
+          return;
+        }
+        this.readingCalls++;
+        var resolver2 = function resolver3(err, data) {
+          _this3.readingCalls--;
+          if (_this3.waitingReads.length > 0) {
+            var next = _this3.waitingReads.shift();
+            _this3.read(next.lng, next.ns, next.fcName, next.tried, next.wait, next.callback);
+          }
+          if (err && data && tried < _this3.maxRetries) {
+            setTimeout(function() {
+              _this3.read.call(_this3, lng, ns, fcName, tried + 1, wait * 2, callback);
+            }, wait);
+            return;
+          }
+          callback(err, data);
+        };
+        var fc = this.backend[fcName].bind(this.backend);
+        if (fc.length === 2) {
+          try {
+            var r2 = fc(lng, ns);
+            if (r2 && typeof r2.then === "function") {
+              r2.then(function(data) {
+                return resolver2(null, data);
+              })["catch"](resolver2);
+            } else {
+              resolver2(null, r2);
+            }
+          } catch (err) {
+            resolver2(err);
+          }
+          return;
+        }
+        return fc(lng, ns, resolver2);
+      }
+    }, {
+      key: "prepareLoading",
+      value: function prepareLoading(languages, namespaces) {
+        var _this4 = this;
+        var options2 = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : {};
+        var callback = arguments.length > 3 ? arguments[3] : void 0;
+        if (!this.backend) {
+          this.logger.warn("No backend was added via i18next.use. Will not load resources.");
+          return callback && callback();
+        }
+        if (typeof languages === "string")
+          languages = this.languageUtils.toResolveHierarchy(languages);
+        if (typeof namespaces === "string")
+          namespaces = [namespaces];
+        var toLoad = this.queueLoad(languages, namespaces, options2, callback);
+        if (!toLoad.toLoad.length) {
+          if (!toLoad.pending.length)
+            callback();
+          return null;
+        }
+        toLoad.toLoad.forEach(function(name) {
+          _this4.loadOne(name);
+        });
+      }
+    }, {
+      key: "load",
+      value: function load(languages, namespaces, callback) {
+        this.prepareLoading(languages, namespaces, {}, callback);
+      }
+    }, {
+      key: "reload",
+      value: function reload(languages, namespaces, callback) {
+        this.prepareLoading(languages, namespaces, {
+          reload: true
+        }, callback);
+      }
+    }, {
+      key: "loadOne",
+      value: function loadOne(name) {
+        var _this5 = this;
+        var prefix = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : "";
+        var s2 = name.split("|");
+        var lng = s2[0];
+        var ns = s2[1];
+        this.read(lng, ns, "read", void 0, void 0, function(err, data) {
+          if (err)
+            _this5.logger.warn("".concat(prefix, "loading namespace ").concat(ns, " for language ").concat(lng, " failed"), err);
+          if (!err && data)
+            _this5.logger.log("".concat(prefix, "loaded namespace ").concat(ns, " for language ").concat(lng), data);
+          _this5.loaded(name, err, data);
+        });
+      }
+    }, {
+      key: "saveMissing",
+      value: function saveMissing(languages, namespace, key2, fallbackValue, isUpdate) {
+        var options2 = arguments.length > 5 && arguments[5] !== void 0 ? arguments[5] : {};
+        var clb = arguments.length > 6 && arguments[6] !== void 0 ? arguments[6] : function() {
+        };
+        if (this.services.utils && this.services.utils.hasLoadedNamespace && !this.services.utils.hasLoadedNamespace(namespace)) {
+          this.logger.warn('did not save key "'.concat(key2, '" as the namespace "').concat(namespace, '" was not yet loaded'), "This means something IS WRONG in your setup. You access the t function before i18next.init / i18next.loadNamespace / i18next.changeLanguage was done. Wait for the callback or Promise to resolve before accessing it!!!");
+          return;
+        }
+        if (key2 === void 0 || key2 === null || key2 === "")
+          return;
+        if (this.backend && this.backend.create) {
+          var opts = _objectSpread$1(_objectSpread$1({}, options2), {}, {
+            isUpdate
+          });
+          var fc = this.backend.create.bind(this.backend);
+          if (fc.length < 6) {
+            try {
+              var r2;
+              if (fc.length === 5) {
+                r2 = fc(languages, namespace, key2, fallbackValue, opts);
+              } else {
+                r2 = fc(languages, namespace, key2, fallbackValue);
+              }
+              if (r2 && typeof r2.then === "function") {
+                r2.then(function(data) {
+                  return clb(null, data);
+                })["catch"](clb);
+              } else {
+                clb(null, r2);
+              }
+            } catch (err) {
+              clb(err);
+            }
+          } else {
+            fc(languages, namespace, key2, fallbackValue, clb, opts);
+          }
+        }
+        if (!languages || !languages[0])
+          return;
+        this.store.addResource(languages[0], namespace, key2, fallbackValue);
+      }
+    }]);
+    return Connector2;
+  }(EventEmitter$1);
+  function get() {
+    return {
+      debug: false,
+      initImmediate: true,
+      ns: ["translation"],
+      defaultNS: ["translation"],
+      fallbackLng: ["dev"],
+      fallbackNS: false,
+      supportedLngs: false,
+      nonExplicitSupportedLngs: false,
+      load: "all",
+      preload: false,
+      simplifyPluralSuffix: true,
+      keySeparator: ".",
+      nsSeparator: ":",
+      pluralSeparator: "_",
+      contextSeparator: "_",
+      partialBundledLanguages: false,
+      saveMissing: false,
+      updateMissing: false,
+      saveMissingTo: "fallback",
+      saveMissingPlurals: true,
+      missingKeyHandler: false,
+      missingInterpolationHandler: false,
+      postProcess: false,
+      postProcessPassResolved: false,
+      returnNull: true,
+      returnEmptyString: true,
+      returnObjects: false,
+      joinArrays: false,
+      returnedObjectHandler: false,
+      parseMissingKeyHandler: false,
+      appendNamespaceToMissingKey: false,
+      appendNamespaceToCIMode: false,
+      overloadTranslationOptionHandler: function handle2(args) {
+        var ret = {};
+        if (_typeof(args[1]) === "object")
+          ret = args[1];
+        if (typeof args[1] === "string")
+          ret.defaultValue = args[1];
+        if (typeof args[2] === "string")
+          ret.tDescription = args[2];
+        if (_typeof(args[2]) === "object" || _typeof(args[3]) === "object") {
+          var options2 = args[3] || args[2];
+          Object.keys(options2).forEach(function(key2) {
+            ret[key2] = options2[key2];
+          });
+        }
+        return ret;
+      },
+      interpolation: {
+        escapeValue: true,
+        format: function format(value, _format, lng, options2) {
+          return value;
+        },
+        prefix: "{{",
+        suffix: "}}",
+        formatSeparator: ",",
+        unescapePrefix: "-",
+        nestingPrefix: "$t(",
+        nestingSuffix: ")",
+        nestingOptionsSeparator: ",",
+        maxReplaces: 1e3,
+        skipOnVariables: true
+      }
+    };
+  }
+  function transformOptions(options2) {
+    if (typeof options2.ns === "string")
+      options2.ns = [options2.ns];
+    if (typeof options2.fallbackLng === "string")
+      options2.fallbackLng = [options2.fallbackLng];
+    if (typeof options2.fallbackNS === "string")
+      options2.fallbackNS = [options2.fallbackNS];
+    if (options2.supportedLngs && options2.supportedLngs.indexOf("cimode") < 0) {
+      options2.supportedLngs = options2.supportedLngs.concat(["cimode"]);
+    }
+    return options2;
+  }
+  function ownKeys(object, enumerableOnly) {
+    var keys = Object.keys(object);
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+      enumerableOnly && (symbols = symbols.filter(function(sym) {
+        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+      })), keys.push.apply(keys, symbols);
+    }
+    return keys;
+  }
+  function _objectSpread(target) {
+    for (var i2 = 1; i2 < arguments.length; i2++) {
+      var source = null != arguments[i2] ? arguments[i2] : {};
+      i2 % 2 ? ownKeys(Object(source), true).forEach(function(key2) {
+        _defineProperty(target, key2, source[key2]);
+      }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function(key2) {
+        Object.defineProperty(target, key2, Object.getOwnPropertyDescriptor(source, key2));
+      });
+    }
+    return target;
+  }
+  function _createSuper(Derived) {
+    var hasNativeReflectConstruct = _isNativeReflectConstruct();
+    return function _createSuperInternal() {
+      var Super = _getPrototypeOf(Derived), result;
+      if (hasNativeReflectConstruct) {
+        var NewTarget = _getPrototypeOf(this).constructor;
+        result = Reflect.construct(Super, arguments, NewTarget);
+      } else {
+        result = Super.apply(this, arguments);
+      }
+      return _possibleConstructorReturn(this, result);
+    };
+  }
+  function _isNativeReflectConstruct() {
+    if (typeof Reflect === "undefined" || !Reflect.construct)
+      return false;
+    if (Reflect.construct.sham)
+      return false;
+    if (typeof Proxy === "function")
+      return true;
+    try {
+      Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function() {
+      }));
+      return true;
+    } catch (e2) {
+      return false;
+    }
+  }
+  function noop$1() {
+  }
+  function bindMemberFunctions(inst) {
+    var mems = Object.getOwnPropertyNames(Object.getPrototypeOf(inst));
+    mems.forEach(function(mem) {
+      if (typeof inst[mem] === "function") {
+        inst[mem] = inst[mem].bind(inst);
+      }
+    });
+  }
+  var I18n = function(_EventEmitter) {
+    _inherits(I18n2, _EventEmitter);
+    var _super = _createSuper(I18n2);
+    function I18n2() {
+      var _this;
+      var options2 = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : {};
+      var callback = arguments.length > 1 ? arguments[1] : void 0;
+      _classCallCheck(this, I18n2);
+      _this = _super.call(this);
+      if (isIE10) {
+        EventEmitter$1.call(_assertThisInitialized(_this));
+      }
+      _this.options = transformOptions(options2);
+      _this.services = {};
+      _this.logger = baseLogger;
+      _this.modules = {
+        external: []
+      };
+      bindMemberFunctions(_assertThisInitialized(_this));
+      if (callback && !_this.isInitialized && !options2.isClone) {
+        if (!_this.options.initImmediate) {
+          _this.init(options2, callback);
+          return _possibleConstructorReturn(_this, _assertThisInitialized(_this));
+        }
+        setTimeout(function() {
+          _this.init(options2, callback);
+        }, 0);
+      }
+      return _this;
+    }
+    _createClass(I18n2, [{
+      key: "init",
+      value: function init() {
+        var _this2 = this;
+        var options2 = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : {};
+        var callback = arguments.length > 1 ? arguments[1] : void 0;
+        if (typeof options2 === "function") {
+          callback = options2;
+          options2 = {};
+        }
+        if (!options2.defaultNS && options2.defaultNS !== false && options2.ns) {
+          if (typeof options2.ns === "string") {
+            options2.defaultNS = options2.ns;
+          } else if (options2.ns.indexOf("translation") < 0) {
+            options2.defaultNS = options2.ns[0];
+          }
+        }
+        var defOpts = get();
+        this.options = _objectSpread(_objectSpread(_objectSpread({}, defOpts), this.options), transformOptions(options2));
+        if (this.options.compatibilityAPI !== "v1") {
+          this.options.interpolation = _objectSpread(_objectSpread({}, defOpts.interpolation), this.options.interpolation);
+        }
+        if (options2.keySeparator !== void 0) {
+          this.options.userDefinedKeySeparator = options2.keySeparator;
+        }
+        if (options2.nsSeparator !== void 0) {
+          this.options.userDefinedNsSeparator = options2.nsSeparator;
+        }
+        function createClassOnDemand(ClassOrObject) {
+          if (!ClassOrObject)
+            return null;
+          if (typeof ClassOrObject === "function")
+            return new ClassOrObject();
+          return ClassOrObject;
+        }
+        if (!this.options.isClone) {
+          if (this.modules.logger) {
+            baseLogger.init(createClassOnDemand(this.modules.logger), this.options);
+          } else {
+            baseLogger.init(null, this.options);
+          }
+          var formatter;
+          if (this.modules.formatter) {
+            formatter = this.modules.formatter;
+          } else if (typeof Intl !== "undefined") {
+            formatter = Formatter;
+          }
+          var lu = new LanguageUtil(this.options);
+          this.store = new ResourceStore(this.options.resources, this.options);
+          var s2 = this.services;
+          s2.logger = baseLogger;
+          s2.resourceStore = this.store;
+          s2.languageUtils = lu;
+          s2.pluralResolver = new PluralResolver(lu, {
+            prepend: this.options.pluralSeparator,
+            compatibilityJSON: this.options.compatibilityJSON,
+            simplifyPluralSuffix: this.options.simplifyPluralSuffix
+          });
+          if (formatter && (!this.options.interpolation.format || this.options.interpolation.format === defOpts.interpolation.format)) {
+            s2.formatter = createClassOnDemand(formatter);
+            s2.formatter.init(s2, this.options);
+            this.options.interpolation.format = s2.formatter.format.bind(s2.formatter);
+          }
+          s2.interpolator = new Interpolator(this.options);
+          s2.utils = {
+            hasLoadedNamespace: this.hasLoadedNamespace.bind(this)
+          };
+          s2.backendConnector = new Connector(createClassOnDemand(this.modules.backend), s2.resourceStore, s2, this.options);
+          s2.backendConnector.on("*", function(event) {
+            for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+              args[_key - 1] = arguments[_key];
+            }
+            _this2.emit.apply(_this2, [event].concat(args));
+          });
+          if (this.modules.languageDetector) {
+            s2.languageDetector = createClassOnDemand(this.modules.languageDetector);
+            if (s2.languageDetector.init)
+              s2.languageDetector.init(s2, this.options.detection, this.options);
+          }
+          if (this.modules.i18nFormat) {
+            s2.i18nFormat = createClassOnDemand(this.modules.i18nFormat);
+            if (s2.i18nFormat.init)
+              s2.i18nFormat.init(this);
+          }
+          this.translator = new Translator(this.services, this.options);
+          this.translator.on("*", function(event) {
+            for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+              args[_key2 - 1] = arguments[_key2];
+            }
+            _this2.emit.apply(_this2, [event].concat(args));
+          });
+          this.modules.external.forEach(function(m2) {
+            if (m2.init)
+              m2.init(_this2);
+          });
+        }
+        this.format = this.options.interpolation.format;
+        if (!callback)
+          callback = noop$1;
+        if (this.options.fallbackLng && !this.services.languageDetector && !this.options.lng) {
+          var codes = this.services.languageUtils.getFallbackCodes(this.options.fallbackLng);
+          if (codes.length > 0 && codes[0] !== "dev")
+            this.options.lng = codes[0];
+        }
+        if (!this.services.languageDetector && !this.options.lng) {
+          this.logger.warn("init: no languageDetector is used and no lng is defined");
+        }
+        var storeApi = ["getResource", "hasResourceBundle", "getResourceBundle", "getDataByLanguage"];
+        storeApi.forEach(function(fcName) {
+          _this2[fcName] = function() {
+            var _this2$store;
+            return (_this2$store = _this2.store)[fcName].apply(_this2$store, arguments);
+          };
+        });
+        var storeApiChained = ["addResource", "addResources", "addResourceBundle", "removeResourceBundle"];
+        storeApiChained.forEach(function(fcName) {
+          _this2[fcName] = function() {
+            var _this2$store2;
+            (_this2$store2 = _this2.store)[fcName].apply(_this2$store2, arguments);
+            return _this2;
+          };
+        });
+        var deferred = defer();
+        var load = function load2() {
+          var finish = function finish2(err, t2) {
+            if (_this2.isInitialized && !_this2.initializedStoreOnce)
+              _this2.logger.warn("init: i18next is already initialized. You should call init just once!");
+            _this2.isInitialized = true;
+            if (!_this2.options.isClone)
+              _this2.logger.log("initialized", _this2.options);
+            _this2.emit("initialized", _this2.options);
+            deferred.resolve(t2);
+            callback(err, t2);
+          };
+          if (_this2.languages && _this2.options.compatibilityAPI !== "v1" && !_this2.isInitialized)
+            return finish(null, _this2.t.bind(_this2));
+          _this2.changeLanguage(_this2.options.lng, finish);
+        };
+        if (this.options.resources || !this.options.initImmediate) {
+          load();
+        } else {
+          setTimeout(load, 0);
+        }
+        return deferred;
+      }
+    }, {
+      key: "loadResources",
+      value: function loadResources(language) {
+        var _this3 = this;
+        var callback = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : noop$1;
+        var usedCallback = callback;
+        var usedLng = typeof language === "string" ? language : this.language;
+        if (typeof language === "function")
+          usedCallback = language;
+        if (!this.options.resources || this.options.partialBundledLanguages) {
+          if (usedLng && usedLng.toLowerCase() === "cimode")
+            return usedCallback();
+          var toLoad = [];
+          var append = function append2(lng) {
+            if (!lng)
+              return;
+            var lngs = _this3.services.languageUtils.toResolveHierarchy(lng);
+            lngs.forEach(function(l2) {
+              if (toLoad.indexOf(l2) < 0)
+                toLoad.push(l2);
+            });
+          };
+          if (!usedLng) {
+            var fallbacks = this.services.languageUtils.getFallbackCodes(this.options.fallbackLng);
+            fallbacks.forEach(function(l2) {
+              return append(l2);
+            });
+          } else {
+            append(usedLng);
+          }
+          if (this.options.preload) {
+            this.options.preload.forEach(function(l2) {
+              return append(l2);
+            });
+          }
+          this.services.backendConnector.load(toLoad, this.options.ns, function(e2) {
+            if (!e2 && !_this3.resolvedLanguage && _this3.language)
+              _this3.setResolvedLanguage(_this3.language);
+            usedCallback(e2);
+          });
+        } else {
+          usedCallback(null);
+        }
+      }
+    }, {
+      key: "reloadResources",
+      value: function reloadResources(lngs, ns, callback) {
+        var deferred = defer();
+        if (!lngs)
+          lngs = this.languages;
+        if (!ns)
+          ns = this.options.ns;
+        if (!callback)
+          callback = noop$1;
+        this.services.backendConnector.reload(lngs, ns, function(err) {
+          deferred.resolve();
+          callback(err);
+        });
+        return deferred;
+      }
+    }, {
+      key: "use",
+      value: function use(module) {
+        if (!module)
+          throw new Error("You are passing an undefined module! Please check the object you are passing to i18next.use()");
+        if (!module.type)
+          throw new Error("You are passing a wrong module! Please check the object you are passing to i18next.use()");
+        if (module.type === "backend") {
+          this.modules.backend = module;
+        }
+        if (module.type === "logger" || module.log && module.warn && module.error) {
+          this.modules.logger = module;
+        }
+        if (module.type === "languageDetector") {
+          this.modules.languageDetector = module;
+        }
+        if (module.type === "i18nFormat") {
+          this.modules.i18nFormat = module;
+        }
+        if (module.type === "postProcessor") {
+          postProcessor.addPostProcessor(module);
+        }
+        if (module.type === "formatter") {
+          this.modules.formatter = module;
+        }
+        if (module.type === "3rdParty") {
+          this.modules.external.push(module);
+        }
+        return this;
+      }
+    }, {
+      key: "setResolvedLanguage",
+      value: function setResolvedLanguage(l2) {
+        if (!l2 || !this.languages)
+          return;
+        if (["cimode", "dev"].indexOf(l2) > -1)
+          return;
+        for (var li2 = 0; li2 < this.languages.length; li2++) {
+          var lngInLngs = this.languages[li2];
+          if (["cimode", "dev"].indexOf(lngInLngs) > -1)
+            continue;
+          if (this.store.hasLanguageSomeTranslations(lngInLngs)) {
+            this.resolvedLanguage = lngInLngs;
+            break;
+          }
+        }
+      }
+    }, {
+      key: "changeLanguage",
+      value: function changeLanguage(lng, callback) {
+        var _this4 = this;
+        this.isLanguageChangingTo = lng;
+        var deferred = defer();
+        this.emit("languageChanging", lng);
+        var setLngProps = function setLngProps2(l2) {
+          _this4.language = l2;
+          _this4.languages = _this4.services.languageUtils.toResolveHierarchy(l2);
+          _this4.resolvedLanguage = void 0;
+          _this4.setResolvedLanguage(l2);
+        };
+        var done = function done2(err, l2) {
+          if (l2) {
+            setLngProps(l2);
+            _this4.translator.changeLanguage(l2);
+            _this4.isLanguageChangingTo = void 0;
+            _this4.emit("languageChanged", l2);
+            _this4.logger.log("languageChanged", l2);
+          } else {
+            _this4.isLanguageChangingTo = void 0;
+          }
+          deferred.resolve(function() {
+            return _this4.t.apply(_this4, arguments);
+          });
+          if (callback)
+            callback(err, function() {
+              return _this4.t.apply(_this4, arguments);
+            });
+        };
+        var setLng = function setLng2(lngs) {
+          if (!lng && !lngs && _this4.services.languageDetector)
+            lngs = [];
+          var l2 = typeof lngs === "string" ? lngs : _this4.services.languageUtils.getBestMatchFromCodes(lngs);
+          if (l2) {
+            if (!_this4.language) {
+              setLngProps(l2);
+            }
+            if (!_this4.translator.language)
+              _this4.translator.changeLanguage(l2);
+            if (_this4.services.languageDetector && _this4.services.languageDetector.cacheUserLanguage)
+              _this4.services.languageDetector.cacheUserLanguage(l2);
+          }
+          _this4.loadResources(l2, function(err) {
+            done(err, l2);
+          });
+        };
+        if (!lng && this.services.languageDetector && !this.services.languageDetector.async) {
+          setLng(this.services.languageDetector.detect());
+        } else if (!lng && this.services.languageDetector && this.services.languageDetector.async) {
+          if (this.services.languageDetector.detect.length === 0) {
+            this.services.languageDetector.detect().then(setLng);
+          } else {
+            this.services.languageDetector.detect(setLng);
+          }
+        } else {
+          setLng(lng);
+        }
+        return deferred;
+      }
+    }, {
+      key: "getFixedT",
+      value: function getFixedT(lng, ns, keyPrefix) {
+        var _this5 = this;
+        var fixedT = function fixedT2(key2, opts) {
+          var options2;
+          if (_typeof(opts) !== "object") {
+            for (var _len3 = arguments.length, rest = new Array(_len3 > 2 ? _len3 - 2 : 0), _key3 = 2; _key3 < _len3; _key3++) {
+              rest[_key3 - 2] = arguments[_key3];
+            }
+            options2 = _this5.options.overloadTranslationOptionHandler([key2, opts].concat(rest));
+          } else {
+            options2 = _objectSpread({}, opts);
+          }
+          options2.lng = options2.lng || fixedT2.lng;
+          options2.lngs = options2.lngs || fixedT2.lngs;
+          options2.ns = options2.ns || fixedT2.ns;
+          options2.keyPrefix = options2.keyPrefix || keyPrefix || fixedT2.keyPrefix;
+          var keySeparator = _this5.options.keySeparator || ".";
+          var resultKey;
+          if (options2.keyPrefix && Array.isArray(key2)) {
+            resultKey = key2.map(function(k2) {
+              return "".concat(options2.keyPrefix).concat(keySeparator).concat(k2);
+            });
+          } else {
+            resultKey = options2.keyPrefix ? "".concat(options2.keyPrefix).concat(keySeparator).concat(key2) : key2;
+          }
+          return _this5.t(resultKey, options2);
+        };
+        if (typeof lng === "string") {
+          fixedT.lng = lng;
+        } else {
+          fixedT.lngs = lng;
+        }
+        fixedT.ns = ns;
+        fixedT.keyPrefix = keyPrefix;
+        return fixedT;
+      }
+    }, {
+      key: "t",
+      value: function t2() {
+        var _this$translator;
+        return this.translator && (_this$translator = this.translator).translate.apply(_this$translator, arguments);
+      }
+    }, {
+      key: "exists",
+      value: function exists() {
+        var _this$translator2;
+        return this.translator && (_this$translator2 = this.translator).exists.apply(_this$translator2, arguments);
+      }
+    }, {
+      key: "setDefaultNamespace",
+      value: function setDefaultNamespace(ns) {
+        this.options.defaultNS = ns;
+      }
+    }, {
+      key: "hasLoadedNamespace",
+      value: function hasLoadedNamespace2(ns) {
+        var _this6 = this;
+        var options2 = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
+        if (!this.isInitialized) {
+          this.logger.warn("hasLoadedNamespace: i18next was not initialized", this.languages);
+          return false;
+        }
+        if (!this.languages || !this.languages.length) {
+          this.logger.warn("hasLoadedNamespace: i18n.languages were undefined or empty", this.languages);
+          return false;
+        }
+        var lng = this.resolvedLanguage || this.languages[0];
+        var fallbackLng = this.options ? this.options.fallbackLng : false;
+        var lastLng = this.languages[this.languages.length - 1];
+        if (lng.toLowerCase() === "cimode")
+          return true;
+        var loadNotPending = function loadNotPending2(l2, n2) {
+          var loadState = _this6.services.backendConnector.state["".concat(l2, "|").concat(n2)];
+          return loadState === -1 || loadState === 2;
+        };
+        if (options2.precheck) {
+          var preResult = options2.precheck(this, loadNotPending);
+          if (preResult !== void 0)
+            return preResult;
+        }
+        if (this.hasResourceBundle(lng, ns))
+          return true;
+        if (!this.services.backendConnector.backend || this.options.resources && !this.options.partialBundledLanguages)
+          return true;
+        if (loadNotPending(lng, ns) && (!fallbackLng || loadNotPending(lastLng, ns)))
+          return true;
+        return false;
+      }
+    }, {
+      key: "loadNamespaces",
+      value: function loadNamespaces2(ns, callback) {
+        var _this7 = this;
+        var deferred = defer();
+        if (!this.options.ns) {
+          if (callback)
+            callback();
+          return Promise.resolve();
+        }
+        if (typeof ns === "string")
+          ns = [ns];
+        ns.forEach(function(n2) {
+          if (_this7.options.ns.indexOf(n2) < 0)
+            _this7.options.ns.push(n2);
+        });
+        this.loadResources(function(err) {
+          deferred.resolve();
+          if (callback)
+            callback(err);
+        });
+        return deferred;
+      }
+    }, {
+      key: "loadLanguages",
+      value: function loadLanguages(lngs, callback) {
+        var deferred = defer();
+        if (typeof lngs === "string")
+          lngs = [lngs];
+        var preloaded = this.options.preload || [];
+        var newLngs = lngs.filter(function(lng) {
+          return preloaded.indexOf(lng) < 0;
+        });
+        if (!newLngs.length) {
+          if (callback)
+            callback();
+          return Promise.resolve();
+        }
+        this.options.preload = preloaded.concat(newLngs);
+        this.loadResources(function(err) {
+          deferred.resolve();
+          if (callback)
+            callback(err);
+        });
+        return deferred;
+      }
+    }, {
+      key: "dir",
+      value: function dir(lng) {
+        if (!lng)
+          lng = this.resolvedLanguage || (this.languages && this.languages.length > 0 ? this.languages[0] : this.language);
+        if (!lng)
+          return "rtl";
+        var rtlLngs = ["ar", "shu", "sqr", "ssh", "xaa", "yhd", "yud", "aao", "abh", "abv", "acm", "acq", "acw", "acx", "acy", "adf", "ads", "aeb", "aec", "afb", "ajp", "apc", "apd", "arb", "arq", "ars", "ary", "arz", "auz", "avl", "ayh", "ayl", "ayn", "ayp", "bbz", "pga", "he", "iw", "ps", "pbt", "pbu", "pst", "prp", "prd", "ug", "ur", "ydd", "yds", "yih", "ji", "yi", "hbo", "men", "xmn", "fa", "jpr", "peo", "pes", "prs", "dv", "sam", "ckb"];
+        var languageUtils = this.services && this.services.languageUtils || new LanguageUtil(get());
+        return rtlLngs.indexOf(languageUtils.getLanguagePartFromCode(lng)) > -1 || lng.toLowerCase().indexOf("-arab") > 1 ? "rtl" : "ltr";
+      }
+    }, {
+      key: "cloneInstance",
+      value: function cloneInstance() {
+        var _this8 = this;
+        var options2 = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : {};
+        var callback = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : noop$1;
+        var mergedOptions = _objectSpread(_objectSpread(_objectSpread({}, this.options), options2), {
+          isClone: true
+        });
+        var clone = new I18n2(mergedOptions);
+        if (options2.debug !== void 0 || options2.prefix !== void 0) {
+          clone.logger = clone.logger.clone(options2);
+        }
+        var membersToCopy = ["store", "services", "language"];
+        membersToCopy.forEach(function(m2) {
+          clone[m2] = _this8[m2];
+        });
+        clone.services = _objectSpread({}, this.services);
+        clone.services.utils = {
+          hasLoadedNamespace: clone.hasLoadedNamespace.bind(clone)
+        };
+        clone.translator = new Translator(clone.services, clone.options);
+        clone.translator.on("*", function(event) {
+          for (var _len4 = arguments.length, args = new Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
+            args[_key4 - 1] = arguments[_key4];
+          }
+          clone.emit.apply(clone, [event].concat(args));
+        });
+        clone.init(mergedOptions, callback);
+        clone.translator.options = clone.options;
+        clone.translator.backendConnector.services.utils = {
+          hasLoadedNamespace: clone.hasLoadedNamespace.bind(clone)
+        };
+        return clone;
+      }
+    }, {
+      key: "toJSON",
+      value: function toJSON() {
+        return {
+          options: this.options,
+          store: this.store,
+          language: this.language,
+          languages: this.languages,
+          resolvedLanguage: this.resolvedLanguage
+        };
+      }
+    }]);
+    return I18n2;
+  }(EventEmitter$1);
+  _defineProperty(I18n, "createInstance", function() {
+    var options2 = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : {};
+    var callback = arguments.length > 1 ? arguments[1] : void 0;
+    return new I18n(options2, callback);
+  });
+  var instance = I18n.createInstance();
+  instance.createInstance = I18n.createInstance;
+  instance.createInstance;
+  instance.dir;
+  instance.init;
+  instance.loadResources;
+  instance.reloadResources;
+  instance.use;
+  instance.changeLanguage;
+  instance.getFixedT;
+  instance.t;
+  instance.exists;
+  instance.setDefaultNamespace;
+  instance.hasLoadedNamespace;
+  instance.loadNamespaces;
+  instance.loadLanguages;
+  const title$4 = "ChatGPT Exporter";
+  const ExportHelper$4 = "Export";
+  const Setting$4 = "Setting";
+  const Language$4 = "Language";
+  const Screenshot$4 = "Screenshot";
+  const Markdown$4 = "Markdown";
+  const HTML$4 = "HTML";
+  const Save$4 = "Save";
+  const Delete$4 = "Delete";
+  const Export$4 = "Export";
+  const Loading$4 = "Loading";
+  const Preview$4 = "Preview";
+  const en_US = {
+    title: title$4,
+    ExportHelper: ExportHelper$4,
+    Setting: Setting$4,
+    Language: Language$4,
+    "Copy Text": "Copy Text",
+    "Copied!": "Copied!",
+    Screenshot: Screenshot$4,
+    Markdown: Markdown$4,
+    HTML: HTML$4,
+    "JSON": "JSON",
+    Save: Save$4,
+    Delete: Delete$4,
+    "Select All": "Select All",
+    Export: Export$4,
+    "Error": "Error",
+    Loading: Loading$4,
+    Preview: Preview$4,
+    "File Name": "File Name",
+    "Export All": "Export All",
+    "Exporter Settings": "Exporter Settings",
+    "Export Dialog Title": "Export Conversations",
+    "Available variables": "Available variables",
+    "Conversation Timestamp": "Conversation Timestamp",
+    "Conversation Timestamp Description": "Will show on the page and HTML files.",
+    "Use 24-hour format": "Use 24-hour format (eg. 23:59)",
+    "Export Metadata": "Export Metadata",
+    "Export Metadata Description": "Add metadata to exported Markdown and HTML files.",
+    "Conversation Delete Alert": "Are you sure you want to delete all selected conversations?",
+    "Conversation Deleted Message": "All selected conversations have been deleted. Please refresh the page to see the changes.",
+    "Please start a conversation first": "Please start a conversation first."
+  };
+  const title$3 = "ChatGPTエクスポーター";
+  const ExportHelper$3 = "エクスポート";
+  const Setting$3 = "設定";
+  const Language$3 = "言語";
+  const Screenshot$3 = "スクリーンショット";
+  const Markdown$3 = "Markdown";
+  const HTML$3 = "HTML";
+  const Save$3 = "保存";
+  const Delete$3 = "削除";
+  const Export$3 = "エクスポート";
+  const Loading$3 = "読み込み中";
+  const Preview$3 = "プレビュー";
+  const ja_JP = {
+    title: title$3,
+    ExportHelper: ExportHelper$3,
+    Setting: Setting$3,
+    Language: Language$3,
+    "Copy Text": "テキストをコピー",
+    "Copied!": "コピーしました！",
+    Screenshot: Screenshot$3,
+    Markdown: Markdown$3,
+    HTML: HTML$3,
+    "JSON": "JSON",
+    Save: Save$3,
+    Delete: Delete$3,
+    "Select All": "すべて選択",
+    Export: Export$3,
+    "Error": "エラー",
+    Loading: Loading$3,
+    Preview: Preview$3,
+    "File Name": "ファイル名",
+    "Export All": "すべてエクスポート",
+    "Exporter Settings": "エクスポーター設定",
+    "Export Dialog Title": "会話をエクスポート",
+    "Available variables": "使用可能な変数",
+    "Conversation Timestamp": "会話のタイムスタンプ",
+    "Conversation Timestamp Description": "ページとHTMLファイルに表示されます。",
+    "Use 24-hour format": "24時間形式を使用する (例: 23:59)",
+    "Export Metadata": "メタデータをエクスポート",
+    "Export Metadata Description": "エクスポートされたMarkdownおよびHTMLファイルにメタデータを追加します。",
+    "Conversation Delete Alert": "選択したすべての会話を削除してもよろしいですか？",
+    "Conversation Deleted Message": "選択したすべての会話が削除されました。変更を表示するには、ページを更新してください。",
+    "Please start a conversation first": "まず会話を開始してください。"
+  };
+  const title$2 = "ChatGPT Exporter";
+  const ExportHelper$2 = "Dışa Aktar";
+  const Setting$2 = "Ayarlar";
+  const Language$2 = "Dil";
+  const Screenshot$2 = "Ekran Alıntısı";
+  const Markdown$2 = "Markdown";
+  const HTML$2 = "HTML";
+  const Save$2 = "Kaydet";
+  const Delete$2 = "Sil";
+  const Export$2 = "Dışa Aktar";
+  const Loading$2 = "Yükleniyor";
+  const Preview$2 = "Önizleme";
+  const tr_TR = {
+    title: title$2,
+    ExportHelper: ExportHelper$2,
+    Setting: Setting$2,
+    Language: Language$2,
+    "Copy Text": "Metni Kopyala",
+    "Copied!": "Kopyalandı!",
+    Screenshot: Screenshot$2,
+    Markdown: Markdown$2,
+    HTML: HTML$2,
+    "JSON": "JSON",
+    Save: Save$2,
+    Delete: Delete$2,
+    "Select All": "Tümünü Seç",
+    Export: Export$2,
+    "Error": "Hata",
+    Loading: Loading$2,
+    Preview: Preview$2,
+    "File Name": "Dosya Adı",
+    "Export All": "Tümünü Dışa Aktar",
+    "Exporter Settings": "Dışa Aktarma Ayarları",
+    "Export Dialog Title": "Konuşmaları Dışa Aktar",
+    "Available variables": "Kullanılabilir değişkenler",
+    "Conversation Timestamp": "Konuşma zaman bilgisi",
+    "Conversation Timestamp Description": "Sayfada ve HTML dosyalarında gözükür.",
+    "Use 24-hour format": "24 saat biçimini kullan (örn. 23:59)",
+    "Export Metadata": "Üst veriyi dışa aktar",
+    "Export Metadata Description": "Dışa aktarılan Markdown ve HTML dosyalarına üst veri ekle",
+    "Conversation Delete Alert": "Seçilen tüm konuşmaları silmek istediğinizden emin misiniz?",
+    "Conversation Deleted Message": "Seçilen tüm konuşmalar silindi. Değişiklikleri görmek için sayfayı yenileyin.",
+    "Please start a conversation first": "Lütfen önce bir konuşma başlatın."
+  };
+  const title$1 = "ChatGPT Exporter";
+  const ExportHelper$1 = "导出助手";
+  const Setting$1 = "设置";
+  const Language$1 = "语言";
+  const Screenshot$1 = "截屏";
+  const Markdown$1 = "Markdown";
+  const HTML$1 = "HTML";
+  const Save$1 = "保存";
+  const Delete$1 = "删除";
+  const Export$1 = "导出";
+  const Loading$1 = "加载中";
+  const Preview$1 = "预览";
+  const zh_Hans = {
+    title: title$1,
+    ExportHelper: ExportHelper$1,
+    Setting: Setting$1,
+    Language: Language$1,
+    "Copy Text": "复制文字",
+    "Copied!": "已复制!",
+    Screenshot: Screenshot$1,
+    Markdown: Markdown$1,
+    HTML: HTML$1,
+    "JSON": "JSON",
+    Save: Save$1,
+    Delete: Delete$1,
+    "Select All": "全选",
+    Export: Export$1,
+    "Error": "错误",
+    Loading: Loading$1,
+    Preview: Preview$1,
+    "File Name": "文件名",
+    "Export All": "批量导出",
+    "Exporter Settings": "导出设置",
+    "Export Dialog Title": "导出对话",
+    "Available variables": "可用变量",
+    "Conversation Timestamp": "对话时间戳",
+    "Conversation Timestamp Description": "会添加至页面以及 HTML 导出。",
+    "Use 24-hour format": "使用24小时制 (例如 23:59)",
+    "Export Metadata": "导出元数据",
+    "Export Metadata Description": "会添加至 Markdown 以及 HTML 导出。",
+    "Conversation Delete Alert": "确定要删除所有选取的对话？",
+    "Conversation Deleted Message": "所有所选的对话已删除。请刷新页面。",
+    "Please start a conversation first": "请先开始一次对话。"
+  };
+  const title = "ChatGPT Exporter";
+  const ExportHelper = "Export";
+  const Setting = "設定";
+  const Language = "語言";
+  const Screenshot = "截圖";
+  const Markdown = "Markdown";
+  const HTML = "HTML";
+  const Save = "保存";
+  const Delete = "刪除";
+  const Export = "匯出";
+  const Loading = "載入中";
+  const Preview = "預覽";
+  const zh_Hant = {
+    title,
+    ExportHelper,
+    Setting,
+    Language,
+    "Copy Text": "複製文字",
+    "Copied!": "已複製!",
+    Screenshot,
+    Markdown,
+    HTML,
+    "JSON": "JSON",
+    Save,
+    Delete,
+    "Select All": "全選",
+    Export,
+    "Error": "錯誤",
+    Loading,
+    Preview,
+    "File Name": "檔案名稱",
+    "Export All": "批量匯出",
+    "Exporter Settings": "設定",
+    "Export Dialog Title": "匯出對話",
+    "Available variables": "可用變數",
+    "Conversation Timestamp": "對話時間戳",
+    "Conversation Timestamp Description": "會添加至頁面以及 HTML 匯出。",
+    "Use 24-hour format": "使用24小時制 (例如 23:59)",
+    "Export Metadata": "匯出元資料",
+    "Export Metadata Description": "會添加至 Markdown 以及 HTML 匯出。",
+    "Conversation Delete Alert": "確定要刪除所有選取的對話？",
+    "Conversation Deleted Message": "所有選取的對話已刪除。請重新整理頁面。",
+    "Please start a conversation first": "請先開始一次對話。"
+  };
+  class GMStorage {
+    static get(key2) {
+      const item = GM_getValue(key2, "");
+      if (item) {
+        try {
+          return JSON.parse(item);
+        } catch {
+          return null;
+        }
+      }
+      return null;
+    }
+    static set(key2, value) {
+      const item = JSON.stringify(value);
+      GM_setValue(key2, item);
+    }
+    static delete(key2) {
+      GM_deleteValue(key2);
+    }
+  }
+  __publicField(GMStorage, "supported", typeof GM_getValue === "function" && typeof GM_setValue === "function" && typeof GM_deleteValue === "function");
+  class LocalStorage {
+    static get(key2) {
+      const item = localStorage.getItem(key2);
+      if (item) {
+        try {
+          return JSON.parse(item);
+        } catch {
+          return null;
+        }
+      }
+      return null;
+    }
+    static set(key2, value) {
+      const item = JSON.stringify(value);
+      localStorage.setItem(key2, item);
+    }
+    static delete(key2) {
+      localStorage.removeItem(key2);
+    }
+  }
+  __publicField(LocalStorage, "supported", typeof localStorage === "object");
+  class MemoryStorage {
+    static get(key2) {
+      const item = this.map.get(key2);
+      if (!item)
+        return null;
+      return item;
+    }
+    static set(key2, value) {
+      this.map.set(key2, value);
+    }
+    static delete(key2) {
+      this.map.delete(key2);
+    }
+  }
+  __publicField(MemoryStorage, "map", /* @__PURE__ */ new Map());
+  __publicField(MemoryStorage, "supported", true);
+  class ScriptStorage {
+    static get(key2) {
+      if (GMStorage.supported) {
+        try {
+          return GMStorage.get(key2);
+        } catch {
+        }
+      }
+      if (LocalStorage.supported) {
+        try {
+          return LocalStorage.get(key2);
+        } catch {
+        }
+      }
+      return MemoryStorage.get(key2);
+    }
+    static set(key2, value) {
+      if (GMStorage.supported) {
+        try {
+          return GMStorage.set(key2, value);
+        } catch {
+        }
+      }
+      if (LocalStorage.supported) {
+        try {
+          return LocalStorage.set(key2, value);
+        } catch {
+        }
+      }
+      return MemoryStorage.set(key2, value);
+    }
+    static delete(key2) {
+      if (GMStorage.supported) {
+        try {
+          return GMStorage.delete(key2);
+        } catch {
+        }
+      }
+      if (LocalStorage.supported) {
+        try {
+          return LocalStorage.delete(key2);
+        } catch {
+        }
+      }
+      return MemoryStorage.delete(key2);
+    }
+  }
+  const EN_US = {
+    name: "English",
+    code: "en-US",
+    resource: en_US
+  };
+  const JA_JP = {
+    name: "日本語",
+    code: "ja-JP",
+    resource: ja_JP
+  };
+  const TR_TR = {
+    name: "Türkçe",
+    code: "tr-TR",
+    resource: tr_TR
+  };
+  const ZH_Hans = {
+    name: "简体中文",
+    code: "zh-Hans",
+    resource: zh_Hans
+  };
+  const ZH_Hant = {
+    name: "繁體中文",
+    code: "zh-Hant",
+    resource: zh_Hant
+  };
+  const LOCALES = [EN_US, JA_JP, TR_TR, ZH_Hans, ZH_Hant];
+  const LanguageMapping = {
+    "en": EN_US.code,
+    "en-US": EN_US.code,
+    "ja": JA_JP.code,
+    "ja-JP": JA_JP.code,
+    "tr": TR_TR.code,
+    "tr-TR": TR_TR.code,
+    "zh": ZH_Hans.code,
+    "zh-CN": ZH_Hans.code,
+    "zh-SG": ZH_Hans.code,
+    "zh-Hans": ZH_Hans.code,
+    "zh-HK": ZH_Hant.code,
+    "zh-MO": ZH_Hant.code,
+    "zh-TW": ZH_Hant.code,
+    "zh-Hant": ZH_Hant.code
+  };
+  const resources = LOCALES.reduce((acc, cur) => {
+    acc[cur.code] = {
+      translation: cur.resource
+    };
+    return acc;
+  }, {});
+  const standardizeLanguage = (language) => {
+    if (language in LanguageMapping)
+      return LanguageMapping[language];
+    const shortLang = language.split("-")[0];
+    if (shortLang in LanguageMapping)
+      return LanguageMapping[shortLang];
+    return language;
+  };
+  const getNavigatorLanguage = () => {
+    const {
+      language,
+      languages
+    } = navigator;
+    if (language)
+      return language;
+    if (languages && languages.length) {
+      return languages[0];
+    }
+    return null;
+  };
+  const getDefaultLanguage = () => {
+    const storedLanguage = ScriptStorage.get(KEY_LANGUAGE);
+    if (storedLanguage)
+      return standardizeLanguage(storedLanguage);
+    const browserLanguage = getNavigatorLanguage();
+    if (browserLanguage)
+      return standardizeLanguage(browserLanguage);
+    return EN_US.code;
+  };
+  instance.use(initReactI18next).init({
+    fallbackLng: EN_US.code,
+    lng: getDefaultLanguage(),
+    debug: false,
+    resources,
+    interpolation: {
+      escapeValue: false
+      // not needed for react as it escapes by default
+    }
+  });
+  instance.on("languageChanged", (lng) => {
+    ScriptStorage.set(KEY_LANGUAGE, lng);
+  });
   const templateHtml = `<!DOCTYPE html>
 <html lang="{{lang}}" data-theme="{{theme}}">
 <head>
@@ -4332,11 +8036,11 @@ var __publicField = (obj, key, value) => {
     document.body.removeChild(a2);
   }
   function getFileNameWithFormat(format, ext, {
-    title = document.title,
+    title: title2 = document.title,
     // chatId will be empty when exporting all conversations
     chatId = ""
   } = {}) {
-    const _title = sanitizeFilename(title).replace(/\s+/g, "_");
+    const _title = sanitizeFilename(title2).replace(/\s+/g, "_");
     return format.replace("{title}", _title).replace("{date}", dateStr()).replace("{timestamp}", timestamp()).replace("{chat_id}", chatId).concat(`.${ext}`);
   }
   class Schema {
@@ -6078,7 +9782,7 @@ var __publicField = (obj, key, value) => {
     html: html$3,
     head: headOrColgroupOrCaption,
     body: body$1,
-    p,
+    p: p$3,
     li,
     dt,
     dd,
@@ -6108,7 +9812,7 @@ var __publicField = (obj, key, value) => {
     const next = siblingAfter(parent, index2);
     return !next || next.type !== "comment";
   }
-  function p(_2, index2, parent) {
+  function p$3(_2, index2, parent) {
     const next = siblingAfter(parent, index2);
     return next ? next.type === "element" && (next.tagName === "address" || next.tagName === "article" || next.tagName === "aside" || next.tagName === "blockquote" || next.tagName === "details" || next.tagName === "div" || next.tagName === "dl" || next.tagName === "fieldset" || next.tagName === "figcaption" || next.tagName === "figure" || next.tagName === "footer" || next.tagName === "form" || next.tagName === "h1" || next.tagName === "h2" || next.tagName === "h3" || next.tagName === "h4" || next.tagName === "h5" || next.tagName === "h6" || next.tagName === "header" || next.tagName === "hgroup" || next.tagName === "hr" || next.tagName === "main" || next.tagName === "menu" || next.tagName === "nav" || next.tagName === "ol" || next.tagName === "p" || next.tagName === "pre" || next.tagName === "section" || next.tagName === "table" || next.tagName === "ul") : !parent || // Confusing parent.
     !(parent.type === "element" && (parent.tagName === "a" || parent.tagName === "audio" || parent.tagName === "del" || parent.tagName === "ins" || parent.tagName === "map" || parent.tagName === "noscript" || parent.tagName === "video"));
@@ -7971,22 +11675,22 @@ var __publicField = (obj, key, value) => {
       effects.enter("chunkString", {
         contentType: "string"
       });
-      return title(code2);
+      return title2(code2);
     }
-    function title(code2) {
+    function title2(code2) {
       if (code2 === marker || code2 === null || markdownLineEnding(code2)) {
         effects.exit("chunkString");
         return atTitleBreak(code2);
       }
       effects.consume(code2);
-      return code2 === 92 ? titleEscape : title;
+      return code2 === 92 ? titleEscape : title2;
     }
     function titleEscape(code2) {
       if (code2 === marker || code2 === 92) {
         effects.consume(code2);
-        return title;
+        return title2;
       }
-      return title(code2);
+      return title2(code2);
     }
   }
   function factoryWhitespace(effects, ok2) {
@@ -15427,117 +19131,12 @@ var __publicField = (obj, key, value) => {
     }
     return transform(tree, 0, void 0)[0];
   }
-  class GMStorage {
-    static get(key2) {
-      const item = GM_getValue(key2, "");
-      if (item) {
-        try {
-          return JSON.parse(item);
-        } catch {
-          return null;
-        }
-      }
-      return null;
-    }
-    static set(key2, value) {
-      const item = JSON.stringify(value);
-      GM_setValue(key2, item);
-    }
-    static delete(key2) {
-      GM_deleteValue(key2);
-    }
-  }
-  __publicField(GMStorage, "supported", typeof GM_getValue === "function" && typeof GM_setValue === "function" && typeof GM_deleteValue === "function");
-  class LocalStorage {
-    static get(key2) {
-      const item = localStorage.getItem(key2);
-      if (item) {
-        try {
-          return JSON.parse(item);
-        } catch {
-          return null;
-        }
-      }
-      return null;
-    }
-    static set(key2, value) {
-      const item = JSON.stringify(value);
-      localStorage.setItem(key2, item);
-    }
-    static delete(key2) {
-      localStorage.removeItem(key2);
-    }
-  }
-  __publicField(LocalStorage, "supported", typeof localStorage === "object");
-  class MemoryStorage {
-    static get(key2) {
-      const item = this.map.get(key2);
-      if (!item)
-        return null;
-      return item;
-    }
-    static set(key2, value) {
-      this.map.set(key2, value);
-    }
-    static delete(key2) {
-      this.map.delete(key2);
-    }
-  }
-  __publicField(MemoryStorage, "map", /* @__PURE__ */ new Map());
-  __publicField(MemoryStorage, "supported", true);
-  class ScriptStorage {
-    static get(key2) {
-      if (GMStorage.supported) {
-        try {
-          return GMStorage.get(key2);
-        } catch {
-        }
-      }
-      if (LocalStorage.supported) {
-        try {
-          return LocalStorage.get(key2);
-        } catch {
-        }
-      }
-      return MemoryStorage.get(key2);
-    }
-    static set(key2, value) {
-      if (GMStorage.supported) {
-        try {
-          return GMStorage.set(key2, value);
-        } catch {
-        }
-      }
-      if (LocalStorage.supported) {
-        try {
-          return LocalStorage.set(key2, value);
-        } catch {
-        }
-      }
-      return MemoryStorage.set(key2, value);
-    }
-    static delete(key2) {
-      if (GMStorage.supported) {
-        try {
-          return GMStorage.delete(key2);
-        } catch {
-        }
-      }
-      if (LocalStorage.supported) {
-        try {
-          return LocalStorage.delete(key2);
-        } catch {
-        }
-      }
-      return MemoryStorage.delete(key2);
-    }
-  }
   function standardizeLineBreaks(text2) {
     return text2.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
   }
   async function exportToHtml(fileNameFormat, metaList) {
     if (!checkIfConversationStarted()) {
-      alert("Please start a conversation first.");
+      alert(instance.t("Please start a conversation first"));
       return false;
     }
     const userAvatar = await getUserAvatar();
@@ -15582,7 +19181,7 @@ var __publicField = (obj, key, value) => {
   function conversationToHtml(conversation, avatar, metaList) {
     const {
       id,
-      title,
+      title: title2,
       model,
       modelSlug,
       conversationNodes
@@ -15642,7 +19241,7 @@ var __publicField = (obj, key, value) => {
       name,
       value
     }) => {
-      const val = value.replace("{title}", title).replace("{date}", date).replace("{timestamp}", timestamp()).replace("{source}", source).replace("{model}", model).replace("{mode_name}", modelSlug);
+      const val = value.replace("{title}", title2).replace("{date}", date).replace("{timestamp}", timestamp()).replace("{source}", source).replace("{model}", model).replace("{mode_name}", modelSlug);
       return [name, val];
     })) ?? [];
     const detailsHtml = _metaList.length > 0 ? `<details>
@@ -15651,7 +19250,7 @@ var __publicField = (obj, key, value) => {
         ${_metaList.map(([key2, value]) => `<div class="metadata_item"><div>${key2}</div><div>${value}</div></div>`).join("\n")}
     </div>
 </details>` : "";
-    const html2 = templateHtml.replaceAll("{{title}}", title).replaceAll("{{date}}", date).replaceAll("{{time}}", time).replaceAll("{{source}}", source).replaceAll("{{lang}}", lang).replaceAll("{{theme}}", theme).replaceAll("{{avatar}}", avatar).replaceAll("{{details}}", detailsHtml).replaceAll("{{content}}", conversationHtml);
+    const html2 = templateHtml.replaceAll("{{title}}", title2).replaceAll("{{date}}", date).replaceAll("{{time}}", time).replaceAll("{{source}}", source).replaceAll("{{lang}}", lang).replaceAll("{{theme}}", theme).replaceAll("{{avatar}}", avatar).replaceAll("{{details}}", detailsHtml).replaceAll("{{content}}", conversationHtml);
     return html2;
   }
   function escapeHtml(html2) {
@@ -15704,7 +19303,7 @@ var __publicField = (obj, key, value) => {
   async function exportToPng(fileNameFormat) {
     var _a, _b;
     if (!checkIfConversationStarted()) {
-      alert("Please start a conversation first.");
+      alert(instance.t("Please start a conversation first"));
       return false;
     }
     const thread = (_a = document.querySelector("main .group")) == null ? void 0 : _a.parentElement;
@@ -15767,7 +19366,7 @@ var __publicField = (obj, key, value) => {
   }
   async function exportToJson(fileNameFormat) {
     if (!checkIfConversationStarted()) {
-      alert("Please start a conversation first.");
+      alert(instance.t("Please start a conversation first"));
       return false;
     }
     const chatId = await getCurrentChatId();
@@ -15818,7 +19417,7 @@ var __publicField = (obj, key, value) => {
   }
   async function exportToMarkdown(fileNameFormat, metaList) {
     if (!checkIfConversationStarted()) {
-      alert("Please start a conversation first.");
+      alert(instance.t("Please start a conversation first"));
       return false;
     }
     const chatId = await getCurrentChatId();
@@ -15861,7 +19460,7 @@ var __publicField = (obj, key, value) => {
   function conversationToMarkdown(conversation, metaList) {
     const {
       id,
-      title,
+      title: title2,
       model,
       modelSlug,
       conversationNodes
@@ -15871,7 +19470,7 @@ var __publicField = (obj, key, value) => {
       name,
       value
     }) => {
-      const val = value.replace("{title}", title).replace("{date}", dateStr()).replace("{timestamp}", timestamp()).replace("{source}", source).replace("{model}", model).replace("{modelSlug}", modelSlug);
+      const val = value.replace("{title}", title2).replace("{date}", dateStr()).replace("{timestamp}", timestamp()).replace("{source}", source).replace("{model}", model).replace("{modelSlug}", modelSlug);
       return `${name}: ${val}`;
     })) ?? [];
     const frontMatter = _metaList.length > 0 ? `---
@@ -15891,7 +19490,7 @@ ${_metaList.join("\n")}
       return `#### ${author}:
 ${message}`;
     }).join("\n\n");
-    const markdown = `${frontMatter}# ${title}
+    const markdown = `${frontMatter}# ${title2}
 
 ${content2}`;
     return markdown;
@@ -15910,7 +19509,7 @@ ${content2}`;
   }
   async function exportToText() {
     if (!checkIfConversationStarted()) {
-      alert("Please start a conversation first.");
+      alert(instance.t("Please start a conversation first"));
       return false;
     }
     const chatId = await getCurrentChatId();
@@ -15944,7 +19543,7 @@ ${message}`;
   async function exportToTextFromIndex(index2) {
     var _a;
     if (!checkIfConversationStarted()) {
-      alert("Please start a conversation first.");
+      alert(instance.t("Please start a conversation first"));
       return false;
     }
     const chatId = await getCurrentChatId();
@@ -15958,7 +19557,7 @@ ${message}`;
     return true;
   }
   var _ = 0;
-  function o(o2, e2, n2, t2, f2, l2) {
+  function o$5(o2, e2, n2, t2, f2, l2) {
     var s2, u2, a2 = {};
     for (u2 in e2)
       "ref" == u2 ? s2 = e2[u2] : a2[u2] = e2[u2];
@@ -15966,15 +19565,15 @@ ${message}`;
     if ("function" == typeof o2 && (s2 = o2.defaultProps))
       for (u2 in s2)
         void 0 === a2[u2] && (a2[u2] = s2[u2]);
-    return l$3.vnode && l$3.vnode(i2), i2;
+    return l$5.vnode && l$5.vnode(i2), i2;
   }
-  const Divider = () => o("div", {
+  const Divider = () => o$5("div", {
     className: "border-b border-white/20"
   });
-  const $1746a345f3d73bb7$var$useReactId = $2AODx$react["useId".toString()] || (() => void 0);
+  const $1746a345f3d73bb7$var$useReactId = e$2["useId".toString()] || (() => void 0);
   let $1746a345f3d73bb7$var$count = 0;
   function $1746a345f3d73bb7$export$f680877a34711e37(deterministicId) {
-    const [id, setId] = h$2($1746a345f3d73bb7$var$useReactId());
+    const [id, setId] = h$4($1746a345f3d73bb7$var$useReactId());
     $9f79659886946c16$export$e5c5a5f917a5871c(() => {
       if (!deterministicId)
         setId(
@@ -15993,7 +19592,7 @@ ${message}`;
   };
   const $d3863c46a17e8a28$export$20e40289641fbbb6 = /* @__PURE__ */ k$1((props, forwardedRef) => {
     const { loop = false, trapped = false, onMountAutoFocus: onMountAutoFocusProp, onUnmountAutoFocus: onUnmountAutoFocusProp, ...scopeProps } = props;
-    const [container1, setContainer] = h$2(null);
+    const [container1, setContainer] = h$4(null);
     const onMountAutoFocus = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onMountAutoFocusProp);
     const onUnmountAutoFocus = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onUnmountAutoFocusProp);
     const lastFocusedElementRef = _$1(null);
@@ -16010,7 +19609,7 @@ ${message}`;
         this.paused = false;
       }
     }).current;
-    p$3(() => {
+    p$6(() => {
       if (trapped) {
         let handleFocusIn = function(event) {
           if (focusScope.paused || !container1)
@@ -16042,7 +19641,7 @@ ${message}`;
       container1,
       focusScope.paused
     ]);
-    p$3(() => {
+    p$6(() => {
       if (container1) {
         $d3863c46a17e8a28$var$focusScopesStack.add(focusScope);
         const previouslyFocusedElement = document.activeElement;
@@ -16080,7 +19679,7 @@ ${message}`;
       onUnmountAutoFocus,
       focusScope
     ]);
-    const handleKeyDown = T$3((event) => {
+    const handleKeyDown = T$4((event) => {
       if (!loop && !trapped)
         return;
       if (focusScope.paused)
@@ -16115,7 +19714,7 @@ ${message}`;
       trapped,
       focusScope.paused
     ]);
-    return /* @__PURE__ */ y$3($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({
+    return /* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({
       tabIndex: -1
     }, scopeProps, {
       ref: composedRefs,
@@ -16222,7 +19821,7 @@ ${message}`;
   }
   let $3db38b7d1fb3fe6a$var$count = 0;
   function $3db38b7d1fb3fe6a$export$b7ece24a22aeda8c() {
-    p$3(() => {
+    p$6(() => {
       var _edgeGuards$, _edgeGuards$2;
       const edgeGuards = document.querySelectorAll("[data-radix-focus-guard]");
       document.body.insertAdjacentElement("afterbegin", (_edgeGuards$ = edgeGuards[0]) !== null && _edgeGuards$ !== void 0 ? _edgeGuards$ : $3db38b7d1fb3fe6a$var$createFocusGuard());
@@ -16292,7 +19891,7 @@ ${message}`;
     return ref;
   }
   function useCallbackRef(initialValue, callback) {
-    var ref = h$2(function() {
+    var ref = h$4(function() {
       return {
         // value
         value: initialValue,
@@ -16416,7 +20015,7 @@ ${message}`;
     if (!Target) {
       throw new Error("Sidecar medium not found");
     }
-    return y$3(Target, __assign({}, rest));
+    return y$6(Target, __assign({}, rest));
   };
   SideCar$1.isSideCarExport = true;
   function exportSidecar(medium, exported) {
@@ -16429,7 +20028,7 @@ ${message}`;
   };
   var RemoveScroll = k$1(function(props, parentRef) {
     var ref = _$1(null);
-    var _a = h$2({
+    var _a = h$4({
       onScrollCapture: nothing,
       onWheelCapture: nothing,
       onTouchMoveCapture: nothing
@@ -16438,11 +20037,11 @@ ${message}`;
     var SideCar2 = sideCar;
     var containerRef = useMergeRefs([ref, parentRef]);
     var containerProps = __assign(__assign({}, rest), callbacks);
-    return y$3(
+    return y$6(
       _$2,
       null,
-      enabled && y$3(SideCar2, { sideCar: effectCar, removeScrollBar, shards, noIsolation, inert, setCallbacks, allowPinchZoom: !!allowPinchZoom, lockRef: ref }),
-      forwardProps ? sn(O$1.only(children), __assign(__assign({}, containerProps), { ref: containerRef })) : y$3(Container, __assign({}, containerProps, { className, ref: containerRef }), children)
+      enabled && y$6(SideCar2, { sideCar: effectCar, removeScrollBar, shards, noIsolation, inert, setCallbacks, allowPinchZoom: !!allowPinchZoom, lockRef: ref }),
+      forwardProps ? sn(O$1.only(children), __assign(__assign({}, containerProps), { ref: containerRef })) : y$6(Container, __assign({}, containerProps, { className, ref: containerRef }), children)
     );
   });
   RemoveScroll.defaultProps = {
@@ -16511,7 +20110,7 @@ ${message}`;
   var styleHookSingleton = function() {
     var sheet = stylesheetSingleton();
     return function(styles, isDynamic) {
-      p$3(function() {
+      p$6(function() {
         sheet.add(styles);
         return function() {
           sheet.remove();
@@ -16578,7 +20177,7 @@ ${message}`;
     var gap = F$1(function() {
       return getGapWidth(gapMode);
     }, [gapMode]);
-    return y$3(Style, { styles: getStyles(gap, !noRelative, gapMode, !noImportant ? "!important" : "") });
+    return y$6(Style, { styles: getStyles(gap, !noRelative, gapMode, !noImportant ? "!important" : "") });
   };
   var passiveSupported = false;
   if (typeof window !== "undefined") {
@@ -16707,15 +20306,15 @@ ${message}`;
     var shouldPreventQueue = _$1([]);
     var touchStartRef = _$1([0, 0]);
     var activeAxis = _$1();
-    var id = h$2(idCounter++)[0];
-    var Style2 = h$2(function() {
+    var id = h$4(idCounter++)[0];
+    var Style2 = h$4(function() {
       return styleSingleton();
     })[0];
     var lastProps = _$1(props);
-    p$3(function() {
+    p$6(function() {
       lastProps.current = props;
     }, [props]);
-    p$3(function() {
+    p$6(function() {
       if (props.inert) {
         document.body.classList.add("block-interactivity-".concat(id));
         var allow_1 = __spreadArray([props.lockRef.current], (props.shards || []).map(extractRef), true).filter(Boolean);
@@ -16731,7 +20330,7 @@ ${message}`;
       }
       return;
     }, [props.inert, props.lockRef.current, props.shards]);
-    var shouldCancelEvent = T$3(function(event, parent) {
+    var shouldCancelEvent = T$4(function(event, parent) {
       if ("touches" in event && event.touches.length === 2) {
         return !lastProps.current.allowPinchZoom;
       }
@@ -16767,7 +20366,7 @@ ${message}`;
       var cancelingAxis = activeAxis.current || currentAxis;
       return handleScroll(cancelingAxis, parent, event, cancelingAxis === "h" ? deltaX : deltaY, true);
     }, []);
-    var shouldPrevent = T$3(function(_event) {
+    var shouldPrevent = T$4(function(_event) {
       var event = _event;
       if (!lockStack.length || lockStack[lockStack.length - 1] !== Style2) {
         return;
@@ -16794,7 +20393,7 @@ ${message}`;
         }
       }
     }, []);
-    var shouldCancel = T$3(function(name, delta, target, should) {
+    var shouldCancel = T$4(function(name, delta, target, should) {
       var event = { name, delta, target, should };
       shouldPreventQueue.current.push(event);
       setTimeout(function() {
@@ -16803,17 +20402,17 @@ ${message}`;
         });
       }, 1);
     }, []);
-    var scrollTouchStart = T$3(function(event) {
+    var scrollTouchStart = T$4(function(event) {
       touchStartRef.current = getTouchXY(event);
       activeAxis.current = void 0;
     }, []);
-    var scrollWheel = T$3(function(event) {
+    var scrollWheel = T$4(function(event) {
       shouldCancel(event.type, getDeltaXY(event), event.target, shouldCancelEvent(event, props.lockRef.current));
     }, []);
-    var scrollTouchMove = T$3(function(event) {
+    var scrollTouchMove = T$4(function(event) {
       shouldCancel(event.type, getTouchXY(event), event.target, shouldCancelEvent(event, props.lockRef.current));
     }, []);
-    p$3(function() {
+    p$6(function() {
       lockStack.push(Style2);
       props.setCallbacks({
         onScrollCapture: scrollWheel,
@@ -16833,16 +20432,16 @@ ${message}`;
       };
     }, []);
     var removeScrollBar = props.removeScrollBar, inert = props.inert;
-    return y$3(
+    return y$6(
       _$2,
       null,
-      inert ? y$3(Style2, { styles: generateStyle(id) }) : null,
-      removeScrollBar ? y$3(RemoveScrollBar, { gapMode: "margin" }) : null
+      inert ? y$6(Style2, { styles: generateStyle(id) }) : null,
+      removeScrollBar ? y$6(RemoveScrollBar, { gapMode: "margin" }) : null
     );
   }
   const SideCar = exportSidecar(effectCar, RemoveScrollSideCar);
   var ReactRemoveScroll = k$1(function(props, ref) {
-    return y$3(RemoveScroll, __assign({}, props, { ref, sideCar: SideCar }));
+    return y$6(RemoveScroll, __assign({}, props, { ref, sideCar: SideCar }));
   });
   ReactRemoveScroll.classNames = RemoveScroll.classNames;
   const $67UHm$RemoveScroll = ReactRemoveScroll;
@@ -16973,7 +20572,7 @@ ${message}`;
       defaultProp: defaultOpen,
       onChange: onOpenChange
     });
-    return /* @__PURE__ */ y$3($5d3850c4d0b4e6c7$var$DialogProvider, {
+    return /* @__PURE__ */ y$6($5d3850c4d0b4e6c7$var$DialogProvider, {
       scope: __scopeDialog,
       triggerRef,
       contentRef,
@@ -16982,7 +20581,7 @@ ${message}`;
       descriptionId: $1746a345f3d73bb7$export$f680877a34711e37(),
       open,
       onOpenChange: setOpen,
-      onOpenToggle: T$3(
+      onOpenToggle: T$4(
         () => setOpen(
           (prevOpen) => !prevOpen
         ),
@@ -16998,7 +20597,7 @@ ${message}`;
     const { __scopeDialog, ...triggerProps } = props;
     const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$TRIGGER_NAME, __scopeDialog);
     const composedTriggerRef = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(forwardedRef, context.triggerRef);
-    return /* @__PURE__ */ y$3($8927f6f2acc4f386$export$250ffa63cdc0d034.button, _extends({
+    return /* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.button, _extends({
       type: "button",
       "aria-haspopup": "dialog",
       "aria-expanded": context.open,
@@ -17016,14 +20615,14 @@ ${message}`;
   const $5d3850c4d0b4e6c7$export$dad7c95542bacce0 = (props) => {
     const { __scopeDialog, forceMount, children, container } = props;
     const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$PORTAL_NAME, __scopeDialog);
-    return /* @__PURE__ */ y$3($5d3850c4d0b4e6c7$var$PortalProvider, {
+    return /* @__PURE__ */ y$6($5d3850c4d0b4e6c7$var$PortalProvider, {
       scope: __scopeDialog,
       forceMount
     }, O$1.map(
       children,
-      (child) => /* @__PURE__ */ y$3($921a889cee6df7e8$export$99c2b779aa4e8b8b, {
+      (child) => /* @__PURE__ */ y$6($921a889cee6df7e8$export$99c2b779aa4e8b8b, {
         present: forceMount || context.open
-      }, /* @__PURE__ */ y$3($f1701beae083dbae$export$602eac185826482c, {
+      }, /* @__PURE__ */ y$6($f1701beae083dbae$export$602eac185826482c, {
         asChild: true,
         container
       }, child))
@@ -17034,9 +20633,9 @@ ${message}`;
     const portalContext = $5d3850c4d0b4e6c7$var$usePortalContext($5d3850c4d0b4e6c7$var$OVERLAY_NAME, props.__scopeDialog);
     const { forceMount = portalContext.forceMount, ...overlayProps } = props;
     const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$OVERLAY_NAME, props.__scopeDialog);
-    return context.modal ? /* @__PURE__ */ y$3($921a889cee6df7e8$export$99c2b779aa4e8b8b, {
+    return context.modal ? /* @__PURE__ */ y$6($921a889cee6df7e8$export$99c2b779aa4e8b8b, {
       present: forceMount || context.open
-    }, /* @__PURE__ */ y$3($5d3850c4d0b4e6c7$var$DialogOverlayImpl, _extends({}, overlayProps, {
+    }, /* @__PURE__ */ y$6($5d3850c4d0b4e6c7$var$DialogOverlayImpl, _extends({}, overlayProps, {
       ref: forwardedRef
     }))) : null;
   });
@@ -17046,13 +20645,13 @@ ${message}`;
     return (
       // Make sure `Content` is scrollable even when it doesn't live inside `RemoveScroll`
       // ie. when `Overlay` and `Content` are siblings
-      /* @__PURE__ */ y$3($67UHm$RemoveScroll, {
+      /* @__PURE__ */ y$6($67UHm$RemoveScroll, {
         as: $5e63c961fc1ce211$export$8c6ed5c666ac1360,
         allowPinchZoom: true,
         shards: [
           context.contentRef
         ]
-      }, /* @__PURE__ */ y$3($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({
+      }, /* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({
         "data-state": $5d3850c4d0b4e6c7$var$getState(context.open)
       }, overlayProps, {
         ref: forwardedRef,
@@ -17068,11 +20667,11 @@ ${message}`;
     const portalContext = $5d3850c4d0b4e6c7$var$usePortalContext($5d3850c4d0b4e6c7$var$CONTENT_NAME, props.__scopeDialog);
     const { forceMount = portalContext.forceMount, ...contentProps } = props;
     const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$CONTENT_NAME, props.__scopeDialog);
-    return /* @__PURE__ */ y$3($921a889cee6df7e8$export$99c2b779aa4e8b8b, {
+    return /* @__PURE__ */ y$6($921a889cee6df7e8$export$99c2b779aa4e8b8b, {
       present: forceMount || context.open
-    }, context.modal ? /* @__PURE__ */ y$3($5d3850c4d0b4e6c7$var$DialogContentModal, _extends({}, contentProps, {
+    }, context.modal ? /* @__PURE__ */ y$6($5d3850c4d0b4e6c7$var$DialogContentModal, _extends({}, contentProps, {
       ref: forwardedRef
-    })) : /* @__PURE__ */ y$3($5d3850c4d0b4e6c7$var$DialogContentNonModal, _extends({}, contentProps, {
+    })) : /* @__PURE__ */ y$6($5d3850c4d0b4e6c7$var$DialogContentNonModal, _extends({}, contentProps, {
       ref: forwardedRef
     })));
   });
@@ -17080,12 +20679,12 @@ ${message}`;
     const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$CONTENT_NAME, props.__scopeDialog);
     const contentRef = _$1(null);
     const composedRefs = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(forwardedRef, context.contentRef, contentRef);
-    p$3(() => {
+    p$6(() => {
       const content2 = contentRef.current;
       if (content2)
         return hideOthers(content2);
     }, []);
-    return /* @__PURE__ */ y$3($5d3850c4d0b4e6c7$var$DialogContentImpl, _extends({}, props, {
+    return /* @__PURE__ */ y$6($5d3850c4d0b4e6c7$var$DialogContentImpl, _extends({}, props, {
       ref: composedRefs,
       trapFocus: context.open,
       disableOutsidePointerEvents: true,
@@ -17110,7 +20709,7 @@ ${message}`;
   const $5d3850c4d0b4e6c7$var$DialogContentNonModal = /* @__PURE__ */ k$1((props, forwardedRef) => {
     const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$CONTENT_NAME, props.__scopeDialog);
     const hasInteractedOutsideRef = _$1(false);
-    return /* @__PURE__ */ y$3($5d3850c4d0b4e6c7$var$DialogContentImpl, _extends({}, props, {
+    return /* @__PURE__ */ y$6($5d3850c4d0b4e6c7$var$DialogContentImpl, _extends({}, props, {
       ref: forwardedRef,
       trapFocus: false,
       disableOutsidePointerEvents: false,
@@ -17143,13 +20742,13 @@ ${message}`;
     const contentRef = _$1(null);
     const composedRefs = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(forwardedRef, contentRef);
     $3db38b7d1fb3fe6a$export$b7ece24a22aeda8c();
-    return /* @__PURE__ */ y$3(_$2, null, /* @__PURE__ */ y$3($d3863c46a17e8a28$export$20e40289641fbbb6, {
+    return /* @__PURE__ */ y$6(_$2, null, /* @__PURE__ */ y$6($d3863c46a17e8a28$export$20e40289641fbbb6, {
       asChild: true,
       loop: true,
       trapped: trapFocus,
       onMountAutoFocus: onOpenAutoFocus,
       onUnmountAutoFocus: onCloseAutoFocus
-    }, /* @__PURE__ */ y$3($5cb92bef7577960e$export$177fb62ff3ec1f22, _extends({
+    }, /* @__PURE__ */ y$6($5cb92bef7577960e$export$177fb62ff3ec1f22, _extends({
       role: "dialog",
       id: context.contentId,
       "aria-describedby": context.descriptionId,
@@ -17164,7 +20763,7 @@ ${message}`;
   const $5d3850c4d0b4e6c7$export$16f7638e4a34b909 = /* @__PURE__ */ k$1((props, forwardedRef) => {
     const { __scopeDialog, ...titleProps } = props;
     const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$TITLE_NAME, __scopeDialog);
-    return /* @__PURE__ */ y$3($8927f6f2acc4f386$export$250ffa63cdc0d034.h2, _extends({
+    return /* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.h2, _extends({
       id: context.titleId
     }, titleProps, {
       ref: forwardedRef
@@ -17174,7 +20773,7 @@ ${message}`;
   const $5d3850c4d0b4e6c7$export$fba2fb7cd781b7ac = /* @__PURE__ */ k$1((props, forwardedRef) => {
     const { __scopeDialog, ...closeProps } = props;
     const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$CLOSE_NAME, __scopeDialog);
-    return /* @__PURE__ */ y$3($8927f6f2acc4f386$export$250ffa63cdc0d034.button, _extends({
+    return /* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.button, _extends({
       type: "button"
     }, closeProps, {
       ref: forwardedRef,
@@ -17259,10 +20858,10 @@ ${message}`;
         return [];
       if (handlers2.fn)
         return [handlers2.fn];
-      for (var i2 = 0, l2 = handlers2.length, ee = new Array(l2); i2 < l2; i2++) {
-        ee[i2] = handlers2[i2].fn;
+      for (var i2 = 0, l2 = handlers2.length, ee2 = new Array(l2); i2 < l2; i2++) {
+        ee2[i2] = handlers2[i2].fn;
       }
-      return ee;
+      return ee2;
     };
     EventEmitter2.prototype.listenerCount = function listenerCount(event) {
       var evt = prefix ? prefix + event : event, listeners = this._events[evt];
@@ -17464,34 +21063,34 @@ ${message}`;
   }
   const CheckBox$1 = "";
   function FileCode() {
-    return o("svg", {
+    return o$5("svg", {
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: "0 0 384 512",
       className: "w-4 h-4",
       fill: "currentColor",
-      children: o("path", {
+      children: o$5("path", {
         d: "M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zM256 0V128H384L256 0zM153 289l-31 31 31 31c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L71 337c-9.4-9.4-9.4-24.6 0-33.9l48-48c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9zM265 255l48 48c9.4 9.4 9.4 24.6 0 33.9l-48 48c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l31-31-31-31c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0z"
       })
     });
   }
   function IconCamera() {
-    return o("svg", {
+    return o$5("svg", {
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: "0 0 512 512",
       className: "w-4 h-4",
       fill: "currentColor",
-      children: o("path", {
+      children: o$5("path", {
         d: "M149.1 64.8L138.7 96H64C28.7 96 0 124.7 0 160V416c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H373.3L362.9 64.8C356.4 45.2 338.1 32 317.4 32H194.6c-20.7 0-39 13.2-45.5 32.8zM256 384c-53 0-96-43-96-96s43-96 96-96s96 43 96 96s-43 96-96 96z"
       })
     });
   }
   function IconMarkdown() {
-    return o("svg", {
+    return o$5("svg", {
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: "0 0 640 512",
       className: "w-4 h-4",
       fill: "currentColor",
-      children: o("path", {
+      children: o$5("path", {
         d: "M593.8 59.1H46.2C20.7 59.1 0 79.8 0 105.2v301.5c0 25.5 20.7 46.2 46.2 46.2h547.7c25.5 0 46.2-20.7 46.1-46.1V105.2c0-25.4-20.7-46.1-46.2-46.1zM338.5 360.6H277v-120l-61.5 76.9-61.5-76.9v120H92.3V151.4h61.5l61.5 76.9 61.5-76.9h61.5v209.2zm135.3 3.1L381.5 256H443V151.4h61.5V256H566z"
       })
     });
@@ -17500,36 +21099,36 @@ ${message}`;
     className,
     style: style2
   }) {
-    return o("svg", {
+    return o$5("svg", {
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: "0 0 512 512",
       className,
       style: style2,
       fill: "currentColor",
-      children: o("path", {
+      children: o$5("path", {
         d: "M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"
       })
     });
   }
   function IconArrowRightFromBracket() {
-    return o("svg", {
+    return o$5("svg", {
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: "0 0 576 512",
       className: "w-4 h-4",
       fill: "currentColor",
-      children: o("path", {
+      children: o$5("path", {
         d: "M534.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L434.7 224 224 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l210.7 0-73.4 73.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l128-128zM192 96c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0c-53 0-96 43-96 96l0 256c0 53 43 96 96 96l64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32l64 0z"
       })
     });
   }
   function IconSetting() {
-    return o("svg", {
+    return o$5("svg", {
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: "0 0 15 15",
       className: "w-4 h-4",
       stroke: "currentColor",
       "stroke-width": "0.5",
-      children: o("path", {
+      children: o$5("path", {
         d: "M7.07095 0.650238C6.67391 0.650238 6.32977 0.925096 6.24198 1.31231L6.0039 2.36247C5.6249 2.47269 5.26335 2.62363 4.92436 2.81013L4.01335 2.23585C3.67748 2.02413 3.23978 2.07312 2.95903 2.35386L2.35294 2.95996C2.0722 3.2407 2.0232 3.6784 2.23493 4.01427L2.80942 4.92561C2.62307 5.2645 2.47227 5.62594 2.36216 6.00481L1.31209 6.24287C0.924883 6.33065 0.650024 6.6748 0.650024 7.07183V7.92897C0.650024 8.32601 0.924883 8.67015 1.31209 8.75794L2.36228 8.99603C2.47246 9.375 2.62335 9.73652 2.80979 10.0755L2.2354 10.9867C2.02367 11.3225 2.07267 11.7602 2.35341 12.041L2.95951 12.6471C3.24025 12.9278 3.67795 12.9768 4.01382 12.7651L4.92506 12.1907C5.26384 12.377 5.62516 12.5278 6.0039 12.6379L6.24198 13.6881C6.32977 14.0753 6.67391 14.3502 7.07095 14.3502H7.92809C8.32512 14.3502 8.66927 14.0753 8.75705 13.6881L8.99505 12.6383C9.37411 12.5282 9.73573 12.3773 10.0748 12.1909L10.986 12.7653C11.3218 12.977 11.7595 12.928 12.0403 12.6473L12.6464 12.0412C12.9271 11.7604 12.9761 11.3227 12.7644 10.9869L12.1902 10.076C12.3768 9.73688 12.5278 9.37515 12.638 8.99596L13.6879 8.75794C14.0751 8.67015 14.35 8.32601 14.35 7.92897V7.07183C14.35 6.6748 14.0751 6.33065 13.6879 6.24287L12.6381 6.00488C12.528 5.62578 12.3771 5.26414 12.1906 4.92507L12.7648 4.01407C12.9766 3.6782 12.9276 3.2405 12.6468 2.95975L12.0407 2.35366C11.76 2.07292 11.3223 2.02392 10.9864 2.23565L10.0755 2.80989C9.73622 2.62328 9.37437 2.47229 8.99505 2.36209L8.75705 1.31231C8.66927 0.925096 8.32512 0.650238 7.92809 0.650238H7.07095ZM4.92053 3.81251C5.44724 3.44339 6.05665 3.18424 6.71543 3.06839L7.07095 1.50024H7.92809L8.28355 3.06816C8.94267 3.18387 9.5524 3.44302 10.0794 3.81224L11.4397 2.9547L12.0458 3.56079L11.1882 4.92117C11.5573 5.44798 11.8164 6.0575 11.9321 6.71638L13.5 7.07183V7.92897L11.932 8.28444C11.8162 8.94342 11.557 9.55301 11.1878 10.0798L12.0453 11.4402L11.4392 12.0462L10.0787 11.1886C9.55192 11.5576 8.94241 11.8166 8.28355 11.9323L7.92809 13.5002H7.07095L6.71543 11.932C6.0569 11.8162 5.44772 11.5572 4.92116 11.1883L3.56055 12.046L2.95445 11.4399L3.81213 10.0794C3.4431 9.55266 3.18403 8.94326 3.06825 8.2845L1.50002 7.92897V7.07183L3.06818 6.71632C3.18388 6.05765 3.44283 5.44833 3.81171 4.92165L2.95398 3.561L3.56008 2.95491L4.92053 3.81251ZM9.02496 7.50008C9.02496 8.34226 8.34223 9.02499 7.50005 9.02499C6.65786 9.02499 5.97513 8.34226 5.97513 7.50008C5.97513 6.65789 6.65786 5.97516 7.50005 5.97516C8.34223 5.97516 9.02496 6.65789 9.02496 7.50008ZM9.92496 7.50008C9.92496 8.83932 8.83929 9.92499 7.50005 9.92499C6.1608 9.92499 5.07513 8.83932 5.07513 7.50008C5.07513 6.16084 6.1608 5.07516 7.50005 5.07516C8.83929 5.07516 9.92496 6.16084 9.92496 7.50008Z",
         fill: "currentColor",
         fillRule: "evenodd",
@@ -17538,12 +21137,12 @@ ${message}`;
     });
   }
   function IconCross() {
-    return o("svg", {
+    return o$5("svg", {
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: "0 0 15 15",
       width: "15",
       height: "15",
-      children: o("path", {
+      children: o$5("path", {
         d: "M11.7816 4.03157C12.0062 3.80702 12.0062 3.44295 11.7816 3.2184C11.5571 2.99385 11.193 2.99385 10.9685 3.2184L7.50005 6.68682L4.03164 3.2184C3.80708 2.99385 3.44301 2.99385 3.21846 3.2184C2.99391 3.44295 2.99391 3.80702 3.21846 4.03157L6.68688 7.49999L3.21846 10.9684C2.99391 11.193 2.99391 11.557 3.21846 11.7816C3.44301 12.0061 3.80708 12.0061 4.03164 11.7816L7.50005 8.31316L10.9685 11.7816C11.193 12.0061 11.5571 12.0061 11.7816 11.7816C12.0062 11.557 12.0062 11.193 11.7816 10.9684L8.31322 7.49999L11.7816 4.03157Z",
         fill: "currentColor",
         fillRule: "evenodd",
@@ -17552,7 +21151,7 @@ ${message}`;
     });
   }
   function IconJSON() {
-    return o("svg", {
+    return o$5("svg", {
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: "0 0 24 24",
       className: "w-4 h-4",
@@ -17561,23 +21160,23 @@ ${message}`;
       fill: "none",
       strokeLinecap: "round",
       strokeLinejoin: "round",
-      children: [o("path", {
+      children: [o$5("path", {
         stroke: "none",
         d: "M0 0h24v24H0z",
         fill: "none"
-      }), o("path", {
+      }), o$5("path", {
         d: "M20 16v-8l3 8v-8"
-      }), o("path", {
+      }), o$5("path", {
         d: "M15 8a2 2 0 0 1 2 2v4a2 2 0 1 1 -4 0v-4a2 2 0 0 1 2 -2z"
-      }), o("path", {
+      }), o$5("path", {
         d: "M1 8h3v6.5a1.5 1.5 0 0 1 -3 0v-.5"
-      }), o("path", {
+      }), o$5("path", {
         d: "M7 15a1 1 0 0 0 1 1h1a1 1 0 0 0 1 -1v-2a1 1 0 0 0 -1 -1h-1a1 1 0 0 1 -1 -1v-2a1 1 0 0 1 1 -1h1a1 1 0 0 1 1 1"
       })]
     });
   }
   function IconZip() {
-    return o("svg", {
+    return o$5("svg", {
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: "0 0 24 24",
       className: "w-4 h-4",
@@ -17586,25 +21185,25 @@ ${message}`;
       fill: "none",
       strokeLinecap: "round",
       strokeLinejoin: "round",
-      children: [o("path", {
+      children: [o$5("path", {
         stroke: "none",
         d: "M0 0h24v24H0z",
         fill: "none"
-      }), o("path", {
+      }), o$5("path", {
         d: "M6 20.735a2 2 0 0 1 -1 -1.735v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2h-1"
-      }), o("path", {
+      }), o$5("path", {
         d: "M11 17a2 2 0 0 1 2 2v2a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-2a2 2 0 0 1 2 -2z"
-      }), o("path", {
+      }), o$5("path", {
         d: "M11 5l-1 0"
-      }), o("path", {
+      }), o$5("path", {
         d: "M13 7l-1 0"
-      }), o("path", {
+      }), o$5("path", {
         d: "M11 9l-1 0"
-      }), o("path", {
+      }), o$5("path", {
         d: "M13 11l-1 0"
-      }), o("path", {
+      }), o$5("path", {
         d: "M11 13l-1 0"
-      }), o("path", {
+      }), o$5("path", {
         d: "M13 15l-1 0"
       })]
     });
@@ -17613,11 +21212,11 @@ ${message}`;
     className,
     style: style2
   }) {
-    return o("span", {
+    return o$5("span", {
       style: {
         animation: "1.4s linear 0s infinite normal none running rotate"
       },
-      children: o("svg", {
+      children: o$5("svg", {
         xmlns: "http://www.w3.org/2000/svg",
         viewBox: "22 22 44 44",
         className,
@@ -17628,7 +21227,7 @@ ${message}`;
         fill: "none",
         stroke: "currentColor",
         "stroke-width": "2",
-        children: o("circle", {
+        children: o$5("circle", {
           cx: "44",
           cy: "44",
           r: "20.2",
@@ -17640,12 +21239,12 @@ ${message}`;
     });
   }
   function IconCheckBox() {
-    return o("svg", {
+    return o$5("svg", {
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: "0 0 24 24",
       style: "width: 1em; height: 1em; display: inline-block",
       fill: "currentColor",
-      children: o("path", {
+      children: o$5("path", {
         d: "M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
       })
     });
@@ -17653,13 +21252,13 @@ ${message}`;
   function IconCheckBoxChecked({
     className
   }) {
-    return o("svg", {
+    return o$5("svg", {
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: "0 0 24 24",
       className,
       style: "width: 1em; height: 1em; display: inline-block",
       fill: "currentColor",
-      children: o("path", {
+      children: o$5("path", {
         d: "M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
       })
     });
@@ -17668,7 +21267,7 @@ ${message}`;
     className,
     style: style2
   }) {
-    return o("svg", {
+    return o$5("svg", {
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: "0 0 24 24",
       className,
@@ -17678,11 +21277,11 @@ ${message}`;
       "stroke-width": "2",
       "stroke-linecap": "round",
       "stroke-linejoin": "round",
-      children: [o("path", {
+      children: [o$5("path", {
         stroke: "none",
         d: "M0 0h24v24H0z",
         fill: "none"
-      }), o("path", {
+      }), o$5("path", {
         d: "M5 12l5 5l10 -10"
       })]
     });
@@ -17691,7 +21290,7 @@ ${message}`;
     className,
     style: style2
   }) {
-    return o("svg", {
+    return o$5("svg", {
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: "0 0 24 24",
       className,
@@ -17699,15 +21298,15 @@ ${message}`;
       fill: "none",
       "stroke-linecap": "round",
       "stroke-linejoin": "round",
-      children: [o("path", {
+      children: [o$5("path", {
         stroke: "none",
         d: "M0 0h24v24H0z",
         fill: "none"
-      }), o("path", {
+      }), o$5("path", {
         d: "M20 6a1 1 0 0 1 .117 1.993l-.117 .007h-.081l-.919 11a3 3 0 0 1 -2.824 2.995l-.176 .005h-8c-1.598 0 -2.904 -1.249 -2.992 -2.75l-.005 -.167l-.923 -11.083h-.08a1 1 0 0 1 -.117 -1.993l.117 -.007h16z",
         "stroke-width": "0",
         fill: "currentColor"
-      }), o("path", {
+      }), o$5("path", {
         d: "M14 2a2 2 0 0 1 2 2a1 1 0 0 1 -1.993 .117l-.007 -.117h-4l-.007 .117a1 1 0 0 1 -1.993 -.117a2 2 0 0 1 1.85 -1.995l.15 -.005h4z",
         "stroke-width": "0",
         fill: "currentColor"
@@ -17721,34 +21320,34 @@ ${message}`;
     label,
     onCheckedChange
   }) => {
-    const [isChecked, setChecked] = h$2(checked);
+    const [isChecked, setChecked] = h$4(checked);
     const onChange = (e2) => {
       const newValue = e2.currentTarget.checked;
       setChecked(newValue);
       onCheckedChange == null ? void 0 : onCheckedChange(newValue);
     };
-    p$3(() => {
+    p$6(() => {
       setChecked(checked);
     }, [checked]);
-    return o("label", {
+    return o$5("label", {
       className: `CheckBoxLabel ${className ?? ""}`,
       disabled,
-      children: [o("span", {
+      children: [o$5("span", {
         className: "IconWrapper",
-        children: [o("input", {
+        children: [o$5("input", {
           type: "checkbox",
           checked: isChecked,
           onChange,
           disabled
-        }), isChecked ? o(IconCheckBoxChecked, {}) : o(IconCheckBox, {})]
-      }), o("span", {
+        }), isChecked ? o$5(IconCheckBoxChecked, {}) : o$5(IconCheckBox, {})]
+      }), o$5("span", {
         className: "LabelText",
         children: label
       })]
     });
   };
   function useGMStorage(key2, initialValue) {
-    const [storedValue, setStoredValue] = h$2(() => ScriptStorage.get(key2) ?? initialValue);
+    const [storedValue, setStoredValue] = h$4(() => ScriptStorage.get(key2) ?? initialValue);
     const setValue = (value) => {
       setStoredValue(value);
       ScriptStorage.set(key2, value);
@@ -17790,12 +21389,12 @@ ${message}`;
     const [timeStamp24H, setTimeStamp24H] = useGMStorage(KEY_TIMESTAMP_24H, false);
     const [enableMeta, setEnableMeta] = useGMStorage(KEY_META_ENABLED, false);
     const [exportMetaList, setExportMetaList] = useGMStorage(KEY_META_LIST, defaultExportMetaList);
-    const resetDefault = T$3(() => {
+    const resetDefault = T$4(() => {
       setFormat(defaultFormat);
       setEnableMeta(false);
       setExportMetaList(defaultExportMetaList);
     }, [setFormat, setEnableMeta, setExportMetaList]);
-    return o(SettingContext.Provider, {
+    return o$5(SettingContext.Provider, {
       value: {
         format,
         setFormat,
@@ -17831,28 +21430,31 @@ ${message}`;
     loading,
     error
   }) => {
-    return o(_$2, {
-      children: [o("div", {
+    const {
+      t: t2
+    } = useTranslation();
+    return o$5(_$2, {
+      children: [o$5("div", {
         className: "SelectToolbar",
-        children: o(CheckBox, {
-          label: "Select All",
+        children: o$5(CheckBox, {
+          label: t2("Select All"),
           disabled,
           checked: selected.length === conversations.length,
           onCheckedChange: (checked) => {
             setSelected(checked ? conversations : []);
           }
         })
-      }), o("ul", {
+      }), o$5("ul", {
         className: "SelectList",
-        children: [loading && o("li", {
+        children: [loading && o$5("li", {
           className: "SelectItem",
-          children: "Loading..."
-        }), error && o("li", {
+          children: [t2("Loading"), "..."]
+        }), error && o$5("li", {
           className: "SelectItem",
-          children: ["Error: ", error]
-        }), conversations.map((c2) => o("li", {
+          children: [t2("Error"), ": ", error]
+        }), conversations.map((c2) => o$5("li", {
           className: "SelectItem",
-          children: o(CheckBox, {
+          children: o$5(CheckBox, {
             label: c2.title,
             disabled,
             checked: selected.some((x2) => x2.id === c2.id),
@@ -17871,40 +21473,43 @@ ${message}`;
     children
   }) => {
     const {
+      t: t2
+    } = useTranslation();
+    const {
       enableMeta,
       exportMetaList
     } = useSettingContext();
     const metaList = F$1(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList]);
-    const [conversations, setConversations] = h$2([]);
-    const [loading, setLoading] = h$2(false);
-    const [error, setError] = h$2("");
-    const [processing, setProcessing] = h$2(false);
-    const [selected, setSelected] = h$2([]);
-    const [exportType, setExportType] = h$2(exportAllOptions[0].label);
+    const [conversations, setConversations] = h$4([]);
+    const [loading, setLoading] = h$4(false);
+    const [error, setError] = h$4("");
+    const [processing, setProcessing] = h$4(false);
+    const [selected, setSelected] = h$4([]);
+    const [exportType, setExportType] = h$4(exportAllOptions[0].label);
     const disabled = loading || processing || !!error || selected.length === 0;
     const requestQueue = F$1(() => new RequestQueue(200, 1600), []);
     const deleteQueue = F$1(() => new RequestQueue(200, 1600), []);
-    const [progress, setProgress] = h$2({
+    const [progress, setProgress] = h$4({
       total: 0,
       completed: 0,
       currentName: "",
       currentStatus: ""
     });
-    p$3(() => {
+    p$6(() => {
       const off = requestQueue.on("progress", (progress2) => {
         setProcessing(true);
         setProgress(progress2);
       });
       return () => off();
     }, [requestQueue]);
-    p$3(() => {
+    p$6(() => {
       const off = deleteQueue.on("progress", (progress2) => {
         setProcessing(true);
         setProgress(progress2);
       });
       return () => off();
     }, [deleteQueue]);
-    p$3(() => {
+    p$6(() => {
       const off = requestQueue.on("done", (results) => {
         var _a;
         setProcessing(false);
@@ -17914,126 +21519,126 @@ ${message}`;
       });
       return () => off();
     }, [requestQueue, exportType, format, metaList]);
-    p$3(() => {
+    p$6(() => {
       const off = deleteQueue.on("done", () => {
         setProcessing(false);
         setConversations(conversations.filter((c2) => !selected.some((s2) => s2.id === c2.id)));
         setSelected([]);
-        alert("All selected conversations have been deleted. Please refresh the page to see the changes.");
+        alert(t2("Conversation Deleted Message"));
       });
       return () => off();
-    }, [deleteQueue, conversations, selected]);
-    const exportAll = T$3(() => {
+    }, [deleteQueue, conversations, selected, t2]);
+    const exportAll = T$4(() => {
       if (disabled)
         return;
       requestQueue.clear();
       selected.forEach(({
         id,
-        title
+        title: title2
       }) => {
         requestQueue.add({
-          name: title,
+          name: title2,
           request: () => fetchConversation(id)
         });
       });
       requestQueue.start();
     }, [disabled, selected, requestQueue]);
-    const deleteAll = T$3(() => {
+    const deleteAll = T$4(() => {
       if (disabled)
         return;
-      const result = confirm("Are you sure you want to delete all selected conversations?");
+      const result = confirm(t2("Conversation Delete Alert"));
       if (!result)
         return;
       deleteQueue.clear();
       selected.forEach(({
         id,
-        title
+        title: title2
       }) => {
         deleteQueue.add({
-          name: title,
+          name: title2,
           request: () => deleteConversation(id)
         });
       });
       deleteQueue.start();
-    }, [disabled, selected, deleteQueue]);
-    p$3(() => {
+    }, [disabled, selected, deleteQueue, t2]);
+    p$6(() => {
       setLoading(true);
       fetchAllConversations().then(setConversations).catch(setError).finally(() => setLoading(false));
     }, []);
-    return o($5d3850c4d0b4e6c7$export$be92b6f5f03c0fe9, {
+    return o$5($5d3850c4d0b4e6c7$export$be92b6f5f03c0fe9, {
       open,
       onOpenChange,
-      children: [o($5d3850c4d0b4e6c7$export$41fb9f06171c75f4, {
+      children: [o$5($5d3850c4d0b4e6c7$export$41fb9f06171c75f4, {
         asChild: true,
         children
-      }), o($5d3850c4d0b4e6c7$export$602eac185826482c, {
-        children: [o($5d3850c4d0b4e6c7$export$c6fdb837b070b4ff, {
+      }), o$5($5d3850c4d0b4e6c7$export$602eac185826482c, {
+        children: [o$5($5d3850c4d0b4e6c7$export$c6fdb837b070b4ff, {
           className: "DialogOverlay"
-        }), o($5d3850c4d0b4e6c7$export$7c6e2c02157bb7d2, {
+        }), o$5($5d3850c4d0b4e6c7$export$7c6e2c02157bb7d2, {
           className: "DialogContent",
-          children: [o($5d3850c4d0b4e6c7$export$f99233281efd08a0, {
+          children: [o$5($5d3850c4d0b4e6c7$export$f99233281efd08a0, {
             className: "DialogTitle",
-            children: "Export Conversations"
-          }), o(ConversationSelect, {
+            children: t2("Export Dialog Title")
+          }), o$5(ConversationSelect, {
             conversations,
             selected,
             setSelected,
             disabled: processing,
             loading,
             error
-          }), o("div", {
+          }), o$5("div", {
             className: "flex mt-6",
             style: {
               justifyContent: "space-between"
             },
-            children: [o("select", {
+            children: [o$5("select", {
               className: "Select",
               disabled: processing,
               value: exportType,
               onChange: (e2) => setExportType(e2.currentTarget.value),
               children: exportAllOptions.map(({
                 label
-              }) => o("option", {
+              }) => o$5("option", {
                 value: label,
                 children: label
-              }, label))
-            }), o("div", {
+              }, t2(label)))
+            }), o$5("div", {
               className: "flex flex-grow"
-            }), o("button", {
+            }), o$5("button", {
               className: "Button red",
               disabled,
               onClick: deleteAll,
-              children: "Delete"
-            }), o("button", {
+              children: t2("Delete")
+            }), o$5("button", {
               className: "Button green ml-4",
               disabled,
               onClick: exportAll,
-              children: "Export"
+              children: t2("Export")
             })]
-          }), processing && o(_$2, {
-            children: [o("div", {
+          }), processing && o$5(_$2, {
+            children: [o$5("div", {
               className: "mt-2 mb-1 justify-between flex",
-              children: [o("span", {
+              children: [o$5("span", {
                 className: "truncate mr-8",
                 children: progress.currentName
-              }), o("span", {
+              }), o$5("span", {
                 children: `${progress.completed}/${progress.total}`
               })]
-            }), o("div", {
+            }), o$5("div", {
               className: "w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700",
-              children: o("div", {
+              children: o$5("div", {
                 className: "bg-blue-600 h-2.5 rounded-full",
                 style: {
                   width: `${progress.completed / progress.total * 100}%`
                 }
               })
             })]
-          }), o($5d3850c4d0b4e6c7$export$f39c2d165cd861fe, {
+          }), o$5($5d3850c4d0b4e6c7$export$f39c2d165cd861fe, {
             asChild: true,
-            children: o("button", {
+            children: o$5("button", {
               className: "IconButton CloseButton",
               "aria-label": "Close",
-              children: o(IconCross, {})
+              children: o$5(IconCross, {})
             })
           })]
         })]
@@ -18045,13 +21650,13 @@ ${message}`;
     text: text2,
     successText,
     disabled = false,
-    title,
+    title: title2,
     icon: Icon,
     onClick,
     className
   }) => {
-    const [loading, setLoading] = h$2(false);
-    const [succeed, setSucceed] = h$2(false);
+    const [loading, setLoading] = h$4(false);
+    const [succeed, setSucceed] = h$4(false);
     const handleClick = typeof onClick === "function" ? async () => {
       try {
         setLoading(true);
@@ -18066,25 +21671,25 @@ ${message}`;
         setLoading(false);
       }
     } : void 0;
-    return o("div", {
+    return o$5("div", {
       className: `menu-item flex py-3 px-3 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm mb-2 flex-shrink-0 border border-white/20 ${className}`,
       onClick: handleClick,
       onTouchStart: handleClick,
       disabled,
-      title,
-      children: loading ? o("div", {
+      title: title2,
+      children: loading ? o$5("div", {
         className: "flex justify-center items-center w-full h-full",
-        children: o(IconLoading, {
+        children: o$5(IconLoading, {
           className: "w-4 h-4"
         })
-      }) : o(_$2, {
-        children: [Icon && o(Icon, {}), succeed && successText ? successText : text2]
+      }) : o$5(_$2, {
+        children: [Icon && o$5(Icon, {}), succeed && successText ? successText : text2]
       })
     });
   };
   function useTitle() {
-    const title = gn(subscribe, getSnapshot);
-    return title;
+    const title2 = gn(subscribe, getSnapshot);
+    return title2;
   }
   function subscribe(callback) {
     const target = document.querySelector("title");
@@ -18102,38 +21707,399 @@ ${message}`;
   function getSnapshot() {
     return document.title;
   }
-  const Toggle = (props) => {
-    const {
-      label = "",
-      checked = true,
-      onCheckedUpdate
-    } = props;
-    const handleChange = (e2) => {
-      if (!e2.target || !onCheckedUpdate)
-        return;
-      onCheckedUpdate(e2.target.checked);
-    };
-    return o("label", {
-      className: "relative inline-flex items-center cursor-pointer",
-      children: [o("input", {
-        type: "checkbox",
+  var i$2 = Object.defineProperty;
+  var d$2 = (t2, e2, n2) => e2 in t2 ? i$2(t2, e2, { enumerable: true, configurable: true, writable: true, value: n2 }) : t2[e2] = n2;
+  var r$1 = (t2, e2, n2) => (d$2(t2, typeof e2 != "symbol" ? e2 + "" : e2, n2), n2);
+  let o$4 = class o {
+    constructor() {
+      r$1(this, "current", this.detect());
+      r$1(this, "handoffState", "pending");
+      r$1(this, "currentId", 0);
+    }
+    set(e2) {
+      this.current !== e2 && (this.handoffState = "pending", this.currentId = 0, this.current = e2);
+    }
+    reset() {
+      this.set(this.detect());
+    }
+    nextId() {
+      return ++this.currentId;
+    }
+    get isServer() {
+      return this.current === "server";
+    }
+    get isClient() {
+      return this.current === "client";
+    }
+    detect() {
+      return typeof window == "undefined" || typeof document == "undefined" ? "server" : "client";
+    }
+    handoff() {
+      this.handoffState === "pending" && (this.handoffState = "complete");
+    }
+    get isHandoffComplete() {
+      return this.handoffState === "complete";
+    }
+  };
+  let s$3 = new o$4();
+  let l$1 = (e2, f2) => {
+    s$3.isServer ? p$6(e2, f2) : y$5(e2, f2);
+  };
+  function s$2(e2) {
+    let r2 = _$1(e2);
+    return l$1(() => {
+      r2.current = e2;
+    }, [e2]), r2;
+  }
+  function t(e2) {
+    typeof queueMicrotask == "function" ? queueMicrotask(e2) : Promise.resolve().then(e2).catch((o2) => setTimeout(() => {
+      throw o2;
+    }));
+  }
+  function o$3() {
+    let n2 = [], r2 = { addEventListener(e2, t2, s2, a2) {
+      return e2.addEventListener(t2, s2, a2), r2.add(() => e2.removeEventListener(t2, s2, a2));
+    }, requestAnimationFrame(...e2) {
+      let t2 = requestAnimationFrame(...e2);
+      return r2.add(() => cancelAnimationFrame(t2));
+    }, nextFrame(...e2) {
+      return r2.requestAnimationFrame(() => r2.requestAnimationFrame(...e2));
+    }, setTimeout(...e2) {
+      let t2 = setTimeout(...e2);
+      return r2.add(() => clearTimeout(t2));
+    }, microTask(...e2) {
+      let t$12 = { current: true };
+      return t(() => {
+        t$12.current && e2[0]();
+      }), r2.add(() => {
+        t$12.current = false;
+      });
+    }, style(e2, t2, s2) {
+      let a2 = e2.style.getPropertyValue(t2);
+      return Object.assign(e2.style, { [t2]: s2 }), this.add(() => {
+        Object.assign(e2.style, { [t2]: a2 });
+      });
+    }, group(e2) {
+      let t2 = o$3();
+      return e2(t2), this.add(() => t2.dispose());
+    }, add(e2) {
+      return n2.push(e2), () => {
+        let t2 = n2.indexOf(e2);
+        if (t2 >= 0)
+          for (let s2 of n2.splice(t2, 1))
+            s2();
+      };
+    }, dispose() {
+      for (let e2 of n2.splice(0))
+        e2();
+    } };
+    return r2;
+  }
+  function p$2() {
+    let [e2] = h$4(o$3);
+    return p$6(() => () => e2.dispose(), [e2]), e2;
+  }
+  let o$2 = function(t2) {
+    let e2 = s$2(t2);
+    return Cn.useCallback((...r2) => e2.current(...r2), [e2]);
+  };
+  function l() {
+    let [e2, f2] = h$4(s$3.isHandoffComplete);
+    return e2 && s$3.isHandoffComplete === false && f2(false), p$6(() => {
+      e2 !== true && f2(true);
+    }, [e2]), p$6(() => s$3.handoff(), []), e2;
+  }
+  var o$1;
+  let I = (o$1 = Cn.useId) != null ? o$1 : function() {
+    let n2 = l(), [e2, u2] = Cn.useState(n2 ? () => s$3.nextId() : null);
+    return l$1(() => {
+      e2 === null && u2(s$3.nextId());
+    }, [e2]), e2 != null ? "" + e2 : void 0;
+  };
+  function u$2(r2, n2, ...a2) {
+    if (r2 in n2) {
+      let e2 = n2[r2];
+      return typeof e2 == "function" ? e2(...a2) : e2;
+    }
+    let t2 = new Error(`Tried to handle "${r2}" but there is no handler defined. Only defined handlers are: ${Object.keys(n2).map((e2) => `"${e2}"`).join(", ")}.`);
+    throw Error.captureStackTrace && Error.captureStackTrace(t2, u$2), t2;
+  }
+  function i$1(t2) {
+    var n2;
+    if (t2.type)
+      return t2.type;
+    let e2 = (n2 = t2.as) != null ? n2 : "button";
+    if (typeof e2 == "string" && e2.toLowerCase() === "button")
+      return "button";
+  }
+  function s$1(t2, e2) {
+    let [n2, u2] = h$4(() => i$1(t2));
+    return l$1(() => {
+      u2(i$1(t2));
+    }, [t2.type, t2.as]), l$1(() => {
+      n2 || e2.current && e2.current instanceof HTMLButtonElement && !e2.current.hasAttribute("type") && u2("button");
+    }, [n2, e2]), n2;
+  }
+  let u$1 = Symbol();
+  function y$2(...t2) {
+    let n2 = _$1(t2);
+    p$6(() => {
+      n2.current = t2;
+    }, [t2]);
+    let c2 = o$2((e2) => {
+      for (let o2 of n2.current)
+        o2 != null && (typeof o2 == "function" ? o2(e2) : o2.current = e2);
+    });
+    return t2.every((e2) => e2 == null || (e2 == null ? void 0 : e2[u$1])) ? void 0 : c2;
+  }
+  function e(...n2) {
+    return n2.filter(Boolean).join(" ");
+  }
+  var S$1 = ((a2) => (a2[a2.None = 0] = "None", a2[a2.RenderStrategy = 1] = "RenderStrategy", a2[a2.Static = 2] = "Static", a2))(S$1 || {}), j = ((e2) => (e2[e2.Unmount = 0] = "Unmount", e2[e2.Hidden = 1] = "Hidden", e2))(j || {});
+  function X({ ourProps: r2, theirProps: t2, slot: e2, defaultTag: a2, features: s2, visible: n2 = true, name: f2 }) {
+    let o2 = N(t2, r2);
+    if (n2)
+      return c$1(o2, e2, a2, f2);
+    let u2 = s2 != null ? s2 : 0;
+    if (u2 & 2) {
+      let { static: l2 = false, ...p2 } = o2;
+      if (l2)
+        return c$1(p2, e2, a2, f2);
+    }
+    if (u2 & 1) {
+      let { unmount: l2 = true, ...p2 } = o2;
+      return u$2(l2 ? 0 : 1, { [0]() {
+        return null;
+      }, [1]() {
+        return c$1({ ...p2, hidden: true, style: { display: "none" } }, e2, a2, f2);
+      } });
+    }
+    return c$1(o2, e2, a2, f2);
+  }
+  function c$1(r2, t2 = {}, e$12, a2) {
+    let { as: s2 = e$12, children: n2, refName: f2 = "ref", ...o2 } = g(r2, ["unmount", "static"]), u2 = r2.ref !== void 0 ? { [f2]: r2.ref } : {}, l2 = typeof n2 == "function" ? n2(t2) : n2;
+    "className" in o2 && o2.className && typeof o2.className == "function" && (o2.className = o2.className(t2));
+    let p2 = {};
+    if (t2) {
+      let i2 = false, m2 = [];
+      for (let [y2, d2] of Object.entries(t2))
+        typeof d2 == "boolean" && (i2 = true), d2 === true && m2.push(y2);
+      i2 && (p2["data-headlessui-state"] = m2.join(" "));
+    }
+    if (s2 === _$2 && Object.keys(R(o2)).length > 0) {
+      if (!an(l2) || Array.isArray(l2) && l2.length > 1)
+        throw new Error(['Passing props on "Fragment"!', "", `The current component <${a2} /> is rendering a "Fragment".`, "However we need to passthrough the following props:", Object.keys(o2).map((d2) => `  - ${d2}`).join(`
+`), "", "You can apply a few solutions:", ['Add an `as="..."` prop, to ensure that we render an actual element instead of a "Fragment".', "Render a single element as the child so that we can forward the props onto that element."].map((d2) => `  - ${d2}`).join(`
+`)].join(`
+`));
+      let i2 = l2.props, m2 = typeof (i2 == null ? void 0 : i2.className) == "function" ? (...d2) => e(i2 == null ? void 0 : i2.className(...d2), o2.className) : e(i2 == null ? void 0 : i2.className, o2.className), y2 = m2 ? { className: m2 } : {};
+      return sn(l2, Object.assign({}, N(l2.props, R(g(o2, ["ref"]))), p2, u2, w(l2.ref, u2.ref), y2));
+    }
+    return y$6(s2, Object.assign({}, g(o2, ["ref"]), s2 !== _$2 && u2, s2 !== _$2 && p2), l2);
+  }
+  function w(...r2) {
+    return { ref: r2.every((t2) => t2 == null) ? void 0 : (t2) => {
+      for (let e2 of r2)
+        e2 != null && (typeof e2 == "function" ? e2(t2) : e2.current = t2);
+    } };
+  }
+  function N(...r2) {
+    if (r2.length === 0)
+      return {};
+    if (r2.length === 1)
+      return r2[0];
+    let t2 = {}, e2 = {};
+    for (let s2 of r2)
+      for (let n2 in s2)
+        n2.startsWith("on") && typeof s2[n2] == "function" ? (e2[n2] != null || (e2[n2] = []), e2[n2].push(s2[n2])) : t2[n2] = s2[n2];
+    if (t2.disabled || t2["aria-disabled"])
+      return Object.assign(t2, Object.fromEntries(Object.keys(e2).map((s2) => [s2, void 0])));
+    for (let s2 in e2)
+      Object.assign(t2, { [s2](n2, ...f2) {
+        let o2 = e2[s2];
+        for (let u2 of o2) {
+          if ((n2 instanceof Event || (n2 == null ? void 0 : n2.nativeEvent) instanceof Event) && n2.defaultPrevented)
+            return;
+          u2(n2, ...f2);
+        }
+      } });
+    return t2;
+  }
+  function D(r2) {
+    var t2;
+    return Object.assign(k$1(r2), { displayName: (t2 = r2.displayName) != null ? t2 : r2.name });
+  }
+  function R(r2) {
+    let t2 = Object.assign({}, r2);
+    for (let e2 in t2)
+      t2[e2] === void 0 && delete t2[e2];
+    return t2;
+  }
+  function g(r2, t2 = []) {
+    let e2 = Object.assign({}, r2);
+    for (let a2 of t2)
+      a2 in e2 && delete e2[a2];
+    return e2;
+  }
+  function r(n2) {
+    let e2 = n2.parentElement, l2 = null;
+    for (; e2 && !(e2 instanceof HTMLFieldSetElement); )
+      e2 instanceof HTMLLegendElement && (l2 = e2), e2 = e2.parentElement;
+    let t2 = (e2 == null ? void 0 : e2.getAttribute("disabled")) === "";
+    return t2 && i(l2) ? false : t2;
+  }
+  function i(n2) {
+    if (!n2)
+      return false;
+    let e2 = n2.previousElementSibling;
+    for (; e2 !== null; ) {
+      if (e2 instanceof HTMLLegendElement)
+        return false;
+      e2 = e2.previousElementSibling;
+    }
+    return true;
+  }
+  function p$1(n2) {
+    var t2;
+    let r2 = (t2 = n2 == null ? void 0 : n2.form) != null ? t2 : n2.closest("form");
+    if (r2) {
+      for (let i2 of r2.elements)
+        if (i2.tagName === "INPUT" && i2.type === "submit" || i2.tagName === "BUTTON" && i2.type === "submit" || i2.nodeName === "INPUT" && i2.type === "image") {
+          i2.click();
+          return;
+        }
+    }
+  }
+  let a = "div";
+  var p = ((e2) => (e2[e2.None = 1] = "None", e2[e2.Focusable = 2] = "Focusable", e2[e2.Hidden = 4] = "Hidden", e2))(p || {});
+  function s(t2, o2) {
+    let { features: n2 = 1, ...e2 } = t2, d2 = { ref: o2, "aria-hidden": (n2 & 2) === 2 ? true : void 0, style: { position: "fixed", top: 1, left: 1, width: 1, height: 0, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0, 0, 0, 0)", whiteSpace: "nowrap", borderWidth: "0", ...(n2 & 4) === 4 && (n2 & 2) !== 2 && { display: "none" } } };
+    return X({ ourProps: d2, theirProps: e2, slot: {}, defaultTag: a, name: "Hidden" });
+  }
+  let c = D(s);
+  var o = ((r2) => (r2.Space = " ", r2.Enter = "Enter", r2.Escape = "Escape", r2.Backspace = "Backspace", r2.Delete = "Delete", r2.ArrowLeft = "ArrowLeft", r2.ArrowUp = "ArrowUp", r2.ArrowRight = "ArrowRight", r2.ArrowDown = "ArrowDown", r2.Home = "Home", r2.End = "End", r2.PageUp = "PageUp", r2.PageDown = "PageDown", r2.Tab = "Tab", r2))(o || {});
+  function T(l2, r2, c2) {
+    let [i2, s2] = h$4(c2), e2 = l2 !== void 0, t2 = _$1(e2), u2 = _$1(false), d2 = _$1(false);
+    return e2 && !t2.current && !u2.current ? (u2.current = true, t2.current = e2, console.error("A component is changing from uncontrolled to controlled. This may be caused by the value changing from undefined to a defined value, which should not happen.")) : !e2 && t2.current && !d2.current && (d2.current = true, t2.current = e2, console.error("A component is changing from controlled to uncontrolled. This may be caused by the value changing from a defined value to undefined, which should not happen.")), [e2 ? l2 : i2, o$2((n2) => (e2 || s2(n2), r2 == null ? void 0 : r2(n2)))];
+  }
+  let d$1 = F$2(null);
+  function f() {
+    let r2 = q$1(d$1);
+    if (r2 === null) {
+      let t2 = new Error("You used a <Description /> component, but it is not inside a relevant parent.");
+      throw Error.captureStackTrace && Error.captureStackTrace(t2, f), t2;
+    }
+    return r2;
+  }
+  function M$1() {
+    let [r2, t2] = h$4([]);
+    return [r2.length > 0 ? r2.join(" ") : void 0, F$1(() => function(e2) {
+      let i2 = o$2((s2) => (t2((o2) => [...o2, s2]), () => t2((o2) => {
+        let p2 = o2.slice(), c2 = p2.indexOf(s2);
+        return c2 !== -1 && p2.splice(c2, 1), p2;
+      }))), n2 = F$1(() => ({ register: i2, slot: e2.slot, name: e2.name, props: e2.props }), [i2, e2.slot, e2.name, e2.props]);
+      return Cn.createElement(d$1.Provider, { value: n2 }, e2.children);
+    }, [t2])];
+  }
+  let S = "p";
+  function h$1(r2, t2) {
+    let a2 = I(), { id: e2 = `headlessui-description-${a2}`, ...i2 } = r2, n2 = f(), s2 = y$2(t2);
+    l$1(() => n2.register(e2), [e2, n2.register]);
+    let o2 = { ref: s2, ...n2.props, id: e2 };
+    return X({ ourProps: o2, theirProps: i2, slot: n2.slot || {}, defaultTag: S, name: n2.name || "Description" });
+  }
+  let y$1 = D(h$1), b = Object.assign(y$1, {});
+  let d = F$2(null);
+  function u() {
+    let o2 = q$1(d);
+    if (o2 === null) {
+      let t2 = new Error("You used a <Label /> component, but it is not inside a relevant parent.");
+      throw Error.captureStackTrace && Error.captureStackTrace(t2, u), t2;
+    }
+    return o2;
+  }
+  function H() {
+    let [o2, t2] = h$4([]);
+    return [o2.length > 0 ? o2.join(" ") : void 0, F$1(() => function(e2) {
+      let s2 = o$2((r2) => (t2((l2) => [...l2, r2]), () => t2((l2) => {
+        let n2 = l2.slice(), p2 = n2.indexOf(r2);
+        return p2 !== -1 && n2.splice(p2, 1), n2;
+      }))), a2 = F$1(() => ({ register: s2, slot: e2.slot, name: e2.name, props: e2.props }), [s2, e2.slot, e2.name, e2.props]);
+      return Cn.createElement(d.Provider, { value: a2 }, e2.children);
+    }, [t2])];
+  }
+  let A = "label";
+  function h(o2, t2) {
+    let i2 = I(), { id: e2 = `headlessui-label-${i2}`, passive: s2 = false, ...a2 } = o2, r2 = u(), l2 = y$2(t2);
+    l$1(() => r2.register(e2), [e2, r2.register]);
+    let n2 = { ref: l2, ...r2.props, id: e2 };
+    return s2 && ("onClick" in n2 && (delete n2.htmlFor, delete n2.onClick), "onClick" in a2 && delete a2.onClick), X({ ourProps: n2, theirProps: a2, slot: r2.slot || {}, defaultTag: A, name: r2.name || "Label" });
+  }
+  let v = D(h), M = Object.assign(v, {});
+  let y = F$2(null);
+  y.displayName = "GroupContext";
+  let Y = _$2;
+  function Z(s2) {
+    var d2;
+    let [n2, p2] = h$4(null), [c2, f2] = H(), [r2, h2] = M$1(), l2 = F$1(() => ({ switch: n2, setSwitch: p2, labelledby: c2, describedby: r2 }), [n2, p2, c2, r2]), T2 = {}, b2 = s2;
+    return Cn.createElement(h2, { name: "Switch.Description" }, Cn.createElement(f2, { name: "Switch.Label", props: { htmlFor: (d2 = l2.switch) == null ? void 0 : d2.id, onClick(t2) {
+      n2 && (t2.currentTarget.tagName === "LABEL" && t2.preventDefault(), n2.click(), n2.focus({ preventScroll: true }));
+    } } }, Cn.createElement(y.Provider, { value: l2 }, X({ ourProps: T2, theirProps: b2, defaultTag: Y, name: "Switch.Group" }))));
+  }
+  let ee = "button";
+  function te(s2, n2) {
+    let p$32 = I(), { id: c$12 = `headlessui-switch-${p$32}`, checked: f2, defaultChecked: r$12 = false, onChange: h2, name: l2, value: T$12, form: b2, ...d2 } = s2, t2 = q$1(y), u2 = _$1(null), D2 = y$2(u2, n2, t2 === null ? null : t2.setSwitch), [o$12, a2] = T(f2, h2, r$12), S2 = o$2(() => a2 == null ? void 0 : a2(!o$12)), C2 = o$2((e2) => {
+      if (r(e2.currentTarget))
+        return e2.preventDefault();
+      e2.preventDefault(), S2();
+    }), L2 = o$2((e2) => {
+      e2.key === o.Space ? (e2.preventDefault(), S2()) : e2.key === o.Enter && p$1(e2.currentTarget);
+    }), v2 = o$2((e2) => e2.preventDefault()), G2 = F$1(() => ({ checked: o$12 }), [o$12]), R$12 = { id: c$12, ref: D2, role: "switch", type: s$1(s2, u2), tabIndex: 0, "aria-checked": o$12, "aria-labelledby": t2 == null ? void 0 : t2.labelledby, "aria-describedby": t2 == null ? void 0 : t2.describedby, onClick: C2, onKeyUp: L2, onKeyPress: v2 }, k2 = p$2();
+    return p$6(() => {
+      var w2;
+      let e2 = (w2 = u2.current) == null ? void 0 : w2.closest("form");
+      e2 && r$12 !== void 0 && k2.addEventListener(e2, "reset", () => {
+        a2(r$12);
+      });
+    }, [u2, a2]), Cn.createElement(Cn.Fragment, null, l2 != null && o$12 && Cn.createElement(c, { features: p.Hidden, ...R({ as: "input", type: "checkbox", hidden: true, readOnly: true, form: b2, checked: o$12, name: l2, value: T$12 }) }), X({ ourProps: R$12, theirProps: d2, slot: G2, defaultTag: ee, name: "Switch" }));
+  }
+  let ne = D(te), re = Z, Ge = Object.assign(ne, { Group: re, Label: M, Description: b });
+  const Toggle = ({
+    label,
+    checked = true,
+    onCheckedUpdate
+  }) => {
+    return o$5("div", {
+      className: "inline-flex items-center",
+      children: [o$5(Ge, {
         checked,
-        onChange: handleChange,
-        className: "sr-only peer"
-      }), o("div", {
-        className: "relative shrink-0 w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
-      }), o("span", {
-        className: "ml-3 text-sm font-medium text-gray-900 dark:text-gray-300 empty:hidden",
+        onChange: onCheckedUpdate,
+        className: `${checked ? "bg-green-600" : "bg-gray-200"} relative inline-flex flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-0 h-6 w-11`,
+        children: [o$5("span", {
+          className: "sr-only",
+          children: "Use setting"
+        }), o$5("span", {
+          className: `${checked ? "translate-x-5" : "translate-x-0"} pointer-events-none relative inline-block transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out h-5 w-5`,
+          children: [o$5("span", {
+            className: "opacity-0 duration-100 ease-out absolute inset-0 flex h-full w-full items-center justify-center transition-opacity",
+            "aria-hidden": "true"
+          }), o$5("span", {
+            className: "opacity-100 duration-200 ease-in absolute inset-0 flex h-full w-full items-center justify-center transition-opacity",
+            "aria-hidden": "true"
+          })]
+        })]
+      }), label && o$5("span", {
+        className: "ml-3 text-sm font-medium text-gray-900 dark:text-gray-300",
         children: label
       })]
     });
   };
   const Variable = ({
     name,
-    title
-  }) => o("strong", {
+    title: title2
+  }) => o$5("strong", {
     className: "cursor-help select-all whitespace-nowrap",
-    title,
+    title: title2,
     children: name
   });
   const SettingDialog = ({
@@ -18153,62 +22119,87 @@ ${message}`;
       exportMetaList,
       setExportMetaList
     } = useSettingContext();
+    const {
+      t: t2,
+      i18n
+    } = useTranslation();
     const _title = useTitle();
     const date = dateStr();
     const timestamp$1 = timestamp();
-    const title = sanitizeFilename(_title).replace(/\s+/g, "_");
+    const title2 = sanitizeFilename(_title).replace(/\s+/g, "_");
     const chatId = getChatIdFromUrl() || "this-is-a-mock-chat-id";
     const preview = getFileNameWithFormat(format, "{ext}", {
-      title,
+      title: title2,
       chatId
     });
     const source = `${baseUrl}/${chatId}`;
-    return o($5d3850c4d0b4e6c7$export$be92b6f5f03c0fe9, {
+    return o$5($5d3850c4d0b4e6c7$export$be92b6f5f03c0fe9, {
       open,
       onOpenChange,
-      children: [o($5d3850c4d0b4e6c7$export$41fb9f06171c75f4, {
+      children: [o$5($5d3850c4d0b4e6c7$export$41fb9f06171c75f4, {
         asChild: true,
         children
-      }), o($5d3850c4d0b4e6c7$export$602eac185826482c, {
-        children: [o($5d3850c4d0b4e6c7$export$c6fdb837b070b4ff, {
+      }), o$5($5d3850c4d0b4e6c7$export$602eac185826482c, {
+        children: [o$5($5d3850c4d0b4e6c7$export$c6fdb837b070b4ff, {
           className: "DialogOverlay"
-        }), o($5d3850c4d0b4e6c7$export$7c6e2c02157bb7d2, {
+        }), o$5($5d3850c4d0b4e6c7$export$7c6e2c02157bb7d2, {
           className: "DialogContent",
-          children: [o($5d3850c4d0b4e6c7$export$f99233281efd08a0, {
+          children: [o$5($5d3850c4d0b4e6c7$export$f99233281efd08a0, {
             className: "DialogTitle",
-            children: "Exporter Setting"
-          }), o("dl", {
+            children: t2("Exporter Settings")
+          }), o$5("dl", {
             className: "space-y-6",
-            children: [o("div", {
+            children: [o$5("div", {
               className: "relative flex bg-white dark:bg-white/5 rounded p-4",
-              children: o("div", {
-                children: [o("dt", {
+              children: o$5("div", {
+                children: [o$5("dt", {
                   className: "text-md font-medium text-gray-800 dark:text-white",
-                  children: "File Name"
-                }), o("dd", {
-                  children: [o("p", {
+                  children: `${t2("Language")} 🌐`
+                }), o$5("dd", {
+                  children: o$5("select", {
+                    className: "Select mt-3",
+                    value: i18n.language,
+                    onChange: (e2) => i18n.changeLanguage(e2.currentTarget.value),
+                    children: LOCALES.map(({
+                      name,
+                      code: code2
+                    }) => o$5("option", {
+                      value: code2,
+                      children: name
+                    }, code2))
+                  })
+                })]
+              })
+            }), o$5("div", {
+              className: "relative flex bg-white dark:bg-white/5 rounded p-4",
+              children: o$5("div", {
+                children: [o$5("dt", {
+                  className: "text-md font-medium text-gray-800 dark:text-white",
+                  children: t2("File Name")
+                }), o$5("dd", {
+                  children: [o$5("p", {
                     className: "text-sm text-gray-700 dark:text-gray-300",
-                    children: ["Available variables:", " ", o(Variable, {
+                    children: [t2("Available variables"), ":", " ", o$5(Variable, {
                       name: "{title}",
-                      title
-                    }), ",", " ", o(Variable, {
+                      title: title2
+                    }), ",", " ", o$5(Variable, {
                       name: "{date}",
                       title: date
-                    }), ",", " ", o(Variable, {
+                    }), ",", " ", o$5(Variable, {
                       name: "{timestamp}",
                       title: timestamp$1
-                    }), ",", " ", o(Variable, {
+                    }), ",", " ", o$5(Variable, {
                       name: "{chat_id}",
                       title: chatId
                     })]
-                  }), o("input", {
+                  }), o$5("input", {
                     className: "Input mt-4",
                     id: "filename",
                     value: format,
                     onChange: (e2) => setFormat(e2.currentTarget.value)
-                  }), o("p", {
+                  }), o$5("p", {
                     className: "mt-1 text-sm text-gray-700 dark:text-gray-300",
-                    children: ["Preview:", " ", o("span", {
+                    children: [t2("Preview"), ":", " ", o$5("span", {
                       className: "select-all",
                       style: {
                         "text-decoration": "underline",
@@ -18219,64 +22210,64 @@ ${message}`;
                   })]
                 })]
               })
-            }), o("div", {
+            }), o$5("div", {
               className: "relative flex bg-white dark:bg-white/5 rounded p-4",
-              children: [o("div", {
-                children: [o("dt", {
+              children: [o$5("div", {
+                children: [o$5("dt", {
                   className: "text-md font-medium text-gray-800 dark:text-white",
-                  children: "Conversation Timestamp"
-                }), o("dd", {
+                  children: t2("Conversation Timestamp")
+                }), o$5("dd", {
                   className: "text-sm text-gray-700 dark:text-gray-300",
-                  children: ["Will show on the page and HTML files.", enableTimestamp && o("div", {
+                  children: [t2("Conversation Timestamp Description"), enableTimestamp && o$5("div", {
                     className: "mt-2",
-                    children: o(Toggle, {
-                      label: "Use 24-hour format (eg. 23:59)",
+                    children: o$5(Toggle, {
+                      label: t2("Use 24-hour format"),
                       checked: timeStamp24H,
                       onCheckedUpdate: setTimeStamp24H
                     })
                   })]
                 })]
-              }), o("div", {
+              }), o$5("div", {
                 className: "absolute right-4",
-                children: o(Toggle, {
+                children: o$5(Toggle, {
                   label: "",
                   checked: enableTimestamp,
                   onCheckedUpdate: setEnableTimestamp
                 })
               })]
-            }), o("div", {
+            }), o$5("div", {
               className: "relative flex bg-white dark:bg-white/5 rounded p-4",
-              children: [o("div", {
-                children: [o("dt", {
+              children: [o$5("div", {
+                children: [o$5("dt", {
                   className: "text-md font-medium text-gray-800 dark:text-white",
-                  children: "Export Metadata"
-                }), o("dd", {
+                  children: t2("Export Metadata")
+                }), o$5("dd", {
                   className: "text-sm text-gray-700 dark:text-gray-300",
-                  children: ["Add metadata to exported Markdown and HTML files.", enableMeta && o(_$2, {
-                    children: [o("p", {
+                  children: [t2("Export Metadata Description"), enableMeta && o$5(_$2, {
+                    children: [o$5("p", {
                       className: "mt-2 text-sm text-gray-700 dark:text-gray-300",
-                      children: ["Available variables:", " ", o(Variable, {
+                      children: [t2("Available variables"), ":", " ", o$5(Variable, {
                         name: "{title}",
-                        title
-                      }), ",", " ", o(Variable, {
+                        title: title2
+                      }), ",", " ", o$5(Variable, {
                         name: "{date}",
                         title: date
-                      }), ",", " ", o(Variable, {
+                      }), ",", " ", o$5(Variable, {
                         name: "{timestamp}",
                         title: timestamp$1
-                      }), ",", " ", o(Variable, {
+                      }), ",", " ", o$5(Variable, {
                         name: "{source}",
                         title: source
-                      }), ",", " ", o(Variable, {
+                      }), ",", " ", o$5(Variable, {
                         name: "{model}",
                         title: "ChatGPT-3.5"
-                      }), ",", " ", o(Variable, {
+                      }), ",", " ", o$5(Variable, {
                         name: "{model_name}",
                         title: "text-davinci-002-render-sha"
                       })]
-                    }), exportMetaList.map((meta, i2) => o("div", {
+                    }), exportMetaList.map((meta, i2) => o$5("div", {
                       className: "flex items-center mt-2",
-                      children: [o("input", {
+                      children: [o$5("input", {
                         className: "Input",
                         value: meta.name,
                         onChange: (e2) => {
@@ -18287,10 +22278,10 @@ ${message}`;
                           };
                           setExportMetaList(list2);
                         }
-                      }), o("span", {
+                      }), o$5("span", {
                         className: "mx-2",
                         children: "→"
-                      }), o("input", {
+                      }), o$5("input", {
                         className: "Input",
                         value: meta.value,
                         onChange: (e2) => {
@@ -18301,17 +22292,17 @@ ${message}`;
                           };
                           setExportMetaList(list2);
                         }
-                      }), o("button", {
+                      }), o$5("button", {
                         className: "ml-2 rounded-full p-1 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition ease-in-out duration-150",
                         "aria-label": "Remove",
                         onClick: () => setExportMetaList(exportMetaList.filter((_2, j2) => j2 !== i2)),
-                        children: o(IconTrash, {
+                        children: o$5(IconTrash, {
                           className: "w-4 h-4"
                         })
                       })]
-                    }, i2)), o("div", {
+                    }, i2)), o$5("div", {
                       className: "flex justify-center items-center mt-2 pr-8",
-                      children: o("button", {
+                      children: o$5("button", {
                         className: "w-full border border-[#6f6e77] dark:border-gray-[#86858d] rounded-md py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition ease-in-out duration-150",
                         "aria-label": "Add",
                         onClick: () => setExportMetaList([...exportMetaList, {
@@ -18323,33 +22314,33 @@ ${message}`;
                     })]
                   })]
                 })]
-              }), o("div", {
+              }), o$5("div", {
                 className: "absolute right-4",
-                children: o(Toggle, {
+                children: o$5(Toggle, {
                   label: "",
                   checked: enableMeta,
                   onCheckedUpdate: setEnableMeta
                 })
               })]
             })]
-          }), o("div", {
+          }), o$5("div", {
             className: "flex mt-6",
             style: {
               justifyContent: "flex-end"
             },
-            children: o($5d3850c4d0b4e6c7$export$f39c2d165cd861fe, {
+            children: o$5($5d3850c4d0b4e6c7$export$f39c2d165cd861fe, {
               asChild: true,
-              children: o("button", {
-                className: "Button green",
-                children: "Save"
+              children: o$5("button", {
+                className: "Button green font-bold",
+                children: t2("Save")
               })
             })
-          }), o($5d3850c4d0b4e6c7$export$f39c2d165cd861fe, {
+          }), o$5($5d3850c4d0b4e6c7$export$f39c2d165cd861fe, {
             asChild: true,
-            children: o("button", {
+            children: o$5("button", {
               className: "IconButton CloseButton",
               "aria-label": "Close",
-              children: o(IconCross, {})
+              children: o$5(IconCross, {})
             })
           })]
         })]
@@ -18364,10 +22355,13 @@ We all have to wait for them to bring it back.`;
   function MenuInner({
     container
   }) {
+    const {
+      t: t2
+    } = useTranslation();
     const disabled = getHistoryDisabled();
-    const [open, setOpen] = h$2(false);
-    const [exportOpen, setExportOpen] = h$2(false);
-    const [settingOpen, setSettingOpen] = h$2(false);
+    const [open, setOpen] = h$4(false);
+    const [exportOpen, setExportOpen] = h$4(false);
+    const [settingOpen, setSettingOpen] = h$4(false);
     const {
       format,
       enableTimestamp,
@@ -18375,7 +22369,7 @@ We all have to wait for them to bring it back.`;
       enableMeta,
       exportMetaList
     } = useSettingContext();
-    p$3(() => {
+    p$6(() => {
       if (enableTimestamp) {
         document.body.setAttribute("data-time-format", timeStamp24H ? "24" : "12");
       } else {
@@ -18383,15 +22377,15 @@ We all have to wait for them to bring it back.`;
       }
     }, [enableTimestamp, timeStamp24H]);
     const metaList = F$1(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList]);
-    const onClickText = T$3(() => exportToText(), []);
-    const onClickPng = T$3(() => exportToPng(format), [format]);
-    const onClickMarkdown = T$3(() => exportToMarkdown(format, metaList), [format, metaList]);
-    const onClickHtml = T$3(() => exportToHtml(format, metaList), [format, metaList]);
-    const onClickJSON = T$3(() => exportToJson(format), [format]);
+    const onClickText = T$4(() => exportToText(), []);
+    const onClickPng = T$4(() => exportToPng(format), [format]);
+    const onClickMarkdown = T$4(() => exportToMarkdown(format, metaList), [format, metaList]);
+    const onClickHtml = T$4(() => exportToHtml(format, metaList), [format, metaList]);
+    const onClickJSON = T$4(() => exportToJson(format), [format]);
     const isMobile = window.innerWidth < 768;
     const Portal = isMobile ? "div" : $cef8881cdc69808e$export$602eac185826482c;
     if (disabled) {
-      return o(MenuItem, {
+      return o$5(MenuItem, {
         className: "mt-1",
         text: "Exporter unavailable",
         icon: IconArrowRightFromBracket,
@@ -18399,29 +22393,29 @@ We all have to wait for them to bring it back.`;
         disabled: true
       });
     }
-    return o(_$2, {
-      children: [isMobile && open && o("div", {
+    return o$5(_$2, {
+      children: [isMobile && open && o$5("div", {
         className: "dropdown-backdrop animate-fadeIn",
         onClick: () => setOpen(false)
-      }), o($cef8881cdc69808e$export$be92b6f5f03c0fe9, {
+      }), o$5($cef8881cdc69808e$export$be92b6f5f03c0fe9, {
         openDelay: 0,
         closeDelay: 300,
         open,
         onOpenChange: setOpen,
-        children: [o($cef8881cdc69808e$export$41fb9f06171c75f4, {
-          children: o(MenuItem, {
+        children: [o$5($cef8881cdc69808e$export$41fb9f06171c75f4, {
+          children: o$5(MenuItem, {
             className: "mt-1",
-            text: "Export",
+            text: t2("ExportHelper"),
             icon: IconArrowRightFromBracket,
             onClick: () => {
               setOpen(true);
               return true;
             }
           })
-        }), o(Portal, {
+        }), o$5(Portal, {
           container: isMobile ? container : document.body,
           forceMount: open || settingOpen || exportOpen,
-          children: o($cef8881cdc69808e$export$7c6e2c02157bb7d2, {
+          children: o$5($cef8881cdc69808e$export$7c6e2c02157bb7d2, {
             className: isMobile ? "fixed grid grid-cols-2 gap-x-1 px-1.5 py-2 bg-gray-900 shadow-md transition-opacity duration-200 animate-slideUp" : "grid grid-cols-2 gap-x-1 px-1.5 py-2 pb-0 rounded-md bg-gray-900 shadow-md transition-opacity duration-200 animate-fadeIn",
             style: {
               width: isMobile ? 316 : 268,
@@ -18432,70 +22426,70 @@ We all have to wait for them to bring it back.`;
             side: isMobile ? "bottom" : "right",
             align: "start",
             alignOffset: isMobile ? 0 : -64,
-            children: [o(SettingDialog, {
+            children: [o$5(SettingDialog, {
               open: settingOpen,
               onOpenChange: setSettingOpen,
-              children: o("div", {
+              children: o$5("div", {
                 className: "row-full",
-                children: o(MenuItem, {
-                  text: "Setting",
+                children: o$5(MenuItem, {
+                  text: t2("Setting"),
                   icon: IconSetting
                 })
               })
-            }), o(MenuItem, {
-              text: "Copy Text",
-              successText: "Copied!",
-              icon: () => o(IconCopy, {
+            }), o$5(MenuItem, {
+              text: t2("Copy Text"),
+              successText: t2("Copied!"),
+              icon: () => o$5(IconCopy, {
                 className: "w-4 h-4"
               }),
               className: "row-full",
               onClick: onClickText
-            }), o(MenuItem, {
-              text: "Screenshot",
+            }), o$5(MenuItem, {
+              text: t2("Screenshot"),
               icon: IconCamera,
               className: "row-half",
               onClick: onClickPng
-            }), o(MenuItem, {
-              text: "Markdown",
+            }), o$5(MenuItem, {
+              text: t2("Markdown"),
               icon: IconMarkdown,
               className: "row-half",
               onClick: onClickMarkdown
-            }), o(MenuItem, {
-              text: "HTML",
+            }), o$5(MenuItem, {
+              text: t2("HTML"),
               icon: FileCode,
               className: "row-half",
               onClick: onClickHtml
-            }), o(MenuItem, {
-              text: "JSON",
+            }), o$5(MenuItem, {
+              text: t2("JSON"),
               icon: IconJSON,
               className: "row-half",
               onClick: onClickJSON
-            }), o(ExportDialog, {
+            }), o$5(ExportDialog, {
               format,
               open: exportOpen,
               onOpenChange: setExportOpen,
-              children: o("div", {
+              children: o$5("div", {
                 className: "row-full",
-                children: o(MenuItem, {
-                  text: "Export All",
+                children: o$5(MenuItem, {
+                  text: t2("Export All"),
                   icon: IconZip
                 })
               })
-            }), o($cef8881cdc69808e$export$21b07c8f274aebd5, {
+            }), o$5($cef8881cdc69808e$export$21b07c8f274aebd5, {
               width: "16",
               height: "8",
               className: "text-gray-900 fill-current"
             })]
           })
         })]
-      }), o(Divider, {})]
+      }), o$5(Divider, {})]
     });
   }
   function Menu({
     container
   }) {
-    return o(SettingProvider, {
-      children: o(MenuInner, {
+    return o$5(SettingProvider, {
+      children: o$5(MenuInner, {
         container
       })
     });
@@ -18505,8 +22499,8 @@ We all have to wait for them to bring it back.`;
   const SecondaryToolbar = ({
     index: index2
   }) => {
-    const [loading, setLoading] = h$2(false);
-    const [succeed, setSucceed] = h$2(false);
+    const [loading, setLoading] = h$4(false);
+    const [succeed, setSucceed] = h$4(false);
     const handleClick = async () => {
       try {
         setLoading(true);
@@ -18521,22 +22515,22 @@ We all have to wait for them to bring it back.`;
         setLoading(false);
       }
     };
-    return o("div", {
+    return o$5("div", {
       className: "flex w-full ml-4 mt-2 absolute lg:translate-x-full lg:right-0 lg:pl-2 lg:mt-0 lg:top-8",
-      children: loading ? o(IconLoading, {
+      children: loading ? o$5(IconLoading, {
         className: "w-6 h-6 text-gray-500 dark:text-gray-400",
         style: {
           padding: 5
         }
-      }) : succeed ? o(IconCheck, {
+      }) : succeed ? o$5(IconCheck, {
         className: "w-6 h-6 text-gray-500 dark:text-gray-400",
         style: {
           padding: 3
         }
-      }) : o("button", {
+      }) : o$5("button", {
         onClick: handleClick,
         className: "p-1 rounded-md hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200",
-        children: o(IconCopy, {
+        children: o$5(IconCopy, {
           className: "w-4 h-4 text-gray-400 dark:text-gray-400"
         })
       })
@@ -18560,7 +22554,7 @@ We all have to wait for them to bring it back.`;
   function main() {
     onloadSafe(() => {
       const container = document.createElement("div");
-      B$2(o(Menu, {
+      B$2(o$5(Menu, {
         container
       }), container);
       sentinel.on("nav", (nav) => {
@@ -18601,7 +22595,7 @@ We all have to wait for them to bring it back.`;
         secondaryToolbar.className = "w-full secondary-toolbar";
         const threads = Array.from(document.querySelectorAll("main .group"));
         const index2 = threads.indexOf(node2.closest(".group"));
-        B$2(o(SecondaryToolbar, {
+        B$2(o$5(SecondaryToolbar, {
           index: index2
         }), secondaryToolbar);
         node2.append(secondaryToolbar);
