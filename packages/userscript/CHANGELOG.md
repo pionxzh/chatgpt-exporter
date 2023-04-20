@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.7.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.7.0...userscript-v2.7.1) (2023-04-20)
+
+
+### Bug Fixes
+
+* some chats cannot be exported because of missing message parts ([2e7ece8](https://github.com/pionxzh/chatgpt-exporter/commit/2e7ece886ef0c4cc7d6a3d5016ebce8799acb6b1))
+* thread might not exist ([d18bf3f](https://github.com/pionxzh/chatgpt-exporter/commit/d18bf3f0620566e86369b6e16e2adeed544f2266))
+
 ## [2.7.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.6.5...userscript-v2.7.0) (2023-04-15)
 
 
