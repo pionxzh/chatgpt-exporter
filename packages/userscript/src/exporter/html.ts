@@ -71,7 +71,7 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
         const avatarEl = author === 'ChatGPT'
             ? '<svg width="41" height="41"><use xlink:href="#chatgpt" /></svg>'
             : `<img alt="${author}" />`
-        const content = item.message?.content.parts.join('\n') ?? ''
+        const content = item.message?.content.parts?.join('\n') ?? ''
         let conversationContent = content
 
         if (author === 'ChatGPT') {

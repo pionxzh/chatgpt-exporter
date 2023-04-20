@@ -79,7 +79,7 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
 
     const content = conversationNodes.map((item) => {
         const author = item.message?.author.role === 'assistant' ? 'ChatGPT' : 'You'
-        const content = item.message?.content.parts.join('\n') ?? ''
+        const content = item.message?.content.parts?.join('\n') ?? ''
         let message = content
 
         // User's message will not be reformatted

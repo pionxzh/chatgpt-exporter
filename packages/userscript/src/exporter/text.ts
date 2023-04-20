@@ -18,7 +18,7 @@ export async function exportToText() {
     const { conversationNodes } = processConversation(rawConversation, conversationChoices)
     const text = conversationNodes.map((item) => {
         const author = item.message?.author.role === 'assistant' ? 'ChatGPT' : 'You'
-        const content = item.message?.content.parts.join('\n') ?? ''
+        const content = item.message?.content.parts?.join('\n') ?? ''
         let message = content
 
         // User's message will not be reformatted
@@ -53,7 +53,7 @@ export async function exportToTextFromIndex(index: number) {
     const conversationChoices = getConversationChoice()
     const { conversationNodes } = processConversation(rawConversation, conversationChoices)
 
-    const text = conversationNodes[index].message?.content.parts.join('\n') ?? ''
+    const text = conversationNodes[index].message?.content.parts?.join('\n') ?? ''
 
     copyToClipboard(standardizeLineBreaks(text))
     return true
