@@ -102,7 +102,7 @@ function main() {
             const { conversationNodes } = processConversation(rawConversation, conversationChoices)
 
             threadContents.forEach((thread, index) => {
-                const createTime = conversationNodes[index].message?.create_time
+                const createTime = conversationNodes[index]?.message?.create_time
                 if (!createTime) return
 
                 const date = new Date(createTime * 1000)
