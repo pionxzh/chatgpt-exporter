@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.7.0
+// @version            2.7.1
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -19187,12 +19187,12 @@ var __publicField = (obj, key, value) => {
       conversationNodes
     } = conversation;
     const conversationHtml = conversationNodes.map((item) => {
-      var _a, _b, _c, _d, _e;
+      var _a, _b, _c, _d, _e, _f;
       const author = ((_a = item.message) == null ? void 0 : _a.author.role) === "assistant" ? "ChatGPT" : "You";
       const model2 = ((_c = (_b = item.message) == null ? void 0 : _b.metadata) == null ? void 0 : _c.model_slug) === "gpt-4" ? "GPT-4" : "GPT-3";
       const authorType = author === "ChatGPT" ? model2 : "user";
       const avatarEl = author === "ChatGPT" ? '<svg width="41" height="41"><use xlink:href="#chatgpt" /></svg>' : `<img alt="${author}" />`;
-      const content2 = ((_d = item.message) == null ? void 0 : _d.content.parts.join("\n")) ?? "";
+      const content2 = ((_e = (_d = item.message) == null ? void 0 : _d.content.parts) == null ? void 0 : _e.join("\n")) ?? "";
       let conversationContent = content2;
       if (author === "ChatGPT") {
         const root2 = fromMarkdown(content2);
@@ -19202,7 +19202,7 @@ var __publicField = (obj, key, value) => {
       }
       const enableTimestamp = ScriptStorage.get(KEY_TIMESTAMP_ENABLED) ?? false;
       const timeStamp24H = ScriptStorage.get(KEY_TIMESTAMP_24H) ?? false;
-      const timestamp2 = ((_e = item.message) == null ? void 0 : _e.create_time) ?? "";
+      const timestamp2 = ((_f = item.message) == null ? void 0 : _f.create_time) ?? "";
       const showTimestamp = enableTimestamp && timestamp2;
       let conversationDate = "";
       let conversationTime = "";
@@ -19479,9 +19479,9 @@ ${_metaList.join("\n")}
 
 ` : "";
     const content2 = conversationNodes.map((item) => {
-      var _a, _b;
+      var _a, _b, _c;
       const author = ((_a = item.message) == null ? void 0 : _a.author.role) === "assistant" ? "ChatGPT" : "You";
-      const content22 = ((_b = item.message) == null ? void 0 : _b.content.parts.join("\n")) ?? "";
+      const content22 = ((_c = (_b = item.message) == null ? void 0 : _b.content.parts) == null ? void 0 : _c.join("\n")) ?? "";
       let message = content22;
       if (author === "ChatGPT") {
         const root2 = fromMarkdown(content22);
@@ -19519,9 +19519,9 @@ ${content2}`;
       conversationNodes
     } = processConversation(rawConversation, conversationChoices);
     const text2 = conversationNodes.map((item) => {
-      var _a, _b;
+      var _a, _b, _c;
       const author = ((_a = item.message) == null ? void 0 : _a.author.role) === "assistant" ? "ChatGPT" : "You";
-      const content2 = ((_b = item.message) == null ? void 0 : _b.content.parts.join("\n")) ?? "";
+      const content2 = ((_c = (_b = item.message) == null ? void 0 : _b.content.parts) == null ? void 0 : _c.join("\n")) ?? "";
       let message = content2;
       if (author === "ChatGPT") {
         const root2 = fromMarkdown(content2);
@@ -19541,7 +19541,7 @@ ${message}`;
     return true;
   }
   async function exportToTextFromIndex(index2) {
-    var _a;
+    var _a, _b;
     if (!checkIfConversationStarted()) {
       alert(instance.t("Please start a conversation first"));
       return false;
@@ -19552,7 +19552,7 @@ ${message}`;
     const {
       conversationNodes
     } = processConversation(rawConversation, conversationChoices);
-    const text2 = ((_a = conversationNodes[index2].message) == null ? void 0 : _a.content.parts.join("\n")) ?? "";
+    const text2 = ((_b = (_a = conversationNodes[index2].message) == null ? void 0 : _a.content.parts) == null ? void 0 : _b.join("\n")) ?? "";
     copyToClipboard(standardizeLineBreaks(text2));
     return true;
   }
@@ -22613,8 +22613,8 @@ We all have to wait for them to bring it back.`;
           conversationNodes
         } = processConversation(rawConversation, conversationChoices);
         threadContents.forEach((thread, index2) => {
-          var _a;
-          const createTime = (_a = conversationNodes[index2].message) == null ? void 0 : _a.create_time;
+          var _a, _b;
+          const createTime = (_b = (_a = conversationNodes[index2]) == null ? void 0 : _a.message) == null ? void 0 : _b.create_time;
           if (!createTime)
             return;
           const date = new Date(createTime * 1e3);
