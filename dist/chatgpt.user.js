@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.7.1
+// @version            2.8.0
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -397,9 +397,6 @@ body[data-time-format="24"] span[data-time-format="24"] {
         opacity: 1;
         transform: translate(-50%, -50%) scale(1);
     }
-}
-.invisible + .secondary-toolbar {
-    display: none;
 }
 .animate-fadeIn  {
     animation: fadeIn .3s;
@@ -19540,21 +19537,12 @@ ${message}`;
     copyToClipboard(standardizeLineBreaks(text2));
     return true;
   }
-  async function exportToTextFromIndex(index2) {
-    var _a, _b;
-    if (!checkIfConversationStarted()) {
-      alert(instance.t("Please start a conversation first"));
-      return false;
-    }
-    const chatId = await getCurrentChatId();
-    const rawConversation = await fetchConversation(chatId);
-    const conversationChoices = getConversationChoice();
-    const {
-      conversationNodes
-    } = processConversation(rawConversation, conversationChoices);
-    const text2 = ((_b = (_a = conversationNodes[index2].message) == null ? void 0 : _a.content.parts) == null ? void 0 : _b.join("\n")) ?? "";
-    copyToClipboard(standardizeLineBreaks(text2));
-    return true;
+  function useWindowResize(selector) {
+    return gn(subscribe$1, selector);
+  }
+  function subscribe$1(callback) {
+    window.addEventListener("resize", callback);
+    return () => window.removeEventListener("resize", callback);
   }
   var _ = 0;
   function o$5(o2, e2, n2, t2, f2, l2) {
@@ -21263,29 +21251,6 @@ ${message}`;
       })
     });
   }
-  function IconCheck({
-    className,
-    style: style2
-  }) {
-    return o$5("svg", {
-      xmlns: "http://www.w3.org/2000/svg",
-      viewBox: "0 0 24 24",
-      className,
-      style: style2,
-      fill: "none",
-      stroke: "currentColor",
-      "stroke-width": "2",
-      "stroke-linecap": "round",
-      "stroke-linejoin": "round",
-      children: [o$5("path", {
-        stroke: "none",
-        d: "M0 0h24v24H0z",
-        fill: "none"
-      }), o$5("path", {
-        d: "M5 12l5 5l10 -10"
-      })]
-    });
-  }
   function IconTrash({
     className,
     style: style2
@@ -21645,7 +21610,7 @@ ${message}`;
       })]
     });
   };
-  const TIMEOUT$1 = 2500;
+  const TIMEOUT = 2500;
   const MenuItem = ({
     text: text2,
     successText,
@@ -21657,13 +21622,16 @@ ${message}`;
   }) => {
     const [loading, setLoading] = h$4(false);
     const [succeed, setSucceed] = h$4(false);
-    const handleClick = typeof onClick === "function" ? async () => {
+    const handleClick = typeof onClick === "function" ? async (e2) => {
+      e2.preventDefault();
+      if (loading)
+        return;
       try {
         setLoading(true);
         const result = await onClick();
         if (result) {
           setSucceed(true);
-          setTimeout(() => setSucceed(false), TIMEOUT$1);
+          setTimeout(() => setSucceed(false), TIMEOUT);
         }
       } catch (error) {
         console.error(error);
@@ -22382,7 +22350,8 @@ We all have to wait for them to bring it back.`;
     const onClickMarkdown = T$4(() => exportToMarkdown(format, metaList), [format, metaList]);
     const onClickHtml = T$4(() => exportToHtml(format, metaList), [format, metaList]);
     const onClickJSON = T$4(() => exportToJson(format), [format]);
-    const isMobile = window.innerWidth < 768;
+    const width = useWindowResize(() => window.innerWidth);
+    const isMobile = width < 768;
     const Portal = isMobile ? "div" : $cef8881cdc69808e$export$602eac185826482c;
     if (disabled) {
       return o$5(MenuItem, {
@@ -22416,16 +22385,17 @@ We all have to wait for them to bring it back.`;
           container: isMobile ? container : document.body,
           forceMount: open || settingOpen || exportOpen,
           children: o$5($cef8881cdc69808e$export$7c6e2c02157bb7d2, {
-            className: isMobile ? "fixed grid grid-cols-2 gap-x-1 px-1.5 py-2 bg-gray-900 shadow-md transition-opacity duration-200 animate-slideUp" : "grid grid-cols-2 gap-x-1 px-1.5 py-2 pb-0 rounded-md bg-gray-900 shadow-md transition-opacity duration-200 animate-fadeIn",
+            className: isMobile ? "fixed grid grid-cols-2 gap-x-1 px-1.5 pt-2 rounded bg-gray-900 shadow-md transition-opacity duration-200 animate-slideUp" : "grid grid-cols-2 gap-x-1 px-1.5 py-2 pb-0 rounded-md bg-gray-900 shadow-md transition-opacity duration-200 animate-fadeIn",
             style: {
               width: isMobile ? 316 : 268,
               left: -6,
-              bottom: "calc(-1 * var(--radix-popper-available-height))"
+              bottom: 0
             },
             sideOffset: 8,
             side: isMobile ? "bottom" : "right",
             align: "start",
             alignOffset: isMobile ? 0 : -64,
+            collisionPadding: isMobile ? 0 : 8,
             children: [o$5(SettingDialog, {
               open: settingOpen,
               onOpenChange: setSettingOpen,
@@ -22475,7 +22445,7 @@ We all have to wait for them to bring it back.`;
                   icon: IconZip
                 })
               })
-            }), o$5($cef8881cdc69808e$export$21b07c8f274aebd5, {
+            }), !isMobile && o$5($cef8881cdc69808e$export$21b07c8f274aebd5, {
               width: "16",
               height: "8",
               className: "text-gray-900 fill-current"
@@ -22494,48 +22464,6 @@ We all have to wait for them to bring it back.`;
       })
     });
   }
-  const SecondaryToolbar$1 = "";
-  const TIMEOUT = 2500;
-  const SecondaryToolbar = ({
-    index: index2
-  }) => {
-    const [loading, setLoading] = h$4(false);
-    const [succeed, setSucceed] = h$4(false);
-    const handleClick = async () => {
-      try {
-        setLoading(true);
-        const result = await exportToTextFromIndex(index2);
-        if (result) {
-          setSucceed(true);
-          setTimeout(() => setSucceed(false), TIMEOUT);
-        }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    return o$5("div", {
-      className: "flex w-full ml-4 mt-2 absolute lg:translate-x-full lg:right-0 lg:pl-2 lg:mt-0 lg:top-8",
-      children: loading ? o$5(IconLoading, {
-        className: "w-6 h-6 text-gray-500 dark:text-gray-400",
-        style: {
-          padding: 5
-        }
-      }) : succeed ? o$5(IconCheck, {
-        className: "w-6 h-6 text-gray-500 dark:text-gray-400",
-        style: {
-          padding: 3
-        }
-      }) : o$5("button", {
-        onClick: handleClick,
-        className: "p-1 rounded-md hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200",
-        children: o$5(IconCopy, {
-          className: "w-4 h-4 text-gray-400 dark:text-gray-400"
-        })
-      })
-    });
-  };
   const missingTailwind = "";
   try {
     const legacyFormat = GM_getValue == null ? void 0 : GM_getValue(LEGACY_KEY_FILENAME_FORMAT, "");
@@ -22585,20 +22513,6 @@ We all have to wait for them to bring it back.`;
           };
           xhr.send();
         }
-      });
-      sentinel.on("main .flex.justify-between", (node2) => {
-        if (!node2.querySelector("button"))
-          return;
-        if (node2.closest("pre"))
-          return;
-        const secondaryToolbar = document.createElement("div");
-        secondaryToolbar.className = "w-full secondary-toolbar";
-        const threads = Array.from(document.querySelectorAll("main .group"));
-        const index2 = threads.indexOf(node2.closest(".group"));
-        B$2(o$5(SecondaryToolbar, {
-          index: index2
-        }), secondaryToolbar);
-        node2.append(secondaryToolbar);
       });
       let chatId = "";
       sentinel.on("main .group", async () => {
