@@ -6,6 +6,7 @@ import { exportToPng } from '../exporter/image'
 import { exportToJson } from '../exporter/json'
 import { exportToMarkdown } from '../exporter/markdown'
 import { exportToText } from '../exporter/text'
+import { useWindowSize } from '../hooks/useWindowSize'
 import { getHistoryDisabled } from '../page'
 import { Divider } from './Divider'
 import { ExportDialog } from './ExportDialog'
@@ -54,7 +55,8 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
     const onClickHtml = useCallback(() => exportToHtml(format, metaList), [format, metaList])
     const onClickJSON = useCallback(() => exportToJson(format), [format])
 
-    const isMobile = window.innerWidth < 768
+    const width = useWindowSize(() => window.innerWidth)
+    const isMobile = width < 768
     const Portal = isMobile ? 'div' : HoverCard.Portal
 
     if (disabled) {
@@ -101,17 +103,18 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                 >
                     <HoverCard.Content
                         className={isMobile
-                            ? 'fixed grid grid-cols-2 gap-x-1 px-1.5 py-2 bg-gray-900 shadow-md transition-opacity duration-200 animate-slideUp'
+                            ? 'fixed grid grid-cols-2 gap-x-1 px-1.5 pt-2 rounded bg-gray-900 shadow-md transition-opacity duration-200 animate-slideUp'
                             : 'grid grid-cols-2 gap-x-1 px-1.5 py-2 pb-0 rounded-md bg-gray-900 shadow-md transition-opacity duration-200 animate-fadeIn'}
                         style={{
                             width: isMobile ? 316 : 268,
                             left: -6,
-                            bottom: 'calc(-1 * var(--radix-popper-available-height))',
+                            bottom: 0,
                         }}
                         sideOffset={8}
                         side={isMobile ? 'bottom' : 'right'}
                         align="start"
                         alignOffset={isMobile ? 0 : -64}
+                        collisionPadding={isMobile ? 0 : 8}
                     >
                         <SettingDialog
                             open={settingOpen}
@@ -166,7 +169,7 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                             </div>
                         </ExportDialog>
 
-                        <HoverCard.Arrow width="16" height="8" className="text-gray-900 fill-current" />
+                        {!isMobile && <HoverCard.Arrow width="16" height="8" className="text-gray-900 fill-current" />}
                     </HoverCard.Content>
                 </Portal>
             </HoverCard.Root>
