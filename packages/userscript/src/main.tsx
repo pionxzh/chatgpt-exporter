@@ -5,7 +5,6 @@ import { fetchConversation, processConversation } from './api'
 import { KEY_FILENAME_FORMAT, LEGACY_KEY_FILENAME_FORMAT } from './constants'
 import { getChatIdFromUrl, getConversationChoice } from './page'
 import { Menu } from './ui/Menu'
-import { SecondaryToolbar } from './ui/SecondaryToolbar'
 import { onloadSafe } from './utils/utils'
 
 import './i18n'
@@ -72,20 +71,6 @@ function main() {
                 }
                 xhr.send()
             }
-        })
-
-        /** Insert copy button to the next of feedback buttons */
-        sentinel.on('main .flex.justify-between', (node) => {
-            if (!node.querySelector('button')) return
-            // ignore codeblock
-            if (node.closest('pre')) return
-
-            const secondaryToolbar = document.createElement('div')
-            secondaryToolbar.className = 'w-full secondary-toolbar'
-            const threads = Array.from(document.querySelectorAll('main .group'))
-            const index = threads.indexOf(node.closest('.group')!)
-            render(<SecondaryToolbar index={index} />, secondaryToolbar)
-            node.append(secondaryToolbar)
         })
 
         /** Insert timestamp to the bottom right of each message */
