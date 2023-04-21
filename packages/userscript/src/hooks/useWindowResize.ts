@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'preact/compat'
 
-export function useWindowSize<T>(selector: () => T) {
+export function useWindowResize<T>(selector: () => T) {
     return useSyncExternalStore(subscribe, selector)
 }
 

@@ -6,7 +6,7 @@ import { exportToPng } from '../exporter/image'
 import { exportToJson } from '../exporter/json'
 import { exportToMarkdown } from '../exporter/markdown'
 import { exportToText } from '../exporter/text'
-import { useWindowSize } from '../hooks/useWindowSize'
+import { useWindowResize } from '../hooks/useWindowResize'
 import { getHistoryDisabled } from '../page'
 import { Divider } from './Divider'
 import { ExportDialog } from './ExportDialog'
@@ -55,7 +55,7 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
     const onClickHtml = useCallback(() => exportToHtml(format, metaList), [format, metaList])
     const onClickJSON = useCallback(() => exportToJson(format), [format])
 
-    const width = useWindowSize(() => window.innerWidth)
+    const width = useWindowResize(() => window.innerWidth)
     const isMobile = width < 768
     const Portal = isMobile ? 'div' : HoverCard.Portal
 

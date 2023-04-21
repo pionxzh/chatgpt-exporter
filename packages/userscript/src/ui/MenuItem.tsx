@@ -19,7 +19,10 @@ export const MenuItem: FC<MenuItemProps> = ({ text, successText, disabled = fals
     const [succeed, setSucceed] = useState(false)
 
     const handleClick = typeof onClick === 'function'
-        ? async () => {
+        ? async (e: Event) => {
+            e.preventDefault()
+            if (loading) return
+
             try {
                 setLoading(true)
                 const result = await onClick()
