@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.8.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.7.1...userscript-v2.8.0) (2023-04-21)
+
+
+### Features
+
+* remove copy button in chat in favor of the built-in copy button ([66dbaa6](https://github.com/pionxzh/chatgpt-exporter/commit/66dbaa669fe0379b0137b67648716e9782cf087e))
+
+
+### Bug Fixes
+
+* fix export twice ([38c6be3](https://github.com/pionxzh/chatgpt-exporter/commit/38c6be3a1589d1d6c4245bc8a0d30ed086986f4b))
+* layout overlap with menu on mobile ([705afe5](https://github.com/pionxzh/chatgpt-exporter/commit/705afe5bef153fe0f3af53b2eb26633c386d23fe)), closes [#134](https://github.com/pionxzh/chatgpt-exporter/issues/134)
+
 ## [2.7.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.7.0...userscript-v2.7.1) (2023-04-20)
 
 
