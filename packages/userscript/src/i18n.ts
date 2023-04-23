@@ -89,11 +89,11 @@ const LanguageMapping: Record<string, string> = {
 
     'zh': ZH_Hans.code,
     'zh-CN': ZH_Hans.code,
+    'zh-MO': ZH_Hans.code,
     'zh-SG': ZH_Hans.code,
     'zh-Hans': ZH_Hans.code,
 
     'zh-HK': ZH_Hant.code,
-    'zh-MO': ZH_Hant.code,
     'zh-TW': ZH_Hant.code,
     'zh-Hant': ZH_Hant.code,
 }
