@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.9.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.8.0...userscript-v2.9.0) (2023-04-23)
+
+
+### Features
+
+* basic support for response from plugin ([c45fdbe](https://github.com/pionxzh/chatgpt-exporter/commit/c45fdbe4a48ec90947d03c2fb3c5ad67e9bff5e6))
+* **i18n:** add spanish to lanaguage list ([2b2f75c](https://github.com/pionxzh/chatgpt-exporter/commit/2b2f75ca0579b723beda03e42c8790931cebd6c1))
+* **i18n:** add spanish translation ([#137](https://github.com/pionxzh/chatgpt-exporter/issues/137)) ([08a6930](https://github.com/pionxzh/chatgpt-exporter/commit/08a693005e19360c15d2577b914bbdd754adeac4))
+
+
+### Bug Fixes
+
+* **i18n:** fix Malaysia should use `ZH_Hans` ([9e2b748](https://github.com/pionxzh/chatgpt-exporter/commit/9e2b7485b340430729cea4819b5c345394129c11))
+* support url with model ([a50d580](https://github.com/pionxzh/chatgpt-exporter/commit/a50d5802be2656450e25d66df8ad10d696ba5d43))
+
 ## [2.8.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.7.1...userscript-v2.8.0) (2023-04-21)
 
 
