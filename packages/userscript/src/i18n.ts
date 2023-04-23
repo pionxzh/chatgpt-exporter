@@ -2,6 +2,7 @@ import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import { KEY_LANGUAGE } from './constants'
 import en_US from './locales/en.json'
+import es from './locales/es.json'
 import ja_JP from './locales/jp.json'
 import tr_TR from './locales/tr.json'
 import zh_Hans from './locales/zh-Hans.json'
@@ -26,6 +27,12 @@ const EN_US = {
     name: 'English',
     code: 'en-US',
     resource: en_US,
+}
+
+const ES = {
+    name: 'Español',
+    code: 'es',
+    resource: es,
 }
 
 const JA_JP = {
@@ -54,15 +61,25 @@ const ZH_Hant = {
 
 export const LOCALES: Locale[] = [
     EN_US,
+    ES,
     JA_JP,
     TR_TR,
     ZH_Hans,
     ZH_Hant,
 ]
 
+// choose language code from https://www.techonthenet.com/js/language_tags.php
 const LanguageMapping: Record<string, string> = {
     'en': EN_US.code,
     'en-US': EN_US.code,
+
+    'es': ES.code,
+    'es-ES': ES.code,
+    'es-AR': ES.code,
+    'es-CL': ES.code,
+    'es-CO': ES.code,
+    'es-MX': ES.code,
+    'es-US': ES.code,
 
     'ja': JA_JP.code,
     'ja-JP': JA_JP.code,
