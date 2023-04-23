@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.8.0
+// @version            2.9.0
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -11,7 +11,7 @@
 // @license            MIT
 // @icon               https://chat.openai.com/favicon.ico
 // @match              https://chat.openai.com/
-// @match              https://chat.openai.com/c?*
+// @match              https://chat.openai.com/?model=*
 // @match              https://chat.openai.com/c/*
 // @require            https://cdn.jsdelivr.net/npm/jszip@3.9.1/dist/jszip.min.js
 // @require            https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js
@@ -1222,7 +1222,10 @@ var __publicField = (obj, key, value) => {
   const modelMapping = {
     "text-davinci-002-render-sha": "GTP-3.5",
     "text-davinci-002-render-paid": "GTP-3.5",
-    "gpt-4": "GPT-4"
+    "text-davinci-002-browse": "GTP-3.5",
+    "gpt-4": "GPT-4",
+    // fuzzy matching
+    "text-davinci-002": "GTP-3.5"
   };
   function processConversation(conversation, conversationChoices = []) {
     var _a, _b, _c, _d;
@@ -1232,7 +1235,18 @@ var __publicField = (obj, key, value) => {
       var _a2, _b2;
       return (_b2 = (_a2 = node2.message) == null ? void 0 : _a2.metadata) == null ? void 0 : _b2.model_slug;
     })) == null ? void 0 : _a.message) == null ? void 0 : _b.metadata) == null ? void 0 : _c.model_slug) || "";
-    const model = modelSlug ? modelMapping[modelSlug] || "" : "";
+    let model = "";
+    if (modelSlug) {
+      if (modelMapping[modelSlug]) {
+        model = modelMapping[modelSlug];
+      } else {
+        Object.keys(modelMapping).forEach((key2) => {
+          if (modelSlug.startsWith(key2)) {
+            model = key2;
+          }
+        });
+      }
+    }
     const result = [];
     const nodes = Object.values(conversation.mapping);
     const root2 = nodes.find((node2) => !node2.parent);
@@ -1248,7 +1262,7 @@ var __publicField = (obj, key, value) => {
       if (!node2)
         throw new Error("No node found.");
       const role = (_d = node2.message) == null ? void 0 : _d.author.role;
-      if (role === "assistant" || role === "user") {
+      if (role === "assistant" || role === "user" || role === "tool") {
         result.push(node2);
       }
       if (node2.children.length === 0)
@@ -6978,36 +6992,36 @@ var __publicField = (obj, key, value) => {
   instance.hasLoadedNamespace;
   instance.loadNamespaces;
   instance.loadLanguages;
-  const title$4 = "ChatGPT Exporter";
-  const ExportHelper$4 = "Export";
-  const Setting$4 = "Setting";
-  const Language$4 = "Language";
-  const Screenshot$4 = "Screenshot";
-  const Markdown$4 = "Markdown";
-  const HTML$4 = "HTML";
-  const Save$4 = "Save";
-  const Delete$4 = "Delete";
-  const Export$4 = "Export";
-  const Loading$4 = "Loading";
-  const Preview$4 = "Preview";
+  const title$5 = "ChatGPT Exporter";
+  const ExportHelper$5 = "Export";
+  const Setting$5 = "Setting";
+  const Language$5 = "Language";
+  const Screenshot$5 = "Screenshot";
+  const Markdown$5 = "Markdown";
+  const HTML$5 = "HTML";
+  const Save$5 = "Save";
+  const Delete$5 = "Delete";
+  const Export$5 = "Export";
+  const Loading$5 = "Loading";
+  const Preview$5 = "Preview";
   const en_US = {
-    title: title$4,
-    ExportHelper: ExportHelper$4,
-    Setting: Setting$4,
-    Language: Language$4,
+    title: title$5,
+    ExportHelper: ExportHelper$5,
+    Setting: Setting$5,
+    Language: Language$5,
     "Copy Text": "Copy Text",
     "Copied!": "Copied!",
-    Screenshot: Screenshot$4,
-    Markdown: Markdown$4,
-    HTML: HTML$4,
+    Screenshot: Screenshot$5,
+    Markdown: Markdown$5,
+    HTML: HTML$5,
     "JSON": "JSON",
-    Save: Save$4,
-    Delete: Delete$4,
+    Save: Save$5,
+    Delete: Delete$5,
     "Select All": "Select All",
-    Export: Export$4,
+    Export: Export$5,
     "Error": "Error",
-    Loading: Loading$4,
-    Preview: Preview$4,
+    Loading: Loading$5,
+    Preview: Preview$5,
     "File Name": "File Name",
     "Export All": "Export All",
     "Exporter Settings": "Exporter Settings",
@@ -7021,6 +7035,50 @@ var __publicField = (obj, key, value) => {
     "Conversation Delete Alert": "Are you sure you want to delete all selected conversations?",
     "Conversation Deleted Message": "All selected conversations have been deleted. Please refresh the page to see the changes.",
     "Please start a conversation first": "Please start a conversation first."
+  };
+  const title$4 = "ChatGPT Exporter";
+  const ExportHelper$4 = "Exportar";
+  const Setting$4 = "Ajustes";
+  const Language$4 = "Idioma";
+  const Screenshot$4 = "Captura De Pantalla";
+  const Markdown$4 = "Markdown";
+  const HTML$4 = "HTML";
+  const Save$4 = "Guardar";
+  const Delete$4 = "Borrar";
+  const Export$4 = "Exportar";
+  const Loading$4 = "Cargando";
+  const Preview$4 = "Previsualizar";
+  const es = {
+    title: title$4,
+    ExportHelper: ExportHelper$4,
+    Setting: Setting$4,
+    Language: Language$4,
+    "Copy Text": "Copiar Texto",
+    "Copied!": "¡Copiado!",
+    Screenshot: Screenshot$4,
+    Markdown: Markdown$4,
+    HTML: HTML$4,
+    "JSON": "JSON",
+    Save: Save$4,
+    Delete: Delete$4,
+    "Select All": "Seleccionar Todas",
+    Export: Export$4,
+    "Error": "Error",
+    Loading: Loading$4,
+    Preview: Preview$4,
+    "File Name": "Nombre Archivo",
+    "Export All": "Exportar Todas",
+    "Exporter Settings": "Ajustes De Exportación",
+    "Export Dialog Title": "Exportar Conversaciones",
+    "Available variables": "Formatos Disponibles",
+    "Conversation Timestamp": "Marca de Tiempo",
+    "Conversation Timestamp Description": "Aparecerá en la página y en el HTML.",
+    "Use 24-hour format": "Usar formato de 24 horas(ej. 23:59)",
+    "Export Metadata": "Exportar Metadata",
+    "Export Metadata Description": "Añadir Metadata a Markdown y a HTML exportados.",
+    "Conversation Delete Alert": "¿Estás seguro que quieres borrar todas las conversaciones seleccionadas?",
+    "Conversation Deleted Message": "Todas las conversaciones seleccionadas se han borrado. Por favor refresca la página para ver los cambios.",
+    "Please start a conversation first": "Por favor empieza una conversación antes."
   };
   const title$3 = "ChatGPTエクスポーター";
   const ExportHelper$3 = "エクスポート";
@@ -7308,6 +7366,11 @@ var __publicField = (obj, key, value) => {
     code: "en-US",
     resource: en_US
   };
+  const ES = {
+    name: "Español",
+    code: "es",
+    resource: es
+  };
   const JA_JP = {
     name: "日本語",
     code: "ja-JP",
@@ -7328,20 +7391,27 @@ var __publicField = (obj, key, value) => {
     code: "zh-Hant",
     resource: zh_Hant
   };
-  const LOCALES = [EN_US, JA_JP, TR_TR, ZH_Hans, ZH_Hant];
+  const LOCALES = [EN_US, ES, JA_JP, TR_TR, ZH_Hans, ZH_Hant];
   const LanguageMapping = {
     "en": EN_US.code,
     "en-US": EN_US.code,
+    "es": ES.code,
+    "es-ES": ES.code,
+    "es-AR": ES.code,
+    "es-CL": ES.code,
+    "es-CO": ES.code,
+    "es-MX": ES.code,
+    "es-US": ES.code,
     "ja": JA_JP.code,
     "ja-JP": JA_JP.code,
     "tr": TR_TR.code,
     "tr-TR": TR_TR.code,
     "zh": ZH_Hans.code,
     "zh-CN": ZH_Hans.code,
+    "zh-MO": ZH_Hans.code,
     "zh-SG": ZH_Hans.code,
     "zh-Hans": ZH_Hans.code,
     "zh-HK": ZH_Hant.code,
-    "zh-MO": ZH_Hant.code,
     "zh-TW": ZH_Hant.code,
     "zh-Hant": ZH_Hant.code
   };
@@ -19175,6 +19245,45 @@ var __publicField = (obj, key, value) => {
     downloadFile("chatgpt-export.zip", "application/zip", blob);
     return true;
   }
+  const transformAuthor$2 = (author) => {
+    switch (author.role) {
+      case "assistant":
+        return "ChatGPT";
+      case "user":
+        return "You";
+      case "tool":
+        return `Plugin${author.name ? ` (${author.name})` : ""}`;
+      default:
+        return author.role;
+    }
+  };
+  const transformContent$2 = (content2, metadata) => {
+    var _a, _b;
+    switch (content2.content_type) {
+      case "text":
+        return ((_a = content2.parts) == null ? void 0 : _a.join("\n")) || "";
+      case "code":
+        return content2.text || "";
+      case "tether_quote":
+        return `> ${content2.title || content2.text || ""}`;
+      case "tether_browsing_code":
+        return "";
+      case "tether_browsing_display": {
+        const metadataList = (_b = metadata == null ? void 0 : metadata._cite_metadata) == null ? void 0 : _b.metadata_list;
+        if (Array.isArray(metadataList) && metadataList.length > 0) {
+          return metadataList.map(({
+            title: title2,
+            url
+          }) => {
+            return `> [${title2}](${url})`;
+          }).join("\n");
+        }
+        return "";
+      }
+      default:
+        return "";
+    }
+  };
   function conversationToHtml(conversation, avatar, metaList) {
     const {
       id,
@@ -19183,23 +19292,28 @@ var __publicField = (obj, key, value) => {
       modelSlug,
       conversationNodes
     } = conversation;
-    const conversationHtml = conversationNodes.map((item) => {
-      var _a, _b, _c, _d, _e, _f;
-      const author = ((_a = item.message) == null ? void 0 : _a.author.role) === "assistant" ? "ChatGPT" : "You";
-      const model2 = ((_c = (_b = item.message) == null ? void 0 : _b.metadata) == null ? void 0 : _c.model_slug) === "gpt-4" ? "GPT-4" : "GPT-3";
-      const authorType = author === "ChatGPT" ? model2 : "user";
-      const avatarEl = author === "ChatGPT" ? '<svg width="41" height="41"><use xlink:href="#chatgpt" /></svg>' : `<img alt="${author}" />`;
-      const content2 = ((_e = (_d = item.message) == null ? void 0 : _d.content.parts) == null ? void 0 : _e.join("\n")) ?? "";
+    const conversationHtml = conversationNodes.map(({
+      message
+    }) => {
+      var _a;
+      if (!message || !message.content)
+        return null;
+      const isUser = message.author.role === "user";
+      const author = transformAuthor$2(message.author);
+      const model2 = ((_a = message == null ? void 0 : message.metadata) == null ? void 0 : _a.model_slug) === "gpt-4" ? "GPT-4" : "GPT-3";
+      const authorType = isUser ? "user" : model2;
+      const avatarEl = isUser ? `<img alt="${author}" />` : '<svg width="41" height="41"><use xlink:href="#chatgpt" /></svg>';
+      const content2 = transformContent$2(message.content, message.metadata);
       let conversationContent = content2;
-      if (author === "ChatGPT") {
+      if (isUser) {
+        conversationContent = `<p>${escapeHtml(content2)}</p>`;
+      } else {
         const root2 = fromMarkdown(content2);
         conversationContent = toHtml(root2);
-      } else {
-        conversationContent = `<p>${escapeHtml(content2)}</p>`;
       }
       const enableTimestamp = ScriptStorage.get(KEY_TIMESTAMP_ENABLED) ?? false;
       const timeStamp24H = ScriptStorage.get(KEY_TIMESTAMP_24H) ?? false;
-      const timestamp2 = ((_f = item.message) == null ? void 0 : _f.create_time) ?? "";
+      const timestamp2 = (message == null ? void 0 : message.create_time) ?? "";
       const showTimestamp = enableTimestamp && timestamp2;
       let conversationDate = "";
       let conversationTime = "";
@@ -19228,7 +19342,7 @@ var __publicField = (obj, key, value) => {
     </div>
     ${showTimestamp ? `<div class="time" title="${conversationDate}">${conversationTime}</div>` : ""}
 </div>`;
-    }).join("\n\n");
+    }).filter(Boolean).join("\n\n");
     const date = dateStr();
     const time = (/* @__PURE__ */ new Date()).toISOString();
     const source = `${baseUrl}/c/${id}`;
@@ -19454,6 +19568,45 @@ var __publicField = (obj, key, value) => {
     downloadFile("chatgpt-export.zip", "application/zip", blob);
     return true;
   }
+  const transformAuthor$1 = (author) => {
+    switch (author.role) {
+      case "assistant":
+        return "ChatGPT";
+      case "user":
+        return "You";
+      case "tool":
+        return `Plugin${author.name ? ` (${author.name})` : ""}`;
+      default:
+        return author.role;
+    }
+  };
+  const transformContent$1 = (content2, metadata) => {
+    var _a, _b;
+    switch (content2.content_type) {
+      case "text":
+        return ((_a = content2.parts) == null ? void 0 : _a.join("\n")) || "";
+      case "code":
+        return content2.text || "";
+      case "tether_quote":
+        return `> ${content2.title || content2.text || ""}`;
+      case "tether_browsing_code":
+        return "";
+      case "tether_browsing_display": {
+        const metadataList = (_b = metadata == null ? void 0 : metadata._cite_metadata) == null ? void 0 : _b.metadata_list;
+        if (Array.isArray(metadataList) && metadataList.length > 0) {
+          return metadataList.map(({
+            title: title2,
+            url
+          }) => {
+            return `> [${title2}](${url})`;
+          }).join("\n");
+        }
+        return "";
+      }
+      default:
+        return "";
+    }
+  };
   function conversationToMarkdown(conversation, metaList) {
     const {
       id,
@@ -19475,18 +19628,21 @@ ${_metaList.join("\n")}
 ---
 
 ` : "";
-    const content2 = conversationNodes.map((item) => {
-      var _a, _b, _c;
-      const author = ((_a = item.message) == null ? void 0 : _a.author.role) === "assistant" ? "ChatGPT" : "You";
-      const content22 = ((_c = (_b = item.message) == null ? void 0 : _b.content.parts) == null ? void 0 : _c.join("\n")) ?? "";
-      let message = content22;
-      if (author === "ChatGPT") {
+    const content2 = conversationNodes.map(({
+      message
+    }) => {
+      if (!message || !message.content)
+        return null;
+      const isUser = message.author.role === "user";
+      const author = transformAuthor$1(message.author);
+      let content22 = transformContent$1(message.content, message.metadata);
+      if (!isUser && content22) {
         const root2 = fromMarkdown(content22);
-        message = toMarkdown(root2);
+        content22 = toMarkdown(root2);
       }
       return `#### ${author}:
-${message}`;
-    }).join("\n\n");
+${content22}`;
+    }).filter(Boolean).join("\n\n");
     const markdown = `${frontMatter}# ${title2}
 
 ${content2}`;
@@ -19504,6 +19660,56 @@ ${content2}`;
       document.body.removeChild(textarea);
     }
   }
+  const transformAuthor = (author) => {
+    switch (author.role) {
+      case "assistant":
+        return "ChatGPT";
+      case "user":
+        return "You";
+      case "tool":
+        return `Plugin${author.name ? ` (${author.name})` : ""}`;
+      default:
+        return author.role;
+    }
+  };
+  const transformContent = (content2, metadata) => {
+    var _a, _b;
+    switch (content2.content_type) {
+      case "text":
+        return ((_a = content2.parts) == null ? void 0 : _a.join("\n")) || "";
+      case "code":
+        return content2.text || "";
+      case "tether_quote":
+        return `> ${content2.title || content2.text || ""}`;
+      case "tether_browsing_code":
+        return "";
+      case "tether_browsing_display": {
+        const metadataList = (_b = metadata == null ? void 0 : metadata._cite_metadata) == null ? void 0 : _b.metadata_list;
+        if (Array.isArray(metadataList) && metadataList.length > 0) {
+          return metadataList.map(({
+            title: title2,
+            url
+          }) => {
+            return `> [${title2}](${url})`;
+          }).join("\n");
+        }
+        return "";
+      }
+      default:
+        return "";
+    }
+  };
+  const reformatContent = (input) => {
+    const root2 = fromMarkdown(input);
+    flatMap(root2, (item) => {
+      if (item.type === "strong")
+        return item.children;
+      if (item.type === "emphasis")
+        return item.children;
+      return [item];
+    });
+    return toMarkdown(root2);
+  };
   async function exportToText() {
     if (!checkIfConversationStarted()) {
       alert(instance.t("Please start a conversation first"));
@@ -19515,25 +19721,19 @@ ${content2}`;
     const {
       conversationNodes
     } = processConversation(rawConversation, conversationChoices);
-    const text2 = conversationNodes.map((item) => {
-      var _a, _b, _c;
-      const author = ((_a = item.message) == null ? void 0 : _a.author.role) === "assistant" ? "ChatGPT" : "You";
-      const content2 = ((_c = (_b = item.message) == null ? void 0 : _b.content.parts) == null ? void 0 : _c.join("\n")) ?? "";
-      let message = content2;
-      if (author === "ChatGPT") {
-        const root2 = fromMarkdown(content2);
-        flatMap(root2, (item2) => {
-          if (item2.type === "strong")
-            return item2.children;
-          if (item2.type === "emphasis")
-            return item2.children;
-          return [item2];
-        });
-        message = toMarkdown(root2);
+    const text2 = conversationNodes.map(({
+      message
+    }) => {
+      if (!message || !message.content)
+        return null;
+      const author = transformAuthor(message.author);
+      let content2 = transformContent(message.content, message.metadata);
+      if (message.author.role !== "user" && content2) {
+        content2 = reformatContent(content2);
       }
       return `${author}:
-${message}`;
-    }).join("\n\n");
+${content2}`;
+    }).filter(Boolean).join("\n\n");
     copyToClipboard(standardizeLineBreaks(text2));
     return true;
   }
