@@ -7,7 +7,7 @@ import { downloadFile, getFileNameWithFormat } from '../utils/download'
 import { fromMarkdown, toMarkdown } from '../utils/markdown'
 import { standardizeLineBreaks } from '../utils/text'
 import { dateStr, timestamp } from '../utils/utils'
-import type { ApiConversationWithId, ConversationResult } from '../api'
+import type { ApiConversationWithId, ConversationNodeMessage, ConversationResult } from '../api'
 import type { ExportMeta } from '../ui/SettingContext'
 
 export async function exportToMarkdown(fileNameFormat: string, metaList: ExportMeta[]) {
@@ -55,6 +55,49 @@ export async function exportAllToMarkdown(fileNameFormat: string, apiConversatio
     return true
 }
 
+const transformAuthor = (author: ConversationNodeMessage['author']): string => {
+    switch (author.role) {
+        case 'assistant':
+            return 'ChatGPT'
+        case 'user':
+            return 'You'
+        case 'tool':
+            return `Plugin${author.name ? ` (${author.name})` : ''}`
+        default:
+            return author.role
+    }
+}
+
+/**
+ * Convert the content based on the type of message
+ */
+const transformContent = (
+    content: ConversationNodeMessage['content'],
+    metadata: ConversationNodeMessage['metadata'],
+) => {
+    switch (content.content_type) {
+        case 'text':
+            return content.parts?.join('\n') || ''
+        case 'code':
+            return content.text || ''
+        case 'tether_quote':
+            return `> ${content.title || content.text || ''}`
+        case 'tether_browsing_code':
+            return '' // TODO: implement
+        case 'tether_browsing_display': {
+            const metadataList = metadata?._cite_metadata?.metadata_list
+            if (Array.isArray(metadataList) && metadataList.length > 0) {
+                return metadataList.map(({ title, url }) => {
+                    return `> [${title}](${url})`
+                }).join('\n')
+            }
+            return ''
+        }
+        default:
+            return ''
+    }
+}
+
 function conversationToMarkdown(conversation: ConversationResult, metaList?: ExportMeta[]) {
     const { id, title, model, modelSlug, conversationNodes } = conversation
     const source = `${baseUrl}/c/${id}`
@@ -77,18 +120,20 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
         ? `---\n${_metaList.join('\n')}\n---\n\n`
         : ''
 
-    const content = conversationNodes.map((item) => {
-        const author = item.message?.author.role === 'assistant' ? 'ChatGPT' : 'You'
-        const content = item.message?.content.parts?.join('\n') ?? ''
-        let message = content
+    const content = conversationNodes.map(({ message }) => {
+        if (!message || !message.content) return null
+
+        const isUser = message.author.role === 'user'
+        const author = transformAuthor(message.author)
+        let content = transformContent(message.content, message.metadata)
 
         // User's message will not be reformatted
-        if (author === 'ChatGPT') {
+        if (!isUser && content) {
             const root = fromMarkdown(content)
-            message = toMarkdown(root)
+            content = toMarkdown(root)
         }
-        return `#### ${author}:\n${message}`
-    }).join('\n\n')
+        return `#### ${author}:\n${content}`
+    }).filter(Boolean).join('\n\n')
 
     const markdown = `${frontMatter}# ${title}\n\n${content}`
 

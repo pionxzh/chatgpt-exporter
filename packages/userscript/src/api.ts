@@ -15,36 +15,71 @@ interface ApiSession {
     }
 }
 
-type ModelSlug = 'text-davinci-002-render-sha' | 'text-davinci-002-render-paid' | 'gpt-4'
+type ModelSlug = 'text-davinci-002-render-sha' | 'text-davinci-002-render-paid' | 'text-davinci-002-browse' | 'gpt-4'
 
 interface MessageMeta {
+    command: 'click' | 'search' | 'quote' | 'scroll' & (string & {})
     finish_details?: {
         stop: string
         type: 'stop' | 'interrupted' & (string & {})
     }
     model_slug?: ModelSlug & (string & {})
     timestamp_: 'absolute' & (string & {})
+    _cite_metadata?: {
+        citation_format: {
+            name: 'tether_og' & (string & {})
+        }
+        metadata_list: Array<{
+            title: string
+            url: string
+            text: string
+        }>
+    }
 }
 
-interface ConversationNode {
+export type AuthorRole = 'system' | 'assistant' | 'user' | 'tool'
+
+export interface ConversationNodeMessage {
+    author: {
+        role: AuthorRole
+        name?: 'browser' & (string & {})
+        metadata: unknown
+    }
+    content: {
+        // chat response
+        content_type: 'text'
+        parts: string[]
+    } | {
+        // plugin response
+        content_type: 'code'
+        language: 'unknown' & (string & {})
+        text: string
+    } | {
+        content_type: 'tether_quote'
+        domain?: string
+        text: string
+        title: string
+        url?: string
+    } | {
+        content_type: 'tether_browsing_code'
+        // unknown
+    } | {
+        content_type: 'tether_browsing_display'
+        result: string
+        summary?: string
+    }
+    create_time: number
+    end_turn: boolean
+    id: string
+    metadata?: MessageMeta
+    recipient: 'all' & 'browser' & (string & {})
+    weight: number
+}
+
+export interface ConversationNode {
     children: string[]
     id: string
-    message?: {
-        author: {
-            role: 'system' | 'assistant' | 'user'
-            metadata: unknown
-        }
-        content: {
-            content_type: 'text' & (string & {})
-            parts: string[]
-        }
-        create_time: number
-        end_turn: boolean
-        id: string
-        metadata?: MessageMeta
-        recipient: 'all' & (string & {})
-        weight: number
-    }
+    message?: ConversationNodeMessage
     parent?: string
 }
 
@@ -184,17 +219,33 @@ export interface ConversationResult {
     conversationNodes: ConversationNode[]
 }
 
-const modelMapping: { [key in ModelSlug]: string } = {
+const modelMapping: { [key in ModelSlug]: string } & { [key: string]: string } = {
     'text-davinci-002-render-sha': 'GTP-3.5',
     'text-davinci-002-render-paid': 'GTP-3.5',
+    'text-davinci-002-browse': 'GTP-3.5',
     'gpt-4': 'GPT-4',
+
+    // fuzzy matching
+    'text-davinci-002': 'GTP-3.5',
 }
 
 export function processConversation(conversation: ApiConversationWithId, conversationChoices: Array<number | null> = []): ConversationResult {
     const title = conversation.title || 'ChatGPT Conversation'
     const createTime = conversation.create_time
     const modelSlug = Object.values(conversation.mapping).find(node => node.message?.metadata?.model_slug)?.message?.metadata?.model_slug || ''
-    const model = modelSlug ? (modelMapping[modelSlug] || '') : ''
+    let model = ''
+    if (modelSlug) {
+        if (modelMapping[modelSlug]) {
+            model = modelMapping[modelSlug]
+        }
+        else {
+            Object.keys(modelMapping).forEach((key) => {
+                if (modelSlug.startsWith(key)) {
+                    model = key
+                }
+            })
+        }
+    }
 
     const result: ConversationNode[] = []
     const nodes = Object.values(conversation.mapping)
@@ -211,7 +262,7 @@ export function processConversation(conversation: ApiConversationWithId, convers
         if (!node) throw new Error('No node found.')
 
         const role = node.message?.author.role
-        if (role === 'assistant' || role === 'user') {
+        if (role === 'assistant' || role === 'user' || role === 'tool') {
             result.push(node)
         }
 

@@ -9,7 +9,7 @@ import { fromMarkdown, toHtml } from '../utils/markdown'
 import { ScriptStorage } from '../utils/storage'
 import { standardizeLineBreaks } from '../utils/text'
 import { dateStr, getColorScheme, timestamp } from '../utils/utils'
-import type { ApiConversationWithId, ConversationResult } from '../api'
+import type { ApiConversationWithId, ConversationNodeMessage, ConversationResult } from '../api'
 import type { ExportMeta } from '../ui/SettingContext'
 
 export async function exportToHtml(fileNameFormat: string, metaList: ExportMeta[]) {
@@ -61,30 +61,76 @@ export async function exportAllToHtml(fileNameFormat: string, apiConversations: 
     return true
 }
 
+const transformAuthor = (author: ConversationNodeMessage['author']): string => {
+    switch (author.role) {
+        case 'assistant':
+            return 'ChatGPT'
+        case 'user':
+            return 'You'
+        case 'tool':
+            return `Plugin${author.name ? ` (${author.name})` : ''}`
+        default:
+            return author.role
+    }
+}
+
+/**
+ * Convert the content based on the type of message
+ */
+const transformContent = (
+    content: ConversationNodeMessage['content'],
+    metadata: ConversationNodeMessage['metadata'],
+) => {
+    switch (content.content_type) {
+        case 'text':
+            return content.parts?.join('\n') || ''
+        case 'code':
+            return content.text || ''
+        case 'tether_quote':
+            return `> ${content.title || content.text || ''}`
+        case 'tether_browsing_code':
+            return '' // TODO: implement
+        case 'tether_browsing_display': {
+            const metadataList = metadata?._cite_metadata?.metadata_list
+            if (Array.isArray(metadataList) && metadataList.length > 0) {
+                return metadataList.map(({ title, url }) => {
+                    return `> [${title}](${url})`
+                }).join('\n')
+            }
+            return ''
+        }
+        default:
+            return ''
+    }
+}
+
 function conversationToHtml(conversation: ConversationResult, avatar: string, metaList?: ExportMeta[]) {
     const { id, title, model, modelSlug, conversationNodes } = conversation
 
-    const conversationHtml = conversationNodes.map((item) => {
-        const author = item.message?.author.role === 'assistant' ? 'ChatGPT' : 'You'
-        const model = item.message?.metadata?.model_slug === 'gpt-4' ? 'GPT-4' : 'GPT-3'
-        const authorType = author === 'ChatGPT' ? model : 'user'
-        const avatarEl = author === 'ChatGPT'
-            ? '<svg width="41" height="41"><use xlink:href="#chatgpt" /></svg>'
-            : `<img alt="${author}" />`
-        const content = item.message?.content.parts?.join('\n') ?? ''
+    const conversationHtml = conversationNodes.map(({ message }) => {
+        if (!message || !message.content) return null
+
+        const isUser = message.author.role === 'user'
+        const author = transformAuthor(message.author)
+        const model = message?.metadata?.model_slug === 'gpt-4' ? 'GPT-4' : 'GPT-3'
+        const authorType = isUser ? 'user' : model
+        const avatarEl = isUser
+            ? `<img alt="${author}" />`
+            : '<svg width="41" height="41"><use xlink:href="#chatgpt" /></svg>'
+        const content = transformContent(message.content, message.metadata)
         let conversationContent = content
 
-        if (author === 'ChatGPT') {
-            const root = fromMarkdown(content)
-            conversationContent = toHtml(root)
+        if (isUser) {
+            conversationContent = `<p>${escapeHtml(content)}</p>`
         }
         else {
-            conversationContent = `<p>${escapeHtml(content)}</p>`
+            const root = fromMarkdown(content)
+            conversationContent = toHtml(root)
         }
 
         const enableTimestamp = ScriptStorage.get<boolean>(KEY_TIMESTAMP_ENABLED) ?? false
         const timeStamp24H = ScriptStorage.get<boolean>(KEY_TIMESTAMP_24H) ?? false
-        const timestamp = item.message?.create_time ?? ''
+        const timestamp = message?.create_time ?? ''
         const showTimestamp = enableTimestamp && timestamp
         let conversationDate = ''
         let conversationTime = ''
@@ -112,7 +158,7 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
     </div>
     ${showTimestamp ? `<div class="time" title="${conversationDate}">${conversationTime}</div>` : ''}
 </div>`
-    }).join('\n\n')
+    }).filter(Boolean).join('\n\n')
 
     const date = dateStr()
     const time = new Date().toISOString()
