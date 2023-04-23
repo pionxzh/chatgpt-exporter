@@ -32,8 +32,8 @@ export default defineConfig({
                 'license': packageJson.license,
                 'match': [
                     'https://chat.openai.com/',
-                    // support https://chat.openai.com/c?model=gpt-4
-                    'https://chat.openai.com/c?*',
+                    // support https://chat.openai.com/?model={model}
+                    'https://chat.openai.com/?model=*',
                     // support https://chat.openai.com/c/123456789
                     'https://chat.openai.com/c/*',
                 ],
