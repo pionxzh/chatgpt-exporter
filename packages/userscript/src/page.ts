@@ -47,10 +47,12 @@ export function getChatIdFromUrl() {
     return null
 }
 
+export const conversationChoiceSelector = '.flex.justify-center span.flex-grow'
+
 export function getConversationChoice() {
     // parse x from `< x / y >` to get the index of the selected response
     const conversationChoices: Array<number | null> = Array.from(document.querySelectorAll('main .group'))
-        .map(group => group.querySelector('.flex.justify-center span.flex-grow'))
+        .map(group => group.querySelector(conversationChoiceSelector))
         // non-existing element will produce null here, which will point to the last child
         // just in case the selector changed
         .map(span => parseInt(span?.textContent?.trim().split(' / ')[0] ?? '0') - 1)
