@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.9.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.9.0...userscript-v2.9.1) (2023-04-24)
+
+
+### Bug Fixes
+
+* reduce the blurriness of screenshot export ([42a1d75](https://github.com/pionxzh/chatgpt-exporter/commit/42a1d75ca735ff5cf449758425a13a0fba959eb3)), closes [#129](https://github.com/pionxzh/chatgpt-exporter/issues/129)
+* remove revison and buttons from screenshot ([ba41b79](https://github.com/pionxzh/chatgpt-exporter/commit/ba41b7951675f87a934f438bc69e343cf8743b07))
+
 ## [2.9.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.8.0...userscript-v2.9.0) (2023-04-23)
 
 
