@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.9.0
+// @version            2.9.1
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -1090,8 +1090,9 @@ var __publicField = (obj, key, value) => {
       return match[1];
     return null;
   }
+  const conversationChoiceSelector = ".flex.justify-center span.flex-grow";
   function getConversationChoice() {
-    const conversationChoices = Array.from(document.querySelectorAll("main .group")).map((group) => group.querySelector(".flex.justify-center span.flex-grow")).map((span) => {
+    const conversationChoices = Array.from(document.querySelectorAll("main .group")).map((group) => group.querySelector(conversationChoiceSelector)).map((span) => {
       var _a;
       return parseInt(((_a = span == null ? void 0 : span.textContent) == null ? void 0 : _a.trim().split(" / ")[0]) ?? "0") - 1;
     }).map((x2) => x2 === -1 ? null : x2);
@@ -19433,6 +19434,27 @@ var __publicField = (obj, key, value) => {
       bottomBar.classList.add("hidden");
       return () => bottomBar.classList.remove("hidden");
     });
+    const buttonWrappers = document.querySelectorAll("main .flex.justify-between");
+    buttonWrappers.forEach((wrapper) => {
+      if (!wrapper.querySelector("button"))
+        return;
+      if (wrapper.closest("pre"))
+        return;
+      effect.add(() => {
+        wrapper.style.display = "none";
+        return () => wrapper.style.display = "";
+      });
+    });
+    const conversationChoices = document.querySelectorAll(conversationChoiceSelector);
+    conversationChoices.forEach((choice) => {
+      effect.add(() => {
+        const parent = choice.parentElement;
+        if (!parent)
+          return;
+        parent.classList.add("hidden");
+        return () => parent.classList.remove("hidden");
+      });
+    });
     const avatarEls = Array.from(document.querySelectorAll("img[alt]:not([aria-hidden])"));
     avatarEls.forEach((el) => {
       const srcset = el.getAttribute("srcset");
@@ -19456,8 +19478,10 @@ var __publicField = (obj, key, value) => {
     });
     effect.run();
     await sleep(100);
+    const ratio = window.devicePixelRatio || 1;
     const canvas = await html2canvas2(thread, {
-      scale: 1,
+      scale: ratio * 2,
+      // scale up to 2x to avoid blurry images
       useCORS: true,
       scrollX: -window.scrollX,
       scrollY: -window.scrollY,
@@ -19465,6 +19489,10 @@ var __publicField = (obj, key, value) => {
       windowHeight: thread.scrollHeight,
       ignoreElements: fnIgnoreElements
     });
+    const context = canvas.getContext("2d");
+    if (context) {
+      context.imageSmoothingEnabled = false;
+    }
     effect.dispose();
     const dataUrl = canvas.toDataURL("image/png", 1).replace(/^data:image\/[^;]/, "data:application/octet-stream");
     const chatId = getChatIdFromUrl() || void 0;
