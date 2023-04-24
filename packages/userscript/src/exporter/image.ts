@@ -70,8 +70,9 @@ export async function exportToPng(fileNameFormat: string) {
 
     await sleep(100)
 
+    const ratio = window.devicePixelRatio || 1
     const canvas = await html2canvas(thread, {
-        scale: 1,
+        scale: ratio * 2, // scale up to 2x to avoid blurry images
         useCORS: true,
         scrollX: -window.scrollX,
         scrollY: -window.scrollY,
@@ -79,6 +80,11 @@ export async function exportToPng(fileNameFormat: string) {
         windowHeight: thread.scrollHeight,
         ignoreElements: fnIgnoreElements,
     })
+
+    const context = canvas.getContext('2d')
+    if (context) {
+        context.imageSmoothingEnabled = false
+    }
 
     effect.dispose()
 
