@@ -49,7 +49,13 @@ export async function exportAllToMarkdown(fileNameFormat: string, apiConversatio
         zip.file(fileName, content)
     })
 
-    const blob = await zip.generateAsync({ type: 'blob' })
+    const blob = await zip.generateAsync({
+        type: 'blob',
+        compression: 'DEFLATE',
+        compressionOptions: {
+            level: 9,
+        },
+    })
     downloadFile('chatgpt-export.zip', 'application/zip', blob)
 
     return true
