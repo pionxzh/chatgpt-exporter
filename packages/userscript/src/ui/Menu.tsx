@@ -18,10 +18,6 @@ import { SettingDialog } from './SettingDialog'
 import '../style.css'
 import './Dialog.css'
 
-const disabledTitle = `Exporter is relying on the History API.
-But History feature is disabled by OpenAI temporarily.
-We all have to wait for them to bring it back.`
-
 function MenuInner({ container }: { container: HTMLDivElement }) {
     const { t } = useTranslation()
     const disabled = getHistoryDisabled()
@@ -63,9 +59,8 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
         return (
             <MenuItem
                 className="mt-1"
-                text="Exporter unavailable"
+                text="Chat History disabled"
                 icon={IconArrowRightFromBracket}
-                title={disabledTitle}
                 disabled={true}
             />
         )

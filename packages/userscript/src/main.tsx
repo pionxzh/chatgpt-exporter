@@ -37,7 +37,7 @@ function main() {
         render(<Menu container={container} />, container)
 
         sentinel.on('nav', (nav) => {
-            const chatList = document.querySelector('nav > div.overflow-y-auto')
+            const chatList = document.querySelector('nav > div.overflow-y-auto, nav > div.overflow-y-hidden')
             if (chatList) {
                 chatList.after(container)
             }

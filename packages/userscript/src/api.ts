@@ -1,6 +1,6 @@
 import urlcat from 'urlcat'
 import { baseUrl } from './constants'
-import { getChatIdFromUrl, getPageAccessToken } from './page'
+import { getChatIdFromUrl } from './page'
 
 interface ApiSession {
     accessToken: string
@@ -105,6 +105,8 @@ export interface ApiConversationItem {
 }
 
 export interface ApiConversations {
+    // what is this for?
+    has_missing_conversations: boolean
     items: ApiConversationItem[]
     limit: number
     offset: number
@@ -183,9 +185,6 @@ async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
 }
 
 async function getAccessToken(): Promise<string> {
-    const _accessToken = getPageAccessToken()
-    if (_accessToken) return _accessToken
-
     const session = await fetchSession()
     return session.accessToken
 }
