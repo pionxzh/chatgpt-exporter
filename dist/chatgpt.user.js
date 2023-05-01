@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.9.1
+// @version            2.9.2
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -19241,7 +19241,11 @@ var __publicField = (obj, key, value) => {
       zip.file(fileName, content2);
     });
     const blob = await zip.generateAsync({
-      type: "blob"
+      type: "blob",
+      compression: "DEFLATE",
+      compressionOptions: {
+        level: 9
+      }
     });
     downloadFile("chatgpt-export.zip", "application/zip", blob);
     return true;
@@ -19546,7 +19550,11 @@ var __publicField = (obj, key, value) => {
       zip.file(fileName, content2);
     });
     const blob = await zip.generateAsync({
-      type: "blob"
+      type: "blob",
+      compression: "DEFLATE",
+      compressionOptions: {
+        level: 9
+      }
     });
     downloadFile("chatgpt-export.zip", "application/zip", blob);
     return true;
@@ -19591,7 +19599,11 @@ var __publicField = (obj, key, value) => {
       zip.file(fileName, content2);
     });
     const blob = await zip.generateAsync({
-      type: "blob"
+      type: "blob",
+      compression: "DEFLATE",
+      compressionOptions: {
+        level: 9
+      }
     });
     downloadFile("chatgpt-export.zip", "application/zip", blob);
     return true;
