@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.9.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.9.1...userscript-v2.9.2) (2023-05-01)
+
+
+### Bug Fixes
+
+* export all should enable compression ([ca9d5c5](https://github.com/pionxzh/chatgpt-exporter/commit/ca9d5c512f92bb423aabc3b6ab25befd1d52e591)), closes [#141](https://github.com/pionxzh/chatgpt-exporter/issues/141)
+
 ## [2.9.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.9.0...userscript-v2.9.1) (2023-04-24)
 
 
