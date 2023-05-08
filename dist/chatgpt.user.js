@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.9.2
+// @version            2.10.0
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -13,6 +13,9 @@
 // @match              https://chat.openai.com/
 // @match              https://chat.openai.com/?model=*
 // @match              https://chat.openai.com/c/*
+// @match              https://chat.zhile.io/
+// @match              https://chat.zhile.io/?model=*
+// @match              https://chat.zhile.io/c/*
 // @require            https://cdn.jsdelivr.net/npm/jszip@3.9.1/dist/jszip.min.js
 // @require            https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js
 // @grant              GM_deleteValue
@@ -366,7 +369,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
 .SelectList {
     position: relative;
     width: 100%;
-    height: 300px;
+    height: 270px;
     padding: 12px 16px;
     overflow-x: hidden;
     overflow-y: auto;
@@ -1038,7 +1041,12 @@ var __publicField = (obj, key, value) => {
   function notNullOrUndefined(v2) {
     return v2 !== void 0 && v2 !== null;
   }
-  const baseUrl = "https://chat.openai.com";
+  const API_MAPPING = {
+    "https://chat.openai.com": "https://chat.openai.com/backend-api",
+    "https://chat.zhile.io": "https://chat-api.zhile.io/api"
+  };
+  const baseUrl = new URL(location.href).origin;
+  const apiUrl = API_MAPPING[baseUrl];
   const LEGACY_KEY_FILENAME_FORMAT = "exporter-format";
   const KEY_LANGUAGE = "exporter:language";
   const KEY_FILENAME_FORMAT = "exporter:filename_format";
@@ -1069,13 +1077,9 @@ var __publicField = (obj, key, value) => {
       img.onerror = reject;
     });
   }
-  function getPageAccessToken() {
-    var _a, _b, _c;
-    return ((_c = (_b = (_a = unsafeWindow == null ? void 0 : unsafeWindow.__NEXT_DATA__) == null ? void 0 : _a.props) == null ? void 0 : _b.pageProps) == null ? void 0 : _c.accessToken) ?? null;
-  }
+  const historyDisabledKey = "oai/apps/historyDisabled";
   function getHistoryDisabled() {
-    var _a, _b, _c;
-    return ((_c = (_b = (_a = unsafeWindow == null ? void 0 : unsafeWindow.__NEXT_DATA__) == null ? void 0 : _a.props) == null ? void 0 : _b.pageProps) == null ? void 0 : _c.shouldDisableHistory) ?? false;
+    return localStorage.getItem(historyDisabledKey) === '"true"';
   }
   function getUserProfile() {
     var _a, _b, _c;
@@ -1122,7 +1126,6 @@ var __publicField = (obj, key, value) => {
   function checkIfConversationStarted() {
     return !!document.querySelector("main .group");
   }
-  const apiUrl = `${baseUrl}/backend-api`;
   const sessionApi = _default(baseUrl, "/api/auth/session");
   const conversationApi = (id) => _default(apiUrl, "/conversation/:id", {
     id
@@ -1196,9 +1199,6 @@ var __publicField = (obj, key, value) => {
     return response.json();
   }
   async function getAccessToken() {
-    const _accessToken = getPageAccessToken();
-    if (_accessToken)
-      return _accessToken;
     const session2 = await fetchSession();
     return session2.accessToken;
   }
@@ -7027,6 +7027,9 @@ var __publicField = (obj, key, value) => {
     "Export All": "Export All",
     "Exporter Settings": "Exporter Settings",
     "Export Dialog Title": "Export Conversations",
+    "Invalid File Format": "Invalid File Format",
+    "Export from official export file": "Export from official export file",
+    "Export from API": "Export from API",
     "Available variables": "Available variables",
     "Conversation Timestamp": "Conversation Timestamp",
     "Conversation Timestamp Description": "Will show on the page and HTML files.",
@@ -7071,6 +7074,9 @@ var __publicField = (obj, key, value) => {
     "Export All": "Exportar Todas",
     "Exporter Settings": "Ajustes De Exportación",
     "Export Dialog Title": "Exportar Conversaciones",
+    "Invalid File Format": "Formato de archivo inválido",
+    "Export from official export file": "Exportar desde archivo de exportación oficial",
+    "Export from API": "Exportar desde API",
     "Available variables": "Formatos Disponibles",
     "Conversation Timestamp": "Marca de Tiempo",
     "Conversation Timestamp Description": "Aparecerá en la página y en el HTML.",
@@ -7115,6 +7121,9 @@ var __publicField = (obj, key, value) => {
     "Export All": "すべてエクスポート",
     "Exporter Settings": "エクスポーター設定",
     "Export Dialog Title": "会話をエクスポート",
+    "Invalid File Format": "無効なファイル形式",
+    "Export from official export file": "公式エクスポートファイルからエクスポートする",
+    "Export from API": "APIからエクスポートする",
     "Available variables": "使用可能な変数",
     "Conversation Timestamp": "会話のタイムスタンプ",
     "Conversation Timestamp Description": "ページとHTMLファイルに表示されます。",
@@ -7159,6 +7168,9 @@ var __publicField = (obj, key, value) => {
     "Export All": "Tümünü Dışa Aktar",
     "Exporter Settings": "Dışa Aktarma Ayarları",
     "Export Dialog Title": "Konuşmaları Dışa Aktar",
+    "Invalid File Format": "Dosya Biçimi Geçersiz",
+    "Export from official export file": "Resmi dışa aktarma dosyasından dışa aktar",
+    "Export from API": "API'den dışa aktar",
     "Available variables": "Kullanılabilir değişkenler",
     "Conversation Timestamp": "Konuşma zaman bilgisi",
     "Conversation Timestamp Description": "Sayfada ve HTML dosyalarında gözükür.",
@@ -7203,6 +7215,9 @@ var __publicField = (obj, key, value) => {
     "Export All": "批量导出",
     "Exporter Settings": "导出设置",
     "Export Dialog Title": "导出对话",
+    "Invalid File Format": "无效的文件格式",
+    "Export from official export file": "从官方导出文件导出",
+    "Export from API": "从 API 导出",
     "Available variables": "可用变量",
     "Conversation Timestamp": "对话时间戳",
     "Conversation Timestamp Description": "会添加至页面以及 HTML 导出。",
@@ -7247,6 +7262,9 @@ var __publicField = (obj, key, value) => {
     "Export All": "批量匯出",
     "Exporter Settings": "設定",
     "Export Dialog Title": "匯出對話",
+    "Invalid File Format": "無效的檔案格式",
+    "Export from official export file": "從官方匯出檔案匯出",
+    "Export from API": "從 API 匯出",
     "Available variables": "可用變數",
     "Conversation Timestamp": "對話時間戳",
     "Conversation Timestamp Description": "會添加至頁面以及 HTML 匯出。",
@@ -21518,6 +21536,34 @@ ${content2}`;
       })]
     });
   }
+  function IconUpload({
+    className,
+    style: style2
+  }) {
+    return o$5("svg", {
+      xmlns: "http://www.w3.org/2000/svg",
+      viewBox: "0 0 24 24",
+      className,
+      style: style2,
+      fill: "none",
+      "stroke-linecap": "round",
+      "stroke-linejoin": "round",
+      children: [o$5("path", {
+        stroke: "none",
+        d: "M0 0h24v24H0z",
+        fill: "none"
+      }), o$5("path", {
+        stroke: "currentColor",
+        d: "M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"
+      }), o$5("path", {
+        stroke: "currentColor",
+        d: "M7 9l5 -5l5 5"
+      }), o$5("path", {
+        stroke: "currentColor",
+        d: "M12 4l0 12"
+      })]
+    });
+  }
   const CheckBox = ({
     className,
     checked = false,
@@ -21685,7 +21731,11 @@ ${content2}`;
       exportMetaList
     } = useSettingContext();
     const metaList = F$1(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList]);
-    const [conversations, setConversations] = h$4([]);
+    const fileInputRef = _$1(null);
+    const [exportSource, setExportSource] = h$4("API");
+    const [apiConversations, setApiConversations] = h$4([]);
+    const [localConversations, setLocalConversations] = h$4([]);
+    const conversations = exportSource === "API" ? apiConversations : localConversations;
     const [loading, setLoading] = h$4(false);
     const [error, setError] = h$4("");
     const [processing, setProcessing] = h$4(false);
@@ -21700,6 +21750,25 @@ ${content2}`;
       currentName: "",
       currentStatus: ""
     });
+    const onUpload = T$4((e2) => {
+      var _a, _b;
+      const file = (_b = (_a = e2.target) == null ? void 0 : _a.files) == null ? void 0 : _b[0];
+      if (!file)
+        return;
+      const fileReader = new FileReader();
+      fileReader.onload = () => {
+        const data = JSON.parse(fileReader.result);
+        if (!Array.isArray(data)) {
+          alert(t2("Invalid File Format"));
+          return;
+        }
+        console.log(data);
+        setSelected([]);
+        setExportSource("Local");
+        setLocalConversations(data);
+      };
+      fileReader.readAsText(file);
+    }, [t2, setExportSource, setLocalConversations]);
     p$6(() => {
       const off = requestQueue.on("progress", (progress2) => {
         setProcessing(true);
@@ -21727,13 +21796,13 @@ ${content2}`;
     p$6(() => {
       const off = deleteQueue.on("done", () => {
         setProcessing(false);
-        setConversations(conversations.filter((c2) => !selected.some((s2) => s2.id === c2.id)));
+        setApiConversations(apiConversations.filter((c2) => !selected.some((s2) => s2.id === c2.id)));
         setSelected([]);
         alert(t2("Conversation Deleted Message"));
       });
       return () => off();
-    }, [deleteQueue, conversations, selected, t2]);
-    const exportAll = T$4(() => {
+    }, [deleteQueue, apiConversations, selected, t2]);
+    const exportAllFromApi = T$4(() => {
       if (disabled)
         return;
       requestQueue.clear();
@@ -21748,6 +21817,18 @@ ${content2}`;
       });
       requestQueue.start();
     }, [disabled, selected, requestQueue]);
+    const exportAllFromLocal = T$4(() => {
+      var _a;
+      if (disabled)
+        return;
+      const results = localConversations.filter((c2) => selected.some((s2) => s2.id === c2.id));
+      const callback = (_a = exportAllOptions.find((o2) => o2.label === exportType)) == null ? void 0 : _a.callback;
+      if (callback)
+        callback(format, results, metaList);
+    }, [disabled, selected, localConversations, exportType, format, metaList]);
+    const exportAll = F$1(() => {
+      return exportSource === "API" ? exportAllFromApi : exportAllFromLocal;
+    }, [exportSource, exportAllFromApi, exportAllFromLocal]);
     const deleteAll = T$4(() => {
       if (disabled)
         return;
@@ -21768,7 +21849,7 @@ ${content2}`;
     }, [disabled, selected, deleteQueue, t2]);
     p$6(() => {
       setLoading(true);
-      fetchAllConversations().then(setConversations).catch(setError).finally(() => setLoading(false));
+      fetchAllConversations().then(setApiConversations).catch(setError).finally(() => setLoading(false));
     }, []);
     return o$5($5d3850c4d0b4e6c7$export$be92b6f5f03c0fe9, {
       open,
@@ -21784,6 +21865,27 @@ ${content2}`;
           children: [o$5($5d3850c4d0b4e6c7$export$f99233281efd08a0, {
             className: "DialogTitle",
             children: t2("Export Dialog Title")
+          }), o$5("div", {
+            className: "flex items-center text-gray-600 dark:text-gray-300 flex justify-between border-b-[1px] pb-3 mb-3 dark:border-gray-700",
+            children: [t2("Export from official export file"), " ", "(conversations.json)", " ", exportSource === "API" && o$5("button", {
+              className: "btn relative btn-neutral",
+              onClick: () => {
+                var _a;
+                return (_a = fileInputRef.current) == null ? void 0 : _a.click();
+              },
+              children: o$5(IconUpload, {
+                className: "w-4 h-4 text-white"
+              })
+            })]
+          }), o$5("input", {
+            type: "file",
+            accept: "application/json",
+            className: "hidden",
+            ref: fileInputRef,
+            onChange: onUpload
+          }), exportSource === "API" && o$5("div", {
+            className: "flex items-center text-gray-600 dark:text-gray-300 flex justify-between mb-3",
+            children: t2("Export from API")
           }), o$5(ConversationSelect, {
             conversations,
             selected,
@@ -21811,7 +21913,7 @@ ${content2}`;
               className: "flex flex-grow"
             }), o$5("button", {
               className: "Button red",
-              disabled,
+              disabled: disabled || exportSource === "Local",
               onClick: deleteAll,
               children: t2("Delete")
             }), o$5("button", {
@@ -22557,9 +22659,6 @@ ${content2}`;
   };
   const style = "";
   const Dialog = "";
-  const disabledTitle = `Exporter is relying on the History API.
-But History feature is disabled by OpenAI temporarily.
-We all have to wait for them to bring it back.`;
   function MenuInner({
     container
   }) {
@@ -22596,9 +22695,8 @@ We all have to wait for them to bring it back.`;
     if (disabled) {
       return o$5(MenuItem, {
         className: "mt-1",
-        text: "Exporter unavailable",
+        text: "Chat History disabled",
         icon: IconArrowRightFromBracket,
-        title: disabledTitle,
         disabled: true
       });
     }
@@ -22726,7 +22824,7 @@ We all have to wait for them to bring it back.`;
         container
       }), container);
       sentinel.on("nav", (nav) => {
-        const chatList = document.querySelector("nav > div.overflow-y-auto");
+        const chatList = document.querySelector("nav > div.overflow-y-auto, nav > div.overflow-y-hidden");
         if (chatList) {
           chatList.after(container);
         } else {
