@@ -36,6 +36,10 @@ export default defineConfig({
                     'https://chat.openai.com/?model=*',
                     // support https://chat.openai.com/c/123456789
                     'https://chat.openai.com/c/*',
+
+                    'https://chat.zhile.io/',
+                    'https://chat.zhile.io/?model=*',
+                    'https://chat.zhile.io/c/*',
                 ],
                 'icon': 'https://chat.openai.com/favicon.ico',
                 'run-at': 'document-end',

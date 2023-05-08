@@ -1,5 +1,5 @@
 import urlcat from 'urlcat'
-import { baseUrl } from './constants'
+import { apiUrl, baseUrl } from './constants'
 import { getChatIdFromUrl } from './page'
 
 interface ApiSession {
@@ -112,8 +112,6 @@ export interface ApiConversations {
     offset: number
     total: number
 }
-
-const apiUrl = `${baseUrl}/backend-api`
 
 const sessionApi = urlcat(baseUrl, '/api/auth/session')
 const conversationApi = (id: string) => urlcat(apiUrl, '/conversation/:id', { id })
