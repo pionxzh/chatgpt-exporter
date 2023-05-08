@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.10.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.9.2...userscript-v2.10.0) (2023-05-08)
+
+
+### Features
+
+* support `chat.zhile.io` ([4331bd8](https://github.com/pionxzh/chatgpt-exporter/commit/4331bd8f936b935ae47839a56e989481ca97f13f)), closes [#143](https://github.com/pionxzh/chatgpt-exporter/issues/143)
+* support exporting from official export ([ac59789](https://github.com/pionxzh/chatgpt-exporter/commit/ac59789f508433675bfd9a492e6887035c588067)), closes [#121](https://github.com/pionxzh/chatgpt-exporter/issues/121)
+
+
+### Bug Fixes
+
+* **i18n:** update `Invalid File Format` in Turkish ([5cbb2e9](https://github.com/pionxzh/chatgpt-exporter/commit/5cbb2e94eebb28797f94322c0e4b0136f8883d89))
+* update API interface and detect chat history disabled ([0fcb3d7](https://github.com/pionxzh/chatgpt-exporter/commit/0fcb3d7efe0501736629d9c45695dff6df30e1ae))
+
 ## [2.9.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.9.1...userscript-v2.9.2) (2023-05-01)
 
 
