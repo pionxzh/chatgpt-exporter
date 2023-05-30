@@ -73,6 +73,7 @@ export interface ConversationNodeMessage {
     id: string
     metadata?: MessageMeta
     recipient: 'all' & 'browser' & (string & {})
+    status: string
     weight: number
 }
 
@@ -259,14 +260,47 @@ export function processConversation(conversation: ApiConversationWithId, convers
         if (!node) throw new Error('No node found.')
 
         const role = node.message?.author.role
+        let isContinueGeneration = false
         if (role === 'assistant' || role === 'user' || role === 'tool') {
-            result.push(node)
+            const prevNode = result[result.length - 1]
+
+            // If the previous node is also an assistant, we merge them together.
+            // This is to improve the output of the conversation when an official
+            // continuation is used. (#146)
+            if (prevNode
+                && role === 'assistant'
+                && prevNode.message?.author.role === 'assistant'
+                && node.message?.content.content_type === 'text'
+                && prevNode.message?.content.content_type === 'text'
+            ) {
+                isContinueGeneration = true
+                // the last part of the previous node should directly concat to the first part of the current node
+                prevNode.message.content.parts[prevNode.message.content.parts.length - 1] += node.message.content.parts[0]
+                prevNode.message.content.parts.push(...node.message.content.parts.slice(1))
+            }
+            else {
+                result.push(node)
+            }
         }
 
         if (node.children.length === 0) continue
 
         const _last = node.children.length - 1
-        const choice = conversationChoices[index++] ?? _last
+        let choice = 0
+        // If the current node is an continue generation like [A -> B], A will always
+        // only have one child which is the continue generation node B. In this case,
+        // when we are processing A, we don't know we have a continue generation node
+        // and no matter what choice we choose, we will always get B, so it's acceptable
+        // And here in B, we will use the previous choice to get the correct child node
+        if (isContinueGeneration) {
+            choice = conversationChoices[index] ?? _last
+        }
+        // Conversation choices will only applied to nodes with message
+        else if ('message' in node) {
+            index++
+            choice = conversationChoices[index] ?? _last
+        }
+
         const childId = node.children[choice] ?? node.children[_last]
         if (!childId) throw new Error('No child node found.')
 
