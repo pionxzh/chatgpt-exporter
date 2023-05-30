@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.11.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.10.0...userscript-v2.11.0) (2023-05-30)
+
+
+### Features
+
+* concat the output of official "Continue generating" ([b191ec2](https://github.com/pionxzh/chatgpt-exporter/commit/b191ec25cc33cd7ff1dc96ef65d1f8fe60d74cfb)), closes [#146](https://github.com/pionxzh/chatgpt-exporter/issues/146)
+
 ## [2.10.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.9.2...userscript-v2.10.0) (2023-05-08)
 
 
