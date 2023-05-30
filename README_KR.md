@@ -1,16 +1,16 @@
 ChatGPT Exporter
-==========================
 
 ![license](https://img.shields.io/github/license/pionxzh/chatgpt-exporter?color=red)
 [![](https://img.shields.io/static/v1?label=%20&message=GreasyFork&style=flat-square&labelColor=7B0000&color=960000&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3ggEBCQHM3fXsAAAAVdJREFUOMudkz2qwkAUhc/goBaGJBgUtBCZyj0ILkpwAW7Bws4yO3AHLiCtEFD8KVREkoiFxZzX5A2KGfN4F04zMN+ce+5c4LMUgDmANYBnrnV+plBSi+FwyHq9TgA2LQpvCiEiABwMBtzv95RSfoNEHy8DYBzHrNVqVEr9BWKcqNFoxF6vx3a7zc1mYyC73a4MogBg7vs+z+czO50OW60Wt9stK5UKp9Mpj8cjq9WqDTBHnjAdxzGQZrPJw+HA31oulzbAWgLoA0CWZVBKIY5jzGYzdLtdE9DlcrFNrY98zobqOA6TJKHW2jg4nU5sNBpFDp6mhVe5rsvVasUwDHm9Xqm15u12o+/7Hy0gD8KatOd5vN/v1FozTVN6nkchxFuI6hsAAIMg4OPxMJCXdtTbR7JJCMEgCJhlGUlyPB4XfumozInrupxMJpRSRtZlKoNYl+m/6/wDuWAjtPfsQuwAAAAASUVORK5CYII=)](https://greasyfork.org/scripts/456055-chatgpt-exporter)
 
 ![image](https://user-images.githubusercontent.com/9910706/215000985-887b6f9e-142b-4c25-b4bf-2ba90c0b4268.png)
 
-💬 Make it easy to share and review your conversation.
+💬 Chatgpt와 대화를 쉽게 공유와 리뷰할 수 있도록 합니다.
 ---
-A GreasyFork script to export the chat history of [ChatGPT](https://chatgpt.com/).
 
-Supported Formats:
+Chatgpt 대화기록을 내보내기 위한 GreasyFork 스크립트.
+
+지원되는 형식:
 - [Text](#text)
 - [PNG](#screenshot) (Full Page Screenshot!)
 - [HTML](#html)
@@ -18,18 +18,19 @@ Supported Formats:
 
 # Install
 
-## Prerequisites
+## 설치하는 법
 
-Install **Tampermonkey** **（[Chrome](https://www.tampermonkey.net/)** / **[Firefox](https://addons.mozilla.org/firefox/addon/tampermonkey/)** / **[Edge](https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd?hl=zh-CN)）**
+Step 1. **Tampermonkey**를 설치합니다. **（[Chrome](https://www.tampermonkey.net/)** / **[Firefox](https://addons.mozilla.org/firefox/addon/tampermonkey/)** / **[Edge](https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd?hl=zh-CN)）**
 
 
-## UserScript
-
+Step 2. **유저 스크립트** 를 설치합니다. 
+둘 중 한개의 링크를 클릭해서  유저 스크립트를 다운합니다.
 | Greasyfork                                                                        | GitHub                                                                                       |
 | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | [Install](https://greasyfork.org/scripts/456055-chatgpt-exporter) | [Install](https://raw.githubusercontent.com/pionxzh/chatgpt-exporter/master/dist/chatgpt.user.js) |
 
-# Example
+# Chatgpt 대화를 내보내기한 예시
+
 
 ## Text
 
