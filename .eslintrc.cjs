@@ -24,5 +24,11 @@ module.exports = {
                 'no-undef': 'off',
             },
         },
+        {
+            files: ['**/*.md/*.*'],
+            rules: {
+                'jsonc/indent': ['error', 4],
+            },
+        },
     ],
 }
