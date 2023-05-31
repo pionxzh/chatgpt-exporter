@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.10.0
+// @version            2.11.0
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -1229,7 +1229,7 @@ var __publicField = (obj, key, value) => {
     "text-davinci-002": "GTP-3.5"
   };
   function processConversation(conversation, conversationChoices = []) {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e, _f, _g;
     const title2 = conversation.title || "ChatGPT Conversation";
     const createTime = conversation.create_time;
     const modelSlug = ((_c = (_b = (_a = Object.values(conversation.mapping).find((node2) => {
@@ -1263,13 +1263,27 @@ var __publicField = (obj, key, value) => {
       if (!node2)
         throw new Error("No node found.");
       const role = (_d = node2.message) == null ? void 0 : _d.author.role;
+      let isContinueGeneration = false;
       if (role === "assistant" || role === "user" || role === "tool") {
-        result.push(node2);
+        const prevNode = result[result.length - 1];
+        if (prevNode && role === "assistant" && ((_e = prevNode.message) == null ? void 0 : _e.author.role) === "assistant" && ((_f = node2.message) == null ? void 0 : _f.content.content_type) === "text" && ((_g = prevNode.message) == null ? void 0 : _g.content.content_type) === "text") {
+          isContinueGeneration = true;
+          prevNode.message.content.parts[prevNode.message.content.parts.length - 1] += node2.message.content.parts[0];
+          prevNode.message.content.parts.push(...node2.message.content.parts.slice(1));
+        } else {
+          result.push(node2);
+        }
       }
       if (node2.children.length === 0)
         continue;
       const _last = node2.children.length - 1;
-      const choice = conversationChoices[index2++] ?? _last;
+      let choice = 0;
+      if (isContinueGeneration) {
+        choice = conversationChoices[index2] ?? _last;
+      } else if ("message" in node2) {
+        index2++;
+        choice = conversationChoices[index2] ?? _last;
+      }
       const childId = node2.children[choice] ?? node2.children[_last];
       if (!childId)
         throw new Error("No child node found.");
