@@ -5,7 +5,9 @@ import { GM_deleteValue, GM_getValue, GM_setValue } from 'vite-plugin-monkey/dis
  * @see https://www.tampermonkey.net/documentation.php#api:GM_setValue
  * @see https://www.tampermonkey.net/documentation.php#api:GM_setValue
  */
-class GMStorage {
+export class GMStorage {
+    static supported = typeof GM_getValue === 'function' && typeof GM_setValue === 'function' && typeof GM_deleteValue === 'function'
+
     static get<T>(key: string): T | null {
         const item = GM_getValue<string>(key, '')
         if (item) {
@@ -29,7 +31,9 @@ class GMStorage {
     }
 }
 
-class LocalStorage {
+export class LocalStorage {
+    static supported = typeof localStorage === 'object'
+
     static get<T>(key: string): T | null {
         const item = localStorage.getItem(key)
         if (item) {
@@ -53,8 +57,10 @@ class LocalStorage {
     }
 }
 
-class MemoryStorage {
+export class MemoryStorage {
     private static map = new Map<string, any>()
+
+    static supported = true
 
     static get<T>(key: string): T | null {
         const item = this.map.get(key)
@@ -73,44 +79,68 @@ class MemoryStorage {
 
 export class ScriptStorage {
     static get<T>(key: string): T | null {
-        try {
-            return GMStorage.get<T>(key)
+        if (GMStorage.supported) {
+            try {
+                return GMStorage.get<T>(key)
+            }
+            catch {
+                // ignore, fallback to next storage
+            }
         }
-        catch {
+
+        if (LocalStorage.supported) {
             try {
                 return LocalStorage.get<T>(key)
             }
             catch {
-                return MemoryStorage.get<T>(key)
+                // ignore, fallback to next storage
             }
         }
+
+        return MemoryStorage.get<T>(key)
     }
 
     static set<T>(key: string, value: T): void {
-        try {
-            return GMStorage.set<T>(key, value)
+        if (GMStorage.supported) {
+            try {
+                return GMStorage.set<T>(key, value)
+            }
+            catch {
+                // ignore, fallback to next storage
+            }
         }
-        catch {
+
+        if (LocalStorage.supported) {
             try {
                 return LocalStorage.set<T>(key, value)
             }
             catch {
-                return MemoryStorage.set<T>(key, value)
+                // ignore, fallback to next storage
             }
         }
+
+        return MemoryStorage.set<T>(key, value)
     }
 
     static delete(key: string): void {
-        try {
-            return GMStorage.delete(key)
+        if (GMStorage.supported) {
+            try {
+                return GMStorage.delete(key)
+            }
+            catch {
+                // ignore, fallback to next storage
+            }
         }
-        catch {
+
+        if (LocalStorage.supported) {
             try {
                 return LocalStorage.delete(key)
             }
             catch {
-                return MemoryStorage.delete(key)
+                // ignore, fallback to next storage
             }
         }
+
+        return MemoryStorage.delete(key)
     }
 }

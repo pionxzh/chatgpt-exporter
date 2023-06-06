@@ -1,6 +1,6 @@
 import urlcat from 'urlcat'
-import { baseUrl } from './constants'
-import { getChatIdFromUrl, getPageAccessToken } from './page'
+import { apiUrl, baseUrl } from './constants'
+import { getChatIdFromUrl } from './page'
 
 interface ApiSession {
     accessToken: string
@@ -15,36 +15,72 @@ interface ApiSession {
     }
 }
 
-type ModelSlug = 'text-davinci-002-render-sha' | 'text-davinci-002-render-paid' | 'gpt-4'
+type ModelSlug = 'text-davinci-002-render-sha' | 'text-davinci-002-render-paid' | 'text-davinci-002-browse' | 'gpt-4'
 
 interface MessageMeta {
+    command: 'click' | 'search' | 'quote' | 'scroll' & (string & {})
     finish_details?: {
         stop: string
         type: 'stop' | 'interrupted' & (string & {})
     }
     model_slug?: ModelSlug & (string & {})
     timestamp_: 'absolute' & (string & {})
+    _cite_metadata?: {
+        citation_format: {
+            name: 'tether_og' & (string & {})
+        }
+        metadata_list: Array<{
+            title: string
+            url: string
+            text: string
+        }>
+    }
 }
 
-interface ConversationNode {
+export type AuthorRole = 'system' | 'assistant' | 'user' | 'tool'
+
+export interface ConversationNodeMessage {
+    author: {
+        role: AuthorRole
+        name?: 'browser' & (string & {})
+        metadata: unknown
+    }
+    content: {
+        // chat response
+        content_type: 'text'
+        parts: string[]
+    } | {
+        // plugin response
+        content_type: 'code'
+        language: 'unknown' & (string & {})
+        text: string
+    } | {
+        content_type: 'tether_quote'
+        domain?: string
+        text: string
+        title: string
+        url?: string
+    } | {
+        content_type: 'tether_browsing_code'
+        // unknown
+    } | {
+        content_type: 'tether_browsing_display'
+        result: string
+        summary?: string
+    }
+    create_time: number
+    end_turn: boolean
+    id: string
+    metadata?: MessageMeta
+    recipient: 'all' & 'browser' & (string & {})
+    status: string
+    weight: number
+}
+
+export interface ConversationNode {
     children: string[]
     id: string
-    message?: {
-        author: {
-            role: 'system' | 'assistant' | 'user'
-            metadata: unknown
-        }
-        content: {
-            content_type: 'text' & (string & {})
-            parts: string[]
-        }
-        create_time: number
-        end_turn: boolean
-        id: string
-        metadata?: MessageMeta
-        recipient: 'all' & (string & {})
-        weight: number
-    }
+    message?: ConversationNodeMessage
     parent?: string
 }
 
@@ -70,13 +106,13 @@ export interface ApiConversationItem {
 }
 
 export interface ApiConversations {
+    // what is this for?
+    has_missing_conversations: boolean
     items: ApiConversationItem[]
     limit: number
     offset: number
     total: number
 }
-
-const apiUrl = `${baseUrl}/backend-api`
 
 const sessionApi = urlcat(baseUrl, '/api/auth/session')
 const conversationApi = (id: string) => urlcat(apiUrl, '/conversation/:id', { id })
@@ -148,9 +184,6 @@ async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
 }
 
 async function getAccessToken(): Promise<string> {
-    const _accessToken = getPageAccessToken()
-    if (_accessToken) return _accessToken
-
     const session = await fetchSession()
     return session.accessToken
 }
@@ -185,10 +218,14 @@ export interface ConversationResult {
     conversationNodes: ConversationNode[]
 }
 
-const modelMapping: { [key in ModelSlug]: string } = {
+const modelMapping: { [key in ModelSlug]: string } & { [key: string]: string } = {
     'text-davinci-002-render-sha': 'GTP-3.5',
     'text-davinci-002-render-paid': 'GTP-3.5',
+    'text-davinci-002-browse': 'GTP-3.5',
     'gpt-4': 'GPT-4',
+
+    // fuzzy matching
+    'text-davinci-002': 'GTP-3.5',
 }
 
 export function processConversation(conversation: ApiConversationWithId, conversationChoices: Array<number | null> = []): ConversationResult {
@@ -196,7 +233,19 @@ export function processConversation(conversation: ApiConversationWithId, convers
     const createTime = conversation.create_time
     const updateTime = conversation.update_time
     const modelSlug = Object.values(conversation.mapping).find(node => node.message?.metadata?.model_slug)?.message?.metadata?.model_slug || ''
-    const model = modelSlug ? (modelMapping[modelSlug] || '') : ''
+    let model = ''
+    if (modelSlug) {
+        if (modelMapping[modelSlug]) {
+            model = modelMapping[modelSlug]
+        }
+        else {
+            Object.keys(modelMapping).forEach((key) => {
+                if (modelSlug.startsWith(key)) {
+                    model = key
+                }
+            })
+        }
+    }
 
     const result: ConversationNode[] = []
     const nodes = Object.values(conversation.mapping)
@@ -213,14 +262,47 @@ export function processConversation(conversation: ApiConversationWithId, convers
         if (!node) throw new Error('No node found.')
 
         const role = node.message?.author.role
-        if (role === 'assistant' || role === 'user') {
-            result.push(node)
+        let isContinueGeneration = false
+        if (role === 'assistant' || role === 'user' || role === 'tool') {
+            const prevNode = result[result.length - 1]
+
+            // If the previous node is also an assistant, we merge them together.
+            // This is to improve the output of the conversation when an official
+            // continuation is used. (#146)
+            if (prevNode
+                && role === 'assistant'
+                && prevNode.message?.author.role === 'assistant'
+                && node.message?.content.content_type === 'text'
+                && prevNode.message?.content.content_type === 'text'
+            ) {
+                isContinueGeneration = true
+                // the last part of the previous node should directly concat to the first part of the current node
+                prevNode.message.content.parts[prevNode.message.content.parts.length - 1] += node.message.content.parts[0]
+                prevNode.message.content.parts.push(...node.message.content.parts.slice(1))
+            }
+            else {
+                result.push(node)
+            }
         }
 
         if (node.children.length === 0) continue
 
         const _last = node.children.length - 1
-        const choice = conversationChoices[index++] ?? _last
+        let choice = 0
+        // If the current node is an continue generation like [A -> B], A will always
+        // only have one child which is the continue generation node B. In this case,
+        // when we are processing A, we don't know we have a continue generation node
+        // and no matter what choice we choose, we will always get B, so it's acceptable
+        // And here in B, we will use the previous choice to get the correct child node
+        if (isContinueGeneration) {
+            choice = conversationChoices[index] ?? _last
+        }
+        // Conversation choices will only applied to nodes with message
+        else if ('message' in node) {
+            index++
+            choice = conversationChoices[index] ?? _last
+        }
+
         const childId = node.children[choice] ?? node.children[_last]
         if (!childId) throw new Error('No child node found.')
 

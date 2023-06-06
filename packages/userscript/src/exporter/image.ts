@@ -1,5 +1,6 @@
 import html2canvas from 'html2canvas'
-import { checkIfConversationStarted, getChatIdFromUrl } from '../page'
+import i18n from '../i18n'
+import { checkIfConversationStarted, conversationChoiceSelector, getChatIdFromUrl } from '../page'
 import { downloadUrl, getFileNameWithFormat } from '../utils/download'
 import { Effect } from '../utils/effect'
 import { sleep } from '../utils/utils'
@@ -11,7 +12,7 @@ function fnIgnoreElements(el: any) {
 
 export async function exportToPng(fileNameFormat: string) {
     if (!checkIfConversationStarted()) {
-        alert('Please start a conversation first.')
+        alert(i18n.t('Please start a conversation first'))
         return false
     }
 
@@ -34,6 +35,30 @@ export async function exportToPng(fileNameFormat: string) {
         const bottomBar = thread.children[thread.children.length - 1]
         bottomBar.classList.add('hidden')
         return () => bottomBar.classList.remove('hidden')
+    })
+
+    // hide buttons
+    const buttonWrappers = document.querySelectorAll<HTMLDivElement>('main .flex.justify-between')
+    buttonWrappers.forEach((wrapper) => {
+        if (!wrapper.querySelector('button')) return
+        // ignore codeblock
+        if (wrapper.closest('pre')) return
+
+        effect.add(() => {
+            wrapper.style.display = 'none'
+            return () => wrapper.style.display = ''
+        })
+    })
+
+    // hide conversation choices. eg. <1 / 6>
+    const conversationChoices = document.querySelectorAll(conversationChoiceSelector)
+    conversationChoices.forEach((choice) => {
+        effect.add(() => {
+            const parent = choice.parentElement
+            if (!parent) return
+            parent.classList.add('hidden')
+            return () => parent.classList.remove('hidden')
+        })
     })
 
     // disabled the avatar srcset
@@ -69,8 +94,9 @@ export async function exportToPng(fileNameFormat: string) {
 
     await sleep(100)
 
+    const ratio = window.devicePixelRatio || 1
     const canvas = await html2canvas(thread, {
-        scale: 1,
+        scale: ratio * 2, // scale up to 2x to avoid blurry images
         useCORS: true,
         scrollX: -window.scrollX,
         scrollY: -window.scrollY,
@@ -78,6 +104,11 @@ export async function exportToPng(fileNameFormat: string) {
         windowHeight: thread.scrollHeight,
         ignoreElements: fnIgnoreElements,
     })
+
+    const context = canvas.getContext('2d')
+    if (context) {
+        context.imageSmoothingEnabled = false
+    }
 
     effect.dispose()
 

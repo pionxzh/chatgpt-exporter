@@ -1,10 +1,12 @@
 import * as HoverCard from '@radix-ui/react-hover-card'
 import { useCallback, useEffect, useMemo, useState } from 'preact/hooks'
+import { useTranslation } from 'react-i18next'
 import { exportToHtml } from '../exporter/html'
 import { exportToPng } from '../exporter/image'
 import { exportToJson } from '../exporter/json'
 import { exportToMarkdown } from '../exporter/markdown'
 import { exportToText } from '../exporter/text'
+import { useWindowResize } from '../hooks/useWindowResize'
 import { getHistoryDisabled } from '../page'
 import { Divider } from './Divider'
 import { ExportDialog } from './ExportDialog'
@@ -16,11 +18,8 @@ import { SettingDialog } from './SettingDialog'
 import '../style.css'
 import './Dialog.css'
 
-const disabledTitle = `Exporter is relying on the History API.
-But History feature is disabled by OpenAI temporarily.
-We all have to wait for them to bring it back.`
-
 function MenuInner({ container }: { container: HTMLDivElement }) {
+    const { t } = useTranslation()
     const disabled = getHistoryDisabled()
 
     const [open, setOpen] = useState(false)
@@ -36,7 +35,6 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
     } = useSettingContext()
 
     useEffect(() => {
-        console.log('enableTimestamp', enableTimestamp, 'timeStamp24H', timeStamp24H)
         if (enableTimestamp) {
             document.body.setAttribute('data-time-format', timeStamp24H ? '24' : '12')
         }
@@ -53,16 +51,16 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
     const onClickHtml = useCallback(() => exportToHtml(format, metaList), [format, metaList])
     const onClickJSON = useCallback(() => exportToJson(format), [format])
 
-    const isMobile = window.innerWidth < 768
+    const width = useWindowResize(() => window.innerWidth)
+    const isMobile = width < 768
     const Portal = isMobile ? 'div' : HoverCard.Portal
 
     if (disabled) {
         return (
             <MenuItem
                 className="mt-1"
-                text="Exporter unavailable"
+                text="Chat History disabled"
                 icon={IconArrowRightFromBracket}
-                title={disabledTitle}
                 disabled={true}
             />
         )
@@ -86,7 +84,7 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                 <HoverCard.Trigger>
                     <MenuItem
                         className="mt-1"
-                        text="Export"
+                        text={t('ExportHelper')}
                         icon={IconArrowRightFromBracket}
                         onClick={() => {
                             setOpen(true)
@@ -100,54 +98,55 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                 >
                     <HoverCard.Content
                         className={isMobile
-                            ? 'fixed grid grid-cols-2 gap-x-1 px-1.5 py-2 bg-gray-900 shadow-md transition-opacity duration-200 animate-slideUp'
+                            ? 'fixed grid grid-cols-2 gap-x-1 px-1.5 pt-2 rounded bg-gray-900 shadow-md transition-opacity duration-200 animate-slideUp'
                             : 'grid grid-cols-2 gap-x-1 px-1.5 py-2 pb-0 rounded-md bg-gray-900 shadow-md transition-opacity duration-200 animate-fadeIn'}
                         style={{
                             width: isMobile ? 316 : 268,
                             left: -6,
-                            bottom: 'calc(-1 * var(--radix-popper-available-height))',
+                            bottom: 0,
                         }}
                         sideOffset={8}
                         side={isMobile ? 'bottom' : 'right'}
                         align="start"
                         alignOffset={isMobile ? 0 : -64}
+                        collisionPadding={isMobile ? 0 : 8}
                     >
                         <SettingDialog
                             open={settingOpen}
                             onOpenChange={setSettingOpen}
                         >
                             <div className="row-full">
-                                <MenuItem text="Setting" icon={IconSetting} />
+                                <MenuItem text={t('Setting')} icon={IconSetting} />
                             </div>
                         </SettingDialog>
 
                         <MenuItem
-                            text="Copy Text"
-                            successText="Copied!"
+                            text={t('Copy Text')}
+                            successText={t('Copied!')}
                             icon={() => <IconCopy className="w-4 h-4" />}
                             className="row-full"
                             onClick={onClickText}
                         />
                         <MenuItem
-                            text="Screenshot"
+                            text={t('Screenshot')}
                             icon={IconCamera}
                             className="row-half"
                             onClick={onClickPng}
                         />
                         <MenuItem
-                            text="Markdown"
+                            text={t('Markdown')}
                             icon={IconMarkdown}
                             className="row-half"
                             onClick={onClickMarkdown}
                         />
                         <MenuItem
-                            text="HTML"
+                            text={t('HTML')}
                             icon={FileCode}
                             className="row-half"
                             onClick={onClickHtml}
                         />
                         <MenuItem
-                            text="JSON"
+                            text={t('JSON')}
                             icon={IconJSON}
                             className="row-half"
                             onClick={onClickJSON}
@@ -159,13 +158,13 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                         >
                             <div className="row-full">
                                 <MenuItem
-                                    text="Export All"
+                                    text={t('Export All')}
                                     icon={IconZip}
                                 />
                             </div>
                         </ExportDialog>
 
-                        <HoverCard.Arrow width="16" height="8" className="text-gray-900 fill-current" />
+                        {!isMobile && <HoverCard.Arrow width="16" height="8" className="text-gray-900 fill-current" />}
                     </HoverCard.Content>
                 </Portal>
             </HoverCard.Root>

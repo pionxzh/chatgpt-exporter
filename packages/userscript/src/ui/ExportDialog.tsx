@@ -1,15 +1,17 @@
 import * as Dialog from '@radix-ui/react-dialog'
-import { useCallback, useEffect, useMemo, useState } from 'preact/hooks'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks'
+import { useTranslation } from 'react-i18next'
 import { deleteConversation, fetchAllConversations, fetchConversation } from '../api'
 import { exportAllToHtml } from '../exporter/html'
 import { exportAllToJson } from '../exporter/json'
 import { exportAllToMarkdown } from '../exporter/markdown'
 import { RequestQueue } from '../utils/queue'
 import { CheckBox } from './CheckBox'
-import { IconCross } from './Icons'
+import { IconCross, IconUpload } from './Icons'
 import { useSettingContext } from './SettingContext'
 import type { ApiConversationItem, ApiConversationWithId } from '../api'
 import type { FC } from '../type'
+import type { ChangeEvent } from 'preact/compat'
 
 const exportAllOptions = [
     { label: 'Markdown', callback: exportAllToMarkdown },
@@ -34,11 +36,13 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
     loading,
     error,
 }) => {
+    const { t } = useTranslation()
+
     return (
         <>
             <div className="SelectToolbar">
                 <CheckBox
-                    label="Select All"
+                    label={t('Select All')}
                     disabled={disabled}
                     checked={selected.length === conversations.length}
                     onCheckedChange={(checked) => {
@@ -47,8 +51,8 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
                 />
             </div>
             <ul className="SelectList">
-                {loading && <li className="SelectItem">Loading...</li>}
-                {error && <li className="SelectItem">Error: {error}</li>}
+                {loading && <li className="SelectItem">{t('Loading')}...</li>}
+                {error && <li className="SelectItem">{t('Error')}: {error}</li>}
                 {conversations.map(c => (
                     <li className="SelectItem" key={c.id}>
                         <CheckBox
@@ -75,11 +79,18 @@ interface ExportDialogProps {
     onOpenChange: (value: boolean) => void
 }
 
+type ExportSource = 'API' | 'Local'
+
 export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange, children }) => {
+    const { t } = useTranslation()
     const { enableMeta, exportMetaList } = useSettingContext()
     const metaList = useMemo(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList])
 
-    const [conversations, setConversations] = useState<ApiConversationItem[]>([])
+    const fileInputRef = useRef<HTMLInputElement>(null)
+    const [exportSource, setExportSource] = useState<ExportSource>('API')
+    const [apiConversations, setApiConversations] = useState<ApiConversationItem[]>([])
+    const [localConversations, setLocalConversations] = useState<ApiConversationWithId[]>([])
+    const conversations = exportSource === 'API' ? apiConversations : localConversations
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
     const [processing, setProcessing] = useState(false)
@@ -96,6 +107,25 @@ export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange
         currentName: '',
         currentStatus: '',
     })
+
+    const onUpload = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        const file = (e.target as HTMLInputElement)?.files?.[0]
+        if (!file) return
+
+        const fileReader = new FileReader()
+        fileReader.onload = () => {
+            const data = JSON.parse(fileReader.result as string)
+            if (!Array.isArray(data)) {
+                alert(t('Invalid File Format'))
+                return
+            }
+            console.log(data)
+            setSelected([])
+            setExportSource('Local')
+            setLocalConversations(data)
+        }
+        fileReader.readAsText(file)
+    }, [t, setExportSource, setLocalConversations])
 
     useEffect(() => {
         const off = requestQueue.on('progress', (progress) => {
@@ -127,14 +157,14 @@ export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange
     useEffect(() => {
         const off = deleteQueue.on('done', () => {
             setProcessing(false)
-            setConversations(conversations.filter(c => !selected.some(s => s.id === c.id)))
+            setApiConversations(apiConversations.filter(c => !selected.some(s => s.id === c.id)))
             setSelected([])
-            alert('All selected conversations have been deleted. Please refresh the page to see the changes.')
+            alert(t('Conversation Deleted Message'))
         })
         return () => off()
-    }, [deleteQueue, conversations, selected])
+    }, [deleteQueue, apiConversations, selected, t])
 
-    const exportAll = useCallback(() => {
+    const exportAllFromApi = useCallback(() => {
         if (disabled) return
 
         requestQueue.clear()
@@ -149,10 +179,22 @@ export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange
         requestQueue.start()
     }, [disabled, selected, requestQueue])
 
+    const exportAllFromLocal = useCallback(() => {
+        if (disabled) return
+
+        const results = localConversations.filter(c => selected.some(s => s.id === c.id))
+        const callback = exportAllOptions.find(o => o.label === exportType)?.callback
+        if (callback) callback(format, results, metaList)
+    }, [disabled, selected, localConversations, exportType, format, metaList])
+
+    const exportAll = useMemo(() => {
+        return exportSource === 'API' ? exportAllFromApi : exportAllFromLocal
+    }, [exportSource, exportAllFromApi, exportAllFromLocal])
+
     const deleteAll = useCallback(() => {
         if (disabled) return
 
-        const result = confirm('Are you sure you want to delete all selected conversations?')
+        const result = confirm(t('Conversation Delete Alert'))
         if (!result) return
 
         deleteQueue.clear()
@@ -165,12 +207,12 @@ export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange
         })
 
         deleteQueue.start()
-    }, [disabled, selected, deleteQueue])
+    }, [disabled, selected, deleteQueue, t])
 
     useEffect(() => {
         setLoading(true)
         fetchAllConversations()
-            .then(setConversations)
+            .then(setApiConversations)
             .catch(setError)
             .finally(() => setLoading(false))
     }, [])
@@ -186,8 +228,27 @@ export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange
             <Dialog.Portal>
                 <Dialog.Overlay className="DialogOverlay" />
                 <Dialog.Content className="DialogContent">
-                    <Dialog.Title className="DialogTitle">Export Conversations</Dialog.Title>
-
+                    <Dialog.Title className="DialogTitle">{t('Export Dialog Title')}</Dialog.Title>
+                    <div className="flex items-center text-gray-600 dark:text-gray-300 flex justify-between border-b-[1px] pb-3 mb-3 dark:border-gray-700">
+                        {t('Export from official export file')} {'(conversations.json)'}&nbsp;
+                        {exportSource === 'API' && (
+                            <button className="btn relative btn-neutral" onClick={() => fileInputRef.current?.click()}>
+                                <IconUpload className="w-4 h-4 text-white" />
+                            </button>
+                        )}
+                    </div>
+                    <input
+                        type="file"
+                        accept="application/json"
+                        className="hidden"
+                        ref={fileInputRef}
+                        onChange={onUpload}
+                    />
+                    {exportSource === 'API' && (
+                        <div className="flex items-center text-gray-600 dark:text-gray-300 flex justify-between mb-3">
+                            {t('Export from API')}
+                        </div>
+                    )}
                     <ConversationSelect
                         conversations={conversations}
                         selected={selected}
@@ -199,15 +260,15 @@ export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange
                     <div className="flex mt-6" style={{ justifyContent: 'space-between' }}>
                         <select className="Select" disabled={processing} value={exportType} onChange={e => setExportType(e.currentTarget.value)}>
                             {exportAllOptions.map(({ label }) => (
-                                <option key={label} value={label}>{label}</option>
+                                <option key={t(label)} value={label}>{label}</option>
                             ))}
                         </select>
                         <div className="flex flex-grow"></div>
-                        <button className="Button red" disabled={disabled} onClick={deleteAll}>
-                            Delete
+                        <button className="Button red" disabled={disabled || exportSource === 'Local'} onClick={deleteAll}>
+                            {t('Delete')}
                         </button>
                         <button className="Button green ml-4" disabled={disabled} onClick={exportAll}>
-                            Export
+                            {t('Export')}
                         </button>
                     </div>
                     {processing && (

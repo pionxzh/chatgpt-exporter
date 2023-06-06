@@ -1,5 +1,116 @@
 # Changelog
 
+## [2.11.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.10.0...userscript-v2.11.0) (2023-05-30)
+
+
+### Features
+
+* concat the output of official "Continue generating" ([b191ec2](https://github.com/pionxzh/chatgpt-exporter/commit/b191ec25cc33cd7ff1dc96ef65d1f8fe60d74cfb)), closes [#146](https://github.com/pionxzh/chatgpt-exporter/issues/146)
+
+## [2.10.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.9.2...userscript-v2.10.0) (2023-05-08)
+
+
+### Features
+
+* support `chat.zhile.io` ([4331bd8](https://github.com/pionxzh/chatgpt-exporter/commit/4331bd8f936b935ae47839a56e989481ca97f13f)), closes [#143](https://github.com/pionxzh/chatgpt-exporter/issues/143)
+* support exporting from official export ([ac59789](https://github.com/pionxzh/chatgpt-exporter/commit/ac59789f508433675bfd9a492e6887035c588067)), closes [#121](https://github.com/pionxzh/chatgpt-exporter/issues/121)
+
+
+### Bug Fixes
+
+* **i18n:** update `Invalid File Format` in Turkish ([5cbb2e9](https://github.com/pionxzh/chatgpt-exporter/commit/5cbb2e94eebb28797f94322c0e4b0136f8883d89))
+* update API interface and detect chat history disabled ([0fcb3d7](https://github.com/pionxzh/chatgpt-exporter/commit/0fcb3d7efe0501736629d9c45695dff6df30e1ae))
+
+## [2.9.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.9.1...userscript-v2.9.2) (2023-05-01)
+
+
+### Bug Fixes
+
+* export all should enable compression ([ca9d5c5](https://github.com/pionxzh/chatgpt-exporter/commit/ca9d5c512f92bb423aabc3b6ab25befd1d52e591)), closes [#141](https://github.com/pionxzh/chatgpt-exporter/issues/141)
+
+## [2.9.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.9.0...userscript-v2.9.1) (2023-04-24)
+
+
+### Bug Fixes
+
+* reduce the blurriness of screenshot export ([42a1d75](https://github.com/pionxzh/chatgpt-exporter/commit/42a1d75ca735ff5cf449758425a13a0fba959eb3)), closes [#129](https://github.com/pionxzh/chatgpt-exporter/issues/129)
+* remove revison and buttons from screenshot ([ba41b79](https://github.com/pionxzh/chatgpt-exporter/commit/ba41b7951675f87a934f438bc69e343cf8743b07))
+
+## [2.9.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.8.0...userscript-v2.9.0) (2023-04-23)
+
+
+### Features
+
+* basic support for response from plugin ([c45fdbe](https://github.com/pionxzh/chatgpt-exporter/commit/c45fdbe4a48ec90947d03c2fb3c5ad67e9bff5e6))
+* **i18n:** add spanish to lanaguage list ([2b2f75c](https://github.com/pionxzh/chatgpt-exporter/commit/2b2f75ca0579b723beda03e42c8790931cebd6c1))
+* **i18n:** add spanish translation ([#137](https://github.com/pionxzh/chatgpt-exporter/issues/137)) ([08a6930](https://github.com/pionxzh/chatgpt-exporter/commit/08a693005e19360c15d2577b914bbdd754adeac4))
+
+
+### Bug Fixes
+
+* **i18n:** fix Malaysia should use `ZH_Hans` ([9e2b748](https://github.com/pionxzh/chatgpt-exporter/commit/9e2b7485b340430729cea4819b5c345394129c11))
+* support url with model ([a50d580](https://github.com/pionxzh/chatgpt-exporter/commit/a50d5802be2656450e25d66df8ad10d696ba5d43))
+
+## [2.8.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.7.1...userscript-v2.8.0) (2023-04-21)
+
+
+### Features
+
+* remove copy button in chat in favor of the built-in copy button ([66dbaa6](https://github.com/pionxzh/chatgpt-exporter/commit/66dbaa669fe0379b0137b67648716e9782cf087e))
+
+
+### Bug Fixes
+
+* fix export twice ([38c6be3](https://github.com/pionxzh/chatgpt-exporter/commit/38c6be3a1589d1d6c4245bc8a0d30ed086986f4b))
+* layout overlap with menu on mobile ([705afe5](https://github.com/pionxzh/chatgpt-exporter/commit/705afe5bef153fe0f3af53b2eb26633c386d23fe)), closes [#134](https://github.com/pionxzh/chatgpt-exporter/issues/134)
+
+## [2.7.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.7.0...userscript-v2.7.1) (2023-04-20)
+
+
+### Bug Fixes
+
+* some chats cannot be exported because of missing message parts ([2e7ece8](https://github.com/pionxzh/chatgpt-exporter/commit/2e7ece886ef0c4cc7d6a3d5016ebce8799acb6b1))
+* thread might not exist ([d18bf3f](https://github.com/pionxzh/chatgpt-exporter/commit/d18bf3f0620566e86369b6e16e2adeed544f2266))
+
+## [2.7.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.6.5...userscript-v2.7.0) (2023-04-15)
+
+
+### Features
+
+* **i18n:** add turkish to language list ([b05776f](https://github.com/pionxzh/chatgpt-exporter/commit/b05776fe4f85bd4c4cca9a80cff808c3be4042b2))
+* **i18n:** add turkish translation ([#128](https://github.com/pionxzh/chatgpt-exporter/issues/128)) ([9ad8e0a](https://github.com/pionxzh/chatgpt-exporter/commit/9ad8e0a3c6fa0cfec5ced00b04caaf6f8441c162))
+* support i18n ([918ff41](https://github.com/pionxzh/chatgpt-exporter/commit/918ff41dc459d228e0c5e09dead41b1abc1c2f4e)), closes [#91](https://github.com/pionxzh/chatgpt-exporter/issues/91)
+* use the same Toggle as ChatGPT's setting ([0f91b56](https://github.com/pionxzh/chatgpt-exporter/commit/0f91b5698bd0e01c9f5d1008062fb48a3e93e7cc))
+
+## [2.6.5](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.6.4...userscript-v2.6.5) (2023-04-14)
+
+
+### Bug Fixes
+
+* [@match](https://github.com/match) url should have a tralling `/` at the end ([f0f64d4](https://github.com/pionxzh/chatgpt-exporter/commit/f0f64d49963946bd8aab3a6f213cfa5df980139c))
+
+## [2.6.4](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.6.3...userscript-v2.6.4) (2023-04-14)
+
+
+### Bug Fixes
+
+* update chat url to /c/* ([96ec23e](https://github.com/pionxzh/chatgpt-exporter/commit/96ec23e7bd63c8b8e92d5c4e6e7527bb6420f2c3))
+
+## [2.6.3](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.6.2...userscript-v2.6.3) (2023-04-13)
+
+
+### Bug Fixes
+
+* add missing css `ml-4` ([f5974d4](https://github.com/pionxzh/chatgpt-exporter/commit/f5974d4bd8bd63c2df18387ac4401d64f4b256ba))
+* handling same chat name in export all ([aa513b1](https://github.com/pionxzh/chatgpt-exporter/commit/aa513b1bdde84a12d96d92956501ceec2c270a26)), closes [#117](https://github.com/pionxzh/chatgpt-exporter/issues/117)
+
+## [2.6.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.6.1...userscript-v2.6.2) (2023-04-12)
+
+
+### Bug Fixes
+
+* handle `GM_*` function might be `undefined` ([77b52b1](https://github.com/pionxzh/chatgpt-exporter/commit/77b52b12fb52ab05c8ea7c49c65c965c99e6281b)), closes [#112](https://github.com/pionxzh/chatgpt-exporter/issues/112)
+
 ## [2.6.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.6.0...userscript-v2.6.1) (2023-04-08)
 
 

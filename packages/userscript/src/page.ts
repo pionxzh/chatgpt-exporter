@@ -4,20 +4,26 @@ import { getBase64FromImageUrl, getBase64FromImg } from './utils/dom'
 declare global {
     interface Window {
         __NEXT_DATA__?: {
+            buildId: string
+            gssp: boolean
+            isFallback: boolean
+            page: string
             props: {
                 pageProps: {
-                    // This seems to be removed on 2023/03/08
-                    accessToken?: string
-                    features: string[]
                     geoOk: boolean
                     isUserInCanPayGroup: boolean
-                    shouldDisableHistory: boolean
-                    shouldShowPaidAnnouncement: boolean
-                    showcasePlusUpdate: boolean
+                    serviceAnnouncement: {
+                        paid: unknown
+                        public: unknown
+                    }
+                    serviceStatus: {}
                     user: {
                         email: string
+                        group: unknown[]
                         id: string
                         image: string
+                        intercom_hash: string
+                        mfa: boolean
                         name: string
                         picture: string
                     }
@@ -27,12 +33,9 @@ declare global {
     }
 }
 
-export function getPageAccessToken(): string | null {
-    return unsafeWindow?.__NEXT_DATA__?.props?.pageProps?.accessToken ?? null
-}
-
+const historyDisabledKey = 'oai/apps/historyDisabled'
 export function getHistoryDisabled(): boolean {
-    return unsafeWindow?.__NEXT_DATA__?.props?.pageProps?.shouldDisableHistory ?? false
+    return localStorage.getItem(historyDisabledKey) === '"true"'
 }
 
 function getUserProfile() {
@@ -42,15 +45,17 @@ function getUserProfile() {
 }
 
 export function getChatIdFromUrl() {
-    const match = location.pathname.match(/^\/chat\/([a-z0-9-]+)$/i)
+    const match = location.pathname.match(/^\/c\/([a-z0-9-]+)$/i)
     if (match) return match[1]
     return null
 }
 
+export const conversationChoiceSelector = '.flex.justify-center span.flex-grow'
+
 export function getConversationChoice() {
     // parse x from `< x / y >` to get the index of the selected response
     const conversationChoices: Array<number | null> = Array.from(document.querySelectorAll('main .group'))
-        .map(group => group.querySelector('.flex.justify-center span.flex-grow'))
+        .map(group => group.querySelector(conversationChoiceSelector))
         // non-existing element will produce null here, which will point to the last child
         // just in case the selector changed
         .map(span => parseInt(span?.textContent?.trim().split(' / ')[0] ?? '0') - 1)

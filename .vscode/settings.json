@@ -22,6 +22,7 @@
     "backoff",
     "chatgpt",
     "davinci",
+    "headlessui",
     "mdast",
     "micromark",
     "preact",
@@ -48,5 +49,8 @@
     "**/.DS_Store": true,
     "**/Thumbs.db": true,
     "**/node_modules": true
+  },
+  "search.exclude": {
+    "**/dist/**": true
   }
 }

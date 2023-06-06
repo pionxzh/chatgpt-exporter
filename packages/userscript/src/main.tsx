@@ -5,23 +5,28 @@ import { fetchConversation, processConversation } from './api'
 import { KEY_FILENAME_FORMAT, LEGACY_KEY_FILENAME_FORMAT } from './constants'
 import { getChatIdFromUrl, getConversationChoice } from './page'
 import { Menu } from './ui/Menu'
-import { SecondaryToolbar } from './ui/SecondaryToolbar'
 import { onloadSafe } from './utils/utils'
 
+import './i18n'
 import './styles/missing-tailwind.css'
 
 /**
  * Migrate legacy filename format
  */
-const legacyFormat = GM_getValue(LEGACY_KEY_FILENAME_FORMAT, '')
-const localLegacyFormat = localStorage.getItem(LEGACY_KEY_FILENAME_FORMAT)
-if (legacyFormat) {
-    GM_deleteValue(LEGACY_KEY_FILENAME_FORMAT)
-    GM_setValue(KEY_FILENAME_FORMAT, JSON.stringify(legacyFormat))
+try {
+    const legacyFormat = GM_getValue?.(LEGACY_KEY_FILENAME_FORMAT, '')
+    const localLegacyFormat = localStorage.getItem(LEGACY_KEY_FILENAME_FORMAT)
+    if (legacyFormat) {
+        GM_deleteValue?.(LEGACY_KEY_FILENAME_FORMAT)
+        GM_setValue?.(KEY_FILENAME_FORMAT, JSON.stringify(legacyFormat))
+    }
+    else if (localLegacyFormat) {
+        localStorage.removeItem(LEGACY_KEY_FILENAME_FORMAT)
+        localStorage.setItem(KEY_FILENAME_FORMAT, JSON.stringify(localLegacyFormat))
+    }
 }
-else if (localLegacyFormat) {
-    localStorage.removeItem(LEGACY_KEY_FILENAME_FORMAT)
-    localStorage.setItem(KEY_FILENAME_FORMAT, JSON.stringify(localLegacyFormat))
+catch (error) {
+    console.error('Failed to migrate legacy filename format', error)
 }
 
 main()
@@ -32,7 +37,7 @@ function main() {
         render(<Menu container={container} />, container)
 
         sentinel.on('nav', (nav) => {
-            const chatList = document.querySelector('nav > div.overflow-y-auto')
+            const chatList = document.querySelector('nav > div.overflow-y-auto, nav > div.overflow-y-hidden')
             if (chatList) {
                 chatList.after(container)
             }
@@ -68,20 +73,6 @@ function main() {
             }
         })
 
-        /** Insert copy button to the next of feedback buttons */
-        sentinel.on('main .flex.justify-between', (node) => {
-            if (!node.querySelector('button')) return
-            // ignore codeblock
-            if (node.closest('pre')) return
-
-            const secondaryToolbar = document.createElement('div')
-            secondaryToolbar.className = 'w-full secondary-toolbar'
-            const threads = Array.from(document.querySelectorAll('main .group'))
-            const index = threads.indexOf(node.closest('.group')!)
-            render(<SecondaryToolbar index={index} />, secondaryToolbar)
-            node.append(secondaryToolbar)
-        })
-
         /** Insert timestamp to the bottom right of each message */
         let chatId = ''
         sentinel.on('main .group', async () => {
@@ -96,7 +87,7 @@ function main() {
             const { conversationNodes } = processConversation(rawConversation, conversationChoices)
 
             threadContents.forEach((thread, index) => {
-                const createTime = conversationNodes[index].message?.create_time
+                const createTime = conversationNodes[index]?.message?.create_time
                 if (!createTime) return
 
                 const date = new Date(createTime * 1000)

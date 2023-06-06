@@ -31,11 +31,15 @@ export default defineConfig({
                 },
                 'license': packageJson.license,
                 'match': [
-                    'https://chat.openai.com/chat',
-                    // support https://chat.openai.com/chat?model=gpt-4
-                    'https://chat.openai.com/chat?*',
-                    // support https://chat.openai.com/chat/123456789
-                    'https://chat.openai.com/chat/*',
+                    'https://chat.openai.com/',
+                    // support https://chat.openai.com/?model={model}
+                    'https://chat.openai.com/?model=*',
+                    // support https://chat.openai.com/c/123456789
+                    'https://chat.openai.com/c/*',
+
+                    'https://chat.zhile.io/',
+                    'https://chat.zhile.io/?model=*',
+                    'https://chat.zhile.io/c/*',
                 ],
                 'icon': 'https://chat.openai.com/favicon.ico',
                 'run-at': 'document-end',
