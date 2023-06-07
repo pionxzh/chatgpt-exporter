@@ -1232,6 +1232,7 @@ var __publicField = (obj, key, value) => {
     var _a, _b, _c, _d, _e, _f, _g;
     const title2 = conversation.title || "ChatGPT Conversation";
     const createTime = conversation.create_time;
+    const updateTime = conversation.update_time;
     const modelSlug = ((_c = (_b = (_a = Object.values(conversation.mapping).find((node2) => {
       var _a2, _b2;
       return (_b2 = (_a2 = node2.message) == null ? void 0 : _a2.metadata) == null ? void 0 : _b2.model_slug;
@@ -1300,6 +1301,7 @@ var __publicField = (obj, key, value) => {
       modelSlug,
       model,
       createTime,
+      updateTime,
       conversationNodes: result
     };
   }
@@ -8115,6 +8117,11 @@ var __publicField = (obj, key, value) => {
   function getColorScheme() {
     return document.documentElement.style.getPropertyValue("color-scheme");
   }
+  function unixTimestampToISOString(timestamp2) {
+    if (!timestamp2)
+      return "";
+    return new Date(timestamp2 * 1e3).toISOString();
+  }
   function downloadFile(filename, type, content2) {
     const blob = content2 instanceof Blob ? content2 : new Blob([content2], {
       type
@@ -8138,10 +8145,14 @@ var __publicField = (obj, key, value) => {
   function getFileNameWithFormat(format, ext, {
     title: title2 = document.title,
     // chatId will be empty when exporting all conversations
-    chatId = ""
+    chatId = "",
+    createTime = Date.now(),
+    updateTime = Date.now()
   } = {}) {
     const _title = sanitizeFilename(title2).replace(/\s+/g, "_");
-    return format.replace("{title}", _title).replace("{date}", dateStr()).replace("{timestamp}", timestamp()).replace("{chat_id}", chatId).concat(`.${ext}`);
+    const _createTime = unixTimestampToISOString(createTime);
+    const _updateTime = unixTimestampToISOString(updateTime);
+    return format.replace("{title}", _title).replace("{date}", dateStr()).replace("{timestamp}", timestamp()).replace("{chat_id}", chatId).replace("{create_time}", _createTime).replace("{update_time}", _updateTime).concat(`.${ext}`);
   }
   class Schema {
     /**
@@ -19247,7 +19258,9 @@ var __publicField = (obj, key, value) => {
     const html2 = conversationToHtml(conversation, userAvatar, metaList);
     const fileName = getFileNameWithFormat(fileNameFormat, "html", {
       title: conversation.title,
-      chatId
+      chatId,
+      createTime: conversation.createTime,
+      updateTime: conversation.updateTime
     });
     downloadFile(fileName, "text/html", standardizeLineBreaks(html2));
     return true;
@@ -19260,7 +19273,9 @@ var __publicField = (obj, key, value) => {
     conversations.forEach((conversation) => {
       let fileName = getFileNameWithFormat(fileNameFormat, "html", {
         title: conversation.title,
-        chatId: conversation.id
+        chatId: conversation.id,
+        createTime: conversation.createTime,
+        updateTime: conversation.updateTime
       });
       if (filenameMap.has(fileName)) {
         const count = filenameMap.get(fileName) ?? 1;
@@ -19327,6 +19342,8 @@ var __publicField = (obj, key, value) => {
       title: title2,
       model,
       modelSlug,
+      createTime,
+      updateTime,
       conversationNodes
     } = conversation;
     const conversationHtml = conversationNodes.map(({
@@ -19389,7 +19406,7 @@ var __publicField = (obj, key, value) => {
       name,
       value
     }) => {
-      const val = value.replace("{title}", title2).replace("{date}", date).replace("{timestamp}", timestamp()).replace("{source}", source).replace("{model}", model).replace("{mode_name}", modelSlug);
+      const val = value.replace("{title}", title2).replace("{date}", date).replace("{timestamp}", timestamp()).replace("{source}", source).replace("{model}", model).replace("{mode_name}", modelSlug).replace("{create_time}", unixTimestampToISOString(createTime)).replace("{update_time}", unixTimestampToISOString(updateTime));
       return [name, val];
     })) ?? [];
     const detailsHtml = _metaList.length > 0 ? `<details>
@@ -19569,7 +19586,9 @@ var __publicField = (obj, key, value) => {
     }) => {
       let fileName = getFileNameWithFormat(fileNameFormat, "json", {
         title: conversation.title,
-        chatId: conversation.id
+        chatId: conversation.id,
+        createTime: conversation.createTime,
+        updateTime: conversation.updateTime
       });
       if (filenameMap.has(fileName)) {
         const count = filenameMap.get(fileName) ?? 1;
@@ -19606,7 +19625,9 @@ var __publicField = (obj, key, value) => {
     const markdown = conversationToMarkdown(conversation, metaList);
     const fileName = getFileNameWithFormat(fileNameFormat, "md", {
       title: conversation.title,
-      chatId
+      chatId,
+      createTime: conversation.createTime,
+      updateTime: conversation.updateTime
     });
     downloadFile(fileName, "text/markdown", standardizeLineBreaks(markdown));
     return true;
@@ -19618,7 +19639,9 @@ var __publicField = (obj, key, value) => {
     conversations.forEach((conversation) => {
       let fileName = getFileNameWithFormat(fileNameFormat, "md", {
         title: conversation.title,
-        chatId: conversation.id
+        chatId: conversation.id,
+        createTime: conversation.createTime,
+        updateTime: conversation.updateTime
       });
       if (filenameMap.has(fileName)) {
         const count = filenameMap.get(fileName) ?? 1;
@@ -19685,6 +19708,8 @@ var __publicField = (obj, key, value) => {
       title: title2,
       model,
       modelSlug,
+      createTime,
+      updateTime,
       conversationNodes
     } = conversation;
     const source = `${baseUrl}/c/${id}`;
@@ -19692,7 +19717,7 @@ var __publicField = (obj, key, value) => {
       name,
       value
     }) => {
-      const val = value.replace("{title}", title2).replace("{date}", dateStr()).replace("{timestamp}", timestamp()).replace("{source}", source).replace("{model}", model).replace("{modelSlug}", modelSlug);
+      const val = value.replace("{title}", title2).replace("{date}", dateStr()).replace("{timestamp}", timestamp()).replace("{source}", source).replace("{model}", model).replace("{model_name}", modelSlug).replace("{create_time}", unixTimestampToISOString(createTime)).replace("{update_time}", unixTimestampToISOString(updateTime));
       return `${name}: ${val}`;
     })) ?? [];
     const frontMatter = _metaList.length > 0 ? `---
@@ -22452,9 +22477,14 @@ ${content2}`;
     const timestamp$1 = timestamp();
     const title2 = sanitizeFilename(_title).replace(/\s+/g, "_");
     const chatId = getChatIdFromUrl() || "this-is-a-mock-chat-id";
+    const now = Date.now() / 1e3;
+    const createTime = now;
+    const updateTime = now;
     const preview = getFileNameWithFormat(format, "{ext}", {
       title: title2,
-      chatId
+      chatId,
+      createTime,
+      updateTime
     });
     const source = `${baseUrl}/${chatId}`;
     return o$5($5d3850c4d0b4e6c7$export$be92b6f5f03c0fe9, {
@@ -22515,6 +22545,12 @@ ${content2}`;
                     }), ",", " ", o$5(Variable, {
                       name: "{chat_id}",
                       title: chatId
+                    }), ",", " ", o$5(Variable, {
+                      name: "{create_time}",
+                      title: unixTimestampToISOString(createTime)
+                    }), ",", " ", o$5(Variable, {
+                      name: "{update_time}",
+                      title: unixTimestampToISOString(updateTime)
                     })]
                   }), o$5("input", {
                     className: "Input mt-4",
@@ -22588,6 +22624,12 @@ ${content2}`;
                       }), ",", " ", o$5(Variable, {
                         name: "{model_name}",
                         title: "text-davinci-002-render-sha"
+                      }), ",", " ", o$5(Variable, {
+                        name: "{create_time}",
+                        title: "2023-04-10T21:45:35.027Z"
+                      }), ",", " ", o$5(Variable, {
+                        name: "{update_time}",
+                        title: "2023-04-10T21:45:35.027Z"
                       })]
                     }), exportMetaList.map((meta, i2) => o$5("div", {
                       className: "flex items-center mt-2",
