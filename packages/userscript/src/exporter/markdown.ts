@@ -6,7 +6,7 @@ import { checkIfConversationStarted, getConversationChoice } from '../page'
 import { downloadFile, getFileNameWithFormat } from '../utils/download'
 import { fromMarkdown, toMarkdown } from '../utils/markdown'
 import { standardizeLineBreaks } from '../utils/text'
-import { dateStr, timestamp } from '../utils/utils'
+import { dateStr, timestamp, unixTimestampToISOString } from '../utils/utils'
 import type { ApiConversationWithId, ConversationNodeMessage, ConversationResult } from '../api'
 import type { ExportMeta } from '../ui/SettingContext'
 
@@ -22,7 +22,7 @@ export async function exportToMarkdown(fileNameFormat: string, metaList: ExportM
     const conversation = processConversation(rawConversation, conversationChoices)
     const markdown = conversationToMarkdown(conversation, metaList)
 
-    const fileName = getFileNameWithFormat(fileNameFormat, 'md', { title: conversation.title, chatId })
+    const fileName = getFileNameWithFormat(fileNameFormat, 'md', { title: conversation.title, chatId, createTime: conversation.createTime, updateTime: conversation.updateTime })
     downloadFile(fileName, 'text/markdown', standardizeLineBreaks(markdown))
 
     return true
@@ -36,6 +36,8 @@ export async function exportAllToMarkdown(fileNameFormat: string, apiConversatio
         let fileName = getFileNameWithFormat(fileNameFormat, 'md', {
             title: conversation.title,
             chatId: conversation.id,
+            createTime: conversation.createTime,
+            updateTime: conversation.updateTime,
         })
         if (filenameMap.has(fileName)) {
             const count = filenameMap.get(fileName) ?? 1
@@ -105,7 +107,7 @@ const transformContent = (
 }
 
 function conversationToMarkdown(conversation: ConversationResult, metaList?: ExportMeta[]) {
-    const { id, title, model, modelSlug, conversationNodes } = conversation
+    const { id, title, model, modelSlug, createTime, updateTime, conversationNodes } = conversation
     const source = `${baseUrl}/c/${id}`
 
     const _metaList = metaList
@@ -117,7 +119,9 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
                 .replace('{timestamp}', timestamp())
                 .replace('{source}', source)
                 .replace('{model}', model)
-                .replace('{modelSlug}', modelSlug)
+                .replace('{model_name}', modelSlug)
+                .replace('{create_time}', unixTimestampToISOString(createTime))
+                .replace('{update_time}', unixTimestampToISOString(updateTime))
 
             return `${name}: ${val}`
         })

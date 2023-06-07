@@ -34,6 +34,8 @@ export async function exportAllToJson(fileNameFormat: string, apiConversations: 
         let fileName = getFileNameWithFormat(fileNameFormat, 'json', {
             title: conversation.title,
             chatId: conversation.id,
+            createTime: conversation.createTime,
+            updateTime: conversation.updateTime,
         })
         if (filenameMap.has(fileName)) {
             const count = filenameMap.get(fileName) ?? 1

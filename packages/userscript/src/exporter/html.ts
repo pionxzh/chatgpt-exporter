@@ -8,7 +8,7 @@ import { downloadFile, getFileNameWithFormat } from '../utils/download'
 import { fromMarkdown, toHtml } from '../utils/markdown'
 import { ScriptStorage } from '../utils/storage'
 import { standardizeLineBreaks } from '../utils/text'
-import { dateStr, getColorScheme, timestamp } from '../utils/utils'
+import { dateStr, getColorScheme, timestamp, unixTimestampToISOString } from '../utils/utils'
 import type { ApiConversationWithId, ConversationNodeMessage, ConversationResult } from '../api'
 import type { ExportMeta } from '../ui/SettingContext'
 
@@ -26,7 +26,7 @@ export async function exportToHtml(fileNameFormat: string, metaList: ExportMeta[
     const conversation = processConversation(rawConversation, conversationChoices)
     const html = conversationToHtml(conversation, userAvatar, metaList)
 
-    const fileName = getFileNameWithFormat(fileNameFormat, 'html', { title: conversation.title, chatId })
+    const fileName = getFileNameWithFormat(fileNameFormat, 'html', { title: conversation.title, chatId, createTime: conversation.createTime, updateTime: conversation.updateTime })
     downloadFile(fileName, 'text/html', standardizeLineBreaks(html))
 
     return true
@@ -42,6 +42,8 @@ export async function exportAllToHtml(fileNameFormat: string, apiConversations: 
         let fileName = getFileNameWithFormat(fileNameFormat, 'html', {
             title: conversation.title,
             chatId: conversation.id,
+            createTime: conversation.createTime,
+            updateTime: conversation.updateTime,
         })
         if (filenameMap.has(fileName)) {
             const count = filenameMap.get(fileName) ?? 1
@@ -111,7 +113,7 @@ const transformContent = (
 }
 
 function conversationToHtml(conversation: ConversationResult, avatar: string, metaList?: ExportMeta[]) {
-    const { id, title, model, modelSlug, conversationNodes } = conversation
+    const { id, title, model, modelSlug, createTime, updateTime, conversationNodes } = conversation
 
     const conversationHtml = conversationNodes.map(({ message }) => {
         if (!message || !message.content) return null
@@ -182,6 +184,8 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
                 .replace('{source}', source)
                 .replace('{model}', model)
                 .replace('{mode_name}', modelSlug)
+                .replace('{create_time}', unixTimestampToISOString(createTime))
+                .replace('{update_time}', unixTimestampToISOString(updateTime))
 
             return [name, val] as const
         })

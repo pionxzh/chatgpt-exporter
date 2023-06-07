@@ -27,3 +27,8 @@ export function timestamp() {
 export function getColorScheme(): 'light' | 'dark' {
     return document.documentElement.style.getPropertyValue('color-scheme') as 'light' | 'dark'
 }
+
+export function unixTimestampToISOString(timestamp: number) {
+    if (!timestamp) return ''
+    return (new Date(timestamp * 1000)).toISOString()
+}

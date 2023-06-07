@@ -6,7 +6,7 @@ import { useTitle } from '../hooks/useTitle'
 import { LOCALES } from '../i18n'
 import { getChatIdFromUrl } from '../page'
 import { getFileNameWithFormat } from '../utils/download'
-import { timestamp as _timestamp, dateStr } from '../utils/utils'
+import { timestamp as _timestamp, dateStr, unixTimestampToISOString } from '../utils/utils'
 import { IconCross, IconTrash } from './Icons'
 import { useSettingContext } from './SettingContext'
 import { Toggle } from './Toggle'
@@ -39,7 +39,10 @@ export const SettingDialog: FC<SettingDialogProps> = ({
     const timestamp = _timestamp()
     const title = sanitize(_title).replace(/\s+/g, '_')
     const chatId = getChatIdFromUrl() || 'this-is-a-mock-chat-id'
-    const preview = getFileNameWithFormat(format, '{ext}', { title, chatId })
+    const now = Date.now() / 1000
+    const createTime = now
+    const updateTime = now
+    const preview = getFileNameWithFormat(format, '{ext}', { title, chatId, createTime, updateTime })
 
     const source = `${baseUrl}/${chatId}`
 
@@ -90,6 +93,10 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                                         <Variable name="{timestamp}" title={timestamp} />
                                         ,{' '}
                                         <Variable name="{chat_id}" title={chatId} />
+                                        ,{' '}
+                                        <Variable name="{create_time}" title={unixTimestampToISOString(createTime)} />
+                                        ,{' '}
+                                        <Variable name="{update_time}" title={unixTimestampToISOString(updateTime)} />
                                     </p>
                                     <input className="Input mt-4" id="filename" value={format} onChange={e => setFormat(e.currentTarget.value)} />
                                     <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">
@@ -144,6 +151,10 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                                                 <Variable name="{model}" title={'ChatGPT-3.5'} />
                                                 ,{' '}
                                                 <Variable name="{model_name}" title={'text-davinci-002-render-sha'} />
+                                                ,{' '}
+                                                <Variable name="{create_time}" title={'2023-04-10T21:45:35.027Z'} />
+                                                ,{' '}
+                                                <Variable name="{update_time}" title={'2023-04-10T21:45:35.027Z'} />
                                             </p>
                                             {exportMetaList.map((meta, i) => (
                                                 <div className="flex items-center mt-2" key={i}>
