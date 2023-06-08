@@ -27,6 +27,10 @@ declare global {
                         name: string
                         picture: string
                     }
+                    serverResponse?: {
+                        type: 'data'
+                        data: any // Basically ApiConversation
+                    }
                 }
             }
         }
@@ -45,9 +49,18 @@ function getUserProfile() {
 }
 
 export function getChatIdFromUrl() {
-    const match = location.pathname.match(/^\/c\/([a-z0-9-]+)$/i)
+    const match = location.pathname.match(/^\/(?:share|c)\/([a-z0-9-]+)/i)
     if (match) return match[1]
     return null
+}
+
+export function isSharePage() {
+    return location.pathname.startsWith('/share')
+        && !location.pathname.endsWith('/continue')
+}
+
+export function getConversationFromSharePage() {
+    return window.__NEXT_DATA__?.props?.pageProps?.serverResponse?.data
 }
 
 export const conversationChoiceSelector = '.flex.justify-center span.flex-grow'
@@ -64,7 +77,7 @@ export function getConversationChoice() {
     return conversationChoices
 }
 
-const defaultAvatar = 'data:image/svg+xml,%3csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20version=%271.1%27%20width=%2730%27%20height=%2730%27/%3e'
+const defaultAvatar = 'data:image/svg+xml,%3Csvg%20stroke%3D%22currentColor%22%20fill%3D%22none%22%20stroke-width%3D%221.5%22%20viewBox%3D%22-6%20-6%2036%2036%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20style%3D%22color%3A%20white%3B%20background%3A%20%23ab68ff%3B%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M20%2021v-2a4%204%200%200%200-4-4H8a4%204%200%200%200-4%204v2%22%3E%3C%2Fpath%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%227%22%20r%3D%224%22%3E%3C%2Fcircle%3E%3C%2Fsvg%3E'
 export async function getUserAvatar(): Promise<string> {
     try {
         const { picture } = getUserProfile()

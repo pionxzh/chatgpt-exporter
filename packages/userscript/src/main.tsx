@@ -3,7 +3,7 @@ import sentinel from 'sentinel-js'
 import { GM_deleteValue, GM_getValue, GM_setValue } from 'vite-plugin-monkey/dist/client'
 import { fetchConversation, processConversation } from './api'
 import { KEY_FILENAME_FORMAT, LEGACY_KEY_FILENAME_FORMAT } from './constants'
-import { getChatIdFromUrl, getConversationChoice } from './page'
+import { getChatIdFromUrl, getConversationChoice, isSharePage } from './page'
 import { Menu } from './ui/Menu'
 import { onloadSafe } from './utils/utils'
 
@@ -46,6 +46,14 @@ function main() {
                 nav.append(container)
             }
         })
+
+        // Support for share page
+        if (isSharePage()) {
+            const continueUrl = `${location.href}/continue`
+            sentinel.on(`a[href="${continueUrl}"]`, (link) => {
+                link.after(container)
+            })
+        }
 
         // dirty fix for unstable image url from unsplash
         const imageMap = new Map<string, string>()

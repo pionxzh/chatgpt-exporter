@@ -1,6 +1,6 @@
 import urlcat from 'urlcat'
 import { apiUrl, baseUrl } from './constants'
-import { getChatIdFromUrl } from './page'
+import { getChatIdFromUrl, getConversationFromSharePage, isSharePage } from './page'
 
 interface ApiSession {
     accessToken: string
@@ -119,6 +119,10 @@ const conversationApi = (id: string) => urlcat(apiUrl, '/conversation/:id', { id
 const conversationsApi = (offset: number, limit: number) => urlcat(apiUrl, '/conversations', { offset, limit })
 
 export async function getCurrentChatId(): Promise<string> {
+    if (isSharePage()) {
+        return `__share__${getChatIdFromUrl()}`
+    }
+
     const chatId = getChatIdFromUrl()
     if (chatId) return chatId
 
@@ -131,6 +135,15 @@ export async function getCurrentChatId(): Promise<string> {
 }
 
 export async function fetchConversation(chatId: string): Promise<ApiConversationWithId> {
+    if (chatId.startsWith('__share__')) {
+        const shareConversation = getConversationFromSharePage() as ApiConversation
+        const id = chatId.replace('__share__', '')
+        return {
+            id,
+            ...shareConversation,
+        }
+    }
+
     const url = conversationApi(chatId)
     const conversation = await fetchApi<ApiConversation>(url)
     return {
