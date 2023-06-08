@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.12.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.11.0...userscript-v2.12.0) (2023-06-08)
+
+
+### Features
+
+* added support for create_time and update_time metadata parameters per [#94](https://github.com/pionxzh/chatgpt-exporter/issues/94) ([#114](https://github.com/pionxzh/chatgpt-exporter/issues/114)) ([5df4ba6](https://github.com/pionxzh/chatgpt-exporter/commit/5df4ba6050292db1f88a12a77dcd1f46eeccba55))
+* support sharing page ([50462cd](https://github.com/pionxzh/chatgpt-exporter/commit/50462cd0ba9adea279b5b16c7445a6214424d2d1)), closes [#147](https://github.com/pionxzh/chatgpt-exporter/issues/147)
+
 ## [2.11.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.10.0...userscript-v2.11.0) (2023-05-30)
 
 
