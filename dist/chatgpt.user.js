@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.11.0
+// @version            2.12.0
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -13,9 +13,13 @@
 // @match              https://chat.openai.com/
 // @match              https://chat.openai.com/?model=*
 // @match              https://chat.openai.com/c/*
+// @match              https://chat.openai.com/share/*
+// @match              https://chat.openai.com/share/*/continue
 // @match              https://chat.zhile.io/
 // @match              https://chat.zhile.io/?model=*
 // @match              https://chat.zhile.io/c/*
+// @match              https://chat.zhile.io/share/*
+// @match              https://chat.zhile.io/share/*/continue
 // @require            https://cdn.jsdelivr.net/npm/jszip@3.9.1/dist/jszip.min.js
 // @require            https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js
 // @grant              GM_deleteValue
@@ -1089,10 +1093,17 @@ var __publicField = (obj, key, value) => {
     return user;
   }
   function getChatIdFromUrl() {
-    const match = location.pathname.match(/^\/c\/([a-z0-9-]+)$/i);
+    const match = location.pathname.match(/^\/(?:share|c)\/([a-z0-9-]+)/i);
     if (match)
       return match[1];
     return null;
+  }
+  function isSharePage() {
+    return location.pathname.startsWith("/share") && !location.pathname.endsWith("/continue");
+  }
+  function getConversationFromSharePage() {
+    var _a, _b, _c, _d;
+    return (_d = (_c = (_b = (_a = window.__NEXT_DATA__) == null ? void 0 : _a.props) == null ? void 0 : _b.pageProps) == null ? void 0 : _c.serverResponse) == null ? void 0 : _d.data;
   }
   const conversationChoiceSelector = ".flex.justify-center span.flex-grow";
   function getConversationChoice() {
@@ -1102,7 +1113,7 @@ var __publicField = (obj, key, value) => {
     }).map((x2) => x2 === -1 ? null : x2);
     return conversationChoices;
   }
-  const defaultAvatar = "data:image/svg+xml,%3csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20version=%271.1%27%20width=%2730%27%20height=%2730%27/%3e";
+  const defaultAvatar = "data:image/svg+xml,%3Csvg%20stroke%3D%22currentColor%22%20fill%3D%22none%22%20stroke-width%3D%221.5%22%20viewBox%3D%22-6%20-6%2036%2036%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20style%3D%22color%3A%20white%3B%20background%3A%20%23ab68ff%3B%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M20%2021v-2a4%204%200%200%200-4-4H8a4%204%200%200%200-4%204v2%22%3E%3C%2Fpath%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%227%22%20r%3D%224%22%3E%3C%2Fcircle%3E%3C%2Fsvg%3E";
   async function getUserAvatar() {
     try {
       const {
@@ -1135,6 +1146,9 @@ var __publicField = (obj, key, value) => {
     limit
   });
   async function getCurrentChatId() {
+    if (isSharePage()) {
+      return `__share__${getChatIdFromUrl()}`;
+    }
     const chatId = getChatIdFromUrl();
     if (chatId)
       return chatId;
@@ -1145,6 +1159,14 @@ var __publicField = (obj, key, value) => {
     throw new Error("No chat id found.");
   }
   async function fetchConversation(chatId) {
+    if (chatId.startsWith("__share__")) {
+      const shareConversation = getConversationFromSharePage();
+      const id = chatId.replace("__share__", "");
+      return {
+        id,
+        ...shareConversation
+      };
+    }
     const url = conversationApi(chatId);
     const conversation = await fetchApi(url);
     return {
@@ -22887,6 +22909,12 @@ ${content2}`;
           nav.append(container);
         }
       });
+      if (isSharePage()) {
+        const continueUrl = `${location.href}/continue`;
+        sentinel.on(`a[href="${continueUrl}"]`, (link2) => {
+          link2.after(container);
+        });
+      }
       const imageMap = /* @__PURE__ */ new Map();
       sentinel.on("img", (img) => {
         const src = img.src;
