@@ -4,14 +4,11 @@
     
 ## Skrip GreasyFork untuk mengekspor riwayat percakapan [ChatGPT](https://chatgpt.com/)
 
-[![author][author-image]][author-url]
 [![license][license-image]][license-url]
 [![release][release-image]][release-url]
 [![last commit][last-commit-image]][last-commit-url]
 [![GreasyFork][GreasyFork-image]][GreasyFork-url]    
 
-[author-image]: https://img.shields.io/badge/author-pionxzh-orange.svg
-[author-url]: https://github.com/pionxzh
 [license-image]: https://img.shields.io/github/license/pionxzh/chatgpt-exporter?color=red
 [license-url]: https://github.com/pionxzh/chatgpt-exporter/blob/master/LICENSE
 [release-image]: https://img.shields.io/github/v/release/pionxzh/chatgpt-exporter?color=blue
@@ -21,7 +18,7 @@
 [GreasyFork-image]: https://img.shields.io/static/v1?label=%20&message=GreasyFork&style=flat-square&labelColor=7B0000&color=960000&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3ggEBCQHM3fXsAAAAVdJREFUOMudkz2qwkAUhc/goBaGJBgUtBCZyj0ILkpwAW7Bws4yO3AHLiCtEFD8KVREkoiFxZzX5A2KGfN4F04zMN+ce+5c4LMUgDmANYBnrnV+plBSi+FwyHq9TgA2LQpvCiEiABwMBtzv95RSfoNEHy8DYBzHrNVqVEr9BWKcqNFoxF6vx3a7zc1mYyC73a4MogBg7vs+z+czO50OW60Wt9stK5UKp9Mpj8cjq9WqDTBHnjAdxzGQZrPJw+HA31oulzbAWgLoA0CWZVBKIY5jzGYzdLtdE9DlcrFNrY98zobqOA6TJKHW2jg4nU5sNBpFDp6mhVe5rsvVasUwDHm9Xqm15u12o+/7Hy0gD8KatOd5vN/v1FozTVN6nkchxFuI6hsAAIMg4OPxMJCXdtTbR7JJCMEgCJhlGUlyPB4XfumozInrupxMJpRSRtZlKoNYl+m/6/wDuWAjtPfsQuwAAAAASUVORK5CYII=
 [GreasyFork-url]: https://greasyfork.org/scripts/456055-chatgpt-exporter
     
-[English](./README.md) &nbsp;&nbsp;|&nbsp;&nbsp; Indonesia &nbsp;&nbsp;|&nbsp;&nbsp; [한국어](./README_KR.md) &nbsp;&nbsp;|&nbsp;&nbsp; [Türkçe](./README_TR.md)   
+[English 🇺🇸](./README.md) &nbsp;&nbsp;|&nbsp;&nbsp; Indonesia 🇮🇩 &nbsp;&nbsp;|&nbsp;&nbsp; [한국어 🇰🇷](./README_KR.md) &nbsp;&nbsp;|&nbsp;&nbsp; [Türkçe 🇹🇷](./README_TR.md)
     
 ![image](https://user-images.githubusercontent.com/9910706/215000985-887b6f9e-142b-4c25-b4bf-2ba90c0b4268.png)    
 
@@ -50,7 +47,7 @@
     
 #
 
-[Format yang Didukung](#-format-yang-didukung) &nbsp;&nbsp;|&nbsp;&nbsp; [Contoh](#-contoh) &nbsp;&nbsp;|&nbsp;&nbsp; [Kontribusi](#-kontribusi) &nbsp;&nbsp;|&nbsp;&nbsp; [Stargazers Sepanjang Waktu](#-stargazers-sepanjang-waktu) 
+[📚 Format yang Didukung](#-format-yang-didukung) &nbsp;&nbsp;|&nbsp;&nbsp; [💡 Contoh](#-contoh) &nbsp;&nbsp;|&nbsp;&nbsp; [🤝 Kontribusi](#-kontribusi) &nbsp;&nbsp;|&nbsp;&nbsp; [⭐ Sejarah Bintang](#-sejarah-bintang)
 
 </div>
 
@@ -211,6 +208,10 @@ Konten mentah dari API `https://chat.openai.com/backend-api/conversation/[id]`
 
 Lihat [CONTRIBUTING.md](./CONTRIBUTING.md)
 
-## 🚀 Stargazers Sepanjang Waktu
+## ⭐ Sejarah Bintang
 
-[![Stargazers over time](https://starchart.cc/pionxzh/chatgpt-exporter.svg)](https://starchart.cc/pionxzh/chatgpt-exporter)
+<div align="center">
+
+<img src="https://api.star-history.com/svg?repos=pionxzh/chatgpt-exporter&type=Date" width="600" height="400" alt="Star History Chart" valign="middle">
+    
+</div>   
