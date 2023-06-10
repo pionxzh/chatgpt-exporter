@@ -209,4 +209,4 @@ Konten mentah dari API `https://chat.openai.com/backend-api/conversation/[id]`
 
 ## 🤝 Kontribusi
 
-Lihat [CONTRIBUTING_ID.md](./CONTRIBUTING_ID.md)
+Lihat [CONTRIBUTING.md](./CONTRIBUTING.md)
