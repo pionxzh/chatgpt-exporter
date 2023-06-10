@@ -50,7 +50,7 @@
     
 #
 
-[지원하는 형식](#-지원하는-형식) &nbsp;&nbsp;|&nbsp;&nbsp; [예제](#-예제) &nbsp;&nbsp;|&nbsp;&nbsp; [기여하기](#-기여하기)
+[지원하는 형식](#-지원하는-형식) &nbsp;&nbsp;|&nbsp;&nbsp; [예제](#-예제) &nbsp;&nbsp;|&nbsp;&nbsp; [기여하기](#-기여하기) &nbsp;&nbsp;|&nbsp;&nbsp;[시간에 따른 천문학자들](#-시간에-따른-천문학자들)
     
 </div>
 
@@ -206,4 +206,8 @@ API `https://chat.openai.com/backend-api/conversation/[id]` 에서 얻은 원시
 
 ## 🤝 기여하기
 
-[CONTRIBUTING.md](./CONTRIBUTING.md) 를 참조하세요.
+[CONTRIBUTING.md](./CONTRIBUTING.md) 를 참조하세요
+
+## 🚀 시간에 따른 천문학자들
+
+[![시간에 따른 천문학자들](https://starchart.cc/pionxzh/chatgpt-exporter.svg)](https://starchart.cc/pionxzh/chatgpt-exporter)
