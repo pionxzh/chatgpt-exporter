@@ -59,8 +59,8 @@
 ## 📚 Format yang Didukung
 
 - [Teks](#teks)
-- [PNG](#tangkapan-layar)
 - [HTML](#html)
+- [PNG](#tangkapan-layar)
 - [JSON](#json)
 
 ## 💡 Contoh
