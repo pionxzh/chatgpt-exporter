@@ -50,7 +50,7 @@
     
 #
     
-[Desteklenen Formatlar](#-desteklenen-formatlar) &nbsp;&nbsp;|&nbsp;&nbsp; [Örnek](#-örnek) &nbsp;&nbsp;|&nbsp;&nbsp; [Katılım](#-katılım)
+[Desteklenen Formatlar](#-desteklenen-formatlar) &nbsp;&nbsp;|&nbsp;&nbsp; [Örnek](#-örnek) &nbsp;&nbsp;|&nbsp;&nbsp; [Katılım](#-katılım) &nbsp;&nbsp;|&nbsp;&nbsp; [Zaman İçindeki Yıldızsavrulardan](#-zaman-i̇çindeki-yıldızsavrulardan)
 
 </div>
 
@@ -210,3 +210,7 @@ API `https://chat.openai.com/backend-api/conversation/[id]` üzerinden alınan h
 ## 🤝 Katılım
 
 [CONTRIBUTING.md](./CONTRIBUTING.md) dosyasına bakın
+
+## 🚀 Zaman İçindeki Yıldızsavrulardan
+
+[![Zaman içindeki yıldızsavrulardan](https://starchart.cc/pionxzh/chatgpt-exporter.svg)](https://starchart.cc/pionxzh/chatgpt-exporter)
