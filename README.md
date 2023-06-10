@@ -47,7 +47,7 @@ English 🇺🇸 &nbsp;&nbsp;|&nbsp;&nbsp; [Indonesia 🇮🇩](./README_ID.md) 
     
 #
 
-[Supported Formats](#-supported-formats) &nbsp;&nbsp;|&nbsp;&nbsp; [Example](#-example) &nbsp;&nbsp;|&nbsp;&nbsp; [Contribution](#-contribution) &nbsp;&nbsp;|&nbsp;&nbsp; [Star History](#-star-history) 
+[📚 Supported Formats](#-supported-formats) &nbsp;&nbsp;|&nbsp;&nbsp; [💡 Example](#-example) &nbsp;&nbsp;|&nbsp;&nbsp; [🤝 Contribution](#-contribution) &nbsp;&nbsp;|&nbsp;&nbsp; [⭐ Star History](#-star-history) 
  
 </div>
 
