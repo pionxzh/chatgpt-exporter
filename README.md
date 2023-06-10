@@ -211,7 +211,6 @@ the raw content from API `https://chat.openai.com/backend-api/conversation/[id]`
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md)
 
-
 ## 🚀 Stargazers Over Time
 
 [![Stargazers over time](https://starchart.cc/pionxzh/chatgpt-exporter.svg)](https://starchart.cc/pionxzh/chatgpt-exporter)
