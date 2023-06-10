@@ -87,7 +87,7 @@ const LanguageMapping: Record<string, string> = {
     'es-CL': ES.code,
     'es-CO': ES.code,
     'es-MX': ES.code,
-    'es-US': ES.code,    
+    'es-US': ES.code,
     'id': ID_ID.code,
     'id-ID': ID_ID.code,
 
