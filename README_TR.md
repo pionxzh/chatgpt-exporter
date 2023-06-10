@@ -1,4 +1,4 @@
-<h1 align="center">ChatGPT Dışa Aktarıcı</h1>
+<h1 align="center">ChatGPT Exporter</h1>
 
 <div align="center">
     
@@ -69,7 +69,7 @@
 
 ```
 Siz:
-ChatGPT Dışa Aktarıcısı oluşturuyorum. Ne düşünüyorsunuz?
+ChatGPT Exporter oluşturuyorum. Ne düşünüyorsunuz?
 
 ChatGPT:
 ChatGPT modelini kullanarak metin dışa aktaran bir araç oluşturmayı 
