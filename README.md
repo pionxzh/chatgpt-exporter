@@ -212,6 +212,6 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 <div align="center">
 
-<img src="https://api.star-history.com/svg?repos=pionxzh/chatgpt-exporter&type=Date" width="400" height="300" alt="Star History Chart" valign="middle">
+<img src="https://api.star-history.com/svg?repos=pionxzh/chatgpt-exporter&type=Date" width="600" height="500" alt="Star History Chart" valign="middle">
 
 </div>    
