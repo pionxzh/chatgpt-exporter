@@ -210,4 +210,8 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 ## ⭐ Star History
 
+<div align="center">
+
 [![Star History Chart](https://api.star-history.com/svg?repos=pionxzh/chatgpt-exporter&type=Date)](https://star-history.com/#pionxzh/chatgpt-exporter&Date)
+
+</div>    
