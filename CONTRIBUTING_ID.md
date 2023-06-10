@@ -1,8 +1,8 @@
-# Kontribusi
+# 🤝 Kontribusi
 
 Kami senang bahwa Anda tertarik untuk berkontribusi pada proyek ini! Sebelum mengirimkan kontribusi Anda, harap baca panduan berikut.
 
-## Persiapan
+## 🔧 Persiapan
 
 Proyek ini menggunakan [PNPM](https://pnpm.js.org/) untuk manajemen paket. Pastikan Anda telah menginstalnya sebelum melanjutkan.
 
@@ -12,7 +12,7 @@ Proyek ini menggunakan [PNPM](https://pnpm.js.org/) untuk manajemen paket. Pasti
 4. Klik "Install" pada popup untuk menginstal skrip pengembangan.
 5. Lakukan perubahan Anda!
 
-## Linting dan Pemeriksaan Tipe
+## ✅ Linting dan Pemeriksaan Tipe
 
 Proyek ini menggunakan [ESLint](https://eslint.org/) dan [TypeScript](https://www.typescriptlang.org/) untuk linting dan pemeriksaan tipe, masing-masing. Pastikan kode Anda lolos keduanya sebelum mengirimkan PR.
 
@@ -21,7 +21,7 @@ pnpm run lint
 pnpm run test
 ```
 
-## Format Pesan Commit
+## 📝 Format Pesan Commit
 
 Proyek ini mengikuti spesifikasi [Conventional Commits](https://www.conventionalcommits.org/). Pastikan pesan commit Anda diformat dengan benar.
 
