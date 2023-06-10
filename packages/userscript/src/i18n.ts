@@ -39,7 +39,7 @@ const ES = {
 const ID_ID = {
     name: 'Indonesia',
     code: 'id-ID',
-    resource: Id_ID,
+    resource: id_ID,
 }
 
 const JA_JP = {
