@@ -50,8 +50,8 @@ English &nbsp;&nbsp;|&nbsp;&nbsp; [Indonesia](./README_ID.md) &nbsp;&nbsp;|&nbsp
     
 #
 
-[Supported Formats](#supported-formats) &nbsp;&nbsp;|&nbsp;&nbsp; [Example](#example) &nbsp;&nbsp;|&nbsp;&nbsp; [Contribution](#contribution)
-    
+[Supported Formats](#supported-formats) &nbsp;&nbsp;|&nbsp;&nbsp; [Example](#example) &nbsp;&nbsp;|&nbsp;&nbsp; [Contribution](#contribution) &nbsp;&nbsp;|&nbsp;&nbsp; [Stargazers Over Time](##-stargazers-over-time) 
+ 
 </div>
 
 #
