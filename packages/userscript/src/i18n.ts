@@ -3,6 +3,7 @@ import { initReactI18next } from 'react-i18next'
 import { KEY_LANGUAGE } from './constants'
 import en_US from './locales/en.json'
 import es from './locales/es.json'
+import id_ID from './locales/id.json'
 import ja_JP from './locales/jp.json'
 import tr_TR from './locales/tr.json'
 import zh_Hans from './locales/zh-Hans.json'
@@ -35,6 +36,12 @@ const ES = {
     resource: es,
 }
 
+const ID_ID = {
+    name: 'Indonesia',
+    code: 'id-ID',
+    resource: Id_ID,
+}
+
 const JA_JP = {
     name: '日本語',
     code: 'ja-JP',
@@ -62,6 +69,7 @@ const ZH_Hant = {
 export const LOCALES: Locale[] = [
     EN_US,
     ES,
+    ID_ID,
     JA_JP,
     TR_TR,
     ZH_Hans,
@@ -80,6 +88,9 @@ const LanguageMapping: Record<string, string> = {
     'es-CO': ES.code,
     'es-MX': ES.code,
     'es-US': ES.code,
+    
+    'id': ID_ID.code,
+    'id-ID': ID_ID.code,
 
     'ja': JA_JP.code,
     'ja-JP': JA_JP.code,
