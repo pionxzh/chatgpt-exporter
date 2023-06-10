@@ -4,14 +4,11 @@
     
 ## A GreasyFork script to export the chat history of [ChatGPT](https://chatgpt.com/)
 
-[![author][author-image]][author-url]
 [![license][license-image]][license-url]
 [![release][release-image]][release-url]
 [![last commit][last-commit-image]][last-commit-url]
 [![GreasyFork][GreasyFork-image]][GreasyFork-url]    
     
-[author-image]: https://img.shields.io/badge/author-pionxzh-orange.svg
-[author-url]: https://github.com/pionxzh
 [license-image]: https://img.shields.io/github/license/pionxzh/chatgpt-exporter?color=red
 [license-url]: https://github.com/pionxzh/chatgpt-exporter/blob/master/LICENSE
 [release-image]: https://img.shields.io/github/v/release/pionxzh/chatgpt-exporter?color=blue
@@ -50,7 +47,7 @@ English &nbsp;&nbsp;|&nbsp;&nbsp; [Indonesia](./README_ID.md) &nbsp;&nbsp;|&nbsp
     
 #
 
-[Supported Formats](#-supported-formats) &nbsp;&nbsp;|&nbsp;&nbsp; [Example](#-example) &nbsp;&nbsp;|&nbsp;&nbsp; [Contribution](#-contribution) &nbsp;&nbsp;|&nbsp;&nbsp; [Stargazers Over Time](#-stargazers-over-time) 
+[Supported Formats](#-supported-formats) &nbsp;&nbsp;|&nbsp;&nbsp; [Example](#-example) &nbsp;&nbsp;|&nbsp;&nbsp; [Contribution](#-contribution) &nbsp;&nbsp;|&nbsp;&nbsp; [Star History](#-star-history) 
  
 </div>
 
@@ -211,6 +208,6 @@ the raw content from API `https://chat.openai.com/backend-api/conversation/[id]`
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md)
 
-## 🚀 Stargazers Over Time
+## ⭐ Star History
 
-[![Stargazers over time](https://starchart.cc/pionxzh/chatgpt-exporter.svg)](https://starchart.cc/pionxzh/chatgpt-exporter)
+[![Star History Chart](https://api.star-history.com/svg?repos=pionxzh/chatgpt-exporter&type=Date)](https://star-history.com/#pionxzh/chatgpt-exporter&Date)
