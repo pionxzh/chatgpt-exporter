@@ -59,8 +59,8 @@ English &nbsp;&nbsp;|&nbsp;&nbsp; [Indonesia](./README_ID.md) &nbsp;&nbsp;|&nbsp
 ## 📚 Supported Formats
 
 - [Text](#text)
-- [PNG](#screenshot)
 - [HTML](#html)
+- [PNG](#screenshot)
 - [JSON](#json)
 
 ## 💡 Example
