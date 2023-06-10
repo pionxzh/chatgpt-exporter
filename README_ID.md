@@ -50,7 +50,7 @@
     
 #
 
-[Format yang Didukung](#-format-yang-didukung) &nbsp;&nbsp;|&nbsp;&nbsp; [Contoh](#-contoh) &nbsp;&nbsp;|&nbsp;&nbsp; [Kontribusi](#-kontribusi)
+[Format yang Didukung](#-format-yang-didukung) &nbsp;&nbsp;|&nbsp;&nbsp; [Contoh](#-contoh) &nbsp;&nbsp;|&nbsp;&nbsp; [Kontribusi](#-kontribusi) &nbsp;&nbsp;|&nbsp;&nbsp; [Stargazers Sepanjang Waktu](#-stargazers-sepanjang-waktu) 
 
 </div>
 
@@ -210,3 +210,7 @@ Konten mentah dari API `https://chat.openai.com/backend-api/conversation/[id]`
 ## 🤝 Kontribusi
 
 Lihat [CONTRIBUTING.md](./CONTRIBUTING.md)
+
+## 🚀 Stargazers Sepanjang Waktu
+
+[![Stargazers over time](https://starchart.cc/pionxzh/chatgpt-exporter.svg)](https://starchart.cc/pionxzh/chatgpt-exporter)
