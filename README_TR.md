@@ -47,7 +47,7 @@
     
 #
     
-[📚 Desteklenen Formatlar](#-desteklenen-formatlar) &nbsp;&nbsp;|&nbsp;&nbsp; [💡 Örnek](#-örnek) &nbsp;&nbsp;|&nbsp;&nbsp; [🤝 Katılım](#-katılım) &nbsp;&nbsp;|&nbsp;&nbsp; [⭐ Yıldız Geçmişi](#-yıldız-geçmişi)
+[📚 Desteklenen Formatlar](#-desteklenen-formatlar) &nbsp;&nbsp;|&nbsp;&nbsp; [💡 Örnek](#-örnek) &nbsp;&nbsp;|&nbsp;&nbsp; [🤝 Katılım](#-katılım) &nbsp;&nbsp;|&nbsp;&nbsp; [⭐ Yıldız Geçmişi](#-y%C4%B1ld%C4%B1z-ge%C3%A7mi%C5%9Fi)
 
 </div>
 
