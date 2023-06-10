@@ -2,13 +2,13 @@
 
 <div align="center">
     
-## [ChatGPT](https://chatgpt.com/) sohbet geçmişini dışa aktarmak için GreasyFork betiği
-    
+## Skrip GreasyFork untuk mengekspor riwayat percakapan [ChatGPT](https://chatgpt.com/)
+
 [![license][license-image]][license-url]
 [![release][release-image]][release-url]
 [![last commit][last-commit-image]][last-commit-url]
 [![GreasyFork][GreasyFork-image]][GreasyFork-url]    
-    
+
 [license-image]: https://img.shields.io/github/license/pionxzh/chatgpt-exporter?color=red
 [license-url]: https://github.com/pionxzh/chatgpt-exporter/blob/master/LICENSE
 [release-image]: https://img.shields.io/github/v/release/pionxzh/chatgpt-exporter?color=blue
@@ -18,27 +18,27 @@
 [GreasyFork-image]: https://img.shields.io/static/v1?label=%20&message=GreasyFork&style=flat-square&labelColor=7B0000&color=960000&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3ggEBCQHM3fXsAAAAVdJREFUOMudkz2qwkAUhc/goBaGJBgUtBCZyj0ILkpwAW7Bws4yO3AHLiCtEFD8KVREkoiFxZzX5A2KGfN4F04zMN+ce+5c4LMUgDmANYBnrnV+plBSi+FwyHq9TgA2LQpvCiEiABwMBtzv95RSfoNEHy8DYBzHrNVqVEr9BWKcqNFoxF6vx3a7zc1mYyC73a4MogBg7vs+z+czO50OW60Wt9stK5UKp9Mpj8cjq9WqDTBHnjAdxzGQZrPJw+HA31oulzbAWgLoA0CWZVBKIY5jzGYzdLtdE9DlcrFNrY98zobqOA6TJKHW2jg4nU5sNBpFDp6mhVe5rsvVasUwDHm9Xqm15u12o+/7Hy0gD8KatOd5vN/v1FozTVN6nkchxFuI6hsAAIMg4OPxMJCXdtTbR7JJCMEgCJhlGUlyPB4XfumozInrupxMJpRSRtZlKoNYl+m/6/wDuWAjtPfsQuwAAAAASUVORK5CYII=
 [GreasyFork-url]: https://greasyfork.org/scripts/456055-chatgpt-exporter
     
-[English](./README.md) &nbsp;&nbsp;|&nbsp;&nbsp; [Indonesia](./README_ID.md) &nbsp;&nbsp;|&nbsp;&nbsp; [한국어](./README_KR.md) &nbsp;&nbsp;|&nbsp;&nbsp; Türkçe
-
-![image](https://user-images.githubusercontent.com/9910706/215000985-887b6f9e-142b-4c25-b4bf-2ba90c0b4268.png)  
+[English](./README.md) &nbsp;&nbsp;|&nbsp;&nbsp; Indonesia &nbsp;&nbsp;|&nbsp;&nbsp; [한국어](./README_KR.md) &nbsp;&nbsp;|&nbsp;&nbsp; [Türkçe](./README_TR.md)
     
-## Kurulum
+![image](https://user-images.githubusercontent.com/9910706/215000985-887b6f9e-142b-4c25-b4bf-2ba90c0b4268.png)    
 
-### Gereksinimler
-
-<align><b>`Tampermonkey`</b> kurulumu yapın</align>
-
-[<img src="https://user-images.githubusercontent.com/3750161/214147732-c75e96a4-48a4-4b64-b407-c2402e899a75.PNG" height="60" alt="Chrome" valign="middle">][link-chrome] &nbsp;&nbsp; [<img src="https://user-images.githubusercontent.com/3750161/214148610-acdef778-753e-470e-8765-6cc97bca85ed.png" height="60" alt="Firefox" valign="middle">][link-firefox] &nbsp;&nbsp; [<img src="https://user-images.githubusercontent.com/3750161/233201810-d1026855-0482-44c8-b1ec-c7247134473e.png" height="60" alt="Chrome" valign="middle">][link-edge]
-
-[link-chrome]: https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=tr 'Chrome Web Mağazası'
-[link-firefox]: https://addons.mozilla.org/firefox/addon/tampermonkey 'Firefox Eklentileri'
-[link-edge]: https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd 'Edge Eklentileri'
+## Instalasi
     
+### Prasyarat
+    
+<align>Instal <b>`Tampermonkey`</b></align>
+    
+[<img src="https://user-images.githubusercontent.com/3750161/214147732-c75e96a4-48a4-4b64-b407-c2402e899a75.PNG" height="60" alt="Chrome" valign="middle">][link-chrome] &nbsp;&nbsp; [<img src="https://user-images.githubusercontent.com/3750161/214148610-acdef778-753e-470e-8765-6cc97bca85ed.png" height="60" alt="Firefox" valign="middle">][link-firefox] &nbsp;&nbsp; [<img src="https://user-images.githubusercontent.com/3750161/233201810-d1026855-0482-44c8-b1ec-c7247134473e.png" height="60" alt="Chrome" valign="middle">][link-edge]    
+
+[link-chrome]: https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=id 'Web Store Chrome'
+[link-firefox]: https://addons.mozilla.org/firefox/addon/tampermonkey 'Add-ons Firefox'
+[link-edge]: https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd 'Add-ons Edge'
+
 ### UserScript
 
 | Greasyfork                                                                        | GitHub                                                                                       |
 | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| [![Install][Install-1-image]][install-1-url] | [![Install][Install-2-image]][install-2-url] |
+| [![Install][Install-1-image]][Install-1-url] | [![Install][Install-2-image]][Install-2-url] |
     
 [Install-1-image]: https://img.shields.io/badge/-Install-blue
 [Install-1-url]: https://greasyfork.org/scripts/456055-chatgpt-exporter
@@ -46,40 +46,40 @@
 [Install-2-url]: https://raw.githubusercontent.com/pionxzh/chatgpt-exporter/master/dist/chatgpt.user.js
     
 #
-    
-[📚 Desteklenen Formatlar](#-desteklenen-formatlar) &nbsp;&nbsp;|&nbsp;&nbsp; [💡 Örnek](#-örnek) &nbsp;&nbsp;|&nbsp;&nbsp; [🤝 Katılım](#-katılım) &nbsp;&nbsp;|&nbsp;&nbsp; [⭐ Yıldız Geçmişi](#-y%C4%B1ld%C4%B1z-ge%C3%A7mi%C5%9Fi)
+
+[📚 Format yang Didukung](#-format-yang-didukung) &nbsp;&nbsp;|&nbsp;&nbsp; [💡 Contoh](#-contoh) &nbsp;&nbsp;|&nbsp;&nbsp; [🤝 Kontribusi](#-kontribusi) &nbsp;&nbsp;|&nbsp;&nbsp; [⭐ Sejarah Bintang](#-sejarah-bintang)
 
 </div>
 
 #
 
-## 📚 Desteklenen Formatlar
+## 📚 Format yang Didukung
 
-- [Metin](#metin)
+- [Teks](#teks)
 - [HTML](#html)
-- [PNG](#ekran-görüntüsü)
+- [PNG](#tangkapan-layar)
 - [JSON](#json)
 
-## 💡 Örnek
+## 💡 Contoh
 
-### Metin
+### Teks
 
 ```
-Siz:
-ChatGPT Exporter oluşturuyorum. Ne düşünüyorsunuz?
+Anda:
+Saya sedang membuat ChatGPT Exporter. Apa pendapat Anda?
 
 ChatGPT:
-ChatGPT modelini kullanarak metin dışa aktaran bir araç oluşturmayı 
-planladığınızı düşünüyorum. ChatGPT, OpenAI tarafından eğitilen büyük bir dil 
-modelidir ve verilen bir girişe dayanarak insan benzeri metin yanıtları
-üretmek için tasarlanmıştır. ChatGPT, sohbet botları, müşteri sorularına 
-otomatik yanıtlar ve daha fazlası gibi çeşitli uygulamalar için kullanılabilir.
+Sepertinya Anda berencana membuat alat yang menggunakan model ChatGPT
+untuk mengekspor teks. ChatGPT adalah model bahasa yang besar yang dilatih oleh OpenAI
+yang dirancang untuk menghasilkan teks yang mirip dengan manusia berdasarkan input yang diberikan. 
+Model ini dapat digunakan untuk berbagai aplikasi, seperti chatbot, 
+respon otomatis terhadap pertanyaan pelanggan, dan lain-lain.
 
-Ancak, lütfen unutmayın ki büyük bir dil modeli olarak, ChatGPT herhangi bir 
-belirli görev için özel olarak eğitilmemiştir, bu nedenle üretilen metinlerin 
-kalitesi, nasıl kullanıldığına ve hangi bağlamda uygulandığına bağlı olacaktır. 
-ChatGPT'yi sorumlu bir şekilde kullanmak ve herhangi bir durumda kullanmanın 
-olası sonuçlarını düşünmek önemlidir.
+Namun, perlu diingat bahwa sebagai model bahasa yang besar, ChatGPT tidak 
+telah dilatih secara khusus untuk tugas tertentu, sehingga kualitas teks yang 
+dihasilkan akan bergantung pada bagaimana penggunaannya dan konteks di mana 
+ini diterapkan. Penting untuk menggunakan ChatGPT dengan tanggung jawab dan 
+mempertimbangkan konsekuensi potensial penggunaannya dalam situasi apa pun.
 ```
 
 ### HTML
@@ -90,7 +90,7 @@ olası sonuçlarını düşünmek önemlidir.
 
 </div>
 
-### Ekran Görüntüsü
+### Tangkapan Layar
 
 <div align="center">
 
@@ -100,11 +100,11 @@ olası sonuçlarını düşünmek önemlidir.
 
 ### JSON
 
-API `https://chat.openai.com/backend-api/conversation/[id]` üzerinden alınan ham içerik
+Konten mentah dari API `https://chat.openai.com/backend-api/conversation/[id]`
 
 <details>
-<summary>Görmek için tıklayın</summary>
-    
+<summary>Klik untuk melihat</summary>
+
 ```json
 {
     "id": "35a1fa05-e928-4c39-8ffa-ca74f75b509f",
@@ -204,14 +204,14 @@ API `https://chat.openai.com/backend-api/conversation/[id]` üzerinden alınan h
 ```
 </details>
 
-## 🤝 Katılım
+## 🤝 Kontribusi
 
-[CONTRIBUTING.md](./CONTRIBUTING.md) dosyasına bakın
+Lihat [CONTRIBUTING.md](./CONTRIBUTING.md)
 
-## ⭐ Yıldız Geçmişi
+## ⭐ Sejarah Bintang
 
 <div align="center">
 
-<img src="https://api.star-history.com/svg?repos=pionxzh/chatgpt-exporter&type=Date" width="600" height="400" alt="Yıldız Geçmişi Grafiği" valign="middle">
+<img src="https://api.star-history.com/svg?repos=pionxzh/chatgpt-exporter&type=Date" width="600" height="400" alt="Star History Chart" valign="middle">
     
-</div>
+</div>   

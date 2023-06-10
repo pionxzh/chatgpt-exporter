@@ -1,74 +1,107 @@
-ChatGPT Exporter
-==========================
+<h1 align="center">ChatGPT Exporter</h1>
 
-![license](https://img.shields.io/github/license/pionxzh/chatgpt-exporter?color=red)
-[![](https://img.shields.io/static/v1?label=%20&message=GreasyFork&style=flat-square&labelColor=7B0000&color=960000&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3ggEBCQHM3fXsAAAAVdJREFUOMudkz2qwkAUhc/goBaGJBgUtBCZyj0ILkpwAW7Bws4yO3AHLiCtEFD8KVREkoiFxZzX5A2KGfN4F04zMN+ce+5c4LMUgDmANYBnrnV+plBSi+FwyHq9TgA2LQpvCiEiABwMBtzv95RSfoNEHy8DYBzHrNVqVEr9BWKcqNFoxF6vx3a7zc1mYyC73a4MogBg7vs+z+czO50OW60Wt9stK5UKp9Mpj8cjq9WqDTBHnjAdxzGQZrPJw+HA31oulzbAWgLoA0CWZVBKIY5jzGYzdLtdE9DlcrFNrY98zobqOA6TJKHW2jg4nU5sNBpFDp6mhVe5rsvVasUwDHm9Xqm15u12o+/7Hy0gD8KatOd5vN/v1FozTVN6nkchxFuI6hsAAIMg4OPxMJCXdtTbR7JJCMEgCJhlGUlyPB4XfumozInrupxMJpRSRtZlKoNYl+m/6/wDuWAjtPfsQuwAAAAASUVORK5CYII=)](https://greasyfork.org/scripts/456055-chatgpt-exporter)
+<div align="center">
+    
+## [ChatGPT](https://chatgpt.com/) 의 채팅 기록을 내보내는 GreasyFork 스크립트
+
+[![license][license-image]][license-url]
+[![release][release-image]][release-url]
+[![last commit][last-commit-image]][last-commit-url]
+[![GreasyFork][GreasyFork-image]][GreasyFork-url]    
+    
+[license-image]: https://img.shields.io/github/license/pionxzh/chatgpt-exporter?color=red
+[license-url]: https://github.com/pionxzh/chatgpt-exporter/blob/master/LICENSE
+[release-image]: https://img.shields.io/github/v/release/pionxzh/chatgpt-exporter?color=blue
+[release-url]: https://github.com/pionxzh/chatgpt-exporter/releases/latest
+[last-commit-image]: https://img.shields.io/github/last-commit/pionxzh/chatgpt-exporter?label=last%20commit
+[last-commit-url]: https://github.com/pionxzh/chatgpt-exporter/commits
+[GreasyFork-image]: https://img.shields.io/static/v1?label=%20&message=GreasyFork&style=flat-square&labelColor=7B0000&color=960000&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3ggEBCQHM3fXsAAAAVdJREFUOMudkz2qwkAUhc/goBaGJBgUtBCZyj0ILkpwAW7Bws4yO3AHLiCtEFD8KVREkoiFxZzX5A2KGfN4F04zMN+ce+5c4LMUgDmANYBnrnV+plBSi+FwyHq9TgA2LQpvCiEiABwMBtzv95RSfoNEHy8DYBzHrNVqVEr9BWKcqNFoxF6vx3a7zc1mYyC73a4MogBg7vs+z+czO50OW60Wt9stK5UKp9Mpj8cjq9WqDTBHnjAdxzGQZrPJw+HA31oulzbAWgLoA0CWZVBKIY5jzGYzdLtdE9DlcrFNrY98zobqOA6TJKHW2jg4nU5sNBpFDp6mhVe5rsvVasUwDHm9Xqm15u12o+/7Hy0gD8KatOd5vN/v1FozTVN6nkchxFuI6hsAAIMg4OPxMJCXdtTbR7JJCMEgCJhlGUlyPB4XfumozInrupxMJpRSRtZlKoNYl+m/6/wDuWAjtPfsQuwAAAAASUVORK5CYII=
+[GreasyFork-url]: https://greasyfork.org/scripts/456055-chatgpt-exporter
+    
+[English](./README.md) &nbsp;&nbsp;|&nbsp;&nbsp; [Indonesia](./README_ID.md) &nbsp;&nbsp;|&nbsp;&nbsp; 한국어 &nbsp;&nbsp;|&nbsp;&nbsp; [Türkçe](./README_TR.md)
 
 ![image](https://user-images.githubusercontent.com/9910706/215000985-887b6f9e-142b-4c25-b4bf-2ba90c0b4268.png)
-[English](./README.md) | 한국어 | [Türkçe](./README_TR.md)
 
-💬 Chatgpt와 대화를 쉽게 공유와 리뷰할 수 있도록 합니다.
----
+## 설치하기
+    
+### 사전 준비 조건
+    
+<b>`Tampermonkey`</b> 설치하기
+    
+[<img src="https://user-images.githubusercontent.com/3750161/214147732-c75e96a4-48a4-4b64-b407-c2402e899a75.PNG" height="60" alt="Chrome" valign="middle">][link-chrome] &nbsp;&nbsp; [<img src="https://user-images.githubusercontent.com/3750161/214148610-acdef778-753e-470e-8765-6cc97bca85ed.png" height="60" alt="Firefox" valign="middle">][link-firefox] &nbsp;&nbsp; [<img src="https://user-images.githubusercontent.com/3750161/233201810-d1026855-0482-44c8-b1ec-c7247134473e.png" height="60" alt="Chrome" valign="middle">][link-edge]      
 
-Chatgpt 대화기록을 내보내기 위한 GreasyFork 스크립트.
+[link-chrome]: https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=id 'Chrome 웹 스토어'
+[link-firefox]: https://addons.mozilla.org/firefox/addon/tampermonkey 'Firefox 애드온'
+[link-edge]: https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd 'Edge 애드온'
+    
+### UserScript
 
-지원되는 형식:
-- [Text](#text)
-- [PNG](#screenshot) (Full Page Screenshot!)
-- [HTML](#html)
-- [JSON](#json)
-
-# Install
-
-## 설치하는 법
-
-Step 1. **Tampermonkey**를 설치합니다. **（[Chrome](https://www.tampermonkey.net/)** / **[Firefox](https://addons.mozilla.org/firefox/addon/tampermonkey/)** / **[Edge](https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd?hl=zh-CN)）**
-
-
-Step 2. **유저 스크립트** 를 설치합니다.
-둘 중 한개의 링크를 클릭해서  유저 스크립트를 다운합니다.
 | Greasyfork                                                                        | GitHub                                                                                       |
 | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| [Install](https://greasyfork.org/scripts/456055-chatgpt-exporter) | [Install](https://raw.githubusercontent.com/pionxzh/chatgpt-exporter/master/dist/chatgpt.user.js) |
+| [![Install][Install-1-image]][install-1-url] | [![Install][Install-2-image]][install-2-url] |
+    
+[Install-1-image]: https://img.shields.io/badge/-Install-blue
+[Install-1-url]: https://greasyfork.org/scripts/456055-chatgpt-exporter
+[Install-2-image]: https://img.shields.io/badge/-Install-blue
+[Install-2-url]: https://raw.githubusercontent.com/pionxzh/chatgpt-exporter/master/dist/chatgpt.user.js
+    
+#
 
-# Chatgpt 대화를 내보내기한 예시
+[📚 지원하는 형식](#-지원하는-형식) &nbsp;&nbsp;|&nbsp;&nbsp; [💡 예제](#-예제) &nbsp;&nbsp;|&nbsp;&nbsp; [🤝 기여하기](#-기여하기) &nbsp;&nbsp;|&nbsp;&nbsp;[⭐ 별 기록](#-별-기록)
+    
+</div>
 
+#
 
-## Text
+## 📚 지원하는 형식
+
+- [텍스트](#텍스트)
+- [HTML](#HTML)
+- [PNG](#스크린샷)
+- [JSON](#JSON)
+
+## 💡 예제
+
+### 텍스트
 
 ```
-You:
-I'm creating a ChatGPT Exporter. What do you think?
+너:
+ChatGPT Exporter 를 만들고 있어요. 어떻게 생각하세요?
 
 ChatGPT:
-It sounds like you're planning on creating a tool that uses the ChatGPT model
-to export text. ChatGPT is a large language model trained by OpenAI that is
-designed to generate human-like text responses based on a given input. It can
-be used for a variety of applications, such as chatbots, automated responses
-to customer inquiries, and more.
+ChatGPT Exporter 를 만들 계획이신 것 같군요. ChatGPT 는 OpenAI 에서 학습한 대규모 
+언어 모델로서, 주어진 입력에 기반하여 인간과 유사한 텍스트 응답을 생성하는 데 
+사용됩니다. 이는 챗봇, 고객 문의에 대한 자동 응답 등 다양한 응용 분야에서 활용될 수 
+있습니다.
 
-However, please keep in mind that as a large language model, ChatGPT has not
-been specifically trained for any specific task, so the quality of the
-generated text will depend on how it is used and the context in which it is
-applied. It's important to use ChatGPT responsibly and consider the potential
-consequences of using it in any given situation.
+하지만 대규모 언어 모델인 ChatGPT는 특정 작업을 위해 특별히 훈련된 것은 아니기 
+때문에 생성된 텍스트의 품질은 사용 방식과 적용되는 문맥에 따라 달라집니다. ChatGPT 
+를 책임있게 사용하고 해당 상황에서의 잠재적인 결과를 고려하는 것이 중요합니다.
 ```
 
-## HTML
+### HTML
 
-![image](https://user-images.githubusercontent.com/9910706/205630407-153fc40d-5411-482d-a75b-82bfe86e38ff.png)
+<div align="center">
 
-## Screenshot
+![이미지](https://user-images.githubusercontent.com/9910706/205630407-153fc40d-5411-482d-a75b-82bfe86e38ff.png)
+
+</div>
+
+### 스크린샷
+
+<div align="center">
 
 <img width="480" src="https://user-images.githubusercontent.com/9910706/205663680-6ac97fac-39b0-495c-bee4-8ef37713a9ae.png" />
 
-## JSON
+</div>
 
-the raw content from API `https://chat.openai.com/backend-api/conversation/[id]`
+### JSON
+
+API `https://chat.openai.com/backend-api/conversation/[id]` 에서 얻은 원시 콘텐츠
 
 <details>
-<summary>Click to see</summary>
-
+<summary>클릭하여 보기</summary>
+    
 ```json
 {
     "id": "35a1fa05-e928-4c39-8ffa-ca74f75b509f",
@@ -168,6 +201,14 @@ the raw content from API `https://chat.openai.com/backend-api/conversation/[id]`
 ```
 </details>
 
-# Contribution
+## 🤝 기여하기
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md)
+[CONTRIBUTING.md](./CONTRIBUTING.md) 를 참조하세요
+
+## ⭐ 별 기록
+
+<div align="center">
+
+<img src="https://api.star-history.com/svg?repos=pionxzh/chatgpt-exporter&type=Date" width="600" height="400" alt="별 기록 차트" valign="middle">
+    
+</div>
