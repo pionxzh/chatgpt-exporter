@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.12.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.12.0...userscript-v2.12.1) (2023-06-15)
+
+
+### Bug Fixes
+
+* fix checkbox style ([e1b41c9](https://github.com/pionxzh/chatgpt-exporter/commit/e1b41c9cd73333f1123049a4d5d3e1c359cf0f9c))
+* update zhile.io API to fakegpt ([2723554](https://github.com/pionxzh/chatgpt-exporter/commit/27235544637e4fb8835b6958b8dc7d7bee70a2da))
+
 ## [2.12.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.11.0...userscript-v2.12.0) (2023-06-08)
 
 
