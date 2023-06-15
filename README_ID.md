@@ -1,13 +1,13 @@
 <h1 align="center">ChatGPT Exporter</h1>
 
 <div align="center">
-    
+
 ## Skrip GreasyFork untuk mengekspor riwayat percakapan [ChatGPT](https://chatgpt.com/)
 
 [![license][license-image]][license-url]
 [![release][release-image]][release-url]
 [![last commit][last-commit-image]][last-commit-url]
-[![GreasyFork][GreasyFork-image]][GreasyFork-url]    
+[![GreasyFork][GreasyFork-image]][GreasyFork-url]
 
 [license-image]: https://img.shields.io/github/license/pionxzh/chatgpt-exporter?color=red
 [license-url]: https://github.com/pionxzh/chatgpt-exporter/blob/master/LICENSE
@@ -17,18 +17,18 @@
 [last-commit-url]: https://github.com/pionxzh/chatgpt-exporter/commits
 [GreasyFork-image]: https://img.shields.io/static/v1?label=%20&message=GreasyFork&style=flat-square&labelColor=7B0000&color=960000&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3ggEBCQHM3fXsAAAAVdJREFUOMudkz2qwkAUhc/goBaGJBgUtBCZyj0ILkpwAW7Bws4yO3AHLiCtEFD8KVREkoiFxZzX5A2KGfN4F04zMN+ce+5c4LMUgDmANYBnrnV+plBSi+FwyHq9TgA2LQpvCiEiABwMBtzv95RSfoNEHy8DYBzHrNVqVEr9BWKcqNFoxF6vx3a7zc1mYyC73a4MogBg7vs+z+czO50OW60Wt9stK5UKp9Mpj8cjq9WqDTBHnjAdxzGQZrPJw+HA31oulzbAWgLoA0CWZVBKIY5jzGYzdLtdE9DlcrFNrY98zobqOA6TJKHW2jg4nU5sNBpFDp6mhVe5rsvVasUwDHm9Xqm15u12o+/7Hy0gD8KatOd5vN/v1FozTVN6nkchxFuI6hsAAIMg4OPxMJCXdtTbR7JJCMEgCJhlGUlyPB4XfumozInrupxMJpRSRtZlKoNYl+m/6/wDuWAjtPfsQuwAAAAASUVORK5CYII=
 [GreasyFork-url]: https://greasyfork.org/scripts/456055-chatgpt-exporter
-    
+
 [English](./README.md) &nbsp;&nbsp;|&nbsp;&nbsp; Indonesia &nbsp;&nbsp;|&nbsp;&nbsp; [한국어](./README_KR.md) &nbsp;&nbsp;|&nbsp;&nbsp; [Türkçe](./README_TR.md)
-    
-![image](https://user-images.githubusercontent.com/9910706/215000985-887b6f9e-142b-4c25-b4bf-2ba90c0b4268.png)    
+
+![image](https://github.com/pionxzh/chatgpt-exporter/assets/9910706/0697599c-2432-4eae-bc6a-ea4b6ecf89aa)
 
 ## Instalasi
-    
+
 ### Prasyarat
-    
+
 <align>Instal <b>`Tampermonkey`</b></align>
-    
-[<img src="https://user-images.githubusercontent.com/3750161/214147732-c75e96a4-48a4-4b64-b407-c2402e899a75.PNG" height="60" alt="Chrome" valign="middle">][link-chrome] &nbsp;&nbsp; [<img src="https://user-images.githubusercontent.com/3750161/214148610-acdef778-753e-470e-8765-6cc97bca85ed.png" height="60" alt="Firefox" valign="middle">][link-firefox] &nbsp;&nbsp; [<img src="https://user-images.githubusercontent.com/3750161/233201810-d1026855-0482-44c8-b1ec-c7247134473e.png" height="60" alt="Chrome" valign="middle">][link-edge]    
+
+[<img src="https://user-images.githubusercontent.com/3750161/214147732-c75e96a4-48a4-4b64-b407-c2402e899a75.PNG" height="60" alt="Chrome" valign="middle">][link-chrome] &nbsp;&nbsp; [<img src="https://user-images.githubusercontent.com/3750161/214148610-acdef778-753e-470e-8765-6cc97bca85ed.png" height="60" alt="Firefox" valign="middle">][link-firefox] &nbsp;&nbsp; [<img src="https://user-images.githubusercontent.com/3750161/233201810-d1026855-0482-44c8-b1ec-c7247134473e.png" height="60" alt="Chrome" valign="middle">][link-edge]
 
 [link-chrome]: https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=id 'Web Store Chrome'
 [link-firefox]: https://addons.mozilla.org/firefox/addon/tampermonkey 'Add-ons Firefox'
@@ -39,12 +39,12 @@
 | Greasyfork                                                                        | GitHub                                                                                       |
 | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | [![Install][Install-1-image]][Install-1-url] | [![Install][Install-2-image]][Install-2-url] |
-    
+
 [Install-1-image]: https://img.shields.io/badge/-Install-blue
 [Install-1-url]: https://greasyfork.org/scripts/456055-chatgpt-exporter
 [Install-2-image]: https://img.shields.io/badge/-Install-blue
 [Install-2-url]: https://raw.githubusercontent.com/pionxzh/chatgpt-exporter/master/dist/chatgpt.user.js
-    
+
 #
 
 [📚 Format yang Didukung](#-format-yang-didukung) &nbsp;&nbsp;|&nbsp;&nbsp; [💡 Contoh](#-contoh) &nbsp;&nbsp;|&nbsp;&nbsp; [🤝 Kontribusi](#-kontribusi) &nbsp;&nbsp;|&nbsp;&nbsp; [⭐ Sejarah Bintang](#-sejarah-bintang)
@@ -57,6 +57,7 @@
 
 - [Teks](#teks)
 - [HTML](#html)
+- [Markdown](#markdown)
 - [PNG](#tangkapan-layar)
 - [JSON](#json)
 
@@ -71,14 +72,14 @@ Saya sedang membuat ChatGPT Exporter. Apa pendapat Anda?
 ChatGPT:
 Sepertinya Anda berencana membuat alat yang menggunakan model ChatGPT
 untuk mengekspor teks. ChatGPT adalah model bahasa yang besar yang dilatih oleh OpenAI
-yang dirancang untuk menghasilkan teks yang mirip dengan manusia berdasarkan input yang diberikan. 
-Model ini dapat digunakan untuk berbagai aplikasi, seperti chatbot, 
+yang dirancang untuk menghasilkan teks yang mirip dengan manusia berdasarkan input yang diberikan.
+Model ini dapat digunakan untuk berbagai aplikasi, seperti chatbot,
 respon otomatis terhadap pertanyaan pelanggan, dan lain-lain.
 
-Namun, perlu diingat bahwa sebagai model bahasa yang besar, ChatGPT tidak 
-telah dilatih secara khusus untuk tugas tertentu, sehingga kualitas teks yang 
-dihasilkan akan bergantung pada bagaimana penggunaannya dan konteks di mana 
-ini diterapkan. Penting untuk menggunakan ChatGPT dengan tanggung jawab dan 
+Namun, perlu diingat bahwa sebagai model bahasa yang besar, ChatGPT tidak
+telah dilatih secara khusus untuk tugas tertentu, sehingga kualitas teks yang
+dihasilkan akan bergantung pada bagaimana penggunaannya dan konteks di mana
+ini diterapkan. Penting untuk menggunakan ChatGPT dengan tanggung jawab dan
 mempertimbangkan konsekuensi potensial penggunaannya dalam situasi apa pun.
 ```
 
@@ -86,9 +87,37 @@ mempertimbangkan konsekuensi potensial penggunaannya dalam situasi apa pun.
 
 <div align="center">
 
-![image](https://user-images.githubusercontent.com/9910706/205630407-153fc40d-5411-482d-a75b-82bfe86e38ff.png)
+<img width="643" alt="image" src="https://github.com/pionxzh/chatgpt-exporter/assets/9910706/47481c7a-4a6a-433b-b08e-fdf3bbabcb64">
 
 </div>
+
+### Markdown
+
+```
+---
+title: ChatGPT Exporter Creation
+source: https://chat.openai.com/c/cf3f8850-1d69-43c8-b99b-affd0de4e76f
+author: ChatGPT
+---
+
+# ChatGPT Exporter Creation
+
+#### You:
+Saya sedang membuat ChatGPT Exporter. Apa pendapat Anda?
+
+#### ChatGPT:
+Sepertinya Anda berencana membuat alat yang menggunakan model ChatGPT
+untuk mengekspor teks. ChatGPT adalah model bahasa yang besar yang dilatih oleh OpenAI
+yang dirancang untuk menghasilkan teks yang mirip dengan manusia berdasarkan input yang diberikan.
+Model ini dapat digunakan untuk berbagai aplikasi, seperti chatbot,
+respon otomatis terhadap pertanyaan pelanggan, dan lain-lain.
+
+Namun, perlu diingat bahwa sebagai model bahasa yang besar, ChatGPT tidak
+telah dilatih secara khusus untuk tugas tertentu, sehingga kualitas teks yang
+dihasilkan akan bergantung pada bagaimana penggunaannya dan konteks di mana
+ini diterapkan. Penting untuk menggunakan ChatGPT dengan tanggung jawab dan
+mempertimbangkan konsekuensi potensial penggunaannya dalam situasi apa pun.
+```
 
 ### Tangkapan Layar
 
@@ -213,5 +242,5 @@ Lihat [CONTRIBUTING.md](./CONTRIBUTING.md)
 <div align="center">
 
 <img src="https://api.star-history.com/svg?repos=pionxzh/chatgpt-exporter&type=Date" width="600" height="400" alt="Star History Chart" valign="middle">
-    
-</div>   
+
+</div>

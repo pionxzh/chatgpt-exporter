@@ -50,6 +50,7 @@
     "**/Thumbs.db": true,
     "**/node_modules": true
   },
+  "markdown.extension.toc.updateOnSave": false,
   "search.exclude": {
     "**/dist/**": true
   }
