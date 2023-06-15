@@ -1,6 +1,6 @@
 const API_MAPPING: Record<string, string> = {
     'https://chat.openai.com': 'https://chat.openai.com/backend-api',
-    'https://chat.zhile.io': 'https://chat-api.zhile.io/api',
+    'https://chat.zhile.io': 'https://proxy1.fakegpt.org/api',
 }
 
 // export const baseUrl = 'https://chat.openai.com'
