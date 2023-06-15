@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.12.0
+// @version            2.12.1
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -440,7 +440,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
     fill: currentColor;
 }
 
-.gap-x-1	 {
+.gap-x-1 {
     column-gap: 0.25rem;
 }
 
@@ -1047,7 +1047,7 @@ var __publicField = (obj, key, value) => {
   }
   const API_MAPPING = {
     "https://chat.openai.com": "https://chat.openai.com/backend-api",
-    "https://chat.zhile.io": "https://chat-api.zhile.io/api"
+    "https://chat.zhile.io": "https://proxy1.fakegpt.org/api"
   };
   const baseUrl = new URL(location.href).origin;
   const apiUrl = API_MAPPING[baseUrl];
@@ -7031,36 +7031,36 @@ var __publicField = (obj, key, value) => {
   instance.hasLoadedNamespace;
   instance.loadNamespaces;
   instance.loadLanguages;
-  const title$5 = "ChatGPT Exporter";
-  const ExportHelper$5 = "Export";
-  const Setting$5 = "Setting";
-  const Language$5 = "Language";
-  const Screenshot$5 = "Screenshot";
-  const Markdown$5 = "Markdown";
-  const HTML$5 = "HTML";
-  const Save$5 = "Save";
-  const Delete$5 = "Delete";
-  const Export$5 = "Export";
-  const Loading$5 = "Loading";
-  const Preview$5 = "Preview";
+  const title$6 = "ChatGPT Exporter";
+  const ExportHelper$6 = "Export";
+  const Setting$6 = "Setting";
+  const Language$6 = "Language";
+  const Screenshot$6 = "Screenshot";
+  const Markdown$6 = "Markdown";
+  const HTML$6 = "HTML";
+  const Save$6 = "Save";
+  const Delete$6 = "Delete";
+  const Export$6 = "Export";
+  const Loading$6 = "Loading";
+  const Preview$6 = "Preview";
   const en_US = {
-    title: title$5,
-    ExportHelper: ExportHelper$5,
-    Setting: Setting$5,
-    Language: Language$5,
+    title: title$6,
+    ExportHelper: ExportHelper$6,
+    Setting: Setting$6,
+    Language: Language$6,
     "Copy Text": "Copy Text",
     "Copied!": "Copied!",
-    Screenshot: Screenshot$5,
-    Markdown: Markdown$5,
-    HTML: HTML$5,
+    Screenshot: Screenshot$6,
+    Markdown: Markdown$6,
+    HTML: HTML$6,
     "JSON": "JSON",
-    Save: Save$5,
-    Delete: Delete$5,
+    Save: Save$6,
+    Delete: Delete$6,
     "Select All": "Select All",
-    Export: Export$5,
+    Export: Export$6,
     "Error": "Error",
-    Loading: Loading$5,
-    Preview: Preview$5,
+    Loading: Loading$6,
+    Preview: Preview$6,
     "File Name": "File Name",
     "Export All": "Export All",
     "Exporter Settings": "Exporter Settings",
@@ -7078,36 +7078,36 @@ var __publicField = (obj, key, value) => {
     "Conversation Deleted Message": "All selected conversations have been deleted. Please refresh the page to see the changes.",
     "Please start a conversation first": "Please start a conversation first."
   };
-  const title$4 = "ChatGPT Exporter";
-  const ExportHelper$4 = "Exportar";
-  const Setting$4 = "Ajustes";
-  const Language$4 = "Idioma";
-  const Screenshot$4 = "Captura De Pantalla";
-  const Markdown$4 = "Markdown";
-  const HTML$4 = "HTML";
-  const Save$4 = "Guardar";
-  const Delete$4 = "Borrar";
-  const Export$4 = "Exportar";
-  const Loading$4 = "Cargando";
-  const Preview$4 = "Previsualizar";
+  const title$5 = "ChatGPT Exporter";
+  const ExportHelper$5 = "Exportar";
+  const Setting$5 = "Ajustes";
+  const Language$5 = "Idioma";
+  const Screenshot$5 = "Captura De Pantalla";
+  const Markdown$5 = "Markdown";
+  const HTML$5 = "HTML";
+  const Save$5 = "Guardar";
+  const Delete$5 = "Borrar";
+  const Export$5 = "Exportar";
+  const Loading$5 = "Cargando";
+  const Preview$5 = "Previsualizar";
   const es = {
-    title: title$4,
-    ExportHelper: ExportHelper$4,
-    Setting: Setting$4,
-    Language: Language$4,
+    title: title$5,
+    ExportHelper: ExportHelper$5,
+    Setting: Setting$5,
+    Language: Language$5,
     "Copy Text": "Copiar Texto",
     "Copied!": "¡Copiado!",
-    Screenshot: Screenshot$4,
-    Markdown: Markdown$4,
-    HTML: HTML$4,
+    Screenshot: Screenshot$5,
+    Markdown: Markdown$5,
+    HTML: HTML$5,
     "JSON": "JSON",
-    Save: Save$4,
-    Delete: Delete$4,
+    Save: Save$5,
+    Delete: Delete$5,
     "Select All": "Seleccionar Todas",
-    Export: Export$4,
+    Export: Export$5,
     "Error": "Error",
-    Loading: Loading$4,
-    Preview: Preview$4,
+    Loading: Loading$5,
+    Preview: Preview$5,
     "File Name": "Nombre Archivo",
     "Export All": "Exportar Todas",
     "Exporter Settings": "Ajustes De Exportación",
@@ -7124,6 +7124,53 @@ var __publicField = (obj, key, value) => {
     "Conversation Delete Alert": "¿Estás seguro que quieres borrar todas las conversaciones seleccionadas?",
     "Conversation Deleted Message": "Todas las conversaciones seleccionadas se han borrado. Por favor refresca la página para ver los cambios.",
     "Please start a conversation first": "Por favor empieza una conversación antes."
+  };
+  const title$4 = "ChatGPT Exporter";
+  const ExportHelper$4 = "Ekspor";
+  const Setting$4 = "Pengaturan";
+  const Language$4 = "Bahasa";
+  const Screenshot$4 = "Tangkapan Layar";
+  const Markdown$4 = "Markdown";
+  const HTML$4 = "HTML";
+  const Save$4 = "Simpan";
+  const Delete$4 = "Hapus";
+  const Export$4 = "Ekspor";
+  const Loading$4 = "Memuat";
+  const Preview$4 = "Pratinjau";
+  const id_ID = {
+    title: title$4,
+    ExportHelper: ExportHelper$4,
+    Setting: Setting$4,
+    Language: Language$4,
+    "Copy Text": "Salin Teks",
+    "Copied!": "Disalin!",
+    Screenshot: Screenshot$4,
+    Markdown: Markdown$4,
+    HTML: HTML$4,
+    "JSON": "JSON",
+    Save: Save$4,
+    Delete: Delete$4,
+    "Select All": "Pilih Semua",
+    Export: Export$4,
+    "Error": "Kesalahan",
+    Loading: Loading$4,
+    Preview: Preview$4,
+    "File Name": "Nama File",
+    "Export All": "Ekspor Semua",
+    "Exporter Settings": "Pengaturan Pengekspor",
+    "Export Dialog Title": "Ekspor Percakapan",
+    "Invalid File Format": "Format File Tidak Valid",
+    "Export from official export file": "Ekspor dari file ekspor resmi",
+    "Export from API": "Ekspor dari API",
+    "Available variables": "Variabel yang Tersedia",
+    "Conversation Timestamp": "Timestamp Percakapan",
+    "Conversation Timestamp Description": "Akan ditampilkan pada halaman dan file HTML.",
+    "Use 24-hour format": "Gunakan format 24 jam (mis. 23:59)",
+    "Export Metadata": "Ekspor Metadata",
+    "Export Metadata Description": "Tambahkan metadata ke file Markdown dan HTML yang diekspor.",
+    "Conversation Delete Alert": "Apakah Anda yakin ingin menghapus semua percakapan yang dipilih?",
+    "Conversation Deleted Message": "Semua percakapan yang dipilih telah dihapus. Harap segarkan halaman untuk melihat perubahan.",
+    "Please start a conversation first": "Harap mulai percakapan terlebih dahulu."
   };
   const title$3 = "ChatGPTエクスポーター";
   const ExportHelper$3 = "エクスポート";
@@ -7428,6 +7475,11 @@ var __publicField = (obj, key, value) => {
     code: "es",
     resource: es
   };
+  const ID_ID = {
+    name: "Indonesia",
+    code: "id-ID",
+    resource: id_ID
+  };
   const JA_JP = {
     name: "日本語",
     code: "ja-JP",
@@ -7448,7 +7500,7 @@ var __publicField = (obj, key, value) => {
     code: "zh-Hant",
     resource: zh_Hant
   };
-  const LOCALES = [EN_US, ES, JA_JP, TR_TR, ZH_Hans, ZH_Hant];
+  const LOCALES = [EN_US, ES, ID_ID, JA_JP, TR_TR, ZH_Hans, ZH_Hant];
   const LanguageMapping = {
     "en": EN_US.code,
     "en-US": EN_US.code,
@@ -7459,6 +7511,8 @@ var __publicField = (obj, key, value) => {
     "es-CO": ES.code,
     "es-MX": ES.code,
     "es-US": ES.code,
+    "id": ID_ID.code,
+    "id-ID": ID_ID.code,
     "ja": JA_JP.code,
     "ja-JP": JA_JP.code,
     "tr": TR_TR.code,
@@ -22445,20 +22499,12 @@ ${content2}`;
       children: [o$5(Ge, {
         checked,
         onChange: onCheckedUpdate,
-        className: `${checked ? "bg-green-600" : "bg-gray-200"} relative inline-flex flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-0 h-6 w-11`,
-        children: [o$5("span", {
-          className: "sr-only",
-          children: "Use setting"
-        }), o$5("span", {
-          className: `${checked ? "translate-x-5" : "translate-x-0"} pointer-events-none relative inline-block transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out h-5 w-5`,
-          children: [o$5("span", {
-            className: "opacity-0 duration-100 ease-out absolute inset-0 flex h-full w-full items-center justify-center transition-opacity",
-            "aria-hidden": "true"
-          }), o$5("span", {
-            className: "opacity-100 duration-200 ease-in absolute inset-0 flex h-full w-full items-center justify-center transition-opacity",
-            "aria-hidden": "true"
-          })]
-        })]
+        "data-state": checked ? "checked" : "unchecked",
+        className: "bg-gray-200 radix-state-checked:bg-green-600 relative h-6 w-[42px] cursor-pointer rounded-full",
+        children: o$5("span", {
+          "data-state": checked ? "checked" : "unchecked",
+          className: "block h-5 w-5 rounded-full translate-x-0.5 transition-transform duration-100 will-change-transform radix-state-checked:translate-x-[19px] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.45)]"
+        })
       }), label && o$5("span", {
         className: "ml-3 text-sm font-medium text-gray-900 dark:text-gray-300",
         children: label
