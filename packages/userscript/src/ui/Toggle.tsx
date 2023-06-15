@@ -7,7 +7,7 @@ interface ToggleProps {
 }
 
 /**
- * Mimics the style of OpenAI's
+ * Mimics the style of OpenAI's toggle switches.
  */
 export const Toggle = ({ label, checked = true, onCheckedUpdate }: ToggleProps) => {
     return (
@@ -15,14 +15,13 @@ export const Toggle = ({ label, checked = true, onCheckedUpdate }: ToggleProps) 
             <Switch
                 checked={checked}
                 onChange={onCheckedUpdate}
-                className={`${
-                    checked ? 'bg-green-600' : 'bg-gray-200'
-                } relative inline-flex flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-0 h-6 w-11`}
+                data-state={checked ? 'checked' : 'unchecked'}
+                className="bg-gray-200 radix-state-checked:bg-green-600 relative h-6 w-[42px] cursor-pointer rounded-full"
             >
-                <span className="sr-only">Use setting</span>
-                <span className={`${checked ? 'translate-x-5' : 'translate-x-0'} pointer-events-none relative inline-block transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out h-5 w-5`}>
-                    <span className="opacity-0 duration-100 ease-out absolute inset-0 flex h-full w-full items-center justify-center transition-opacity" aria-hidden="true"></span>
-                    <span className="opacity-100 duration-200 ease-in absolute inset-0 flex h-full w-full items-center justify-center transition-opacity" aria-hidden="true"></span>
+                <span
+                    data-state={checked ? 'checked' : 'unchecked'}
+                    className="block h-5 w-5 rounded-full translate-x-0.5 transition-transform duration-100 will-change-transform radix-state-checked:translate-x-[19px] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.45)]"
+                >
                 </span>
             </Switch>
             {label && <span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">{label}</span>}
