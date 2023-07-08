@@ -71,7 +71,7 @@ export function getConversationChoice() {
         .map(group => group.querySelector(conversationChoiceSelector))
         // non-existing element will produce null here, which will point to the last child
         // just in case the selector changed
-        .map(span => parseInt(span?.textContent?.trim().split(' / ')[0] ?? '0') - 1)
+        .map(span => Number.parseInt(span?.textContent?.trim().split(' / ')[0] ?? '0') - 1)
         .map(x => x === -1 ? null : x)
 
     return conversationChoices
