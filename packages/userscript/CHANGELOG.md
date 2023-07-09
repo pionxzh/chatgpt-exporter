@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.13.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.12.1...userscript-v2.13.0) (2023-07-09)
+
+
+### Features
+
+* support conversation timestamp in markdown export ([38f4a97](https://github.com/pionxzh/chatgpt-exporter/commit/38f4a97a9d1d7ab32190f1100a370429baf4b34e)), closes [#155](https://github.com/pionxzh/chatgpt-exporter/issues/155)
+
 ## [2.12.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.12.0...userscript-v2.12.1) (2023-06-15)
 
 
