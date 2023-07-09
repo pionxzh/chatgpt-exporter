@@ -30,6 +30,8 @@ export const SettingDialog: FC<SettingDialogProps> = ({
         format, setFormat,
         enableTimestamp, setEnableTimestamp,
         timeStamp24H, setTimeStamp24H,
+        enableTimestampHTML, setEnableTimestampHTML,
+        enableTimestampMarkdown, setEnableTimestampMarkdown,
         enableMeta, setEnableMeta,
         exportMetaList, setExportMetaList,
     } = useSettingContext()
@@ -114,13 +116,29 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                                 <dd className="text-sm text-gray-700 dark:text-gray-300">
                                     {t('Conversation Timestamp Description')}
                                     {enableTimestamp && (
-                                        <div className="mt-2">
-                                            <Toggle
-                                                label={t('Use 24-hour format')}
-                                                checked={timeStamp24H}
-                                                onCheckedUpdate={setTimeStamp24H}
-                                            />
-                                        </div>
+                                        <>
+                                            <div className="mt-2">
+                                                <Toggle
+                                                    label={t('Use 24-hour format')}
+                                                    checked={timeStamp24H}
+                                                    onCheckedUpdate={setTimeStamp24H}
+                                                />
+                                            </div>
+                                            <div className="mt-2">
+                                                <Toggle
+                                                    label={t('Enable on HTML')}
+                                                    checked={enableTimestampHTML}
+                                                    onCheckedUpdate={setEnableTimestampHTML}
+                                                />
+                                            </div>
+                                            <div className="mt-2">
+                                                <Toggle
+                                                    label={t('Enable on Markdown')}
+                                                    checked={enableTimestampMarkdown}
+                                                    onCheckedUpdate={setEnableTimestampMarkdown}
+                                                />
+                                            </div>
+                                        </>
                                     )}
                                 </dd>
                             </div>

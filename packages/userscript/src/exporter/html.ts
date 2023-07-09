@@ -1,6 +1,6 @@
 import JSZip from 'jszip'
 import { fetchConversation, getCurrentChatId, processConversation } from '../api'
-import { KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, baseUrl } from '../constants'
+import { KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_HTML, baseUrl } from '../constants'
 import i18n from '../i18n'
 import { checkIfConversationStarted, getConversationChoice, getUserAvatar } from '../page'
 import templateHtml from '../template.html?raw'
@@ -115,6 +115,10 @@ const transformContent = (
 function conversationToHtml(conversation: ConversationResult, avatar: string, metaList?: ExportMeta[]) {
     const { id, title, model, modelSlug, createTime, updateTime, conversationNodes } = conversation
 
+    const enableTimestamp = ScriptStorage.get<boolean>(KEY_TIMESTAMP_ENABLED) ?? false
+    const timeStampHtml = ScriptStorage.get<boolean>(KEY_TIMESTAMP_HTML) ?? false
+    const timeStamp24H = ScriptStorage.get<boolean>(KEY_TIMESTAMP_24H) ?? false
+
     const conversationHtml = conversationNodes.map(({ message }) => {
         if (!message || !message.content) return null
 
@@ -136,22 +140,16 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
             conversationContent = toHtml(root)
         }
 
-        const enableTimestamp = ScriptStorage.get<boolean>(KEY_TIMESTAMP_ENABLED) ?? false
-        const timeStamp24H = ScriptStorage.get<boolean>(KEY_TIMESTAMP_24H) ?? false
         const timestamp = message?.create_time ?? ''
-        const showTimestamp = enableTimestamp && timestamp
-        let conversationDate = ''
+        const showTimestamp = enableTimestamp && timeStampHtml && timestamp
+        let timestampHtml = ''
         let conversationTime = ''
 
         if (showTimestamp) {
             const date = new Date(timestamp * 1000)
-            const isoStr = date.toISOString()
-            // format: 2022-01-01 10:12:00 UTC
-            conversationDate = `${isoStr.split('T')[0]} ${isoStr.split('T')[1].split('.')[0]} UTC`
             // format: 20:12 / 08:12 PM
-            conversationTime = timeStamp24H
-                ? date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
-                : date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+            conversationTime = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: !timeStamp24H })
+            timestampHtml = `<time class="time" datetime="${date.toISOString()}" title="${date.toLocaleString()}">${conversationTime}</time>`
         }
 
         return `
@@ -164,7 +162,7 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
             ${conversationContent}
         </div>
     </div>
-    ${showTimestamp ? `<div class="time" title="${conversationDate}">${conversationTime}</div>` : ''}
+    ${timestampHtml}
 </div>`
     }).filter(Boolean).join('\n\n')
 

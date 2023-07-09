@@ -1,10 +1,11 @@
 import JSZip from 'jszip'
 import { fetchConversation, getCurrentChatId, processConversation } from '../api'
-import { baseUrl } from '../constants'
+import { KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_HTML, baseUrl } from '../constants'
 import i18n from '../i18n'
 import { checkIfConversationStarted, getConversationChoice } from '../page'
 import { downloadFile, getFileNameWithFormat } from '../utils/download'
 import { fromMarkdown, toMarkdown } from '../utils/markdown'
+import { ScriptStorage } from '../utils/storage'
 import { standardizeLineBreaks } from '../utils/text'
 import { dateStr, timestamp, unixTimestampToISOString } from '../utils/utils'
 import type { ApiConversationWithId, ConversationNodeMessage, ConversationResult } from '../api'
@@ -130,8 +131,22 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
         ? `---\n${_metaList.join('\n')}\n---\n\n`
         : ''
 
+    const enableTimestamp = ScriptStorage.get<boolean>(KEY_TIMESTAMP_ENABLED) ?? false
+    const timeStampHtml = ScriptStorage.get<boolean>(KEY_TIMESTAMP_HTML) ?? false
+    const timeStamp24H = ScriptStorage.get<boolean>(KEY_TIMESTAMP_24H) ?? false
+
     const content = conversationNodes.map(({ message }) => {
         if (!message || !message.content) return null
+
+        const timestamp = message?.create_time ?? ''
+        const showTimestamp = enableTimestamp && timeStampHtml && timestamp
+        let timestampHtml = ''
+        if (showTimestamp) {
+            const date = new Date(timestamp * 1000)
+            // format: 20:12 / 08:12 PM
+            const conversationTime = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: !timeStamp24H })
+            timestampHtml = `<time datetime="${date.toISOString()}" title="${date.toLocaleString()}">${conversationTime}</time>\n\n`
+        }
 
         const isUser = message.author.role === 'user'
         const author = transformAuthor(message.author)
@@ -142,7 +157,7 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
             const root = fromMarkdown(content)
             content = toMarkdown(root)
         }
-        return `#### ${author}:\n${content}`
+        return `#### ${author}:\n${timestampHtml}${content}`
     }).filter(Boolean).join('\n\n')
 
     const markdown = `${frontMatter}# ${title}\n\n${content}`
