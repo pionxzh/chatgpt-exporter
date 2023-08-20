@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.14.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.14.0...userscript-v2.14.1) (2023-08-20)
+
+
+### Bug Fixes
+
+* toggle should not shrink on small screen ([b152f44](https://github.com/pionxzh/chatgpt-exporter/commit/b152f4493927fbaebe47327dc347e76c18ca1d61))
+
 ## [2.14.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.13.0...userscript-v2.14.0) (2023-08-20)
 
 
