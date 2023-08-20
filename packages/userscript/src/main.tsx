@@ -36,6 +36,10 @@ function main() {
         const container = document.createElement('div')
         render(<Menu container={container} />, container)
 
+        const styleEl = document.createElement('style')
+        styleEl.id = 'sentinel-css'
+        document.head.append(styleEl)
+
         sentinel.on('nav', (nav) => {
             const chatList = document.querySelector('nav > div.overflow-y-auto, nav > div.overflow-y-hidden')
             if (chatList) {

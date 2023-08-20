@@ -4,11 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-patchedDependencies:
-  sentinel-js@0.0.5:
-    hash: 4xqsksf5w62wic46kncafprj3e
-    path: patches/sentinel-js@0.0.5.patch
-
 importers:
 
   .:
@@ -107,8 +102,8 @@ importers:
         specifier: ^1.6.3
         version: 1.6.3
       sentinel-js:
-        specifier: ^0.0.5
-        version: 0.0.5(patch_hash=4xqsksf5w62wic46kncafprj3e)
+        specifier: ^0.0.7
+        version: 0.0.7
       urlcat:
         specifier: ^2.0.4
         version: 2.0.4
@@ -2419,7 +2414,7 @@ packages:
     dependencies:
       debug: 3.2.7
       is-core-module: 2.12.1
-      resolve: 1.22.2
+      resolve: 1.22.3
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -5239,10 +5234,9 @@ packages:
       lru-cache: 6.0.0
     dev: true
 
-  /sentinel-js@0.0.5(patch_hash=4xqsksf5w62wic46kncafprj3e):
-    resolution: {integrity: sha512-Pk27UCVN4ub6fwFNgoMLMKG8vb6E9odXhMMG+WV3tGJLLv8fIwqzyrYgEoW3KtpgAQ1qn2MgZdJ0GOSpDfn8OQ==}
+  /sentinel-js@0.0.7:
+    resolution: {integrity: sha512-jbGZvDqhmjd5IZh8a3qCypmc1Hlgdu+vastCCT6nK2Vopfsoq/3fstVMJxZJtxy2wlw9EVVGmFeGFObVp9E6MA==}
     dev: false
-    patched: true
 
   /set-immediate-shim@1.0.1:
     resolution: {integrity: sha512-Li5AOqrZWCVA2n5kryzEmqai6bKSIvpz5oUJHPVj6+dsbD3X1ixtsY5tEnsaNpH3pFAHmG8eIHUrtEtohrg+UQ==}

@@ -39,7 +39,7 @@
     "preact": "^10.13.2",
     "react-i18next": "^12.2.0",
     "sanitize-filename": "^1.6.3",
-    "sentinel-js": "^0.0.5",
+    "sentinel-js": "^0.0.7",
     "urlcat": "^2.0.4",
     "vite-plugin-monkey": "^3.3.0"
   },

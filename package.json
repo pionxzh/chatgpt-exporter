@@ -37,11 +37,6 @@
     "turbo": "^1.10.7",
     "typescript": "^5.1.6"
   },
-  "pnpm": {
-    "patchedDependencies": {
-      "sentinel-js@0.0.5": "patches/sentinel-js@0.0.5.patch"
-    }
-  },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "pnpm exec eslint"
   }
