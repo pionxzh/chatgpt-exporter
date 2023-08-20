@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.14.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.13.0...userscript-v2.14.0) (2023-08-20)
+
+
+### Features
+
+* support OpenAI official JSON format ([66d8f90](https://github.com/pionxzh/chatgpt-exporter/commit/66d8f90cb22ff46e45ccd18c17ed3dd269244d46)), closes [#162](https://github.com/pionxzh/chatgpt-exporter/issues/162)
+
+
+### Bug Fixes
+
+* adopt latest sentinel-js, no more patch ([631332d](https://github.com/pionxzh/chatgpt-exporter/commit/631332dac23406189ce44929fc1aec9c4b273e67))
+
 ## [2.13.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.12.1...userscript-v2.13.0) (2023-07-09)
 
 
