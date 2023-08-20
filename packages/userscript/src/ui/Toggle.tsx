@@ -16,7 +16,7 @@ export const Toggle = ({ label, checked = true, onCheckedUpdate }: ToggleProps) 
                 checked={checked}
                 onChange={onCheckedUpdate}
                 data-state={checked ? 'checked' : 'unchecked'}
-                className="bg-gray-200 radix-state-checked:bg-green-600 relative h-6 w-[42px] cursor-pointer rounded-full"
+                className="bg-gray-200 radix-state-checked:bg-green-600 relative h-6 w-[42px] cursor-pointer rounded-full shrink-0"
             >
                 <span
                     data-state={checked ? 'checked' : 'unchecked'}
