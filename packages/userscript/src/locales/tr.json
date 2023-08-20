@@ -29,6 +29,8 @@
   "Enable on HTML": "HTML dosyalarında etkinleştir",
   "Enable on Markdown": "Markdown dosyalarında etkinleştir",
   "Use 24-hour format": "24 saat biçimini kullan (örn. 23:59)",
+  "Export Format": "Dışa Aktarma Formatı",
+  "Export JSON Format Description": "OpenAI Resmi Formatında JSON Dışa Aktarma",
   "Export Metadata": "Üst veriyi dışa aktar",
   "Export Metadata Description": "Dışa aktarılan Markdown ve HTML dosyalarına üst veri ekle",
   "Conversation Delete Alert": "Seçilen tüm konuşmaları silmek istediğinizden emin misiniz?",

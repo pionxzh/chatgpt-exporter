@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import { useTranslation } from 'react-i18next'
 import { deleteConversation, fetchAllConversations, fetchConversation } from '../api'
 import { exportAllToHtml } from '../exporter/html'
-import { exportAllToJson } from '../exporter/json'
+import { exportAllToJson, exportAllToOfficialJson } from '../exporter/json'
 import { exportAllToMarkdown } from '../exporter/markdown'
 import { RequestQueue } from '../utils/queue'
 import { CheckBox } from './CheckBox'
@@ -12,12 +12,6 @@ import { useSettingContext } from './SettingContext'
 import type { ApiConversationItem, ApiConversationWithId } from '../api'
 import type { FC } from '../type'
 import type { ChangeEvent } from 'preact/compat'
-
-const exportAllOptions = [
-    { label: 'Markdown', callback: exportAllToMarkdown },
-    { label: 'JSON', callback: exportAllToJson },
-    { label: 'HTML', callback: exportAllToHtml },
-]
 
 interface ConversationSelectProps {
     conversations: ApiConversationItem[]
@@ -83,8 +77,14 @@ type ExportSource = 'API' | 'Local'
 
 export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange, children }) => {
     const { t } = useTranslation()
-    const { enableMeta, exportMetaList } = useSettingContext()
+    const { enableMeta, exportMetaList, exportOfficialJsonFormat } = useSettingContext()
     const metaList = useMemo(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList])
+
+    const exportAllOptions = useMemo(() => [
+        { label: 'Markdown', callback: exportAllToMarkdown },
+        { label: 'JSON', callback: exportOfficialJsonFormat ? exportAllToOfficialJson : exportAllToJson },
+        { label: 'HTML', callback: exportAllToHtml },
+    ], [exportOfficialJsonFormat])
 
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [exportSource, setExportSource] = useState<ExportSource>('API')
@@ -152,7 +152,7 @@ export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange
             if (callback) callback(format, results, metaList)
         })
         return () => off()
-    }, [requestQueue, exportType, format, metaList])
+    }, [requestQueue, exportAllOptions, exportType, format, metaList])
 
     useEffect(() => {
         const off = deleteQueue.on('done', () => {
@@ -185,7 +185,7 @@ export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange
         const results = localConversations.filter(c => selected.some(s => s.id === c.id))
         const callback = exportAllOptions.find(o => o.label === exportType)?.callback
         if (callback) callback(format, results, metaList)
-    }, [disabled, selected, localConversations, exportType, format, metaList])
+    }, [disabled, selected, localConversations, exportAllOptions, exportType, format, metaList])
 
     const exportAll = useMemo(() => {
         return exportSource === 'API' ? exportAllFromApi : exportAllFromLocal

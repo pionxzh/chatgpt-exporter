@@ -5,7 +5,7 @@ import { checkIfConversationStarted, getConversationChoice } from '../page'
 import { downloadFile, getFileNameWithFormat } from '../utils/download'
 import type { ApiConversationWithId } from '../api'
 
-export async function exportToJson(fileNameFormat: string) {
+export async function exportToJson(fileNameFormat: string, options: { officialFormat: boolean }) {
     if (!checkIfConversationStarted()) {
         alert(i18n.t('Please start a conversation first'))
         return false
@@ -17,8 +17,18 @@ export async function exportToJson(fileNameFormat: string) {
     const conversation = processConversation(rawConversation, conversationChoices)
 
     const fileName = getFileNameWithFormat(fileNameFormat, 'json', { title: conversation.title, chatId })
-    const content = conversationToJson(rawConversation)
+    /**
+     * The official format is just an array of the API response.
+     */
+    const content = conversationToJson(options.officialFormat ? [rawConversation] : rawConversation)
     downloadFile(fileName, 'application/json', content)
+
+    return true
+}
+
+export async function exportAllToOfficialJson(_fileNameFormat: string, apiConversations: ApiConversationWithId[]) {
+    const content = conversationToJson(apiConversations)
+    downloadFile('chatgpt-export.json', 'application/json', content)
 
     return true
 }
@@ -61,6 +71,6 @@ export async function exportAllToJson(fileNameFormat: string, apiConversations: 
     return true
 }
 
-function conversationToJson(conversation: ApiConversationWithId) {
+function conversationToJson(conversation: ApiConversationWithId | ApiConversationWithId[]) {
     return JSON.stringify(conversation)
 }

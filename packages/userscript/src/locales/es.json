@@ -29,6 +29,8 @@
   "Enable on HTML": "Habilitar en archivos HTML",
   "Enable on Markdown": "Habilitar en archivos Markdown",
   "Use 24-hour format": "Usar formato de 24 horas(ej. 23:59)",
+  "Export Format": "Formato de Exportación",
+  "Export JSON Format Description": "Exportar JSON en el Formato Oficial de OpenAI",
   "Export Metadata": "Exportar Metadata",
   "Export Metadata Description": "Añadir Metadata a Markdown y a HTML exportados.",
   "Conversation Delete Alert": "¿Estás seguro que quieres borrar todas las conversaciones seleccionadas?",

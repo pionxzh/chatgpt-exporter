@@ -29,6 +29,8 @@
   "Enable on HTML": "HTML ファイルで有効にする",
   "Enable on Markdown": "Markdown ファイルで有効にする",
   "Use 24-hour format": "24時間形式を使用する (例: 23:59)",
+  "Export Format": "エクスポートフォーマット",
+  "Export JSON Format Description": "OpenAI公式フォーマットでのJSONのエクスポート",
   "Export Metadata": "メタデータをエクスポート",
   "Export Metadata Description": "エクスポートされたMarkdownおよびHTMLファイルにメタデータを追加します。",
   "Conversation Delete Alert": "選択したすべての会話を削除してもよろしいですか？",

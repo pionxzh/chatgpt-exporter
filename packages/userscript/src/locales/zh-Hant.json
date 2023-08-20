@@ -29,6 +29,8 @@
   "Enable on HTML": "在 HTML 檔案上啟用",
   "Enable on Markdown": "在 Markdown 檔案上啟用",
   "Use 24-hour format": "使用24小時制 (例如 23:59)",
+  "Export Format": "匯出格式",
+  "Export JSON Format Description": "以 OpenAI 官方格式匯出 JSON",
   "Export Metadata": "匯出元資料",
   "Export Metadata Description": "會添加至 Markdown 以及 HTML 匯出。",
   "Conversation Delete Alert": "確定要刪除所有選取的對話？",

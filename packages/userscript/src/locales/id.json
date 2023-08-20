@@ -29,6 +29,8 @@
   "Enable on HTML": "Aktifkan pada file HTML",
   "Enable on Markdown": "Aktifkan pada file Markdown",
   "Use 24-hour format": "Gunakan format 24 jam (mis. 23:59)",
+  "Export Format": "Format Ekspor",
+  "Export JSON Format Description": "Ekspor JSON dalam Format Resmi OpenAI",
   "Export Metadata": "Ekspor Metadata",
   "Export Metadata Description": "Tambahkan metadata ke file Markdown dan HTML yang diekspor.",
   "Conversation Delete Alert": "Apakah Anda yakin ingin menghapus semua percakapan yang dipilih?",

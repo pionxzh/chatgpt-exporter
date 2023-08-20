@@ -28,6 +28,7 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
 
     const {
         format,
+        exportOfficialJsonFormat,
         enableTimestamp,
         timeStamp24H,
         enableMeta,
@@ -49,7 +50,7 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
     const onClickPng = useCallback(() => exportToPng(format), [format])
     const onClickMarkdown = useCallback(() => exportToMarkdown(format, metaList), [format, metaList])
     const onClickHtml = useCallback(() => exportToHtml(format, metaList), [format, metaList])
-    const onClickJSON = useCallback(() => exportToJson(format), [format])
+    const onClickJSON = useCallback(() => exportToJson(format, { officialFormat: exportOfficialJsonFormat }), [format, exportOfficialJsonFormat])
 
     const width = useWindowResize(() => window.innerWidth)
     const isMobile = width < 768
