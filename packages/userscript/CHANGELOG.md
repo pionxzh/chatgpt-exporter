@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.14.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.14.1...userscript-v2.14.2) (2023-08-21)
+
+
+### Bug Fixes
+
+* z-index collision with history list ([c1faca9](https://github.com/pionxzh/chatgpt-exporter/commit/c1faca9dee9efea4d8d23e38add1cc85236ea4a3)), closes [#164](https://github.com/pionxzh/chatgpt-exporter/issues/164)
+
 ## [2.14.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.14.0...userscript-v2.14.1) (2023-08-20)
 
 
