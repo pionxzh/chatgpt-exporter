@@ -35,7 +35,7 @@ function main() {
     onloadSafe(() => {
         const container = document.createElement('div')
         // to overlap on the list section
-        container.style.zIndex = '99'
+        container.style.zIndex = '20'
         render(<Menu container={container} />, container)
 
         const styleEl = document.createElement('style')
