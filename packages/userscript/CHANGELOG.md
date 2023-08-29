@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.14.3](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.14.2...userscript-v2.14.3) (2023-08-29)
+
+
+### Bug Fixes
+
+* zIndex should not overlap on setting menu ([39d13da](https://github.com/pionxzh/chatgpt-exporter/commit/39d13da3465bdf4cc0b14344fcd345f063ecbb4a)), closes [#166](https://github.com/pionxzh/chatgpt-exporter/issues/166)
+
 ## [2.14.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.14.1...userscript-v2.14.2) (2023-08-21)
 
 
