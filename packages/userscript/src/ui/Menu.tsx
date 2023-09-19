@@ -99,14 +99,14 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                 >
                     <HoverCard.Content
                         className={isMobile
-                            ? 'fixed grid grid-cols-2 gap-x-1 px-1.5 pt-2 rounded bg-gray-900 shadow-md transition-opacity duration-200 animate-slideUp'
+                            ? 'grid grid-cols-2 gap-x-1 px-1.5 pt-2 rounded bg-gray-900 shadow-md transition-opacity duration-200 animate-slideUp'
                             : 'grid grid-cols-2 gap-x-1 px-1.5 py-2 pb-0 rounded-md bg-gray-900 shadow-md transition-opacity duration-200 animate-fadeIn'}
                         style={{
                             width: isMobile ? 316 : 268,
                             left: -6,
                             bottom: 0,
                         }}
-                        sideOffset={8}
+                        sideOffset={isMobile ? 0 : 8}
                         side={isMobile ? 'bottom' : 'right'}
                         align="start"
                         alignOffset={isMobile ? 0 : -64}
