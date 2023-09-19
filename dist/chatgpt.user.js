@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.14.3
+// @version            2.14.4
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -23000,13 +23000,13 @@ ${content2}`;
           container: isMobile ? container : document.body,
           forceMount: open || settingOpen || exportOpen,
           children: o$5($cef8881cdc69808e$export$7c6e2c02157bb7d2, {
-            className: isMobile ? "fixed grid grid-cols-2 gap-x-1 px-1.5 pt-2 rounded bg-gray-900 shadow-md transition-opacity duration-200 animate-slideUp" : "grid grid-cols-2 gap-x-1 px-1.5 py-2 pb-0 rounded-md bg-gray-900 shadow-md transition-opacity duration-200 animate-fadeIn",
+            className: isMobile ? "grid grid-cols-2 gap-x-1 px-1.5 pt-2 rounded bg-gray-900 shadow-md transition-opacity duration-200 animate-slideUp" : "grid grid-cols-2 gap-x-1 px-1.5 py-2 pb-0 rounded-md bg-gray-900 shadow-md transition-opacity duration-200 animate-fadeIn",
             style: {
               width: isMobile ? 316 : 268,
               left: -6,
               bottom: 0
             },
-            sideOffset: 8,
+            sideOffset: isMobile ? 0 : 8,
             side: isMobile ? "bottom" : "right",
             align: "start",
             alignOffset: isMobile ? 0 : -64,
