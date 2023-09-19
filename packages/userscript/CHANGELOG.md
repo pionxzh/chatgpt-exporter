@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.14.4](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.14.3...userscript-v2.14.4) (2023-09-19)
+
+
+### Bug Fixes
+
+* fix popup position on mobile (esp sharing page) ([3b39746](https://github.com/pionxzh/chatgpt-exporter/commit/3b397468e17683c09aa312b12504d66654f33f9f))
+
 ## [2.14.3](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.14.2...userscript-v2.14.3) (2023-08-29)
 
 
