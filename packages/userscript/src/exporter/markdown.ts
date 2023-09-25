@@ -88,9 +88,9 @@ const transformContent = (
         case 'text':
             return content.parts?.join('\n') || ''
         case 'code':
-            return content.text || ''
+            return `Code:\n\`\`\`\n${content.text}\n\`\`\`` || ''
         case 'execution_output':
-            return content.text || ''
+            return `Result:\n\`\`\`\n${content.text}\n\`\`\`` || ''
         case 'tether_quote':
             return `> ${content.title || content.text || ''}`
         case 'tether_browsing_code':
