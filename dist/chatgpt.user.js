@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.14.4
+// @version            2.14.5
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -1084,7 +1084,10 @@ body[data-time-format="24"] span[data-time-format="24"] {
   }
   function getConversationFromSharePage() {
     var _a, _b, _c, _d;
-    return (_d = (_c = (_b = (_a = window.__NEXT_DATA__) == null ? void 0 : _a.props) == null ? void 0 : _b.pageProps) == null ? void 0 : _c.serverResponse) == null ? void 0 : _d.data;
+    if ((_d = (_c = (_b = (_a = window.__NEXT_DATA__) == null ? void 0 : _a.props) == null ? void 0 : _b.pageProps) == null ? void 0 : _c.serverResponse) == null ? void 0 : _d.data) {
+      return JSON.parse(JSON.stringify(window.__NEXT_DATA__.props.pageProps.serverResponse.data));
+    }
+    return null;
   }
   const conversationChoiceSelector = ".flex.justify-center span.flex-grow";
   function getConversationChoice() {
@@ -19477,7 +19480,15 @@ body[data-time-format="24"] span[data-time-format="24"] {
       case "text":
         return ((_a = content2.parts) == null ? void 0 : _a.join("\n")) || "";
       case "code":
-        return content2.text || "";
+        return `Code:
+\`\`\`
+${content2.text}
+\`\`\`` || "";
+      case "execution_output":
+        return `Result:
+\`\`\`
+${content2.text}
+\`\`\`` || "";
       case "tether_quote":
         return `> ${content2.title || content2.text || ""}`;
       case "tether_browsing_code":
@@ -19690,23 +19701,36 @@ body[data-time-format="24"] span[data-time-format="24"] {
     });
     effect.run();
     await sleep(100);
-    const ratio = window.devicePixelRatio || 1;
-    const canvas = await html2canvas(thread, {
-      scale: ratio * 2,
-      // scale up to 2x to avoid blurry images
-      useCORS: true,
-      scrollX: -window.scrollX,
-      scrollY: -window.scrollY,
-      windowWidth: thread.scrollWidth,
-      windowHeight: thread.scrollHeight,
-      ignoreElements: fnIgnoreElements
-    });
-    const context = canvas.getContext("2d");
-    if (context) {
-      context.imageSmoothingEnabled = false;
+    const passLimit = 5;
+    const takeScreenshot = async (width, height, additionalScale = 1, currentPass = 1) => {
+      const ratio = window.devicePixelRatio || 1;
+      const canvas = await html2canvas(thread, {
+        scale: ratio * 2 * additionalScale,
+        // scale up to 2x to avoid blurry images
+        useCORS: true,
+        scrollX: -window.scrollX,
+        scrollY: -window.scrollY,
+        windowWidth: thread.scrollWidth,
+        windowHeight: thread.scrollHeight,
+        ignoreElements: fnIgnoreElements
+      });
+      const context = canvas.getContext("2d");
+      if (context)
+        context.imageSmoothingEnabled = false;
+      const dataUrl2 = canvas.toDataURL("image/png", 1).replace(/^data:image\/[^;]/, "data:application/octet-stream");
+      if (dataUrl2 === "data:,") {
+        if (currentPass > passLimit)
+          return null;
+        return takeScreenshot(width, height, additionalScale / 1.4, currentPass + 1);
+      }
+      return dataUrl2;
+    };
+    const dataUrl = await takeScreenshot(thread.scrollWidth, thread.scrollHeight);
+    if (!dataUrl) {
+      alert("Failed to export to PNG. This might be caused by the size of the conversation. Please try to export a smaller conversation.");
+      return false;
     }
     effect.dispose();
-    const dataUrl = canvas.toDataURL("image/png", 1).replace(/^data:image\/[^;]/, "data:application/octet-stream");
     const chatId = getChatIdFromUrl() || void 0;
     const fileName = getFileNameWithFormat(fileNameFormat, "png", {
       chatId
@@ -19845,7 +19869,15 @@ body[data-time-format="24"] span[data-time-format="24"] {
       case "text":
         return ((_a = content2.parts) == null ? void 0 : _a.join("\n")) || "";
       case "code":
-        return content2.text || "";
+        return `Code:
+\`\`\`
+${content2.text}
+\`\`\`` || "";
+      case "execution_output":
+        return `Result:
+\`\`\`
+${content2.text}
+\`\`\`` || "";
       case "tether_quote":
         return `> ${content2.title || content2.text || ""}`;
       case "tether_browsing_code":
@@ -19956,6 +19988,8 @@ ${content2}`;
       case "text":
         return ((_a = content2.parts) == null ? void 0 : _a.join("\n")) || "";
       case "code":
+        return content2.text || "";
+      case "execution_output":
         return content2.text || "";
       case "tether_quote":
         return `> ${content2.title || content2.text || ""}`;
