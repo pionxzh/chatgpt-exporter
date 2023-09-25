@@ -94,26 +94,46 @@ export async function exportToPng(fileNameFormat: string) {
 
     await sleep(100)
 
-    const ratio = window.devicePixelRatio || 1
-    const canvas = await html2canvas(thread, {
-        scale: ratio * 2, // scale up to 2x to avoid blurry images
-        useCORS: true,
-        scrollX: -window.scrollX,
-        scrollY: -window.scrollY,
-        windowWidth: thread.scrollWidth,
-        windowHeight: thread.scrollHeight,
-        ignoreElements: fnIgnoreElements,
-    })
+    const passLimit = 5
+    const takeScreenshot = async (width: number, height: number, additionalScale = 1, currentPass = 1): Promise<string | null> => {
+        const ratio = window.devicePixelRatio || 1
+        const canvas = await html2canvas(thread, {
+            scale: ratio * 2 * additionalScale, // scale up to 2x to avoid blurry images
+            useCORS: true,
+            scrollX: -window.scrollX,
+            scrollY: -window.scrollY,
+            windowWidth: thread.scrollWidth,
+            windowHeight: thread.scrollHeight,
+            ignoreElements: fnIgnoreElements,
+        })
 
-    const context = canvas.getContext('2d')
-    if (context) {
-        context.imageSmoothingEnabled = false
+        const context = canvas.getContext('2d')
+        if (context) context.imageSmoothingEnabled = false
+
+        const dataUrl = canvas.toDataURL('image/png', 1)
+            .replace(/^data:image\/[^;]/, 'data:application/octet-stream')
+
+        // corrupted image
+        // meaning we might hit on the canvas size limit
+        // See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas#maximum_canvas_size
+        if (dataUrl === 'data:,') {
+            if (currentPass > passLimit) return null
+
+            // 1.4 ^ 5 ~= 5.37, should be enough for most cases
+            return takeScreenshot(width, height, additionalScale / 1.4, currentPass + 1)
+        }
+
+        return dataUrl
+    }
+
+    const dataUrl = await takeScreenshot(thread.scrollWidth, thread.scrollHeight)
+    if (!dataUrl) {
+        alert('Failed to export to PNG. This might be caused by the size of the conversation. Please try to export a smaller conversation.')
+        return false
     }
 
     effect.dispose()
 
-    const dataUrl = canvas.toDataURL('image/png', 1)
-        .replace(/^data:image\/[^;]/, 'data:application/octet-stream')
     const chatId = getChatIdFromUrl() || undefined
     const fileName = getFileNameWithFormat(fileNameFormat, 'png', { chatId })
     downloadUrl(fileName, dataUrl)
