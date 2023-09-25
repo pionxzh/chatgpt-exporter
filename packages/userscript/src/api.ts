@@ -55,6 +55,9 @@ export interface ConversationNodeMessage {
         language: 'unknown' & (string & {})
         text: string
     } | {
+        content_type: 'execution_output'
+        text: string
+    } | {
         content_type: 'tether_quote'
         domain?: string
         text: string
