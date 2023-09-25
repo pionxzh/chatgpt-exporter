@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.14.5](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.14.4...userscript-v2.14.5) (2023-09-25)
+
+
+### Bug Fixes
+
+* further improve the code and execution result's output format ([49cfd6e](https://github.com/pionxzh/chatgpt-exporter/commit/49cfd6e2b036240bafd690bc49fd7ac233515b39))
+* handle canvas size might exceed browser's limit ([3e6629d](https://github.com/pionxzh/chatgpt-exporter/commit/3e6629d2b5117f8471eb1ba30f6a5337e477f993))
+* handle frozen page props ([75b5f9d](https://github.com/pionxzh/chatgpt-exporter/commit/75b5f9d51a9e5c4de74e5ce51b891d56f86c5878))
+* support message content type `execution_output` from plugin ([78e4ecf](https://github.com/pionxzh/chatgpt-exporter/commit/78e4ecfd5d8ec16e52abf10208f868c74d44e234))
+
 ## [2.14.4](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.14.3...userscript-v2.14.4) (2023-09-19)
 
 
