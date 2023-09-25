@@ -60,7 +60,12 @@ export function isSharePage() {
 }
 
 export function getConversationFromSharePage() {
-    return window.__NEXT_DATA__?.props?.pageProps?.serverResponse?.data
+    if (window.__NEXT_DATA__?.props?.pageProps?.serverResponse?.data) {
+        // Next.js or OpenAI started to freeze some objects, so we do a
+        // deep copy here to avoid polluting the original object
+        return JSON.parse(JSON.stringify(window.__NEXT_DATA__.props.pageProps.serverResponse.data))
+    }
+    return null
 }
 
 export const conversationChoiceSelector = '.flex.justify-center span.flex-grow'
