@@ -60,6 +60,24 @@ const transformContent = (
 }
 
 /**
+ * Transform foot notes in assistant's message
+ */
+const transformFootNotes = (
+    input: string,
+    metadata: ConversationNodeMessage['metadata'],
+) => {
+    // 【11†(PrintWiki)】
+    const footNoteMarkRegex = /【(\d+)†\((.+?)\)】/g
+    return input.replace(footNoteMarkRegex, (match, citeIndex, _evidenceText) => {
+        const citation = metadata?.citations?.find(cite => cite.metadata?.extra?.cited_message_idx === +citeIndex)
+        // We simply remove the foot note mark in text output
+        if (citation) return ''
+
+        return match
+    })
+}
+
+/**
  * Remove some markdown syntaxes from the content
  */
 const reformatContent = (input: string) => {
@@ -93,6 +111,9 @@ export async function exportToText() {
 
         const author = transformAuthor(message.author)
         let content = transformContent(message.content, message.metadata)
+        if (message.author.role === 'assistant') {
+            content = transformFootNotes(content, message.metadata)
+        }
 
         // User's message will not be reformatted
         if (message.author.role !== 'user' && content) {

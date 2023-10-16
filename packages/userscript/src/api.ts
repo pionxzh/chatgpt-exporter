@@ -17,6 +17,33 @@ interface ApiSession {
 
 type ModelSlug = 'text-davinci-002-render-sha' | 'text-davinci-002-render-paid' | 'text-davinci-002-browse' | 'gpt-4' | 'gpt-4-browsing'
 
+export interface Citation {
+    start_ix: number
+    end_ix: number
+    citation_format_type: 'tether_og' & (string & {})
+    metadata?: {
+        extra?: {
+            cited_message_idx: number
+            evidence_text: string
+        }
+        text: string
+        title: string
+        type: 'webpage' & (string & {})
+        url: string
+    }
+}
+
+interface CiteMetadata {
+    citation_format: {
+        name: 'tether_og' & (string & {})
+    }
+    metadata_list: Array<{
+        title: string
+        url: string
+        text: string
+    }>
+}
+
 interface MessageMeta {
     command: 'click' | 'search' | 'quote' | 'quote_lines' | 'scroll' & (string & {})
     args: unknown
@@ -26,16 +53,8 @@ interface MessageMeta {
     }
     model_slug?: ModelSlug & (string & {})
     timestamp_: 'absolute' & (string & {})
-    _cite_metadata?: {
-        citation_format: {
-            name: 'tether_og' & (string & {})
-        }
-        metadata_list: Array<{
-            title: string
-            url: string
-            text: string
-        }>
-    }
+    citations?: Citation[]
+    _cite_metadata?: CiteMetadata
 }
 
 export type AuthorRole = 'system' | 'assistant' | 'user' | 'tool'
@@ -252,7 +271,7 @@ const modelMapping: { [key in ModelSlug]: string } & { [key: string]: string } =
     'text-davinci-002-render-paid': 'GTP-3.5',
     'text-davinci-002-browse': 'GTP-3.5',
     'gpt-4': 'GPT-4',
-    'gpt-4-browsing': 'GPT-4 (Browsing)',
+    'gpt-4-browsing': 'GPT-4 (Browser)',
 
     // fuzzy matching
     'text-davinci-002': 'GTP-3.5',

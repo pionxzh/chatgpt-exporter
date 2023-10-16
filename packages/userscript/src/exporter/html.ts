@@ -121,6 +121,24 @@ const transformContent = (
     }
 }
 
+/**
+ * Transform foot notes in assistant's message
+ */
+const transformFootNotes = (
+    input: string,
+    metadata: ConversationNodeMessage['metadata'],
+) => {
+    // 【11†(PrintWiki)】
+    const footNoteMarkRegex = /【(\d+)†\((.+?)\)】/g
+    return input.replace(footNoteMarkRegex, (match, citeIndex, _evidenceText) => {
+        const citation = metadata?.citations?.find(cite => cite.metadata?.extra?.cited_message_idx === +citeIndex)
+        // We simply remove the foot note mark in html output
+        if (citation) return ''
+
+        return match
+    })
+}
+
 function conversationToHtml(conversation: ConversationResult, avatar: string, metaList?: ExportMeta[]) {
     const { id, title, model, modelSlug, createTime, updateTime, conversationNodes } = conversation
 
@@ -135,13 +153,18 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
         if (message.author.role === 'tool') return null // Skip tool's intermediate message
 
         const isUser = message.author.role === 'user'
+        const isAssistant = message.author.role === 'assistant'
         const author = transformAuthor(message.author)
         const model = message?.metadata?.model_slug === 'gpt-4' ? 'GPT-4' : 'GPT-3'
         const authorType = isUser ? 'user' : model
         const avatarEl = isUser
             ? `<img alt="${author}" />`
             : '<svg width="41" height="41"><use xlink:href="#chatgpt" /></svg>'
-        const content = transformContent(message.content, message.metadata)
+        let content = transformContent(message.content, message.metadata)
+        if (isAssistant) {
+            content = transformFootNotes(content, message.metadata)
+        }
+
         let conversationContent = content
 
         if (isUser) {

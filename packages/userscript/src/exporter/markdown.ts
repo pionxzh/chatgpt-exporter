@@ -8,7 +8,7 @@ import { fromMarkdown, toMarkdown } from '../utils/markdown'
 import { ScriptStorage } from '../utils/storage'
 import { standardizeLineBreaks } from '../utils/text'
 import { dateStr, timestamp, unixTimestampToISOString } from '../utils/utils'
-import type { ApiConversationWithId, ConversationNodeMessage, ConversationResult } from '../api'
+import type { ApiConversationWithId, Citation, ConversationNodeMessage, ConversationResult } from '../api'
 import type { ExportMeta } from '../ui/SettingContext'
 
 export async function exportToMarkdown(fileNameFormat: string, metaList: ExportMeta[]) {
@@ -116,6 +116,37 @@ const transformContent = (
     }
 }
 
+/**
+ * Transform foot notes in assistant's message
+ */
+const transformFootNotes = (
+    input: string,
+    metadata: ConversationNodeMessage['metadata'],
+) => {
+    // 【11†(PrintWiki)】
+    const footNoteMarkRegex = /【(\d+)†\((.+?)\)】/g
+
+    const citationList: Citation[] = []
+    const output = input.replace(footNoteMarkRegex, (match, citeIndex, _evidenceText) => {
+        const citation = metadata?.citations?.find(cite => cite.metadata?.extra?.cited_message_idx === +citeIndex)
+        if (citation) {
+            citationList.push(citation)
+            // Use markdown caret to represent foot note ([^1])
+            return `[^${citeIndex}]`
+        }
+
+        return match
+    })
+    const citationText = citationList.map((citation) => {
+        const citeIndex = citation.metadata?.extra?.cited_message_idx ?? 1
+        const citeTitle = citation.metadata?.title ?? 'No title'
+        return `[^${citeIndex}]: ${citeTitle}`
+    }).join('\n')
+
+    // Foot notes are placed at the end of the conversation node, not the end of the whole document
+    return `${output}\n\n${citationText}`
+}
+
 function conversationToMarkdown(conversation: ConversationResult, metaList?: ExportMeta[]) {
     const { id, title, model, modelSlug, createTime, updateTime, conversationNodes } = conversation
     const source = `${baseUrl}/c/${id}`
@@ -163,6 +194,9 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
         const isUser = message.author.role === 'user'
         const author = transformAuthor(message.author)
         let content = transformContent(message.content, message.metadata)
+        if (message.author.role === 'assistant') {
+            content = transformFootNotes(content, message.metadata)
+        }
 
         // User's message will not be reformatted
         if (!isUser && content) {
