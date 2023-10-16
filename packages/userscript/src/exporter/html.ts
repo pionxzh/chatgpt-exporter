@@ -109,8 +109,15 @@ const transformContent = (
             }
             return ''
         }
+        case 'multimodal_text': {
+            return content.parts?.map((part) => {
+                if (typeof part === 'string') return part
+                if (part.asset_pointer) return `![image](${part.asset_pointer})`
+                return '[Unsupported multimodal content]'
+            }).join('\n') || ''
+        }
         default:
-            return ''
+            return '[Unsupported Content]'
     }
 }
 

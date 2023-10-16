@@ -4,12 +4,15 @@ import { getBase64FromImageUrl, getBase64FromImg } from './utils/dom'
 declare global {
     interface Window {
         __NEXT_DATA__?: {
+            assetPrefix: string
             buildId: string
             gssp: boolean
             isFallback: boolean
             page: string
             props: {
                 pageProps: {
+                    allowBrowserStorage: boolean
+                    canManageBrowserStorage: boolean
                     geoOk: boolean
                     isUserInCanPayGroup: boolean
                     serviceAnnouncement: {
@@ -27,6 +30,7 @@ declare global {
                         name: string
                         picture: string
                     }
+                    userCountry: string
                     serverResponse?: {
                         type: 'data'
                         data: any // Basically ApiConversation

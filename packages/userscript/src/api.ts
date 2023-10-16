@@ -39,6 +39,14 @@ interface MessageMeta {
 
 export type AuthorRole = 'system' | 'assistant' | 'user' | 'tool'
 
+interface MultiModalInputImage {
+    asset_pointer: string
+    content_type: 'image_asset_pointer' & (string & {})
+    height: number
+    size_bytes: number
+    width: number
+}
+
 export interface ConversationNodeMessage {
     author: {
         role: AuthorRole
@@ -70,6 +78,10 @@ export interface ConversationNodeMessage {
         content_type: 'tether_browsing_display'
         result: string
         summary?: string
+    } | {
+        // multi-modal input
+        content_type: 'multimodal_text'
+        parts: Array<MultiModalInputImage | string>
     }
     create_time: number
     end_turn: boolean
