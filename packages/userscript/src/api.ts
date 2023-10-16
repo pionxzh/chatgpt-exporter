@@ -299,11 +299,14 @@ export function processConversation(conversation: ApiConversationWithId, convers
             // If the previous node is also an assistant, we merge them together.
             // This is to improve the output of the conversation when an official
             // continuation is used. (#146)
-            if (prevNode
-                && role === 'assistant'
-                && prevNode.message?.author.role === 'assistant'
-                && node.message?.content.content_type === 'text'
-                && prevNode.message?.content.content_type === 'text'
+            if (role === 'assistant'
+                && prevNode?.message
+                && prevNode.message.author.role === 'assistant'
+                && prevNode.message.recipient === 'all'
+                && prevNode.message.content.content_type === 'text'
+                && node.message
+                && node.message.recipient === 'all'
+                && node.message.content.content_type === 'text'
             ) {
                 isContinueGeneration = true
                 // the last part of the previous node should directly concat to the first part of the current node
@@ -328,7 +331,7 @@ export function processConversation(conversation: ApiConversationWithId, convers
             choice = conversationChoices[index] ?? _last
         }
         // Conversation choices will only applied to nodes with message
-        else if ('message' in node) {
+        else if ('message' in node && node.message?.recipient === 'all') {
             index++
             choice = conversationChoices[index] ?? _last
         }
