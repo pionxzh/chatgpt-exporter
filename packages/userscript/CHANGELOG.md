@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.15.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.14.5...userscript-v2.15.0) (2023-10-16)
+
+
+### Features
+
+* partially support `multimodal_text` ([7d5c7de](https://github.com/pionxzh/chatgpt-exporter/commit/7d5c7de30b7b9f7f9ec88fb1fb45f52e7b3b3a69))
+* support footnote ([35d74e0](https://github.com/pionxzh/chatgpt-exporter/commit/35d74e0f9e02cd81a2a705bed47cafc26243c98f))
+
+
+### Bug Fixes
+
+* conversationChoices should only applied to node with recipient all ([bd36162](https://github.com/pionxzh/chatgpt-exporter/commit/bd3616282ea570e31d2a91f801aeec45d9699dab))
+* should not output response from plugins ([8d4ee37](https://github.com/pionxzh/chatgpt-exporter/commit/8d4ee3752a240e8252a68d06d8b0144fcbdf13c1))
+
 ## [2.14.5](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.14.4...userscript-v2.14.5) (2023-09-25)
 
 
