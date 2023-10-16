@@ -88,6 +88,9 @@ export async function exportToText() {
     const text = conversationNodes.map(({ message }) => {
         if (!message || !message.content) return null
 
+        if (message.recipient !== 'all') return null // ChatGPT is talking to tool
+        if (message.author.role === 'tool') return null // Skip tool's intermediate message
+
         const author = transformAuthor(message.author)
         let content = transformContent(message.content, message.metadata)
 

@@ -131,6 +131,9 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
     const conversationHtml = conversationNodes.map(({ message }) => {
         if (!message || !message.content) return null
 
+        if (message.recipient !== 'all') return null // ChatGPT is talking to tool
+        if (message.author.role === 'tool') return null // Skip tool's intermediate message
+
         const isUser = message.author.role === 'user'
         const author = transformAuthor(message.author)
         const model = message?.metadata?.model_slug === 'gpt-4' ? 'GPT-4' : 'GPT-3'

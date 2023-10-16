@@ -147,6 +147,9 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
     const content = conversationNodes.map(({ message }) => {
         if (!message || !message.content) return null
 
+        if (message.recipient !== 'all') return null // ChatGPT is talking to tool
+        if (message.author.role === 'tool') return null // Skip tool's intermediate message
+
         const timestamp = message?.create_time ?? ''
         const showTimestamp = enableTimestamp && timeStampHtml && timestamp
         let timestampHtml = ''

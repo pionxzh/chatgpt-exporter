@@ -15,10 +15,11 @@ interface ApiSession {
     }
 }
 
-type ModelSlug = 'text-davinci-002-render-sha' | 'text-davinci-002-render-paid' | 'text-davinci-002-browse' | 'gpt-4'
+type ModelSlug = 'text-davinci-002-render-sha' | 'text-davinci-002-render-paid' | 'text-davinci-002-browse' | 'gpt-4' | 'gpt-4-browsing'
 
 interface MessageMeta {
-    command: 'click' | 'search' | 'quote' | 'scroll' & (string & {})
+    command: 'click' | 'search' | 'quote' | 'quote_lines' | 'scroll' & (string & {})
+    args: unknown
     finish_details?: {
         stop: string
         type: 'stop' | 'interrupted' & (string & {})
@@ -87,7 +88,7 @@ export interface ConversationNodeMessage {
     end_turn: boolean
     id: string
     metadata?: MessageMeta
-    recipient: 'all' & 'browser' & (string & {})
+    recipient: 'all' | 'browser' & (string & {})
     status: string
     weight: number
 }
@@ -251,6 +252,7 @@ const modelMapping: { [key in ModelSlug]: string } & { [key: string]: string } =
     'text-davinci-002-render-paid': 'GTP-3.5',
     'text-davinci-002-browse': 'GTP-3.5',
     'gpt-4': 'GPT-4',
+    'gpt-4-browsing': 'GPT-4 (Browsing)',
 
     // fuzzy matching
     'text-davinci-002': 'GTP-3.5',
