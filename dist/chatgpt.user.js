@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.14.5
+// @version            2.15.0
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -1231,11 +1231,12 @@ body[data-time-format="24"] span[data-time-format="24"] {
     "text-davinci-002-render-paid": "GTP-3.5",
     "text-davinci-002-browse": "GTP-3.5",
     "gpt-4": "GPT-4",
+    "gpt-4-browsing": "GPT-4 (Browser)",
     // fuzzy matching
     "text-davinci-002": "GTP-3.5"
   };
   function processConversation(conversation, conversationChoices = []) {
-    var _a, _b, _c, _d, _e, _f, _g;
+    var _a, _b, _c, _d, _e;
     const title2 = conversation.title || "ChatGPT Conversation";
     const createTime = conversation.create_time;
     const updateTime = conversation.update_time;
@@ -1273,7 +1274,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
       let isContinueGeneration = false;
       if (role === "assistant" || role === "user" || role === "tool") {
         const prevNode = result[result.length - 1];
-        if (prevNode && role === "assistant" && ((_e = prevNode.message) == null ? void 0 : _e.author.role) === "assistant" && ((_f = node2.message) == null ? void 0 : _f.content.content_type) === "text" && ((_g = prevNode.message) == null ? void 0 : _g.content.content_type) === "text") {
+        if (role === "assistant" && (prevNode == null ? void 0 : prevNode.message) && prevNode.message.author.role === "assistant" && prevNode.message.recipient === "all" && prevNode.message.content.content_type === "text" && node2.message && node2.message.recipient === "all" && node2.message.content.content_type === "text") {
           isContinueGeneration = true;
           prevNode.message.content.parts[prevNode.message.content.parts.length - 1] += node2.message.content.parts[0];
           prevNode.message.content.parts.push(...node2.message.content.parts.slice(1));
@@ -1287,7 +1288,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
       let choice = 0;
       if (isContinueGeneration) {
         choice = conversationChoices[index2] ?? _last;
-      } else if ("message" in node2) {
+      } else if ("message" in node2 && ((_e = node2.message) == null ? void 0 : _e.recipient) === "all") {
         index2++;
         choice = conversationChoices[index2] ?? _last;
       }
@@ -19475,7 +19476,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
     }
   };
   const transformContent$2 = (content2, metadata) => {
-    var _a, _b;
+    var _a, _b, _c;
     switch (content2.content_type) {
       case "text":
         return ((_a = content2.parts) == null ? void 0 : _a.join("\n")) || "";
@@ -19505,9 +19506,31 @@ ${content2.text}
         }
         return "";
       }
+      case "multimodal_text": {
+        return ((_c = content2.parts) == null ? void 0 : _c.map((part) => {
+          if (typeof part === "string")
+            return part;
+          if (part.asset_pointer)
+            return `![image](${part.asset_pointer})`;
+          return "[Unsupported multimodal content]";
+        }).join("\n")) || "";
+      }
       default:
-        return "";
+        return "[Unsupported Content]";
     }
+  };
+  const transformFootNotes$2 = (input, metadata) => {
+    const footNoteMarkRegex = /【(\d+)†\((.+?)\)】/g;
+    return input.replace(footNoteMarkRegex, (match, citeIndex, _evidenceText) => {
+      var _a;
+      const citation = (_a = metadata == null ? void 0 : metadata.citations) == null ? void 0 : _a.find((cite) => {
+        var _a2, _b;
+        return ((_b = (_a2 = cite.metadata) == null ? void 0 : _a2.extra) == null ? void 0 : _b.cited_message_idx) === +citeIndex;
+      });
+      if (citation)
+        return "";
+      return match;
+    });
   };
   function conversationToHtml(conversation, avatar, metaList) {
     const {
@@ -19528,12 +19551,20 @@ ${content2.text}
       var _a;
       if (!message || !message.content)
         return null;
+      if (message.recipient !== "all")
+        return null;
+      if (message.author.role === "tool")
+        return null;
       const isUser = message.author.role === "user";
+      const isAssistant = message.author.role === "assistant";
       const author = transformAuthor$2(message.author);
       const model2 = ((_a = message == null ? void 0 : message.metadata) == null ? void 0 : _a.model_slug) === "gpt-4" ? "GPT-4" : "GPT-3";
       const authorType = isUser ? "user" : model2;
       const avatarEl = isUser ? `<img alt="${author}" />` : '<svg width="41" height="41"><use xlink:href="#chatgpt" /></svg>';
-      const content2 = transformContent$2(message.content, message.metadata);
+      let content2 = transformContent$2(message.content, message.metadata);
+      if (isAssistant) {
+        content2 = transformFootNotes$2(content2, message.metadata);
+      }
       let conversationContent = content2;
       if (isUser) {
         conversationContent = `<p>${escapeHtml(content2)}</p>`;
@@ -19864,7 +19895,7 @@ ${content2.text}
     }
   };
   const transformContent$1 = (content2, metadata) => {
-    var _a, _b;
+    var _a, _b, _c;
     switch (content2.content_type) {
       case "text":
         return ((_a = content2.parts) == null ? void 0 : _a.join("\n")) || "";
@@ -19894,9 +19925,43 @@ ${content2.text}
         }
         return "";
       }
+      case "multimodal_text": {
+        return ((_c = content2.parts) == null ? void 0 : _c.map((part) => {
+          if (typeof part === "string")
+            return part;
+          if (part.asset_pointer)
+            return `![image](${part.asset_pointer})`;
+          return "[Unsupported multimodal content]";
+        }).join("\n")) || "";
+      }
       default:
-        return "";
+        return "[Unsupported Content]";
     }
+  };
+  const transformFootNotes$1 = (input, metadata) => {
+    const footNoteMarkRegex = /【(\d+)†\((.+?)\)】/g;
+    const citationList = [];
+    const output2 = input.replace(footNoteMarkRegex, (match, citeIndex, _evidenceText) => {
+      var _a;
+      const citation = (_a = metadata == null ? void 0 : metadata.citations) == null ? void 0 : _a.find((cite) => {
+        var _a2, _b;
+        return ((_b = (_a2 = cite.metadata) == null ? void 0 : _a2.extra) == null ? void 0 : _b.cited_message_idx) === +citeIndex;
+      });
+      if (citation) {
+        citationList.push(citation);
+        return `[^${citeIndex}]`;
+      }
+      return match;
+    });
+    const citationText = citationList.map((citation) => {
+      var _a, _b, _c;
+      const citeIndex = ((_b = (_a = citation.metadata) == null ? void 0 : _a.extra) == null ? void 0 : _b.cited_message_idx) ?? 1;
+      const citeTitle = ((_c = citation.metadata) == null ? void 0 : _c.title) ?? "No title";
+      return `[^${citeIndex}]: ${citeTitle}`;
+    }).join("\n");
+    return `${output2}
+
+${citationText}`;
   };
   function conversationToMarkdown(conversation, metaList) {
     const {
@@ -19929,6 +19994,10 @@ ${_metaList.join("\n")}
     }) => {
       if (!message || !message.content)
         return null;
+      if (message.recipient !== "all")
+        return null;
+      if (message.author.role === "tool")
+        return null;
       const timestamp2 = (message == null ? void 0 : message.create_time) ?? "";
       const showTimestamp = enableTimestamp && timeStampHtml && timestamp2;
       let timestampHtml = "";
@@ -19946,6 +20015,9 @@ ${_metaList.join("\n")}
       const isUser = message.author.role === "user";
       const author = transformAuthor$1(message.author);
       let content22 = transformContent$1(message.content, message.metadata);
+      if (message.author.role === "assistant") {
+        content22 = transformFootNotes$1(content22, message.metadata);
+      }
       if (!isUser && content22) {
         const root2 = fromMarkdown(content22);
         content22 = toMarkdown(root2);
@@ -19983,7 +20055,7 @@ ${content2}`;
     }
   };
   const transformContent = (content2, metadata) => {
-    var _a, _b;
+    var _a, _b, _c;
     switch (content2.content_type) {
       case "text":
         return ((_a = content2.parts) == null ? void 0 : _a.join("\n")) || "";
@@ -20007,9 +20079,31 @@ ${content2}`;
         }
         return "";
       }
+      case "multimodal_text": {
+        return ((_c = content2.parts) == null ? void 0 : _c.map((part) => {
+          if (typeof part === "string")
+            return part;
+          if (part.asset_pointer)
+            return `![image](${part.asset_pointer})`;
+          return "[Unsupported multimodal content]";
+        }).join("\n")) || "";
+      }
       default:
-        return "";
+        return "[Unsupported Content]";
     }
+  };
+  const transformFootNotes = (input, metadata) => {
+    const footNoteMarkRegex = /【(\d+)†\((.+?)\)】/g;
+    return input.replace(footNoteMarkRegex, (match, citeIndex, _evidenceText) => {
+      var _a;
+      const citation = (_a = metadata == null ? void 0 : metadata.citations) == null ? void 0 : _a.find((cite) => {
+        var _a2, _b;
+        return ((_b = (_a2 = cite.metadata) == null ? void 0 : _a2.extra) == null ? void 0 : _b.cited_message_idx) === +citeIndex;
+      });
+      if (citation)
+        return "";
+      return match;
+    });
   };
   const reformatContent = (input) => {
     const root2 = fromMarkdown(input);
@@ -20038,8 +20132,15 @@ ${content2}`;
     }) => {
       if (!message || !message.content)
         return null;
+      if (message.recipient !== "all")
+        return null;
+      if (message.author.role === "tool")
+        return null;
       const author = transformAuthor(message.author);
       let content2 = transformContent(message.content, message.metadata);
+      if (message.author.role === "assistant") {
+        content2 = transformFootNotes(content2, message.metadata);
+      }
       if (message.author.role !== "user" && content2) {
         content2 = reformatContent(content2);
       }
