@@ -106,7 +106,11 @@ export async function exportToText() {
         if (!message || !message.content) return null
 
         if (message.recipient !== 'all') return null // ChatGPT is talking to tool
-        if (message.author.role === 'tool') return null // Skip tool's intermediate message
+        // Skip tool's intermediate message.
+        //
+        // HACK: we special case the content_type 'multimodal_text' here because it is used by
+        // the dall-e tool to return the image result, and we do want to show that.
+        if (message.author.role === 'tool' && message.content.content_type !== 'multimodal_text') return null
 
         const author = transformAuthor(message.author)
         let content = transformContent(message.content, message.metadata)
