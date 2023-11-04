@@ -67,15 +67,13 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
     )
 }
 
-interface ExportDialogProps {
-    format: string
-    open: boolean
-    onOpenChange: (value: boolean) => void
-}
-
 type ExportSource = 'API' | 'Local'
 
-export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange, children }) => {
+interface DialogContentProps {
+    format: string
+}
+
+const DialogContent: FC<DialogContentProps> = ({ format }) => {
     const { t } = useTranslation()
     const { enableMeta, exportMetaList, exportOfficialJsonFormat } = useSettingContext()
     const metaList = useMemo(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList])
@@ -217,6 +215,76 @@ export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange
             .finally(() => setLoading(false))
     }, [])
 
+    return (<>
+        <Dialog.Title className="DialogTitle">{t('Export Dialog Title')}</Dialog.Title>
+        <div className="flex items-center text-gray-600 dark:text-gray-300 flex justify-between border-b-[1px] pb-3 mb-3 dark:border-gray-700">
+            {t('Export from official export file')} {'(conversations.json)'}&nbsp;
+            {exportSource === 'API' && (
+                <button className="btn relative btn-neutral" onClick={() => fileInputRef.current?.click()}>
+                    <IconUpload className="w-4 h-4 text-white" />
+                </button>
+            )}
+        </div>
+        <input
+            type="file"
+            accept="application/json"
+            className="hidden"
+            ref={fileInputRef}
+            onChange={onUpload}
+        />
+        {exportSource === 'API' && (
+            <div className="flex items-center text-gray-600 dark:text-gray-300 flex justify-between mb-3">
+                {t('Export from API')}
+            </div>
+        )}
+        <ConversationSelect
+            conversations={conversations}
+            selected={selected}
+            setSelected={setSelected}
+            disabled={processing}
+            loading={loading}
+            error={error}
+        />
+        <div className="flex mt-6" style={{ justifyContent: 'space-between' }}>
+            <select className="Select" disabled={processing} value={exportType} onChange={e => setExportType(e.currentTarget.value)}>
+                {exportAllOptions.map(({ label }) => (
+                    <option key={t(label)} value={label}>{label}</option>
+                ))}
+            </select>
+            <div className="flex flex-grow"></div>
+            <button className="Button red" disabled={disabled || exportSource === 'Local'} onClick={deleteAll}>
+                {t('Delete')}
+            </button>
+            <button className="Button green ml-4" disabled={disabled} onClick={exportAll}>
+                {t('Export')}
+            </button>
+        </div>
+        {processing && (
+            <>
+                <div className="mt-2 mb-1 justify-between flex">
+                    <span className="truncate mr-8">{progress.currentName}</span>
+                    <span>{`${progress.completed}/${progress.total}`}</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
+                    <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${progress.completed / progress.total * 100}%` }} />
+                </div>
+            </>
+        )}
+        <Dialog.Close asChild>
+            <button className="IconButton CloseButton" aria-label="Close">
+                <IconCross />
+            </button>
+        </Dialog.Close>
+        </>)
+}
+
+interface ExportDialogProps {
+    format: string
+    open: boolean
+    onOpenChange: (value: boolean) => void
+}
+
+export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange, children }) => {
     return (
         <Dialog.Root
             open={open}
@@ -228,65 +296,7 @@ export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange
             <Dialog.Portal>
                 <Dialog.Overlay className="DialogOverlay" />
                 <Dialog.Content className="DialogContent">
-                    <Dialog.Title className="DialogTitle">{t('Export Dialog Title')}</Dialog.Title>
-                    <div className="flex items-center text-gray-600 dark:text-gray-300 flex justify-between border-b-[1px] pb-3 mb-3 dark:border-gray-700">
-                        {t('Export from official export file')} {'(conversations.json)'}&nbsp;
-                        {exportSource === 'API' && (
-                            <button className="btn relative btn-neutral" onClick={() => fileInputRef.current?.click()}>
-                                <IconUpload className="w-4 h-4 text-white" />
-                            </button>
-                        )}
-                    </div>
-                    <input
-                        type="file"
-                        accept="application/json"
-                        className="hidden"
-                        ref={fileInputRef}
-                        onChange={onUpload}
-                    />
-                    {exportSource === 'API' && (
-                        <div className="flex items-center text-gray-600 dark:text-gray-300 flex justify-between mb-3">
-                            {t('Export from API')}
-                        </div>
-                    )}
-                    <ConversationSelect
-                        conversations={conversations}
-                        selected={selected}
-                        setSelected={setSelected}
-                        disabled={processing}
-                        loading={loading}
-                        error={error}
-                    />
-                    <div className="flex mt-6" style={{ justifyContent: 'space-between' }}>
-                        <select className="Select" disabled={processing} value={exportType} onChange={e => setExportType(e.currentTarget.value)}>
-                            {exportAllOptions.map(({ label }) => (
-                                <option key={t(label)} value={label}>{label}</option>
-                            ))}
-                        </select>
-                        <div className="flex flex-grow"></div>
-                        <button className="Button red" disabled={disabled || exportSource === 'Local'} onClick={deleteAll}>
-                            {t('Delete')}
-                        </button>
-                        <button className="Button green ml-4" disabled={disabled} onClick={exportAll}>
-                            {t('Export')}
-                        </button>
-                    </div>
-                    {processing && (
-                        <>
-                            <div className="mt-2 mb-1 justify-between flex">
-                                <span className="truncate mr-8">{progress.currentName}</span>
-                                <span>{`${progress.completed}/${progress.total}`}</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
-                                <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${progress.completed / progress.total * 100}%` }} />
-                            </div>
-                        </>
-                    )}
-                    <Dialog.Close asChild>
-                        <button className="IconButton CloseButton" aria-label="Close">
-                            <IconCross />
-                        </button>
-                    </Dialog.Close>
+                    {open && <DialogContent format={format}/>}
                 </Dialog.Content>
             </Dialog.Portal>
         </Dialog.Root>
