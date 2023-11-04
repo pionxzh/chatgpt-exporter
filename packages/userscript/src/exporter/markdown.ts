@@ -83,36 +83,35 @@ const transformAuthor = (author: ConversationNodeMessage['author']): string => {
 const transformContent = (
     content: ConversationNodeMessage['content'],
     metadata: ConversationNodeMessage['metadata'],
+    postProcess: (input: string) => string = input => input,
 ) => {
     switch (content.content_type) {
         case 'text':
-            return content.parts?.join('\n') || ''
+            return postProcess(content.parts?.join('\n') || '')
         case 'code':
-            return `Code:\n\`\`\`\n${content.text}\n\`\`\`` || ''
+            return postProcess(`Code:\n\`\`\`\n${content.text}\n\`\`\`` || '')
         case 'execution_output':
-            return `Result:\n\`\`\`\n${content.text}\n\`\`\`` || ''
+            return postProcess(`Result:\n\`\`\`\n${content.text}\n\`\`\`` || '')
         case 'tether_quote':
-            return `> ${content.title || content.text || ''}`
+            return postProcess(`> ${content.title || content.text || ''}`)
         case 'tether_browsing_code':
-            return '' // TODO: implement
+            return postProcess('') // TODO: implement
         case 'tether_browsing_display': {
             const metadataList = metadata?._cite_metadata?.metadata_list
             if (Array.isArray(metadataList) && metadataList.length > 0) {
-                return metadataList.map(({ title, url }) => {
-                    return `> [${title}](${url})`
-                }).join('\n')
+                return postProcess(metadataList.map(({ title, url }) => `> [${title}](${url})`).join('\n'))
             }
-            return ''
+            return postProcess('')
         }
         case 'multimodal_text': {
             return content.parts?.map((part) => {
-                if (typeof part === 'string') return part
+                if (typeof part === 'string') return postProcess(part)
                 if (part.asset_pointer) return `![image](${part.asset_pointer})`
-                return '[Unsupported multimodal content]'
+                return postProcess('[Unsupported multimodal content]')
             }).join('\n') || ''
         }
         default:
-            return '[Unsupported Content]'
+            return postProcess('[Unsupported Content]')
     }
 }
 
@@ -193,16 +192,17 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
 
         const isUser = message.author.role === 'user'
         const author = transformAuthor(message.author)
-        let content = transformContent(message.content, message.metadata)
-        if (message.author.role === 'assistant') {
-            content = transformFootNotes(content, message.metadata)
-        }
 
-        // User's message will not be reformatted
-        if (!isUser && content) {
-            const root = fromMarkdown(content)
-            content = toMarkdown(root)
+        let postSteps: Array<(v: string) => string> = []
+        if (message.author.role === 'assistant') {
+            postSteps = [...postSteps, (input: string) => transformFootNotes(input, message.metadata)]
         }
+        if (!isUser) { // User's message will not be reformatted
+            postSteps = [...postSteps, (input: string) => toMarkdown(fromMarkdown(input))]
+        }
+        const postProcess = (input: string) => postSteps.reduce((acc, fn) => fn(acc), input)
+        const content = transformContent(message.content, message.metadata, postProcess)
+
         return `#### ${author}:\n${timestampHtml}${content}`
     }).filter(Boolean).join('\n\n')
 
