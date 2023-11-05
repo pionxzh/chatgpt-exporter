@@ -1,6 +1,7 @@
 import urlcat from 'urlcat'
 import { apiUrl, baseUrl } from './constants'
 import { getChatIdFromUrl, getConversationFromSharePage, isSharePage } from './page'
+import { blobToDataURL } from './utils/dom'
 
 interface ApiSession {
     accessToken: string
@@ -189,12 +190,7 @@ async function fetchImageFromPointer(uri: string) {
     const imageDetails = await fetchApi<ApiFileDownload>(fileDownloadApi(pointer))
     const image = await fetch(imageDetails.download_url)
     const blob = await image.blob()
-    const base64 = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader()
-        reader.onerror = reject
-        reader.onload = () => resolve(reader.result as string)
-        reader.readAsDataURL(blob)
-    })
+    const base64 = await blobToDataURL(blob)
     return base64.replace(/^data:.*?;/, `data:${image.headers.get('content-type')};`)
 }
 
