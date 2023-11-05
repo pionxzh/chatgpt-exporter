@@ -26,36 +26,35 @@ const transformAuthor = (author: ConversationNodeMessage['author']): string => {
 const transformContent = (
     content: ConversationNodeMessage['content'],
     metadata: ConversationNodeMessage['metadata'],
+    postProcess: (input: string) => string = input => input,
 ) => {
     switch (content.content_type) {
         case 'text':
-            return content.parts?.join('\n') || ''
+            return postProcess(content.parts?.join('\n') || '')
         case 'code':
-            return content.text || ''
+            return postProcess(content.text || '')
         case 'execution_output':
-            return content.text || ''
+            return postProcess(content.text || '')
         case 'tether_quote':
-            return `> ${content.title || content.text || ''}`
+            return postProcess(`> ${content.title || content.text || ''}`)
         case 'tether_browsing_code':
-            return '' // TODO: implement
+            return postProcess('') // TODO: implement
         case 'tether_browsing_display': {
             const metadataList = metadata?._cite_metadata?.metadata_list
             if (Array.isArray(metadataList) && metadataList.length > 0) {
-                return metadataList.map(({ title, url }) => {
-                    return `> [${title}](${url})`
-                }).join('\n')
+                return postProcess(metadataList.map(({ title, url }) => `> [${title}](${url})`).join('\n'))
             }
-            return ''
+            return postProcess('')
         }
         case 'multimodal_text': {
             return content.parts?.map((part) => {
-                if (typeof part === 'string') return part
+                if (typeof part === 'string') return postProcess(part)
                 if (part.asset_pointer) return `![image](${part.asset_pointer})`
-                return '[Unsupported multimodal content]'
+                return postProcess('[Unsupported multimodal content]')
             }).join('\n') || ''
         }
         default:
-            return '[Unsupported Content]'
+            return postProcess('[Unsupported Content]')
     }
 }
 
@@ -107,7 +106,11 @@ export async function exportToText() {
         if (!message || !message.content) return null
 
         if (message.recipient !== 'all') return null // ChatGPT is talking to tool
-        if (message.author.role === 'tool') return null // Skip tool's intermediate message
+        // Skip tool's intermediate message.
+        //
+        // HACK: we special case the content_type 'multimodal_text' here because it is used by
+        // the dall-e tool to return the image result, and we do want to show that.
+        if (message.author.role === 'tool' && message.content.content_type !== 'multimodal_text') return null
 
         const author = transformAuthor(message.author)
         let content = transformContent(message.content, message.metadata)

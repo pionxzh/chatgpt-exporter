@@ -60,6 +60,10 @@ interface MessageMeta {
 export type AuthorRole = 'system' | 'assistant' | 'user' | 'tool'
 
 interface MultiModalInputImage {
+    /**
+     * hack: this come from the api in the form of 'file-service://file-base64', but we replace it
+     * automatically in the api wrapper with a data uri
+     */
     asset_pointer: string
     content_type: 'image_asset_pointer' & (string & {})
     height: number
@@ -149,9 +153,20 @@ export interface ApiConversations {
     total: number
 }
 
+interface ApiFileDownload {
+    status: 'success'
+    /** signed download url */
+    download_url: string
+    metadata: {}
+    file_name: string
+    /** iso8601 datetime string */
+    creation_time: string
+}
+
 const sessionApi = urlcat(baseUrl, '/api/auth/session')
 const conversationApi = (id: string) => urlcat(apiUrl, '/conversation/:id', { id })
 const conversationsApi = (offset: number, limit: number) => urlcat(apiUrl, '/conversations', { offset, limit })
+const fileDownloadApi = (id: string) => urlcat(apiUrl, '/files/:id/download', { id })
 
 export async function getCurrentChatId(): Promise<string> {
     if (isSharePage()) {
@@ -169,22 +184,54 @@ export async function getCurrentChatId(): Promise<string> {
     throw new Error('No chat id found.')
 }
 
+async function fetchImageFromPointer(uri: string) {
+    const pointer = uri.replace('file-service://', '')
+    const imageDetails = await fetchApi<ApiFileDownload>(fileDownloadApi(pointer))
+    const image = await fetch(imageDetails.download_url)
+    const blob = await image.blob()
+    const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onerror = reject
+        reader.onload = () => resolve(reader.result as string)
+        reader.readAsDataURL(blob)
+    })
+    return base64.replace(/^data:.*?;/, `data:${image.headers.get('content-type')};`)
+}
+
+/** replaces `file-service://` pointers with data uris containing the image */
+async function enhanceImageAssets(conversation: ApiConversationWithId): Promise<ApiConversationWithId> {
+    const imageAssets = Object.values(conversation.mapping).flatMap((node) => {
+        if (!node.message) return []
+        if (node.message.content.content_type !== 'multimodal_text') return []
+        return node.message.content.parts.filter(
+            (part): part is MultiModalInputImage =>
+                typeof part !== 'string' && part.asset_pointer.startsWith('file-service://'),
+        )
+    })
+
+    await Promise.all(imageAssets.map(async (asset) => {
+        asset.asset_pointer = await fetchImageFromPointer(asset.asset_pointer)
+    }))
+
+    return conversation
+}
+
 export async function fetchConversation(chatId: string): Promise<ApiConversationWithId> {
     if (chatId.startsWith('__share__')) {
         const shareConversation = getConversationFromSharePage() as ApiConversation
         const id = chatId.replace('__share__', '')
-        return {
+        return enhanceImageAssets({
             id,
             ...shareConversation,
-        }
+        })
     }
 
     const url = conversationApi(chatId)
     const conversation = await fetchApi<ApiConversation>(url)
-    return {
+    return enhanceImageAssets({
         id: chatId,
         ...conversation,
-    }
+    })
 }
 
 async function fetchConversations(offset = 0, limit = 20): Promise<ApiConversations> {

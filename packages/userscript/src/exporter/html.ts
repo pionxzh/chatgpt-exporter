@@ -88,36 +88,37 @@ const transformAuthor = (author: ConversationNodeMessage['author']): string => {
 const transformContent = (
     content: ConversationNodeMessage['content'],
     metadata: ConversationNodeMessage['metadata'],
+    postProcess: (input: string) => string = input => input,
 ) => {
     switch (content.content_type) {
         case 'text':
-            return content.parts?.join('\n') || ''
+            return postProcess(content.parts?.join('\n') || '')
         case 'code':
-            return `Code:\n\`\`\`\n${content.text}\n\`\`\`` || ''
+            return postProcess(`Code:\n\`\`\`\n${content.text}\n\`\`\`` || '')
         case 'execution_output':
-            return `Result:\n\`\`\`\n${content.text}\n\`\`\`` || ''
+            return postProcess(`Result:\n\`\`\`\n${content.text}\n\`\`\`` || '')
         case 'tether_quote':
-            return `> ${content.title || content.text || ''}`
+            return postProcess(`> ${content.title || content.text || ''}`)
         case 'tether_browsing_code':
-            return '' // TODO: implement
+            return postProcess('') // TODO: implement
         case 'tether_browsing_display': {
             const metadataList = metadata?._cite_metadata?.metadata_list
             if (Array.isArray(metadataList) && metadataList.length > 0) {
-                return metadataList.map(({ title, url }) => {
+                return postProcess(metadataList.map(({ title, url }) => {
                     return `> [${title}](${url})`
-                }).join('\n')
+                }).join('\n'))
             }
-            return ''
+            return postProcess('')
         }
         case 'multimodal_text': {
             return content.parts?.map((part) => {
-                if (typeof part === 'string') return part
-                if (part.asset_pointer) return `![image](${part.asset_pointer})`
-                return '[Unsupported multimodal content]'
+                if (typeof part === 'string') return postProcess(part)
+                if (part.asset_pointer) return `<img src="${part.asset_pointer}" height="${part.height}" width="${part.width}" />`
+                return postProcess('[Unsupported multimodal content]')
             }).join('\n') || ''
         }
         default:
-            return '[Unsupported Content]'
+            return postProcess('[Unsupported Content]')
     }
 }
 
@@ -150,30 +151,31 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
         if (!message || !message.content) return null
 
         if (message.recipient !== 'all') return null // ChatGPT is talking to tool
-        if (message.author.role === 'tool') return null // Skip tool's intermediate message
+        // Skip tool's intermediate message.
+        //
+        // HACK: we special case the content_type 'multimodal_text' here because it is used by
+        // the dall-e tool to return the image result, and we do want to show that.
+        if (message.author.role === 'tool' && message.content.content_type !== 'multimodal_text') return null
 
-        const isUser = message.author.role === 'user'
-        const isAssistant = message.author.role === 'assistant'
         const author = transformAuthor(message.author)
         const model = message?.metadata?.model_slug === 'gpt-4' ? 'GPT-4' : 'GPT-3'
-        const authorType = isUser ? 'user' : model
-        const avatarEl = isUser
+        const authorType = message.author.role === 'user' ? 'user' : model
+        const avatarEl = message.author.role === 'user'
             ? `<img alt="${author}" />`
             : '<svg width="41" height="41"><use xlink:href="#chatgpt" /></svg>'
-        let content = transformContent(message.content, message.metadata)
-        if (isAssistant) {
-            content = transformFootNotes(content, message.metadata)
+
+        let postSteps: Array<(input: string) => string> = []
+        if (message.author.role === 'assistant') {
+            postSteps = [...postSteps, input => transformFootNotes(input, message.metadata)]
         }
-
-        let conversationContent = content
-
-        if (isUser) {
-            conversationContent = `<p>${escapeHtml(content)}</p>`
+        if (message.author.role === 'user') {
+            postSteps = [...postSteps, input => `<p>${escapeHtml(input)}</p>`]
         }
         else {
-            const root = fromMarkdown(content)
-            conversationContent = toHtml(root)
+            postSteps = [...postSteps, input => toHtml(fromMarkdown(input))]
         }
+        const postProcess = (input: string) => postSteps.reduce((acc, fn) => fn(acc), input)
+        const content = transformContent(message.content, message.metadata, postProcess)
 
         const timestamp = message?.create_time ?? ''
         const showTimestamp = enableTimestamp && timeStampHtml && timestamp
@@ -194,7 +196,7 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
     </div>
     <div class="conversation-content-wrapper">
         <div class="conversation-content">
-            ${conversationContent}
+            ${content}
         </div>
     </div>
     ${timestampHtml}
