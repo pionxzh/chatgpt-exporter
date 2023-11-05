@@ -198,7 +198,7 @@ async function fetchImageFromPointer(uri: string) {
     return base64.replace(/^data:.*?;/, `data:${image.headers.get('content-type')};`)
 }
 
-/** replaces file-service:// pointers with data uris containing the image */
+/** replaces `file-service://` pointers with data uris containing the image */
 async function enhanceImageAssets(conversation: ApiConversationWithId): Promise<ApiConversationWithId> {
     const imageAssets = Object.values(conversation.mapping).flatMap((node) => {
         if (!node.message) return []

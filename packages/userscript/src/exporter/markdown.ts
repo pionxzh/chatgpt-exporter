@@ -197,12 +197,12 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
         const isUser = message.author.role === 'user'
         const author = transformAuthor(message.author)
 
-        let postSteps: Array<(v: string) => string> = []
+        let postSteps: Array<(input: string) => string> = []
         if (message.author.role === 'assistant') {
-            postSteps = [...postSteps, (input: string) => transformFootNotes(input, message.metadata)]
+            postSteps = [...postSteps, input => transformFootNotes(input, message.metadata)]
         }
         if (!isUser) { // User's message will not be reformatted
-            postSteps = [...postSteps, (input: string) => toMarkdown(fromMarkdown(input))]
+            postSteps = [...postSteps, input => toMarkdown(fromMarkdown(input))]
         }
         const postProcess = (input: string) => postSteps.reduce((acc, fn) => fn(acc), input)
         const content = transformContent(message.content, message.metadata, postProcess)

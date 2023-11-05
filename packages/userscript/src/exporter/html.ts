@@ -164,15 +164,15 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
             ? `<img alt="${author}" />`
             : '<svg width="41" height="41"><use xlink:href="#chatgpt" /></svg>'
 
-        let postSteps: Array<(v: string) => string> = []
+        let postSteps: Array<(input: string) => string> = []
         if (message.author.role === 'assistant') {
-            postSteps = [...postSteps, (input: string) => transformFootNotes(input, message.metadata)]
+            postSteps = [...postSteps, input => transformFootNotes(input, message.metadata)]
         }
         if (message.author.role === 'user') {
-            postSteps = [...postSteps, (input: string) => `<p>${escapeHtml(input)}</p>`]
+            postSteps = [...postSteps, input => `<p>${escapeHtml(input)}</p>`]
         }
         else {
-            postSteps = [...postSteps, (input: string) => toHtml(fromMarkdown(input))]
+            postSteps = [...postSteps, input => toHtml(fromMarkdown(input))]
         }
         const postProcess = (input: string) => postSteps.reduce((acc, fn) => fn(acc), input)
         const content = transformContent(message.content, message.metadata, postProcess)
