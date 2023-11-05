@@ -64,88 +64,6 @@ export async function exportAllToMarkdown(fileNameFormat: string, apiConversatio
     return true
 }
 
-const transformAuthor = (author: ConversationNodeMessage['author']): string => {
-    switch (author.role) {
-        case 'assistant':
-            return 'ChatGPT'
-        case 'user':
-            return 'You'
-        case 'tool':
-            return `Plugin${author.name ? ` (${author.name})` : ''}`
-        default:
-            return author.role
-    }
-}
-
-/**
- * Convert the content based on the type of message
- */
-const transformContent = (
-    content: ConversationNodeMessage['content'],
-    metadata: ConversationNodeMessage['metadata'],
-    postProcess: (input: string) => string = input => input,
-) => {
-    switch (content.content_type) {
-        case 'text':
-            return postProcess(content.parts?.join('\n') || '')
-        case 'code':
-            return postProcess(`Code:\n\`\`\`\n${content.text}\n\`\`\`` || '')
-        case 'execution_output':
-            return postProcess(`Result:\n\`\`\`\n${content.text}\n\`\`\`` || '')
-        case 'tether_quote':
-            return postProcess(`> ${content.title || content.text || ''}`)
-        case 'tether_browsing_code':
-            return postProcess('') // TODO: implement
-        case 'tether_browsing_display': {
-            const metadataList = metadata?._cite_metadata?.metadata_list
-            if (Array.isArray(metadataList) && metadataList.length > 0) {
-                return postProcess(metadataList.map(({ title, url }) => `> [${title}](${url})`).join('\n'))
-            }
-            return postProcess('')
-        }
-        case 'multimodal_text': {
-            return content.parts?.map((part) => {
-                if (typeof part === 'string') return postProcess(part)
-                if (part.asset_pointer) return `![image](${part.asset_pointer})`
-                return postProcess('[Unsupported multimodal content]')
-            }).join('\n') || ''
-        }
-        default:
-            return postProcess('[Unsupported Content]')
-    }
-}
-
-/**
- * Transform foot notes in assistant's message
- */
-const transformFootNotes = (
-    input: string,
-    metadata: ConversationNodeMessage['metadata'],
-) => {
-    // 【11†(PrintWiki)】
-    const footNoteMarkRegex = /【(\d+)†\((.+?)\)】/g
-
-    const citationList: Citation[] = []
-    const output = input.replace(footNoteMarkRegex, (match, citeIndex, _evidenceText) => {
-        const citation = metadata?.citations?.find(cite => cite.metadata?.extra?.cited_message_idx === +citeIndex)
-        if (citation) {
-            citationList.push(citation)
-            // Use markdown caret to represent foot note ([^1])
-            return `[^${citeIndex}]`
-        }
-
-        return match
-    })
-    const citationText = citationList.map((citation) => {
-        const citeIndex = citation.metadata?.extra?.cited_message_idx ?? 1
-        const citeTitle = citation.metadata?.title ?? 'No title'
-        return `[^${citeIndex}]: ${citeTitle}`
-    }).join('\n')
-
-    // Foot notes are placed at the end of the conversation node, not the end of the whole document
-    return `${output}\n\n${citationText}`
-}
-
 function conversationToMarkdown(conversation: ConversationResult, metaList?: ExportMeta[]) {
     const { id, title, model, modelSlug, createTime, updateTime, conversationNodes } = conversation
     const source = `${baseUrl}/c/${id}`
@@ -177,7 +95,9 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
     const content = conversationNodes.map(({ message }) => {
         if (!message || !message.content) return null
 
-        if (message.recipient !== 'all') return null // ChatGPT is talking to tool
+        // ChatGPT is talking to tool
+        if (message.recipient !== 'all') return null
+
         // Skip tool's intermediate message.
         //
         // HACK: we special case the content_type 'multimodal_text' here because it is used by
@@ -213,4 +133,86 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
     const markdown = `${frontMatter}# ${title}\n\n${content}`
 
     return markdown
+}
+
+function transformAuthor(author: ConversationNodeMessage['author']): string {
+    switch (author.role) {
+        case 'assistant':
+            return 'ChatGPT'
+        case 'user':
+            return 'You'
+        case 'tool':
+            return `Plugin${author.name ? ` (${author.name})` : ''}`
+        default:
+            return author.role
+    }
+}
+
+/**
+ * Transform foot notes in assistant's message
+ */
+function transformFootNotes(
+    input: string,
+    metadata: ConversationNodeMessage['metadata'],
+) {
+    // 【11†(PrintWiki)】
+    const footNoteMarkRegex = /【(\d+)†\((.+?)\)】/g
+
+    const citationList: Citation[] = []
+    const output = input.replace(footNoteMarkRegex, (match, citeIndex, _evidenceText) => {
+        const citation = metadata?.citations?.find(cite => cite.metadata?.extra?.cited_message_idx === +citeIndex)
+        if (citation) {
+            citationList.push(citation)
+            // Use markdown caret to represent foot note ([^1])
+            return `[^${citeIndex}]`
+        }
+
+        return match
+    })
+    const citationText = citationList.map((citation) => {
+        const citeIndex = citation.metadata?.extra?.cited_message_idx ?? 1
+        const citeTitle = citation.metadata?.title ?? 'No title'
+        return `[^${citeIndex}]: ${citeTitle}`
+    }).join('\n')
+
+    // Foot notes are placed at the end of the conversation node, not the end of the whole document
+    return `${output}\n\n${citationText}`
+}
+
+/**
+ * Convert the content based on the type of message
+ */
+function transformContent(
+    content: ConversationNodeMessage['content'],
+    metadata: ConversationNodeMessage['metadata'],
+    postProcess: (input: string) => string = input => input,
+) {
+    switch (content.content_type) {
+        case 'text':
+            return postProcess(content.parts?.join('\n') || '')
+        case 'code':
+            return postProcess(`Code:\n\`\`\`\n${content.text}\n\`\`\`` || '')
+        case 'execution_output':
+            return postProcess(`Result:\n\`\`\`\n${content.text}\n\`\`\`` || '')
+        case 'tether_quote':
+            return postProcess(`> ${content.title || content.text || ''}`)
+        case 'tether_browsing_code':
+            return postProcess('') // TODO: implement
+        case 'tether_browsing_display': {
+            const metadataList = metadata?._cite_metadata?.metadata_list
+            if (Array.isArray(metadataList) && metadataList.length > 0) {
+                return postProcess(metadataList.map(({ title, url }) => `> [${title}](${url})`).join('\n'))
+            }
+            return postProcess('')
+        }
+        case 'multimodal_text': {
+            return content.parts?.map((part) => {
+                if (typeof part === 'string') return postProcess(part)
+                if (part.asset_pointer) return `![image](${part.asset_pointer})`
+                return postProcess('[Unsupported multimodal content]')
+            }).join('\n') || ''
+        }
+        default:
+            return postProcess('[Unsupported Content]')
+    }
 }

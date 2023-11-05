@@ -69,77 +69,6 @@ export async function exportAllToHtml(fileNameFormat: string, apiConversations: 
     return true
 }
 
-const transformAuthor = (author: ConversationNodeMessage['author']): string => {
-    switch (author.role) {
-        case 'assistant':
-            return 'ChatGPT'
-        case 'user':
-            return 'You'
-        case 'tool':
-            return `Plugin${author.name ? ` (${author.name})` : ''}`
-        default:
-            return author.role
-    }
-}
-
-/**
- * Convert the content based on the type of message
- */
-const transformContent = (
-    content: ConversationNodeMessage['content'],
-    metadata: ConversationNodeMessage['metadata'],
-    postProcess: (input: string) => string = input => input,
-) => {
-    switch (content.content_type) {
-        case 'text':
-            return postProcess(content.parts?.join('\n') || '')
-        case 'code':
-            return postProcess(`Code:\n\`\`\`\n${content.text}\n\`\`\`` || '')
-        case 'execution_output':
-            return postProcess(`Result:\n\`\`\`\n${content.text}\n\`\`\`` || '')
-        case 'tether_quote':
-            return postProcess(`> ${content.title || content.text || ''}`)
-        case 'tether_browsing_code':
-            return postProcess('') // TODO: implement
-        case 'tether_browsing_display': {
-            const metadataList = metadata?._cite_metadata?.metadata_list
-            if (Array.isArray(metadataList) && metadataList.length > 0) {
-                return postProcess(metadataList.map(({ title, url }) => {
-                    return `> [${title}](${url})`
-                }).join('\n'))
-            }
-            return postProcess('')
-        }
-        case 'multimodal_text': {
-            return content.parts?.map((part) => {
-                if (typeof part === 'string') return postProcess(part)
-                if (part.asset_pointer) return `<img src="${part.asset_pointer}" height="${part.height}" width="${part.width}" />`
-                return postProcess('[Unsupported multimodal content]')
-            }).join('\n') || ''
-        }
-        default:
-            return postProcess('[Unsupported Content]')
-    }
-}
-
-/**
- * Transform foot notes in assistant's message
- */
-const transformFootNotes = (
-    input: string,
-    metadata: ConversationNodeMessage['metadata'],
-) => {
-    // 【11†(PrintWiki)】
-    const footNoteMarkRegex = /【(\d+)†\((.+?)\)】/g
-    return input.replace(footNoteMarkRegex, (match, citeIndex, _evidenceText) => {
-        const citation = metadata?.citations?.find(cite => cite.metadata?.extra?.cited_message_idx === +citeIndex)
-        // We simply remove the foot note mark in html output
-        if (citation) return ''
-
-        return match
-    })
-}
-
 function conversationToHtml(conversation: ConversationResult, avatar: string, metaList?: ExportMeta[]) {
     const { id, title, model, modelSlug, createTime, updateTime, conversationNodes } = conversation
 
@@ -150,7 +79,9 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
     const conversationHtml = conversationNodes.map(({ message }) => {
         if (!message || !message.content) return null
 
-        if (message.recipient !== 'all') return null // ChatGPT is talking to tool
+        // ChatGPT is talking to tool
+        if (message.recipient !== 'all') return null
+
         // Skip tool's intermediate message.
         //
         // HACK: we special case the content_type 'multimodal_text' here because it is used by
@@ -245,6 +176,77 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
         .replaceAll('{{details}}', detailsHtml)
         .replaceAll('{{content}}', conversationHtml)
     return html
+}
+
+function transformAuthor(author: ConversationNodeMessage['author']): string {
+    switch (author.role) {
+        case 'assistant':
+            return 'ChatGPT'
+        case 'user':
+            return 'You'
+        case 'tool':
+            return `Plugin${author.name ? ` (${author.name})` : ''}`
+        default:
+            return author.role
+    }
+}
+
+/**
+ * Transform foot notes in assistant's message
+ */
+function transformFootNotes(
+    input: string,
+    metadata: ConversationNodeMessage['metadata'],
+) {
+    // 【11†(PrintWiki)】
+    const footNoteMarkRegex = /【(\d+)†\((.+?)\)】/g
+    return input.replace(footNoteMarkRegex, (match, citeIndex, _evidenceText) => {
+        const citation = metadata?.citations?.find(cite => cite.metadata?.extra?.cited_message_idx === +citeIndex)
+        // We simply remove the foot note mark in html output
+        if (citation) return ''
+
+        return match
+    })
+}
+
+/**
+ * Convert the content based on the type of message
+ */
+function transformContent(
+    content: ConversationNodeMessage['content'],
+    metadata: ConversationNodeMessage['metadata'],
+    postProcess: (input: string) => string = input => input,
+) {
+    switch (content.content_type) {
+        case 'text':
+            return postProcess(content.parts?.join('\n') || '')
+        case 'code':
+            return postProcess(`Code:\n\`\`\`\n${content.text}\n\`\`\`` || '')
+        case 'execution_output':
+            return postProcess(`Result:\n\`\`\`\n${content.text}\n\`\`\`` || '')
+        case 'tether_quote':
+            return postProcess(`> ${content.title || content.text || ''}`)
+        case 'tether_browsing_code':
+            return postProcess('') // TODO: implement
+        case 'tether_browsing_display': {
+            const metadataList = metadata?._cite_metadata?.metadata_list
+            if (Array.isArray(metadataList) && metadataList.length > 0) {
+                return postProcess(metadataList.map(({ title, url }) => {
+                    return `> [${title}](${url})`
+                }).join('\n'))
+            }
+            return postProcess('')
+        }
+        case 'multimodal_text': {
+            return content.parts?.map((part) => {
+                if (typeof part === 'string') return postProcess(part)
+                if (part.asset_pointer) return `<img src="${part.asset_pointer}" height="${part.height}" width="${part.width}" />`
+                return postProcess('[Unsupported multimodal content]')
+            }).join('\n') || ''
+        }
+        default:
+            return postProcess('[Unsupported Content]')
+    }
 }
 
 function escapeHtml(html: string) {
