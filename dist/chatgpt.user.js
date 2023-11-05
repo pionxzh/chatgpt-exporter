@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.15.0
+// @version            2.16.0
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -1062,6 +1062,14 @@ body[data-time-format="24"] span[data-time-format="24"] {
       img.onerror = reject;
     });
   }
+  function blobToDataURL(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = reject;
+      reader.onload = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+  }
   const historyDisabledKey = "oai/apps/historyDisabled";
   function getHistoryDisabled() {
     return localStorage.getItem(historyDisabledKey) === '"true"';
@@ -1129,6 +1137,9 @@ body[data-time-format="24"] span[data-time-format="24"] {
     offset,
     limit
   });
+  const fileDownloadApi = (id) => _default(apiUrl, "/files/:id/download", {
+    id
+  });
   async function getCurrentChatId() {
     if (isSharePage()) {
       return `__share__${getChatIdFromUrl()}`;
@@ -1142,10 +1153,34 @@ body[data-time-format="24"] span[data-time-format="24"] {
     }
     throw new Error("No chat id found.");
   }
+  async function fetchImageFromPointer(uri) {
+    const pointer = uri.replace("file-service://", "");
+    const imageDetails = await fetchApi(fileDownloadApi(pointer));
+    const image2 = await fetch(imageDetails.download_url);
+    const blob = await image2.blob();
+    const base64 = await blobToDataURL(blob);
+    return base64.replace(/^data:.*?;/, `data:${image2.headers.get("content-type")};`);
+  }
+  async function replaceImageAssets(conversation) {
+    const isMultiModalInputImage = (part) => {
+      return typeof part !== "string" && part.asset_pointer.startsWith("file-service://");
+    };
+    const imageAssets = Object.values(conversation.mapping).flatMap((node2) => {
+      if (!node2.message)
+        return [];
+      if (node2.message.content.content_type !== "multimodal_text")
+        return [];
+      return node2.message.content.parts.filter(isMultiModalInputImage);
+    });
+    await Promise.all(imageAssets.map(async (asset) => {
+      asset.asset_pointer = await fetchImageFromPointer(asset.asset_pointer);
+    }));
+  }
   async function fetchConversation(chatId) {
     if (chatId.startsWith("__share__")) {
-      const shareConversation = getConversationFromSharePage();
       const id = chatId.replace("__share__", "");
+      const shareConversation = getConversationFromSharePage();
+      await replaceImageAssets(shareConversation);
       return {
         id,
         ...shareConversation
@@ -1153,6 +1188,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
     }
     const url = conversationApi(chatId);
     const conversation = await fetchApi(url);
+    await replaceImageAssets(conversation);
     return {
       id: chatId,
       ...conversation
@@ -19463,75 +19499,6 @@ body[data-time-format="24"] span[data-time-format="24"] {
     downloadFile("chatgpt-export.zip", "application/zip", blob);
     return true;
   }
-  const transformAuthor$2 = (author) => {
-    switch (author.role) {
-      case "assistant":
-        return "ChatGPT";
-      case "user":
-        return "You";
-      case "tool":
-        return `Plugin${author.name ? ` (${author.name})` : ""}`;
-      default:
-        return author.role;
-    }
-  };
-  const transformContent$2 = (content2, metadata) => {
-    var _a, _b, _c;
-    switch (content2.content_type) {
-      case "text":
-        return ((_a = content2.parts) == null ? void 0 : _a.join("\n")) || "";
-      case "code":
-        return `Code:
-\`\`\`
-${content2.text}
-\`\`\`` || "";
-      case "execution_output":
-        return `Result:
-\`\`\`
-${content2.text}
-\`\`\`` || "";
-      case "tether_quote":
-        return `> ${content2.title || content2.text || ""}`;
-      case "tether_browsing_code":
-        return "";
-      case "tether_browsing_display": {
-        const metadataList = (_b = metadata == null ? void 0 : metadata._cite_metadata) == null ? void 0 : _b.metadata_list;
-        if (Array.isArray(metadataList) && metadataList.length > 0) {
-          return metadataList.map(({
-            title: title2,
-            url
-          }) => {
-            return `> [${title2}](${url})`;
-          }).join("\n");
-        }
-        return "";
-      }
-      case "multimodal_text": {
-        return ((_c = content2.parts) == null ? void 0 : _c.map((part) => {
-          if (typeof part === "string")
-            return part;
-          if (part.asset_pointer)
-            return `![image](${part.asset_pointer})`;
-          return "[Unsupported multimodal content]";
-        }).join("\n")) || "";
-      }
-      default:
-        return "[Unsupported Content]";
-    }
-  };
-  const transformFootNotes$2 = (input, metadata) => {
-    const footNoteMarkRegex = /【(\d+)†\((.+?)\)】/g;
-    return input.replace(footNoteMarkRegex, (match, citeIndex, _evidenceText) => {
-      var _a;
-      const citation = (_a = metadata == null ? void 0 : metadata.citations) == null ? void 0 : _a.find((cite) => {
-        var _a2, _b;
-        return ((_b = (_a2 = cite.metadata) == null ? void 0 : _a2.extra) == null ? void 0 : _b.cited_message_idx) === +citeIndex;
-      });
-      if (citation)
-        return "";
-      return match;
-    });
-  };
   function conversationToHtml(conversation, avatar, metaList) {
     const {
       id,
@@ -19553,25 +19520,23 @@ ${content2.text}
         return null;
       if (message.recipient !== "all")
         return null;
-      if (message.author.role === "tool")
+      if (message.author.role === "tool" && message.content.content_type !== "multimodal_text")
         return null;
-      const isUser = message.author.role === "user";
-      const isAssistant = message.author.role === "assistant";
       const author = transformAuthor$2(message.author);
       const model2 = ((_a = message == null ? void 0 : message.metadata) == null ? void 0 : _a.model_slug) === "gpt-4" ? "GPT-4" : "GPT-3";
-      const authorType = isUser ? "user" : model2;
-      const avatarEl = isUser ? `<img alt="${author}" />` : '<svg width="41" height="41"><use xlink:href="#chatgpt" /></svg>';
-      let content2 = transformContent$2(message.content, message.metadata);
-      if (isAssistant) {
-        content2 = transformFootNotes$2(content2, message.metadata);
+      const authorType = message.author.role === "user" ? "user" : model2;
+      const avatarEl = message.author.role === "user" ? `<img alt="${author}" />` : '<svg width="41" height="41"><use xlink:href="#chatgpt" /></svg>';
+      let postSteps = [];
+      if (message.author.role === "assistant") {
+        postSteps = [...postSteps, (input) => transformFootNotes$2(input, message.metadata)];
       }
-      let conversationContent = content2;
-      if (isUser) {
-        conversationContent = `<p>${escapeHtml(content2)}</p>`;
+      if (message.author.role === "user") {
+        postSteps = [...postSteps, (input) => `<p>${escapeHtml(input)}</p>`];
       } else {
-        const root2 = fromMarkdown(content2);
-        conversationContent = toHtml(root2);
+        postSteps = [...postSteps, (input) => toHtml(fromMarkdown(input))];
       }
+      const postProcess = (input) => postSteps.reduce((acc, fn2) => fn2(acc), input);
+      const content2 = transformContent$2(message.content, message.metadata, postProcess);
       const timestamp2 = (message == null ? void 0 : message.create_time) ?? "";
       const showTimestamp = enableTimestamp && timeStampHtml && timestamp2;
       let timestampHtml = "";
@@ -19592,7 +19557,7 @@ ${content2.text}
     </div>
     <div class="conversation-content-wrapper">
         <div class="conversation-content">
-            ${conversationContent}
+            ${content2}
         </div>
     </div>
     ${timestampHtml}
@@ -19618,6 +19583,75 @@ ${content2.text}
 </details>` : "";
     const html2 = templateHtml.replaceAll("{{title}}", title2).replaceAll("{{date}}", date).replaceAll("{{time}}", time).replaceAll("{{source}}", source).replaceAll("{{lang}}", lang).replaceAll("{{theme}}", theme).replaceAll("{{avatar}}", avatar).replaceAll("{{details}}", detailsHtml).replaceAll("{{content}}", conversationHtml);
     return html2;
+  }
+  function transformAuthor$2(author) {
+    switch (author.role) {
+      case "assistant":
+        return "ChatGPT";
+      case "user":
+        return "You";
+      case "tool":
+        return `Plugin${author.name ? ` (${author.name})` : ""}`;
+      default:
+        return author.role;
+    }
+  }
+  function transformFootNotes$2(input, metadata) {
+    const footNoteMarkRegex = /【(\d+)†\((.+?)\)】/g;
+    return input.replace(footNoteMarkRegex, (match, citeIndex, _evidenceText) => {
+      var _a;
+      const citation = (_a = metadata == null ? void 0 : metadata.citations) == null ? void 0 : _a.find((cite) => {
+        var _a2, _b;
+        return ((_b = (_a2 = cite.metadata) == null ? void 0 : _a2.extra) == null ? void 0 : _b.cited_message_idx) === +citeIndex;
+      });
+      if (citation)
+        return "";
+      return match;
+    });
+  }
+  function transformContent$2(content2, metadata, postProcess = (input) => input) {
+    var _a, _b, _c;
+    switch (content2.content_type) {
+      case "text":
+        return postProcess(((_a = content2.parts) == null ? void 0 : _a.join("\n")) || "");
+      case "code":
+        return postProcess(`Code:
+\`\`\`
+${content2.text}
+\`\`\`` || "");
+      case "execution_output":
+        return postProcess(`Result:
+\`\`\`
+${content2.text}
+\`\`\`` || "");
+      case "tether_quote":
+        return postProcess(`> ${content2.title || content2.text || ""}`);
+      case "tether_browsing_code":
+        return postProcess("");
+      case "tether_browsing_display": {
+        const metadataList = (_b = metadata == null ? void 0 : metadata._cite_metadata) == null ? void 0 : _b.metadata_list;
+        if (Array.isArray(metadataList) && metadataList.length > 0) {
+          return postProcess(metadataList.map(({
+            title: title2,
+            url
+          }) => {
+            return `> [${title2}](${url})`;
+          }).join("\n"));
+        }
+        return postProcess("");
+      }
+      case "multimodal_text": {
+        return ((_c = content2.parts) == null ? void 0 : _c.map((part) => {
+          if (typeof part === "string")
+            return postProcess(part);
+          if (part.asset_pointer)
+            return `<img src="${part.asset_pointer}" height="${part.height}" width="${part.width}" />`;
+          return postProcess("[Unsupported multimodal content]");
+        }).join("\n")) || "";
+      }
+      default:
+        return postProcess("[Unsupported Content]");
+    }
   }
   function escapeHtml(html2) {
     return html2.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
@@ -19882,87 +19916,6 @@ ${content2.text}
     downloadFile("chatgpt-export.zip", "application/zip", blob);
     return true;
   }
-  const transformAuthor$1 = (author) => {
-    switch (author.role) {
-      case "assistant":
-        return "ChatGPT";
-      case "user":
-        return "You";
-      case "tool":
-        return `Plugin${author.name ? ` (${author.name})` : ""}`;
-      default:
-        return author.role;
-    }
-  };
-  const transformContent$1 = (content2, metadata) => {
-    var _a, _b, _c;
-    switch (content2.content_type) {
-      case "text":
-        return ((_a = content2.parts) == null ? void 0 : _a.join("\n")) || "";
-      case "code":
-        return `Code:
-\`\`\`
-${content2.text}
-\`\`\`` || "";
-      case "execution_output":
-        return `Result:
-\`\`\`
-${content2.text}
-\`\`\`` || "";
-      case "tether_quote":
-        return `> ${content2.title || content2.text || ""}`;
-      case "tether_browsing_code":
-        return "";
-      case "tether_browsing_display": {
-        const metadataList = (_b = metadata == null ? void 0 : metadata._cite_metadata) == null ? void 0 : _b.metadata_list;
-        if (Array.isArray(metadataList) && metadataList.length > 0) {
-          return metadataList.map(({
-            title: title2,
-            url
-          }) => {
-            return `> [${title2}](${url})`;
-          }).join("\n");
-        }
-        return "";
-      }
-      case "multimodal_text": {
-        return ((_c = content2.parts) == null ? void 0 : _c.map((part) => {
-          if (typeof part === "string")
-            return part;
-          if (part.asset_pointer)
-            return `![image](${part.asset_pointer})`;
-          return "[Unsupported multimodal content]";
-        }).join("\n")) || "";
-      }
-      default:
-        return "[Unsupported Content]";
-    }
-  };
-  const transformFootNotes$1 = (input, metadata) => {
-    const footNoteMarkRegex = /【(\d+)†\((.+?)\)】/g;
-    const citationList = [];
-    const output2 = input.replace(footNoteMarkRegex, (match, citeIndex, _evidenceText) => {
-      var _a;
-      const citation = (_a = metadata == null ? void 0 : metadata.citations) == null ? void 0 : _a.find((cite) => {
-        var _a2, _b;
-        return ((_b = (_a2 = cite.metadata) == null ? void 0 : _a2.extra) == null ? void 0 : _b.cited_message_idx) === +citeIndex;
-      });
-      if (citation) {
-        citationList.push(citation);
-        return `[^${citeIndex}]`;
-      }
-      return match;
-    });
-    const citationText = citationList.map((citation) => {
-      var _a, _b, _c;
-      const citeIndex = ((_b = (_a = citation.metadata) == null ? void 0 : _a.extra) == null ? void 0 : _b.cited_message_idx) ?? 1;
-      const citeTitle = ((_c = citation.metadata) == null ? void 0 : _c.title) ?? "No title";
-      return `[^${citeIndex}]: ${citeTitle}`;
-    }).join("\n");
-    return `${output2}
-
-${citationText}`;
-  };
   function conversationToMarkdown(conversation, metaList) {
     const {
       id,
@@ -19996,7 +19949,7 @@ ${_metaList.join("\n")}
         return null;
       if (message.recipient !== "all")
         return null;
-      if (message.author.role === "tool")
+      if (message.author.role === "tool" && message.content.content_type !== "multimodal_text")
         return null;
       const timestamp2 = (message == null ? void 0 : message.create_time) ?? "";
       const showTimestamp = enableTimestamp && timeStampHtml && timestamp2;
@@ -20014,14 +19967,15 @@ ${_metaList.join("\n")}
       }
       const isUser = message.author.role === "user";
       const author = transformAuthor$1(message.author);
-      let content22 = transformContent$1(message.content, message.metadata);
+      let postSteps = [];
       if (message.author.role === "assistant") {
-        content22 = transformFootNotes$1(content22, message.metadata);
+        postSteps = [...postSteps, (input) => transformFootNotes$1(input, message.metadata)];
       }
-      if (!isUser && content22) {
-        const root2 = fromMarkdown(content22);
-        content22 = toMarkdown(root2);
+      if (!isUser) {
+        postSteps = [...postSteps, (input) => toMarkdown(fromMarkdown(input))];
       }
+      const postProcess = (input) => postSteps.reduce((acc, fn2) => fn2(acc), input);
+      const content22 = transformContent$1(message.content, message.metadata, postProcess);
       return `#### ${author}:
 ${timestampHtml}${content22}`;
     }).filter(Boolean).join("\n\n");
@@ -20029,6 +19983,85 @@ ${timestampHtml}${content22}`;
 
 ${content2}`;
     return markdown;
+  }
+  function transformAuthor$1(author) {
+    switch (author.role) {
+      case "assistant":
+        return "ChatGPT";
+      case "user":
+        return "You";
+      case "tool":
+        return `Plugin${author.name ? ` (${author.name})` : ""}`;
+      default:
+        return author.role;
+    }
+  }
+  function transformFootNotes$1(input, metadata) {
+    const footNoteMarkRegex = /【(\d+)†\((.+?)\)】/g;
+    const citationList = [];
+    const output2 = input.replace(footNoteMarkRegex, (match, citeIndex, _evidenceText) => {
+      var _a;
+      const citation = (_a = metadata == null ? void 0 : metadata.citations) == null ? void 0 : _a.find((cite) => {
+        var _a2, _b;
+        return ((_b = (_a2 = cite.metadata) == null ? void 0 : _a2.extra) == null ? void 0 : _b.cited_message_idx) === +citeIndex;
+      });
+      if (citation) {
+        citationList.push(citation);
+        return `[^${citeIndex}]`;
+      }
+      return match;
+    });
+    const citationText = citationList.map((citation) => {
+      var _a, _b, _c;
+      const citeIndex = ((_b = (_a = citation.metadata) == null ? void 0 : _a.extra) == null ? void 0 : _b.cited_message_idx) ?? 1;
+      const citeTitle = ((_c = citation.metadata) == null ? void 0 : _c.title) ?? "No title";
+      return `[^${citeIndex}]: ${citeTitle}`;
+    }).join("\n");
+    return `${output2}
+
+${citationText}`;
+  }
+  function transformContent$1(content2, metadata, postProcess = (input) => input) {
+    var _a, _b, _c;
+    switch (content2.content_type) {
+      case "text":
+        return postProcess(((_a = content2.parts) == null ? void 0 : _a.join("\n")) || "");
+      case "code":
+        return postProcess(`Code:
+\`\`\`
+${content2.text}
+\`\`\`` || "");
+      case "execution_output":
+        return postProcess(`Result:
+\`\`\`
+${content2.text}
+\`\`\`` || "");
+      case "tether_quote":
+        return postProcess(`> ${content2.title || content2.text || ""}`);
+      case "tether_browsing_code":
+        return postProcess("");
+      case "tether_browsing_display": {
+        const metadataList = (_b = metadata == null ? void 0 : metadata._cite_metadata) == null ? void 0 : _b.metadata_list;
+        if (Array.isArray(metadataList) && metadataList.length > 0) {
+          return postProcess(metadataList.map(({
+            title: title2,
+            url
+          }) => `> [${title2}](${url})`).join("\n"));
+        }
+        return postProcess("");
+      }
+      case "multimodal_text": {
+        return ((_c = content2.parts) == null ? void 0 : _c.map((part) => {
+          if (typeof part === "string")
+            return postProcess(part);
+          if (part.asset_pointer)
+            return `![image](${part.asset_pointer})`;
+          return postProcess("[Unsupported multimodal content]");
+        }).join("\n")) || "";
+      }
+      default:
+        return postProcess("[Unsupported Content]");
+    }
   }
   function copyToClipboard(text2) {
     try {
@@ -20042,80 +20075,6 @@ ${content2}`;
       document.body.removeChild(textarea);
     }
   }
-  const transformAuthor = (author) => {
-    switch (author.role) {
-      case "assistant":
-        return "ChatGPT";
-      case "user":
-        return "You";
-      case "tool":
-        return `Plugin${author.name ? ` (${author.name})` : ""}`;
-      default:
-        return author.role;
-    }
-  };
-  const transformContent = (content2, metadata) => {
-    var _a, _b, _c;
-    switch (content2.content_type) {
-      case "text":
-        return ((_a = content2.parts) == null ? void 0 : _a.join("\n")) || "";
-      case "code":
-        return content2.text || "";
-      case "execution_output":
-        return content2.text || "";
-      case "tether_quote":
-        return `> ${content2.title || content2.text || ""}`;
-      case "tether_browsing_code":
-        return "";
-      case "tether_browsing_display": {
-        const metadataList = (_b = metadata == null ? void 0 : metadata._cite_metadata) == null ? void 0 : _b.metadata_list;
-        if (Array.isArray(metadataList) && metadataList.length > 0) {
-          return metadataList.map(({
-            title: title2,
-            url
-          }) => {
-            return `> [${title2}](${url})`;
-          }).join("\n");
-        }
-        return "";
-      }
-      case "multimodal_text": {
-        return ((_c = content2.parts) == null ? void 0 : _c.map((part) => {
-          if (typeof part === "string")
-            return part;
-          if (part.asset_pointer)
-            return `![image](${part.asset_pointer})`;
-          return "[Unsupported multimodal content]";
-        }).join("\n")) || "";
-      }
-      default:
-        return "[Unsupported Content]";
-    }
-  };
-  const transformFootNotes = (input, metadata) => {
-    const footNoteMarkRegex = /【(\d+)†\((.+?)\)】/g;
-    return input.replace(footNoteMarkRegex, (match, citeIndex, _evidenceText) => {
-      var _a;
-      const citation = (_a = metadata == null ? void 0 : metadata.citations) == null ? void 0 : _a.find((cite) => {
-        var _a2, _b;
-        return ((_b = (_a2 = cite.metadata) == null ? void 0 : _a2.extra) == null ? void 0 : _b.cited_message_idx) === +citeIndex;
-      });
-      if (citation)
-        return "";
-      return match;
-    });
-  };
-  const reformatContent = (input) => {
-    const root2 = fromMarkdown(input);
-    flatMap(root2, (item) => {
-      if (item.type === "strong")
-        return item.children;
-      if (item.type === "emphasis")
-        return item.children;
-      return [item];
-    });
-    return toMarkdown(root2);
-  };
   async function exportToText() {
     if (!checkIfConversationStarted()) {
       alert(instance.t("Please start a conversation first"));
@@ -20129,26 +20088,99 @@ ${content2}`;
     } = processConversation(rawConversation, conversationChoices);
     const text2 = conversationNodes.map(({
       message
-    }) => {
-      if (!message || !message.content)
-        return null;
-      if (message.recipient !== "all")
-        return null;
-      if (message.author.role === "tool")
-        return null;
-      const author = transformAuthor(message.author);
-      let content2 = transformContent(message.content, message.metadata);
-      if (message.author.role === "assistant") {
-        content2 = transformFootNotes(content2, message.metadata);
-      }
-      if (message.author.role !== "user" && content2) {
-        content2 = reformatContent(content2);
-      }
-      return `${author}:
-${content2}`;
-    }).filter(Boolean).join("\n\n");
+    }) => transformMessage(message)).filter(Boolean).join("\n\n");
     copyToClipboard(standardizeLineBreaks(text2));
     return true;
+  }
+  function transformMessage(message) {
+    if (!message || !message.content)
+      return null;
+    if (message.recipient !== "all")
+      return null;
+    if (message.author.role === "tool" && message.content.content_type !== "multimodal_text")
+      return null;
+    const author = transformAuthor(message.author);
+    let content2 = transformContent(message.content, message.metadata);
+    if (message.author.role === "assistant") {
+      content2 = transformFootNotes(content2, message.metadata);
+    }
+    if (message.author.role !== "user" && content2) {
+      content2 = reformatContent(content2);
+    }
+    return `${author}:
+${content2}`;
+  }
+  function transformContent(content2, metadata, postProcess = (input) => input) {
+    var _a, _b, _c;
+    switch (content2.content_type) {
+      case "text":
+        return postProcess(((_a = content2.parts) == null ? void 0 : _a.join("\n")) || "");
+      case "code":
+        return postProcess(content2.text || "");
+      case "execution_output":
+        return postProcess(content2.text || "");
+      case "tether_quote":
+        return postProcess(`> ${content2.title || content2.text || ""}`);
+      case "tether_browsing_code":
+        return postProcess("");
+      case "tether_browsing_display": {
+        const metadataList = (_b = metadata == null ? void 0 : metadata._cite_metadata) == null ? void 0 : _b.metadata_list;
+        if (Array.isArray(metadataList) && metadataList.length > 0) {
+          return postProcess(metadataList.map(({
+            title: title2,
+            url
+          }) => `> [${title2}](${url})`).join("\n"));
+        }
+        return postProcess("");
+      }
+      case "multimodal_text": {
+        return ((_c = content2.parts) == null ? void 0 : _c.map((part) => {
+          if (typeof part === "string")
+            return postProcess(part);
+          if (part.asset_pointer)
+            return "[image]";
+          return postProcess("[Unsupported multimodal content]");
+        }).join("\n")) || "";
+      }
+      default:
+        return postProcess("[Unsupported Content]");
+    }
+  }
+  function reformatContent(input) {
+    const root2 = fromMarkdown(input);
+    flatMap(root2, (item) => {
+      if (item.type === "strong")
+        return item.children;
+      if (item.type === "emphasis")
+        return item.children;
+      return [item];
+    });
+    return toMarkdown(root2);
+  }
+  function transformAuthor(author) {
+    switch (author.role) {
+      case "assistant":
+        return "ChatGPT";
+      case "user":
+        return "You";
+      case "tool":
+        return `Plugin${author.name ? ` (${author.name})` : ""}`;
+      default:
+        return author.role;
+    }
+  }
+  function transformFootNotes(input, metadata) {
+    const footNoteMarkRegex = /【(\d+)†\((.+?)\)】/g;
+    return input.replace(footNoteMarkRegex, (match, citeIndex, _evidenceText) => {
+      var _a;
+      const citation = (_a = metadata == null ? void 0 : metadata.citations) == null ? void 0 : _a.find((cite) => {
+        var _a2, _b;
+        return ((_b = (_a2 = cite.metadata) == null ? void 0 : _a2.extra) == null ? void 0 : _b.cited_message_idx) === +citeIndex;
+      });
+      if (citation)
+        return "";
+      return match;
+    });
   }
   function useWindowResize(selector) {
     return En(subscribe$1, selector);
@@ -22068,11 +22100,8 @@ ${content2}`;
       })]
     });
   };
-  const ExportDialog = ({
-    format,
-    open,
-    onOpenChange,
-    children
+  const DialogContent = ({
+    format
   }) => {
     const {
       t: t2
@@ -22213,6 +22242,101 @@ ${content2}`;
       setLoading(true);
       fetchAllConversations().then(setApiConversations).catch(setError).finally(() => setLoading(false));
     }, []);
+    return o$5(k$3, {
+      children: [o$5($5d3850c4d0b4e6c7$export$f99233281efd08a0, {
+        className: "DialogTitle",
+        children: t2("Export Dialog Title")
+      }), o$5("div", {
+        className: "flex items-center text-gray-600 dark:text-gray-300 flex justify-between border-b-[1px] pb-3 mb-3 dark:border-gray-700",
+        children: [t2("Export from official export file"), " ", "(conversations.json)", " ", exportSource === "API" && o$5("button", {
+          className: "btn relative btn-neutral",
+          onClick: () => {
+            var _a;
+            return (_a = fileInputRef.current) == null ? void 0 : _a.click();
+          },
+          children: o$5(IconUpload, {
+            className: "w-4 h-4 text-white"
+          })
+        })]
+      }), o$5("input", {
+        type: "file",
+        accept: "application/json",
+        className: "hidden",
+        ref: fileInputRef,
+        onChange: onUpload
+      }), exportSource === "API" && o$5("div", {
+        className: "flex items-center text-gray-600 dark:text-gray-300 flex justify-between mb-3",
+        children: t2("Export from API")
+      }), o$5(ConversationSelect, {
+        conversations,
+        selected,
+        setSelected,
+        disabled: processing,
+        loading,
+        error: error2
+      }), o$5("div", {
+        className: "flex mt-6",
+        style: {
+          justifyContent: "space-between"
+        },
+        children: [o$5("select", {
+          className: "Select",
+          disabled: processing,
+          value: exportType,
+          onChange: (e2) => setExportType(e2.currentTarget.value),
+          children: exportAllOptions.map(({
+            label
+          }) => o$5("option", {
+            value: label,
+            children: label
+          }, t2(label)))
+        }), o$5("div", {
+          className: "flex flex-grow"
+        }), o$5("button", {
+          className: "Button red",
+          disabled: disabled || exportSource === "Local",
+          onClick: deleteAll,
+          children: t2("Delete")
+        }), o$5("button", {
+          className: "Button green ml-4",
+          disabled,
+          onClick: exportAll,
+          children: t2("Export")
+        })]
+      }), processing && o$5(k$3, {
+        children: [o$5("div", {
+          className: "mt-2 mb-1 justify-between flex",
+          children: [o$5("span", {
+            className: "truncate mr-8",
+            children: progress.currentName
+          }), o$5("span", {
+            children: `${progress.completed}/${progress.total}`
+          })]
+        }), o$5("div", {
+          className: "w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700",
+          children: o$5("div", {
+            className: "bg-blue-600 h-2.5 rounded-full",
+            style: {
+              width: `${progress.completed / progress.total * 100}%`
+            }
+          })
+        })]
+      }), o$5($5d3850c4d0b4e6c7$export$f39c2d165cd861fe, {
+        asChild: true,
+        children: o$5("button", {
+          className: "IconButton CloseButton",
+          "aria-label": "Close",
+          children: o$5(IconCross, {})
+        })
+      })]
+    });
+  };
+  const ExportDialog = ({
+    format,
+    open,
+    onOpenChange,
+    children
+  }) => {
     return o$5($5d3850c4d0b4e6c7$export$be92b6f5f03c0fe9, {
       open,
       onOpenChange,
@@ -22224,92 +22348,9 @@ ${content2}`;
           className: "DialogOverlay"
         }), o$5($5d3850c4d0b4e6c7$export$7c6e2c02157bb7d2, {
           className: "DialogContent",
-          children: [o$5($5d3850c4d0b4e6c7$export$f99233281efd08a0, {
-            className: "DialogTitle",
-            children: t2("Export Dialog Title")
-          }), o$5("div", {
-            className: "flex items-center text-gray-600 dark:text-gray-300 flex justify-between border-b-[1px] pb-3 mb-3 dark:border-gray-700",
-            children: [t2("Export from official export file"), " ", "(conversations.json)", " ", exportSource === "API" && o$5("button", {
-              className: "btn relative btn-neutral",
-              onClick: () => {
-                var _a;
-                return (_a = fileInputRef.current) == null ? void 0 : _a.click();
-              },
-              children: o$5(IconUpload, {
-                className: "w-4 h-4 text-white"
-              })
-            })]
-          }), o$5("input", {
-            type: "file",
-            accept: "application/json",
-            className: "hidden",
-            ref: fileInputRef,
-            onChange: onUpload
-          }), exportSource === "API" && o$5("div", {
-            className: "flex items-center text-gray-600 dark:text-gray-300 flex justify-between mb-3",
-            children: t2("Export from API")
-          }), o$5(ConversationSelect, {
-            conversations,
-            selected,
-            setSelected,
-            disabled: processing,
-            loading,
-            error: error2
-          }), o$5("div", {
-            className: "flex mt-6",
-            style: {
-              justifyContent: "space-between"
-            },
-            children: [o$5("select", {
-              className: "Select",
-              disabled: processing,
-              value: exportType,
-              onChange: (e2) => setExportType(e2.currentTarget.value),
-              children: exportAllOptions.map(({
-                label
-              }) => o$5("option", {
-                value: label,
-                children: label
-              }, t2(label)))
-            }), o$5("div", {
-              className: "flex flex-grow"
-            }), o$5("button", {
-              className: "Button red",
-              disabled: disabled || exportSource === "Local",
-              onClick: deleteAll,
-              children: t2("Delete")
-            }), o$5("button", {
-              className: "Button green ml-4",
-              disabled,
-              onClick: exportAll,
-              children: t2("Export")
-            })]
-          }), processing && o$5(k$3, {
-            children: [o$5("div", {
-              className: "mt-2 mb-1 justify-between flex",
-              children: [o$5("span", {
-                className: "truncate mr-8",
-                children: progress.currentName
-              }), o$5("span", {
-                children: `${progress.completed}/${progress.total}`
-              })]
-            }), o$5("div", {
-              className: "w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700",
-              children: o$5("div", {
-                className: "bg-blue-600 h-2.5 rounded-full",
-                style: {
-                  width: `${progress.completed / progress.total * 100}%`
-                }
-              })
-            })]
-          }), o$5($5d3850c4d0b4e6c7$export$f39c2d165cd861fe, {
-            asChild: true,
-            children: o$5("button", {
-              className: "IconButton CloseButton",
-              "aria-label": "Close",
-              children: o$5(IconCross, {})
-            })
-          })]
+          children: open && o$5(DialogContent, {
+            format
+          })
         })]
       })]
     });
