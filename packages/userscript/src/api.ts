@@ -61,7 +61,7 @@ export type AuthorRole = 'system' | 'assistant' | 'user' | 'tool'
 
 interface MultiModalInputImage {
     /**
-     * hack: this come from the api in the form of 'file-service://file-base64', but we replace it
+     * hack: this come from the api in the form of `file-service://file-base64`, but we replace it
      * automatically in the api wrapper with a data uri
      */
     asset_pointer: string
@@ -199,39 +199,42 @@ async function fetchImageFromPointer(uri: string) {
 }
 
 /** replaces `file-service://` pointers with data uris containing the image */
-async function enhanceImageAssets(conversation: ApiConversationWithId): Promise<ApiConversationWithId> {
+async function replaceImageAssets(conversation: ApiConversation): Promise<void> {
+    const isMultiModalInputImage = (part: string | MultiModalInputImage): part is MultiModalInputImage => {
+        return typeof part !== 'string' && part.asset_pointer.startsWith('file-service://')
+    }
     const imageAssets = Object.values(conversation.mapping).flatMap((node) => {
         if (!node.message) return []
         if (node.message.content.content_type !== 'multimodal_text') return []
-        return node.message.content.parts.filter(
-            (part): part is MultiModalInputImage =>
-                typeof part !== 'string' && part.asset_pointer.startsWith('file-service://'),
-        )
+
+        return node.message.content.parts.filter(isMultiModalInputImage)
     })
 
     await Promise.all(imageAssets.map(async (asset) => {
         asset.asset_pointer = await fetchImageFromPointer(asset.asset_pointer)
     }))
-
-    return conversation
 }
 
 export async function fetchConversation(chatId: string): Promise<ApiConversationWithId> {
     if (chatId.startsWith('__share__')) {
-        const shareConversation = getConversationFromSharePage() as ApiConversation
         const id = chatId.replace('__share__', '')
-        return enhanceImageAssets({
+        const shareConversation = getConversationFromSharePage() as ApiConversation
+        await replaceImageAssets(shareConversation)
+
+        return {
             id,
             ...shareConversation,
-        })
+        }
     }
 
     const url = conversationApi(chatId)
     const conversation = await fetchApi<ApiConversation>(url)
-    return enhanceImageAssets({
+    await replaceImageAssets(conversation)
+
+    return {
         id: chatId,
         ...conversation,
-    })
+    }
 }
 
 async function fetchConversations(offset = 0, limit = 20): Promise<ApiConversations> {
