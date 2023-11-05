@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.16.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.15.0...userscript-v2.16.0) (2023-11-05)
+
+
+### Features
+
+* support multi-modal ([#179](https://github.com/pionxzh/chatgpt-exporter/issues/179)) ([c5ed341](https://github.com/pionxzh/chatgpt-exporter/commit/c5ed3413d52a1122775fdc2fc872c719c651d2a2))
+
+
+### Bug Fixes
+
+* do not render export dialog until needed ([#178](https://github.com/pionxzh/chatgpt-exporter/issues/178)) ([1e7f0fa](https://github.com/pionxzh/chatgpt-exporter/commit/1e7f0fa0b56963272969a72904d2ce9760e785ef))
+* show `[image]` for multi-modal in text export ([ddfbee7](https://github.com/pionxzh/chatgpt-exporter/commit/ddfbee7ae632085f765e1bf8996136bd660132ed))
+
 ## [2.15.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.14.5...userscript-v2.15.0) (2023-10-16)
 
 
