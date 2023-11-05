@@ -81,7 +81,8 @@ function transformContent(
         case 'multimodal_text': {
             return content.parts?.map((part) => {
                 if (typeof part === 'string') return postProcess(part)
-                if (part.asset_pointer) return `![image](${part.asset_pointer})`
+                // We show `[image]` for multimodal as the base64 string is too long. This is bad for sharing pure text.
+                if (part.asset_pointer) return '[image]'
                 return postProcess('[Unsupported multimodal content]')
             }).join('\n') || ''
         }
