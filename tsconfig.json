@@ -6,11 +6,9 @@
     "moduleResolution": "Node",
     "strict": true,
     "outDir": "dist",
-    "sourceMap": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "esModuleInterop": true,
-    "composite": true,
     "noEmit": true,
     "noImplicitAny": true,
     "noUnusedLocals": true,
@@ -18,11 +16,19 @@
     "noImplicitReturns": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
-    "useDefineForClassFields": true
+    "useDefineForClassFields": true,
+    "types": ["vite/client"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact"
   },
+  "include": [
+    "src",
+    "src/locales/*.json",
+    "package.json",
+    "vite.config.ts"
+  ],
   "exclude": [
     "node_modules",
-    "**/dist",
-    "**/.turbo"
+    "**/dist"
   ]
 }

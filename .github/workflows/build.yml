@@ -26,19 +26,14 @@ jobs:
 
       - run: pnpm install
 
-      - name: Build
-        run: pnpm run build
-
       - name: Lint
         run: pnpm run lint
 
       - name: Test
         run: pnpm run test
 
-      - name: Release
-        run: |
-          pnpm run clean
-          pnpm run release:ci
+      - name: Build
+        run: pnpm run build
 
       - name: Git commit
         id: commit

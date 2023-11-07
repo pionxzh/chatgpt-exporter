@@ -8,8 +8,6 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-packages/**/dist
-shared/**/dist
 *.local
 .turbo
 
