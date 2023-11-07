@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.16.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.16.0...userscript-v2.16.1) (2023-11-07)
+
+
+### Bug Fixes
+
+* messages from tool shouldn't use conversation choice ([aff5ce1](https://github.com/pionxzh/chatgpt-exporter/commit/aff5ce18fe309e3eff2f0eb3ebdee1818745db79)), closes [#173](https://github.com/pionxzh/chatgpt-exporter/issues/173)
+
 ## [2.16.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.15.0...userscript-v2.16.0) (2023-11-05)
 
 
