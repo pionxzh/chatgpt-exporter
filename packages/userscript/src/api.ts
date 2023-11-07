@@ -396,7 +396,7 @@ export function processConversation(conversation: ApiConversationWithId, convers
             choice = conversationChoices[index] ?? _last
         }
         // Conversation choices will only applied to nodes with message
-        else if ('message' in node && node.message?.recipient === 'all') {
+        else if ('message' in node && node.message?.recipient === 'all' && node.message.author.role !== 'tool') {
             index++
             choice = conversationChoices[index] ?? _last
         }
