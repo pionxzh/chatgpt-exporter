@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.16.1
+// @version            2.17.0
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -13,6 +13,7 @@
 // @match              https://chat.openai.com/
 // @match              https://chat.openai.com/?model=*
 // @match              https://chat.openai.com/c/*
+// @match              https://chat.openai.com/g/*
 // @match              https://chat.openai.com/share/*
 // @match              https://chat.openai.com/share/*/continue
 // @match              https://chat.zhile.io/
@@ -22,6 +23,7 @@
 // @match              https://chat.zhile.io/share/*/continue
 // @require            https://cdn.jsdelivr.net/npm/jszip@3.9.1/dist/jszip.min.js
 // @require            https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js
+// @grant              GM_addStyle
 // @grant              GM_deleteValue
 // @grant              GM_getValue
 // @grant              GM_setValue
@@ -29,7 +31,7 @@
 // @run-at             document-end
 // ==/UserScript==
 
-(e=>{const n=document.createElement("style");n.dataset.source="vite-plugin-monkey",n.textContent=e,document.head.append(n)})(` .CheckBoxLabel {
+(n=>{if(typeof GM_addStyle=="function"){GM_addStyle(n);return}const e=document.createElement("style");e.textContent=n,document.head.append(e)})(` .CheckBoxLabel {
     position: relative;
     display: flex;
     font-size: 16px;
@@ -1082,7 +1084,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
     return user;
   }
   function getChatIdFromUrl() {
-    const match = location.pathname.match(/^\/(?:share|c)\/([a-z0-9-]+)/i);
+    const match = location.pathname.match(/^\/(?:share|c|g\/[a-z0-9-]+\/c)\/([a-z0-9-]+)/i);
     if (match)
       return match[1];
     return null;
@@ -7614,15 +7616,15 @@ body[data-time-format="24"] span[data-time-format="24"] {
     };
     return acc;
   }, {});
-  const standardizeLanguage = (language) => {
+  function standardizeLanguage(language) {
     if (language in LanguageMapping)
       return LanguageMapping[language];
     const shortLang = language.split("-")[0];
     if (shortLang in LanguageMapping)
       return LanguageMapping[shortLang];
     return language;
-  };
-  const getNavigatorLanguage = () => {
+  }
+  function getNavigatorLanguage() {
     const {
       language,
       languages
@@ -7633,8 +7635,8 @@ body[data-time-format="24"] span[data-time-format="24"] {
       return languages[0];
     }
     return null;
-  };
-  const getDefaultLanguage = () => {
+  }
+  function getDefaultLanguage() {
     const storedLanguage = ScriptStorage.get(KEY_LANGUAGE);
     if (storedLanguage)
       return standardizeLanguage(storedLanguage);
@@ -7642,7 +7644,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
     if (browserLanguage)
       return standardizeLanguage(browserLanguage);
     return EN_US.code;
-  };
+  }
   instance.use(initReactI18next).init({
     fallbackLng: EN_US.code,
     lng: getDefaultLanguage(),
@@ -8252,8 +8254,8 @@ body[data-time-format="24"] span[data-time-format="24"] {
     return sanitize(output2, "");
   };
   const sanitize$1 = /* @__PURE__ */ getDefaultExportFromCjs(sanitizeFilename);
-  const noop = () => {
-  };
+  function noop() {
+  }
   function onloadSafe(fn2) {
     if (document.readyState === "complete") {
       fn2();
@@ -21863,7 +21865,11 @@ ${content2}`;
     return o$5("svg", {
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: "0 0 24 24",
-      style: "width: 1em; height: 1em; display: inline-block",
+      style: {
+        width: "1em",
+        height: "1em",
+        display: "inline-block"
+      },
       fill: "currentColor",
       children: o$5("path", {
         d: "M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
@@ -21877,7 +21883,11 @@ ${content2}`;
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: "0 0 24 24",
       className,
-      style: "width: 1em; height: 1em; display: inline-block",
+      style: {
+        width: "1em",
+        height: "1em",
+        display: "inline-block"
+      },
       fill: "currentColor",
       children: o$5("path", {
         d: "M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
@@ -22153,7 +22163,6 @@ ${content2}`;
           alert(t2("Invalid File Format"));
           return;
         }
-        console.log(data);
         setSelected([]);
         setExportSource("Local");
         setLocalConversations(data);
@@ -22248,7 +22257,7 @@ ${content2}`;
         children: t2("Export Dialog Title")
       }), o$5("div", {
         className: "flex items-center text-gray-600 dark:text-gray-300 flex justify-between border-b-[1px] pb-3 mb-3 dark:border-gray-700",
-        children: [t2("Export from official export file"), " ", "(conversations.json)", " ", exportSource === "API" && o$5("button", {
+        children: [t2("Export from official export file"), " (conversations.json) ", exportSource === "API" && o$5("button", {
           className: "btn relative btn-neutral",
           onClick: () => {
             var _a;
@@ -22777,11 +22786,11 @@ ${content2}`;
     }, [u2, a2]), wn.createElement(wn.Fragment, null, l2 != null && o$12 && wn.createElement(c, { features: p.Hidden, ...R({ as: "input", type: "checkbox", hidden: true, readOnly: true, form: b2, checked: o$12, name: l2, value: T$12 }) }), X({ ourProps: R$12, theirProps: d2, slot: G2, defaultTag: ee, name: "Switch" }));
   }
   let ne = D(te), re = Z, Ge = Object.assign(ne, { Group: re, Label: M, Description: b });
-  const Toggle = ({
+  function Toggle({
     label,
     checked = true,
     onCheckedUpdate
-  }) => {
+  }) {
     return o$5("div", {
       className: "inline-flex items-center",
       children: [o$5(Ge, {
@@ -22798,21 +22807,24 @@ ${content2}`;
         children: label
       })]
     });
-  };
-  const Variable = ({
+  }
+  function Variable({
     name,
     title: title2
-  }) => o$5("strong", {
-    className: "cursor-help select-all whitespace-nowrap",
-    title: title2,
-    children: name
-  });
+  }) {
+    return o$5("strong", {
+      className: "cursor-help select-all whitespace-nowrap",
+      title: title2,
+      children: name
+    });
+  }
   const SettingDialog = ({
     open,
     onOpenChange,
     children
   }) => {
     const {
+      /* eslint-disable pionxzh/consistent-list-newline */
       format,
       setFormat,
       enableTimestamp,
@@ -22829,6 +22841,7 @@ ${content2}`;
       setEnableMeta,
       exportMetaList,
       setExportMetaList
+      /* eslint-enable pionxzh/consistent-list-newline */
     } = useSettingContext();
     const {
       t: t2,
