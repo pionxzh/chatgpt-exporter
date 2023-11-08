@@ -113,7 +113,7 @@ const resources = LOCALES.reduce<Record<string, { translation: Record<string, st
     return acc
 }, {})
 
-const standardizeLanguage = (language: string) => {
+function standardizeLanguage(language: string) {
     if (language in LanguageMapping) return LanguageMapping[language]
 
     const shortLang = language.split('-')[0]
@@ -122,7 +122,7 @@ const standardizeLanguage = (language: string) => {
     return language
 }
 
-const getNavigatorLanguage = () => {
+function getNavigatorLanguage() {
     const { language, languages } = navigator
     if (language) return language
 
@@ -133,7 +133,7 @@ const getNavigatorLanguage = () => {
     return null
 }
 
-const getDefaultLanguage = () => {
+function getDefaultLanguage() {
     const storedLanguage = ScriptStorage.get<string>(KEY_LANGUAGE)
     if (storedLanguage) return standardizeLanguage(storedLanguage)
 

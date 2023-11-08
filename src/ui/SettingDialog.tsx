@@ -12,9 +12,9 @@ import { useSettingContext } from './SettingContext'
 import { Toggle } from './Toggle'
 import type { FC } from '../type'
 
-const Variable = ({ name, title }: { name: string; title: string }) => (
-    <strong className="cursor-help select-all whitespace-nowrap" title={title}>{name}</strong>
-)
+function Variable({ name, title }: { name: string; title: string }) {
+    return <strong className="cursor-help select-all whitespace-nowrap" title={title}>{name}</strong>
+}
 
 interface SettingDialogProps {
     open: boolean
@@ -27,6 +27,7 @@ export const SettingDialog: FC<SettingDialogProps> = ({
     children,
 }) => {
     const {
+        /* eslint-disable pionxzh/consistent-list-newline */
         format, setFormat,
         enableTimestamp, setEnableTimestamp,
         timeStamp24H, setTimeStamp24H,
@@ -35,6 +36,7 @@ export const SettingDialog: FC<SettingDialogProps> = ({
         exportOfficialJsonFormat, setExportOfficialJsonFormat,
         enableMeta, setEnableMeta,
         exportMetaList, setExportMetaList,
+        /* eslint-enable pionxzh/consistent-list-newline */
     } = useSettingContext()
     const { t, i18n } = useTranslation()
     const _title = useTitle()
@@ -183,14 +185,15 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                                                 ,{' '}
                                                 <Variable name="{source}" title={source} />
                                                 ,{' '}
-                                                <Variable name="{model}" title={'ChatGPT-3.5'} />
+                                                <Variable name="{model}" title="ChatGPT-3.5" />
                                                 ,{' '}
-                                                <Variable name="{model_name}" title={'text-davinci-002-render-sha'} />
+                                                <Variable name="{model_name}" title="text-davinci-002-render-sha" />
                                                 ,{' '}
-                                                <Variable name="{create_time}" title={'2023-04-10T21:45:35.027Z'} />
+                                                <Variable name="{create_time}" title="2023-04-10T21:45:35.027Z" />
                                                 ,{' '}
-                                                <Variable name="{update_time}" title={'2023-04-10T21:45:35.027Z'} />
+                                                <Variable name="{update_time}" title="2023-04-10T21:45:35.027Z" />
                                             </p>
+                                            {/* eslint-disable-next-line pionxzh/consistent-list-newline */}
                                             {exportMetaList.map((meta, i) => (
                                                 <div className="flex items-center mt-2" key={i}>
                                                     <input

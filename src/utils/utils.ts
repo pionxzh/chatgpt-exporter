@@ -1,4 +1,4 @@
-export const noop = () => {}
+export function noop() {}
 
 export function onloadSafe(fn: () => void) {
     if (document.readyState === 'complete') {

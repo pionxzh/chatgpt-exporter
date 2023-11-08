@@ -19,7 +19,7 @@ declare global {
                         paid: unknown
                         public: unknown
                     }
-                    serviceStatus: {}
+                    serviceStatus: unknown
                     user: {
                         email: string
                         group: unknown[]

@@ -55,7 +55,7 @@
   "devDependencies": {
     "@commitlint/cli": "^18.2.0",
     "@commitlint/config-conventional": "^18.1.0",
-    "@pionxzh/eslint-config-react": "^0.7.0",
+    "@pionxzh/eslint-config": "^1.0.1",
     "@preact/preset-vite": "^2.6.0",
     "@types/mdast": "^3.0.12",
     "@types/node": "^20.5.1",

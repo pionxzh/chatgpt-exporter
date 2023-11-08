@@ -9,7 +9,7 @@ interface ToggleProps {
 /**
  * Mimics the style of OpenAI's toggle switches.
  */
-export const Toggle = ({ label, checked = true, onCheckedUpdate }: ToggleProps) => {
+export function Toggle({ label, checked = true, onCheckedUpdate }: ToggleProps) {
     return (
         <div className="inline-flex items-center">
             <Switch

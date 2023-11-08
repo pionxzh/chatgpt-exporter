@@ -117,7 +117,6 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                 alert(t('Invalid File Format'))
                 return
             }
-            console.log(data)
             setSelected([])
             setExportSource('Local')
             setLocalConversations(data)
@@ -219,7 +218,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
         <>
             <Dialog.Title className="DialogTitle">{t('Export Dialog Title')}</Dialog.Title>
             <div className="flex items-center text-gray-600 dark:text-gray-300 flex justify-between border-b-[1px] pb-3 mb-3 dark:border-gray-700">
-                {t('Export from official export file')} {'(conversations.json)'}&nbsp;
+                {t('Export from official export file')} (conversations.json)&nbsp;
                 {exportSource === 'API' && (
                     <button className="btn relative btn-neutral" onClick={() => fileInputRef.current?.click()}>
                         <IconUpload className="w-4 h-4 text-white" />

@@ -62,7 +62,7 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                 className="mt-1"
                 text="Chat History disabled"
                 icon={IconArrowRightFromBracket}
-                disabled={true}
+                disabled
             />
         )
     }

@@ -1,34 +1,30 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "ESNext",
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     "lib": ["ESNext", "DOM"],
+    "useDefineForClassFields": true,
+    "module": "ESNext",
     "moduleResolution": "Node",
-    "strict": true,
-    "outDir": "dist",
     "resolveJsonModule": true,
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "noEmit": true,
+    "types": ["vite/client"],
+    "strict": true,
+    "strictNullChecks": true,
     "noImplicitAny": true,
+    "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "skipLibCheck": true,
-    "strictNullChecks": true,
-    "useDefineForClassFields": true,
-    "types": ["vite/client"],
-    "jsx": "react-jsx",
-    "jsxImportSource": "preact"
+    "noEmit": true,
+    "outDir": "dist",
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "skipLibCheck": true
   },
   "include": [
     "src",
     "src/locales/*.json",
     "package.json",
     "vite.config.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "**/dist"
   ]
 }
