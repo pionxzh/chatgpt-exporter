@@ -53,7 +53,10 @@ function getUserProfile() {
 }
 
 export function getChatIdFromUrl() {
-    const match = location.pathname.match(/^\/(?:share|c)\/([a-z0-9-]+)/i)
+    // /share/1e5sf-asdf-1234
+    // /c/1e5sf-asdf-1234
+    // /g/1e5sf-asdf-1234/c/1e5sf-asdf-1234
+    const match = location.pathname.match(/^\/(?:share|c|g\/[a-z0-9-]+\/c)\/([a-z0-9-]+)/i)
     if (match) return match[1]
     return null
 }
