@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.17.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.16.1...userscript-v2.17.0) (2023-11-08)
+
+
+### Features
+
+* support running on gizmo page ([#182](https://github.com/pionxzh/chatgpt-exporter/issues/182)) ([d278210](https://github.com/pionxzh/chatgpt-exporter/commit/d27821027863f7efaf7ef1e4bb4e2f765d57252a))
+
+
+### Bug Fixes
+
+* support extract id from gizmo path ([0bf3115](https://github.com/pionxzh/chatgpt-exporter/commit/0bf3115948d85e2a639f269d6ca01b71c4fb853e))
+
 ## [2.16.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.16.0...userscript-v2.16.1) (2023-11-07)
 
 
