@@ -1,4 +1,9 @@
 {
   "pull-request-header": ":robot: I have created a release",
-  "pull-request-title-pattern": "chore: release${component} ${version}"
+  "pull-request-title-pattern": "chore: release${component} ${version}",
+  "packages": {
+    ".": {
+      "component": "userscript"
+    }
+  }
 }
