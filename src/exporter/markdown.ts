@@ -122,7 +122,19 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
             postSteps = [...postSteps, input => transformFootNotes(input, message.metadata)]
         }
         if (!isUser) { // User's message will not be reformatted
-            postSteps = [...postSteps, input => toMarkdown(fromMarkdown(input))]
+            postSteps = [...postSteps, (input) => {
+                // Skip code block as the following steps can potentially break the code
+                if (!(/```/.test(input))) {
+                    // Replace mathematical formula annotation
+                    input = input
+                        .replace(/^\\\[(.+)\\\]$/gm, '$$$$$1$$$$')
+                        .replace(/\\\[/g, '$')
+                        .replace(/\\\]/g, '$')
+                        .replace(/\\\(/g, '$')
+                        .replace(/\\\)/g, '$')
+                }
+                return toMarkdown(fromMarkdown(input))
+            }]
         }
         const postProcess = (input: string) => postSteps.reduce((acc, fn) => fn(acc), input)
         const content = transformContent(message.content, message.metadata, postProcess)
