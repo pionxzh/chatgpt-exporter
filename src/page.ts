@@ -76,11 +76,17 @@ export function getConversationFromSharePage() {
 }
 
 export const conversationChoiceSelector = '.flex.justify-center span.flex-grow'
+export const conversationChoiceSelectorGizmo = 'flex-grow flex-shrink-0 tabular-nums'
+
+export function isGizmoMode() {
+    return document.documentElement.classList.contains('gizmo')
+}
 
 export function getConversationChoice() {
     // parse x from `< x / y >` to get the index of the selected response
+    const selector = isGizmoMode() ? conversationChoiceSelectorGizmo : conversationChoiceSelector
     const conversationChoices: Array<number | null> = Array.from(document.querySelectorAll('main .group'))
-        .map(group => group.querySelector(conversationChoiceSelector))
+        .map(group => group.querySelector(selector))
         // non-existing element will produce null here, which will point to the last child
         // just in case the selector changed
         .map(span => Number.parseInt(span?.textContent?.trim().split(' / ')[0] ?? '0') - 1)
