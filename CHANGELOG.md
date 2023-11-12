@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.17.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.17.0...userscript-v2.17.1) (2023-11-12)
+
+
+### Bug Fixes
+
+* fix screenshot and conversation choice ([4bb56f8](https://github.com/pionxzh/chatgpt-exporter/commit/4bb56f8fc2adab3c62c6ef25a8022fc5cb0b76a4))
+* replace latex annotation `\[ \] \( \)` with $ for better compatibility ([6e72297](https://github.com/pionxzh/chatgpt-exporter/commit/6e72297a065722947eae2afd6635ac27a1c95abb)), closes [#187](https://github.com/pionxzh/chatgpt-exporter/issues/187)
+
 ## [2.17.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.16.1...userscript-v2.17.0) (2023-11-08)
 
 
