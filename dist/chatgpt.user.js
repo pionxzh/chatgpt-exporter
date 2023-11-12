@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.17.0
+// @version            2.17.1
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -1100,8 +1100,13 @@ body[data-time-format="24"] span[data-time-format="24"] {
     return null;
   }
   const conversationChoiceSelector = ".flex.justify-center span.flex-grow";
+  const conversationChoiceSelectorGizmo = "flex-grow flex-shrink-0 tabular-nums";
+  function isGizmoMode() {
+    return document.documentElement.classList.contains("gizmo");
+  }
   function getConversationChoice() {
-    const conversationChoices = Array.from(document.querySelectorAll("main .group")).map((group) => group.querySelector(conversationChoiceSelector)).map((span) => {
+    const selector = isGizmoMode() ? conversationChoiceSelectorGizmo : conversationChoiceSelector;
+    const conversationChoices = Array.from(document.querySelectorAll("main .group")).map((group) => group.querySelector(selector)).map((span) => {
       var _a;
       return Number.parseInt(((_a = span == null ? void 0 : span.textContent) == null ? void 0 : _a.trim().split(" / ")[0]) ?? "0") - 1;
     }).map((x2) => x2 === -1 ? null : x2);
@@ -19708,77 +19713,160 @@ ${content2.text}
       alert(instance.t("Please start a conversation first"));
       return false;
     }
-    const thread = (_a = document.querySelector("main .group")) == null ? void 0 : _a.parentElement;
-    if (!thread || thread.children.length === 0)
-      return false;
     const effect = new Effect();
-    const modelBar = thread.firstElementChild;
-    if ((_b = modelBar == null ? void 0 : modelBar.textContent) == null ? void 0 : _b.startsWith("Model:")) {
+    let thread = null;
+    const isGizmo = isGizmoMode();
+    if (isGizmo) {
+      thread = document.querySelector("main [class^='react-scroll-to-bottom'] > div > div");
+      if (!thread || thread.children.length === 0 || thread.scrollHeight < 50) {
+        alert(instance.t("Failed to export to PNG. Failed to find the element node."));
+        return false;
+      }
       effect.add(() => {
-        modelBar.classList.add("hidden");
-        return () => modelBar.classList.remove("hidden");
+        document.documentElement.classList.remove("gizmo");
+        return () => document.documentElement.classList.add("gizmo");
       });
-    }
-    effect.add(() => {
-      const bottomBar = thread.children[thread.children.length - 1];
-      bottomBar.classList.add("hidden");
-      return () => bottomBar.classList.remove("hidden");
-    });
-    const buttonWrappers = document.querySelectorAll("main .flex.justify-between");
-    buttonWrappers.forEach((wrapper) => {
-      if (!wrapper.querySelector("button"))
-        return;
-      if (wrapper.closest("pre"))
-        return;
       effect.add(() => {
-        wrapper.style.display = "none";
-        return () => wrapper.style.display = "";
+        document.documentElement.style.setProperty("font-size", "12px");
+        return () => document.documentElement.style.removeProperty("font-size");
       });
-    });
-    const conversationChoices = document.querySelectorAll(conversationChoiceSelector);
-    conversationChoices.forEach((choice) => {
       effect.add(() => {
-        const parent = choice.parentElement;
-        if (!parent)
-          return;
-        parent.classList.add("hidden");
-        return () => parent.classList.remove("hidden");
+        const style2 = document.createElement("style");
+        style2.textContent = `
+            pre {
+                margin-top: 8px !important;
+            }
+
+            pre > div > div > span {
+                margin-top: -12px;
+                padding-bottom: 2px;
+            }
+            `;
+        thread.appendChild(style2);
+        return () => style2.remove();
       });
-    });
-    const avatarEls = Array.from(document.querySelectorAll("img[alt]:not([aria-hidden])"));
-    avatarEls.forEach((el) => {
-      const srcset = el.getAttribute("srcset");
-      if (srcset) {
+      const conversationNodes = document.querySelectorAll('[data-testid^="conversation-turn-"]');
+      conversationNodes.forEach((node2) => {
         effect.add(() => {
-          el.setAttribute("data-srcset", srcset);
-          el.removeAttribute("srcset");
-          return () => {
-            el.setAttribute("srcset", srcset);
-            el.removeAttribute("data-srcset");
-          };
+          node2.style.height = `${node2.clientHeight}px`;
+          return () => node2.style.removeProperty("height");
+        });
+      });
+      const topHeader = thread.querySelector(".sticky.top-0");
+      if (topHeader) {
+        effect.add(() => {
+          topHeader.classList.add("hidden");
+          return () => topHeader.classList.remove("hidden");
         });
       }
-    });
-    const messageEls = Array.from(thread.querySelectorAll(".group .whitespace-pre-wrap"));
-    messageEls.forEach((el) => {
-      effect.add(() => {
-        el.classList.add("break-words");
-        return () => el.classList.remove("break-words");
+      const buttonWrappers = document.querySelectorAll("main .flex.justify-between");
+      buttonWrappers.forEach((wrapper) => {
+        if (!wrapper.querySelector("button"))
+          return;
+        if (wrapper.closest("pre"))
+          return;
+        effect.add(() => {
+          wrapper.style.display = "none";
+          return () => wrapper.style.display = "";
+        });
       });
-    });
+      const copyButtons = thread.querySelectorAll("pre button");
+      copyButtons.forEach((button) => {
+        effect.add(() => {
+          button.classList.add("hidden");
+          return () => button.classList.remove("hidden");
+        });
+      });
+      const backToTop = thread.querySelectorAll("button.absolute");
+      backToTop.forEach((button) => {
+        effect.add(() => {
+          button.classList.add("hidden");
+          return () => button.classList.remove("hidden");
+        });
+      });
+      const shadowStrokes = thread.querySelectorAll(".gizmo-shadow-stroke");
+      shadowStrokes.forEach((stroke) => {
+        effect.add(() => {
+          stroke.classList.remove("gizmo-shadow-stroke");
+          return () => stroke.classList.add("gizmo-shadow-stroke");
+        });
+      });
+    } else {
+      thread = ((_a = document.querySelector("main .group")) == null ? void 0 : _a.parentElement) ?? null;
+      if (!thread || thread.children.length === 0 || thread.scrollHeight < 50) {
+        alert(instance.t("Failed to export to PNG. Failed to find the element node."));
+        return false;
+      }
+      const threadEl2 = thread;
+      const modelBar = threadEl2.firstElementChild;
+      if ((_b = modelBar == null ? void 0 : modelBar.textContent) == null ? void 0 : _b.startsWith("Model:")) {
+        effect.add(() => {
+          modelBar.classList.add("hidden");
+          return () => modelBar.classList.remove("hidden");
+        });
+      }
+      effect.add(() => {
+        const bottomBar = threadEl2.children[threadEl2.children.length - 1];
+        bottomBar.classList.add("hidden");
+        return () => bottomBar.classList.remove("hidden");
+      });
+      const buttonWrappers = document.querySelectorAll("main .flex.justify-between");
+      buttonWrappers.forEach((wrapper) => {
+        if (!wrapper.querySelector("button"))
+          return;
+        if (wrapper.closest("pre"))
+          return;
+        effect.add(() => {
+          wrapper.style.display = "none";
+          return () => wrapper.style.display = "";
+        });
+      });
+      const conversationChoices = document.querySelectorAll(conversationChoiceSelector);
+      conversationChoices.forEach((choice) => {
+        effect.add(() => {
+          const parent = choice.parentElement;
+          if (!parent)
+            return;
+          parent.classList.add("hidden");
+          return () => parent.classList.remove("hidden");
+        });
+      });
+      const avatarEls = Array.from(document.querySelectorAll("img[alt]:not([aria-hidden])"));
+      avatarEls.forEach((el) => {
+        const srcset = el.getAttribute("srcset");
+        if (srcset) {
+          effect.add(() => {
+            el.setAttribute("data-srcset", srcset);
+            el.removeAttribute("srcset");
+            return () => {
+              el.setAttribute("srcset", srcset);
+              el.removeAttribute("data-srcset");
+            };
+          });
+        }
+      });
+      const messageEls = Array.from(threadEl2.querySelectorAll(".group .whitespace-pre-wrap"));
+      messageEls.forEach((el) => {
+        effect.add(() => {
+          el.classList.add("break-words");
+          return () => el.classList.remove("break-words");
+        });
+      });
+    }
+    const threadEl = thread;
     effect.run();
     await sleep(100);
     const passLimit = 5;
     const takeScreenshot = async (width, height, additionalScale = 1, currentPass = 1) => {
       const ratio = window.devicePixelRatio || 1;
-      const canvas = await html2canvas(thread, {
+      const canvas = await html2canvas(threadEl, {
         scale: ratio * 2 * additionalScale,
         // scale up to 2x to avoid blurry images
         useCORS: true,
         scrollX: -window.scrollX,
         scrollY: -window.scrollY,
-        windowWidth: thread.scrollWidth,
-        windowHeight: thread.scrollHeight,
+        windowWidth: threadEl.scrollWidth,
+        windowHeight: threadEl.scrollHeight,
         ignoreElements: fnIgnoreElements
       });
       const context = canvas.getContext("2d");
@@ -19793,11 +19881,11 @@ ${content2.text}
       return dataUrl2;
     };
     const dataUrl = await takeScreenshot(thread.scrollWidth, thread.scrollHeight);
+    effect.dispose();
     if (!dataUrl) {
       alert("Failed to export to PNG. This might be caused by the size of the conversation. Please try to export a smaller conversation.");
       return false;
     }
-    effect.dispose();
     const chatId = getChatIdFromUrl() || void 0;
     const fileName = getFileNameWithFormat(fileNameFormat, "png", {
       chatId
@@ -19974,7 +20062,12 @@ ${_metaList.join("\n")}
         postSteps = [...postSteps, (input) => transformFootNotes$1(input, message.metadata)];
       }
       if (!isUser) {
-        postSteps = [...postSteps, (input) => toMarkdown(fromMarkdown(input))];
+        postSteps = [...postSteps, (input) => {
+          if (!/```/.test(input)) {
+            input = input.replace(/^\\\[(.+)\\\]$/gm, "$$$$$1$$$$").replace(/\\\[/g, "$").replace(/\\\]/g, "$").replace(/\\\(/g, "$").replace(/\\\)/g, "$");
+          }
+          return toMarkdown(fromMarkdown(input));
+        }];
       }
       const postProcess = (input) => postSteps.reduce((acc, fn2) => fn2(acc), input);
       const content22 = transformContent$1(message.content, message.metadata, postProcess);
