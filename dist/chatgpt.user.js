@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.17.1
+// @version            2.17.2
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -1100,13 +1100,13 @@ body[data-time-format="24"] span[data-time-format="24"] {
     return null;
   }
   const conversationChoiceSelector = ".flex.justify-center span.flex-grow";
-  const conversationChoiceSelectorGizmo = "flex-grow flex-shrink-0 tabular-nums";
+  const conversationChoiceSelectorGizmo = ".flex-grow.flex-shrink-0.tabular-nums";
   function isGizmoMode() {
     return document.documentElement.classList.contains("gizmo");
   }
   function getConversationChoice() {
-    const selector = isGizmoMode() ? conversationChoiceSelectorGizmo : conversationChoiceSelector;
-    const conversationChoices = Array.from(document.querySelectorAll("main .group")).map((group) => group.querySelector(selector)).map((span) => {
+    const nodes = isGizmoMode() ? Array.from(document.querySelectorAll('[data-testid^="conversation-turn-"]')).map((turn) => turn.querySelector(conversationChoiceSelectorGizmo)) : Array.from(document.querySelectorAll("main .group")).map((group) => group.querySelector(conversationChoiceSelector));
+    const conversationChoices = nodes.map((span) => {
       var _a;
       return Number.parseInt(((_a = span == null ? void 0 : span.textContent) == null ? void 0 : _a.trim().split(" / ")[0]) ?? "0") - 1;
     }).map((x2) => x2 === -1 ? null : x2);
