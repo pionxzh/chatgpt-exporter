@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.17.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.17.1...userscript-v2.17.2) (2023-11-14)
+
+
+### Bug Fixes
+
+* fix conversation choice selector ([355e07d](https://github.com/pionxzh/chatgpt-exporter/commit/355e07d4efe8b7b3dc597ca1576d65874f7a8734))
+
 ## [2.17.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.17.0...userscript-v2.17.1) (2023-11-12)
 
 
