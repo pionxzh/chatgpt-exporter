@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.18.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.17.2...userscript-v2.18.0) (2023-11-22)
+
+
+### Features
+
+* support image in execution output ([38c65b9](https://github.com/pionxzh/chatgpt-exporter/commit/38c65b910db0ef8c38e1465df1e643cccbfad4bb)), closes [#191](https://github.com/pionxzh/chatgpt-exporter/issues/191)
+
+
+### Bug Fixes
+
+* should not output \[image] ([5478d65](https://github.com/pionxzh/chatgpt-exporter/commit/5478d6586cb143aa03548aedff375177ced614e7))
+
 ## [2.17.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.17.1...userscript-v2.17.2) (2023-11-14)
 
 
