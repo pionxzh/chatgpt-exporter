@@ -67,9 +67,18 @@ interface MultiModalInputImage {
      */
     asset_pointer: string
     content_type: 'image_asset_pointer' & (string & {})
+    fovea: number
     height: number
     size_bytes: number
     width: number
+    metadata?: {
+        dalle?: {
+            gen_id: string
+            prompt: string
+            seed: number
+            serialization_title: string
+        }
+    }
 }
 
 export interface ConversationNodeMessage {
@@ -112,7 +121,7 @@ export interface ConversationNodeMessage {
     end_turn: boolean
     id: string
     metadata?: MessageMeta
-    recipient: 'all' | 'browser' | 'dalle.text2im' & (string & {})
+    recipient: 'all' | 'browser' | 'python' | 'dalle.text2im' & (string & {})
     status: string
     weight: number
 }
@@ -222,7 +231,6 @@ async function replaceImageAssets(conversation: ApiConversation): Promise<void> 
         }
         catch (error) {
             console.error('Failed to fetch image asset', error)
-            // do nothing
         }
     }))
 }

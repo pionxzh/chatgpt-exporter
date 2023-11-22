@@ -101,7 +101,7 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
         // Skip tool's intermediate message.
         //
         // HACK: we special case the content_type 'multimodal_text' here because it is used by
-        // the dall-e tool to return the image result, and we do want to show that.
+        // the dalle tool to return the image result, and we do want to show that.
         if (message.author.role === 'tool' && message.content.content_type !== 'multimodal_text') return null
 
         const timestamp = message?.create_time ?? ''
