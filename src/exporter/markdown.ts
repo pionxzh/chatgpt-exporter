@@ -114,14 +114,14 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
             timestampHtml = `<time datetime="${date.toISOString()}" title="${date.toLocaleString()}">${conversationTime}</time>\n\n`
         }
 
-        const isUser = message.author.role === 'user'
         const author = transformAuthor(message.author)
 
         let postSteps: Array<(input: string) => string> = []
         if (message.author.role === 'assistant') {
             postSteps = [...postSteps, input => transformFootNotes(input, message.metadata)]
         }
-        if (!isUser) { // User's message will not be reformatted
+        // Only message from assistant will be reformatted
+        if (message.author.role === 'assistant') {
             postSteps = [...postSteps, (input) => {
                 // Skip code block as the following steps can potentially break the code
                 if (!(/```/.test(input))) {

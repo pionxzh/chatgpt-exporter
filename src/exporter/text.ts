@@ -45,8 +45,8 @@ function transformMessage(message?: ConversationNodeMessage) {
         content = transformFootNotes(content, message.metadata)
     }
 
-    // User's message will not be reformatted
-    if (message.author.role !== 'user' && content) {
+    // Only message from assistant will be reformatted
+    if (message.author.role === 'assistant' && content) {
         content = reformatContent(content)
     }
     return `${author}:\n${content}`
@@ -82,7 +82,7 @@ function transformContent(
             return content.parts?.map((part) => {
                 if (typeof part === 'string') return postProcess(part)
                 // We show `[image]` for multimodal as the base64 string is too long. This is bad for sharing pure text.
-                if (part.asset_pointer) return '[image]'
+                if (part.asset_pointer) return postProcess('[image]')
                 return postProcess('[Unsupported multimodal content]')
             }).join('\n') || ''
         }
