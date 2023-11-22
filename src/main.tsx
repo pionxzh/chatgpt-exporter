@@ -96,7 +96,7 @@ function main() {
             if (!currentChatId || currentChatId === chatId) return
             chatId = currentChatId
 
-            const rawConversation = await fetchConversation(chatId)
+            const rawConversation = await fetchConversation(chatId, false)
             const conversationChoices = getConversationChoice()
             const { conversationNodes } = processConversation(rawConversation, conversationChoices)
 

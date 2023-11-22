@@ -169,12 +169,12 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
         selected.forEach(({ id, title }) => {
             requestQueue.add({
                 name: title,
-                request: () => fetchConversation(id),
+                request: () => fetchConversation(id, exportType !== 'JSON'),
             })
         })
 
         requestQueue.start()
-    }, [disabled, selected, requestQueue])
+    }, [disabled, selected, requestQueue, exportType])
 
     const exportAllFromLocal = useCallback(() => {
         if (disabled) return

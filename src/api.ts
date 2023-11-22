@@ -46,8 +46,25 @@ interface CiteMetadata {
 }
 
 interface MessageMeta {
-    command: 'click' | 'search' | 'quote' | 'quote_lines' | 'scroll' & (string & {})
+    aggregate_result?: {
+        code: string
+        end_time: number
+        jupyter_messages: unknown[]
+        messages: Array<{
+            image_url: string
+            message_type: 'image'
+            sender: 'server'
+            time: number
+            width: number
+            height: number
+        }>
+        run_id: string
+        start_time: number
+        status: 'success' | 'error' & (string & {})
+        update_time: number
+    }
     args: unknown
+    command: 'click' | 'search' | 'quote' | 'quote_lines' | 'scroll' & (string & {})
     finish_details?: {
         stop: string
         type: 'stop' | 'interrupted' & (string & {})
@@ -224,18 +241,38 @@ async function replaceImageAssets(conversation: ApiConversation): Promise<void> 
         return node.message.content.parts.filter(isMultiModalInputImage)
     })
 
-    await Promise.all(imageAssets.map(async (asset) => {
-        try {
-            const newAssetPointer = await fetchImageFromPointer(asset.asset_pointer)
-            if (newAssetPointer) asset.asset_pointer = newAssetPointer
-        }
-        catch (error) {
-            console.error('Failed to fetch image asset', error)
-        }
-    }))
+    const executionOutputs = Object.values(conversation.mapping).flatMap((node) => {
+        if (!node.message) return []
+        if (node.message.content.content_type !== 'execution_output') return []
+        if (!node.message.metadata?.aggregate_result?.messages) return []
+
+        return node.message.metadata.aggregate_result.messages
+            .filter(msg => msg.message_type === 'image')
+    })
+
+    await Promise.all([
+        ...imageAssets.map(async (asset) => {
+            try {
+                const newAssetPointer = await fetchImageFromPointer(asset.asset_pointer)
+                if (newAssetPointer) asset.asset_pointer = newAssetPointer
+            }
+            catch (error) {
+                console.error('Failed to fetch image asset', error)
+            }
+        }),
+        ...executionOutputs.map(async (msg) => {
+            try {
+                const newImageUrl = await fetchImageFromPointer(msg.image_url)
+                if (newImageUrl) msg.image_url = newImageUrl
+            }
+            catch (error) {
+                console.error('Failed to fetch image asset', error)
+            }
+        }),
+    ])
 }
 
-export async function fetchConversation(chatId: string): Promise<ApiConversationWithId> {
+export async function fetchConversation(chatId: string, shouldReplaceAssets: boolean): Promise<ApiConversationWithId> {
     if (chatId.startsWith('__share__')) {
         const id = chatId.replace('__share__', '')
         const shareConversation = getConversationFromSharePage() as ApiConversation
@@ -249,7 +286,10 @@ export async function fetchConversation(chatId: string): Promise<ApiConversation
 
     const url = conversationApi(chatId)
     const conversation = await fetchApi<ApiConversation>(url)
-    await replaceImageAssets(conversation)
+
+    if (shouldReplaceAssets) {
+        await replaceImageAssets(conversation)
+    }
 
     return {
         id: chatId,

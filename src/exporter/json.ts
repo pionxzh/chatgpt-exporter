@@ -12,7 +12,7 @@ export async function exportToJson(fileNameFormat: string, options: { officialFo
     }
 
     const chatId = await getCurrentChatId()
-    const rawConversation = await fetchConversation(chatId)
+    const rawConversation = await fetchConversation(chatId, false)
     const conversationChoices = getConversationChoice()
     const conversation = processConversation(rawConversation, conversationChoices)
 

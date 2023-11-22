@@ -18,7 +18,7 @@ export async function exportToMarkdown(fileNameFormat: string, metaList: ExportM
     }
 
     const chatId = await getCurrentChatId()
-    const rawConversation = await fetchConversation(chatId)
+    const rawConversation = await fetchConversation(chatId, true)
     const conversationChoices = getConversationChoice()
     const conversation = processConversation(rawConversation, conversationChoices)
     const markdown = conversationToMarkdown(conversation, metaList)
@@ -99,10 +99,20 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
         if (message.recipient !== 'all') return null
 
         // Skip tool's intermediate message.
-        //
-        // HACK: we special case the content_type 'multimodal_text' here because it is used by
-        // the dalle tool to return the image result, and we do want to show that.
-        if (message.author.role === 'tool' && message.content.content_type !== 'multimodal_text') return null
+        if (message.author.role === 'tool') {
+            if (
+            // HACK: we special case the content_type 'multimodal_text' here because it is used by
+            // the dalle tool to return the image result, and we do want to show that.
+                message.content.content_type !== 'multimodal_text'
+            // Code execution result with image
+            && !(
+                message.content.content_type === 'execution_output'
+                && message.metadata?.aggregate_result?.messages?.some(msg => msg.message_type === 'image')
+            )
+            ) {
+                return null
+            }
+        }
 
         const timestamp = message?.create_time ?? ''
         const showTimestamp = enableTimestamp && timeStampHtml && timestamp
@@ -203,8 +213,14 @@ function transformContent(
         case 'text':
             return postProcess(content.parts?.join('\n') || '')
         case 'code':
-            return postProcess(`Code:\n\`\`\`\n${content.text}\n\`\`\`` || '')
+            return `Code:\n\`\`\`\n${content.text}\n\`\`\`` || ''
         case 'execution_output':
+            if (metadata?.aggregate_result?.messages) {
+                return metadata.aggregate_result.messages
+                    .filter(msg => msg.message_type === 'image')
+                    .map(msg => `![image](${msg.image_url})`)
+                    .join('\n')
+            }
             return postProcess(`Result:\n\`\`\`\n${content.text}\n\`\`\`` || '')
         case 'tether_quote':
             return postProcess(`> ${content.title || content.text || ''}`)

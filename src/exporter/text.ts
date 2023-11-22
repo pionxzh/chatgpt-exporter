@@ -14,7 +14,10 @@ export async function exportToText() {
     }
 
     const chatId = await getCurrentChatId()
-    const rawConversation = await fetchConversation(chatId)
+    // All image in text output will be replaced with `[image]`
+    // So we don't need to waste time to download them
+    const rawConversation = await fetchConversation(chatId, false)
+
     const conversationChoices = getConversationChoice()
     const { conversationNodes } = processConversation(rawConversation, conversationChoices)
     const text = conversationNodes
@@ -34,10 +37,20 @@ function transformMessage(message?: ConversationNodeMessage) {
     if (message.recipient !== 'all') return null
 
     // Skip tool's intermediate message.
-    //
-    // HACK: we special case the content_type 'multimodal_text' here because it is used by
-    // the dalle tool to return the image result, and we do want to show that.
-    if (message.author.role === 'tool' && message.content.content_type !== 'multimodal_text') return null
+    if (message.author.role === 'tool') {
+        if (
+            // HACK: we special case the content_type 'multimodal_text' here because it is used by
+            // the dalle tool to return the image result, and we do want to show that.
+            message.content.content_type !== 'multimodal_text'
+            // Code execution result with image
+            && !(
+                message.content.content_type === 'execution_output'
+                && message.metadata?.aggregate_result?.messages?.some(msg => msg.message_type === 'image')
+            )
+        ) {
+            return null
+        }
+    }
 
     const author = transformAuthor(message.author)
     let content = transformContent(message.content, message.metadata)
@@ -65,6 +78,12 @@ function transformContent(
         case 'code':
             return content.text || ''
         case 'execution_output':
+            if (metadata?.aggregate_result?.messages) {
+                return metadata.aggregate_result.messages
+                    .filter(msg => msg.message_type === 'image')
+                    .map(() => '[image]')
+                    .join('\n')
+            }
             return content.text || ''
         case 'tether_quote':
             return `> ${content.title || content.text || ''}`
