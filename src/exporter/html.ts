@@ -215,7 +215,7 @@ function transformFootNotes(
 function transformContent(
     content: ConversationNodeMessage['content'],
     metadata: ConversationNodeMessage['metadata'],
-    postProcess: (input: string) => string = input => input,
+    postProcess: (input: string) => string,
 ) {
     switch (content.content_type) {
         case 'text':

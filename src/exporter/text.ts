@@ -58,36 +58,35 @@ function transformMessage(message?: ConversationNodeMessage) {
 function transformContent(
     content: ConversationNodeMessage['content'],
     metadata: ConversationNodeMessage['metadata'],
-    postProcess: (input: string) => string = input => input,
 ) {
     switch (content.content_type) {
         case 'text':
-            return postProcess(content.parts?.join('\n') || '')
+            return content.parts?.join('\n') || ''
         case 'code':
-            return postProcess(content.text || '')
+            return content.text || ''
         case 'execution_output':
-            return postProcess(content.text || '')
+            return content.text || ''
         case 'tether_quote':
-            return postProcess(`> ${content.title || content.text || ''}`)
+            return `> ${content.title || content.text || ''}`
         case 'tether_browsing_code':
-            return postProcess('') // TODO: implement
+            return '' // TODO: implement
         case 'tether_browsing_display': {
             const metadataList = metadata?._cite_metadata?.metadata_list
             if (Array.isArray(metadataList) && metadataList.length > 0) {
-                return postProcess(metadataList.map(({ title, url }) => `> [${title}](${url})`).join('\n'))
+                return metadataList.map(({ title, url }) => `> [${title}](${url})`).join('\n')
             }
-            return postProcess('')
+            return ''
         }
         case 'multimodal_text': {
             return content.parts?.map((part) => {
-                if (typeof part === 'string') return postProcess(part)
+                if (typeof part === 'string') return part
                 // We show `[image]` for multimodal as the base64 string is too long. This is bad for sharing pure text.
-                if (part.asset_pointer) return postProcess('[image]')
-                return postProcess('[Unsupported multimodal content]')
+                if (part.asset_pointer) return '[image]'
+                return '[Unsupported multimodal content]'
             }).join('\n') || ''
         }
         default:
-            return postProcess('[Unsupported Content]')
+            return '[Unsupported Content]'
     }
 }
 
