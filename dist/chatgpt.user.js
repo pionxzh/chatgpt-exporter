@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.17.2
+// @version            2.18.0
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -1163,6 +1163,10 @@ body[data-time-format="24"] span[data-time-format="24"] {
   async function fetchImageFromPointer(uri) {
     const pointer = uri.replace("file-service://", "");
     const imageDetails = await fetchApi(fileDownloadApi(pointer));
+    if (imageDetails.status === "error") {
+      console.error("Failed to fetch image asset", imageDetails.error_code, imageDetails.error_message);
+      return null;
+    }
     const image2 = await fetch(imageDetails.download_url);
     const blob = await image2.blob();
     const base64 = await blobToDataURL(blob);
@@ -1179,11 +1183,35 @@ body[data-time-format="24"] span[data-time-format="24"] {
         return [];
       return node2.message.content.parts.filter(isMultiModalInputImage);
     });
-    await Promise.all(imageAssets.map(async (asset) => {
-      asset.asset_pointer = await fetchImageFromPointer(asset.asset_pointer);
-    }));
+    const executionOutputs = Object.values(conversation.mapping).flatMap((node2) => {
+      var _a, _b;
+      if (!node2.message)
+        return [];
+      if (node2.message.content.content_type !== "execution_output")
+        return [];
+      if (!((_b = (_a = node2.message.metadata) == null ? void 0 : _a.aggregate_result) == null ? void 0 : _b.messages))
+        return [];
+      return node2.message.metadata.aggregate_result.messages.filter((msg) => msg.message_type === "image");
+    });
+    await Promise.all([...imageAssets.map(async (asset) => {
+      try {
+        const newAssetPointer = await fetchImageFromPointer(asset.asset_pointer);
+        if (newAssetPointer)
+          asset.asset_pointer = newAssetPointer;
+      } catch (error2) {
+        console.error("Failed to fetch image asset", error2);
+      }
+    }), ...executionOutputs.map(async (msg) => {
+      try {
+        const newImageUrl = await fetchImageFromPointer(msg.image_url);
+        if (newImageUrl)
+          msg.image_url = newImageUrl;
+      } catch (error2) {
+        console.error("Failed to fetch image asset", error2);
+      }
+    })]);
   }
-  async function fetchConversation(chatId) {
+  async function fetchConversation(chatId, shouldReplaceAssets) {
     if (chatId.startsWith("__share__")) {
       const id = chatId.replace("__share__", "");
       const shareConversation = getConversationFromSharePage();
@@ -1195,7 +1223,9 @@ body[data-time-format="24"] span[data-time-format="24"] {
     }
     const url = conversationApi(chatId);
     const conversation = await fetchApi(url);
-    await replaceImageAssets(conversation);
+    if (shouldReplaceAssets) {
+      await replaceImageAssets(conversation);
+    }
     return {
       id: chatId,
       ...conversation
@@ -19461,7 +19491,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
     }
     const userAvatar = await getUserAvatar();
     const chatId = await getCurrentChatId();
-    const rawConversation = await fetchConversation(chatId);
+    const rawConversation = await fetchConversation(chatId, true);
     const conversationChoices = getConversationChoice();
     const conversation = processConversation(rawConversation, conversationChoices);
     const html2 = conversationToHtml(conversation, userAvatar, metaList);
@@ -19522,15 +19552,22 @@ body[data-time-format="24"] span[data-time-format="24"] {
     const conversationHtml = conversationNodes.map(({
       message
     }) => {
-      var _a;
+      var _a, _b, _c, _d;
       if (!message || !message.content)
         return null;
       if (message.recipient !== "all")
         return null;
-      if (message.author.role === "tool" && message.content.content_type !== "multimodal_text")
-        return null;
+      if (message.author.role === "tool") {
+        if (
+          // HACK: we special case the content_type 'multimodal_text' here because it is used by
+          // the dalle tool to return the image result, and we do want to show that.
+          message.content.content_type !== "multimodal_text" && !(message.content.content_type === "execution_output" && ((_c = (_b = (_a = message.metadata) == null ? void 0 : _a.aggregate_result) == null ? void 0 : _b.messages) == null ? void 0 : _c.some((msg) => msg.message_type === "image")))
+        ) {
+          return null;
+        }
+      }
       const author = transformAuthor$2(message.author);
-      const model2 = ((_a = message == null ? void 0 : message.metadata) == null ? void 0 : _a.model_slug) === "gpt-4" ? "GPT-4" : "GPT-3";
+      const model2 = ((_d = message == null ? void 0 : message.metadata) == null ? void 0 : _d.model_slug) === "gpt-4" ? "GPT-4" : "GPT-3";
       const authorType = message.author.role === "user" ? "user" : model2;
       const avatarEl = message.author.role === "user" ? `<img alt="${author}" />` : '<svg width="41" height="41"><use xlink:href="#chatgpt" /></svg>';
       let postSteps = [];
@@ -19616,17 +19653,20 @@ body[data-time-format="24"] span[data-time-format="24"] {
       return match;
     });
   }
-  function transformContent$2(content2, metadata, postProcess = (input) => input) {
-    var _a, _b, _c;
+  function transformContent$2(content2, metadata, postProcess) {
+    var _a, _b, _c, _d;
     switch (content2.content_type) {
       case "text":
         return postProcess(((_a = content2.parts) == null ? void 0 : _a.join("\n")) || "");
       case "code":
-        return postProcess(`Code:
+        return `Code:
 \`\`\`
 ${content2.text}
-\`\`\`` || "");
+\`\`\`` || "";
       case "execution_output":
+        if ((_b = metadata == null ? void 0 : metadata.aggregate_result) == null ? void 0 : _b.messages) {
+          return metadata.aggregate_result.messages.filter((msg) => msg.message_type === "image").map((msg) => `<img src="${msg.image_url}" height="${msg.height}" width="${msg.width}" />`).join("\n");
+        }
         return postProcess(`Result:
 \`\`\`
 ${content2.text}
@@ -19636,7 +19676,7 @@ ${content2.text}
       case "tether_browsing_code":
         return postProcess("");
       case "tether_browsing_display": {
-        const metadataList = (_b = metadata == null ? void 0 : metadata._cite_metadata) == null ? void 0 : _b.metadata_list;
+        const metadataList = (_c = metadata == null ? void 0 : metadata._cite_metadata) == null ? void 0 : _c.metadata_list;
         if (Array.isArray(metadataList) && metadataList.length > 0) {
           return postProcess(metadataList.map(({
             title: title2,
@@ -19648,7 +19688,7 @@ ${content2.text}
         return postProcess("");
       }
       case "multimodal_text": {
-        return ((_c = content2.parts) == null ? void 0 : _c.map((part) => {
+        return ((_d = content2.parts) == null ? void 0 : _d.map((part) => {
           if (typeof part === "string")
             return postProcess(part);
           if (part.asset_pointer)
@@ -19900,7 +19940,7 @@ ${content2.text}
       return false;
     }
     const chatId = await getCurrentChatId();
-    const rawConversation = await fetchConversation(chatId);
+    const rawConversation = await fetchConversation(chatId, false);
     const conversationChoices = getConversationChoice();
     const conversation = processConversation(rawConversation, conversationChoices);
     const fileName = getFileNameWithFormat(fileNameFormat, "json", {
@@ -19962,7 +20002,7 @@ ${content2.text}
       return false;
     }
     const chatId = await getCurrentChatId();
-    const rawConversation = await fetchConversation(chatId);
+    const rawConversation = await fetchConversation(chatId, true);
     const conversationChoices = getConversationChoice();
     const conversation = processConversation(rawConversation, conversationChoices);
     const markdown = conversationToMarkdown(conversation, metaList);
@@ -20035,12 +20075,20 @@ ${_metaList.join("\n")}
     const content2 = conversationNodes.map(({
       message
     }) => {
+      var _a, _b, _c;
       if (!message || !message.content)
         return null;
       if (message.recipient !== "all")
         return null;
-      if (message.author.role === "tool" && message.content.content_type !== "multimodal_text")
-        return null;
+      if (message.author.role === "tool") {
+        if (
+          // HACK: we special case the content_type 'multimodal_text' here because it is used by
+          // the dalle tool to return the image result, and we do want to show that.
+          message.content.content_type !== "multimodal_text" && !(message.content.content_type === "execution_output" && ((_c = (_b = (_a = message.metadata) == null ? void 0 : _a.aggregate_result) == null ? void 0 : _b.messages) == null ? void 0 : _c.some((msg) => msg.message_type === "image")))
+        ) {
+          return null;
+        }
+      }
       const timestamp2 = (message == null ? void 0 : message.create_time) ?? "";
       const showTimestamp = enableTimestamp && timeStampHtml && timestamp2;
       let timestampHtml = "";
@@ -20055,13 +20103,12 @@ ${_metaList.join("\n")}
 
 `;
       }
-      const isUser = message.author.role === "user";
       const author = transformAuthor$1(message.author);
       let postSteps = [];
       if (message.author.role === "assistant") {
         postSteps = [...postSteps, (input) => transformFootNotes$1(input, message.metadata)];
       }
-      if (!isUser) {
+      if (message.author.role === "assistant") {
         postSteps = [...postSteps, (input) => {
           if (!/```/.test(input)) {
             input = input.replace(/^\\\[(.+)\\\]$/gm, "$$$$$1$$$$").replace(/\\\[/g, "$").replace(/\\\]/g, "$").replace(/\\\(/g, "$").replace(/\\\)/g, "$");
@@ -20116,17 +20163,20 @@ ${content2}`;
 
 ${citationText}`;
   }
-  function transformContent$1(content2, metadata, postProcess = (input) => input) {
-    var _a, _b, _c;
+  function transformContent$1(content2, metadata, postProcess) {
+    var _a, _b, _c, _d;
     switch (content2.content_type) {
       case "text":
         return postProcess(((_a = content2.parts) == null ? void 0 : _a.join("\n")) || "");
       case "code":
-        return postProcess(`Code:
+        return `Code:
 \`\`\`
 ${content2.text}
-\`\`\`` || "");
+\`\`\`` || "";
       case "execution_output":
+        if ((_b = metadata == null ? void 0 : metadata.aggregate_result) == null ? void 0 : _b.messages) {
+          return metadata.aggregate_result.messages.filter((msg) => msg.message_type === "image").map((msg) => `![image](${msg.image_url})`).join("\n");
+        }
         return postProcess(`Result:
 \`\`\`
 ${content2.text}
@@ -20136,7 +20186,7 @@ ${content2.text}
       case "tether_browsing_code":
         return postProcess("");
       case "tether_browsing_display": {
-        const metadataList = (_b = metadata == null ? void 0 : metadata._cite_metadata) == null ? void 0 : _b.metadata_list;
+        const metadataList = (_c = metadata == null ? void 0 : metadata._cite_metadata) == null ? void 0 : _c.metadata_list;
         if (Array.isArray(metadataList) && metadataList.length > 0) {
           return postProcess(metadataList.map(({
             title: title2,
@@ -20146,7 +20196,7 @@ ${content2.text}
         return postProcess("");
       }
       case "multimodal_text": {
-        return ((_c = content2.parts) == null ? void 0 : _c.map((part) => {
+        return ((_d = content2.parts) == null ? void 0 : _d.map((part) => {
           if (typeof part === "string")
             return postProcess(part);
           if (part.asset_pointer)
@@ -20176,7 +20226,7 @@ ${content2.text}
       return false;
     }
     const chatId = await getCurrentChatId();
-    const rawConversation = await fetchConversation(chatId);
+    const rawConversation = await fetchConversation(chatId, false);
     const conversationChoices = getConversationChoice();
     const {
       conversationNodes
@@ -20188,57 +20238,68 @@ ${content2.text}
     return true;
   }
   function transformMessage(message) {
+    var _a, _b, _c;
     if (!message || !message.content)
       return null;
     if (message.recipient !== "all")
       return null;
-    if (message.author.role === "tool" && message.content.content_type !== "multimodal_text")
-      return null;
+    if (message.author.role === "tool") {
+      if (
+        // HACK: we special case the content_type 'multimodal_text' here because it is used by
+        // the dalle tool to return the image result, and we do want to show that.
+        message.content.content_type !== "multimodal_text" && !(message.content.content_type === "execution_output" && ((_c = (_b = (_a = message.metadata) == null ? void 0 : _a.aggregate_result) == null ? void 0 : _b.messages) == null ? void 0 : _c.some((msg) => msg.message_type === "image")))
+      ) {
+        return null;
+      }
+    }
     const author = transformAuthor(message.author);
     let content2 = transformContent(message.content, message.metadata);
     if (message.author.role === "assistant") {
       content2 = transformFootNotes(content2, message.metadata);
     }
-    if (message.author.role !== "user" && content2) {
+    if (message.author.role === "assistant" && content2) {
       content2 = reformatContent(content2);
     }
     return `${author}:
 ${content2}`;
   }
-  function transformContent(content2, metadata, postProcess = (input) => input) {
-    var _a, _b, _c;
+  function transformContent(content2, metadata) {
+    var _a, _b, _c, _d;
     switch (content2.content_type) {
       case "text":
-        return postProcess(((_a = content2.parts) == null ? void 0 : _a.join("\n")) || "");
+        return ((_a = content2.parts) == null ? void 0 : _a.join("\n")) || "";
       case "code":
-        return postProcess(content2.text || "");
+        return content2.text || "";
       case "execution_output":
-        return postProcess(content2.text || "");
+        if ((_b = metadata == null ? void 0 : metadata.aggregate_result) == null ? void 0 : _b.messages) {
+          return metadata.aggregate_result.messages.filter((msg) => msg.message_type === "image").map(() => "[image]").join("\n");
+        }
+        return content2.text || "";
       case "tether_quote":
-        return postProcess(`> ${content2.title || content2.text || ""}`);
+        return `> ${content2.title || content2.text || ""}`;
       case "tether_browsing_code":
-        return postProcess("");
+        return "";
       case "tether_browsing_display": {
-        const metadataList = (_b = metadata == null ? void 0 : metadata._cite_metadata) == null ? void 0 : _b.metadata_list;
+        const metadataList = (_c = metadata == null ? void 0 : metadata._cite_metadata) == null ? void 0 : _c.metadata_list;
         if (Array.isArray(metadataList) && metadataList.length > 0) {
-          return postProcess(metadataList.map(({
+          return metadataList.map(({
             title: title2,
             url
-          }) => `> [${title2}](${url})`).join("\n"));
+          }) => `> [${title2}](${url})`).join("\n");
         }
-        return postProcess("");
+        return "";
       }
       case "multimodal_text": {
-        return ((_c = content2.parts) == null ? void 0 : _c.map((part) => {
+        return ((_d = content2.parts) == null ? void 0 : _d.map((part) => {
           if (typeof part === "string")
-            return postProcess(part);
+            return part;
           if (part.asset_pointer)
             return "[image]";
-          return postProcess("[Unsupported multimodal content]");
+          return "[Unsupported multimodal content]";
         }).join("\n")) || "";
       }
       default:
-        return postProcess("[Unsupported Content]");
+        return "[Unsupported Content]";
     }
   }
   function reformatContent(input) {
@@ -22305,11 +22366,11 @@ ${content2}`;
       }) => {
         requestQueue.add({
           name: title2,
-          request: () => fetchConversation(id)
+          request: () => fetchConversation(id, exportType !== "JSON")
         });
       });
       requestQueue.start();
-    }, [disabled, selected, requestQueue]);
+    }, [disabled, selected, requestQueue, exportType]);
     const exportAllFromLocal = T$4(() => {
       var _a;
       if (disabled)
@@ -23427,7 +23488,7 @@ ${content2}`;
         if (!currentChatId || currentChatId === chatId)
           return;
         chatId = currentChatId;
-        const rawConversation = await fetchConversation(chatId);
+        const rawConversation = await fetchConversation(chatId, false);
         const conversationChoices = getConversationChoice();
         const {
           conversationNodes
