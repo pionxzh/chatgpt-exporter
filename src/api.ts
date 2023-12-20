@@ -399,7 +399,7 @@ export function processConversation(conversation: ApiConversationWithId, _conver
 
     let result: ConversationNode[] = []
 
-    const bottomMostNodeId = findBottomMostNode(conversation.mapping)
+    const bottomMostNodeId = conversation.current_node
     if (bottomMostNodeId) {
         result = extractConversationResult(conversation.mapping, bottomMostNodeId)
     }
@@ -413,30 +413,6 @@ export function processConversation(conversation: ApiConversationWithId, _conver
         updateTime,
         conversationNodes: result,
     }
-}
-
-function findBottomMostNode(conversationData: Record<string, ConversationNode>): string | null {
-    if (typeof conversationData !== 'object') {
-        throw new TypeError('Conversation data must be a dictionary.')
-    }
-
-    try {
-        const keys = Object.keys(conversationData).reverse()
-        for (const nodeId of keys) {
-            const node = conversationData[nodeId]
-            if (typeof node !== 'object') {
-                throw new TypeError(`Node ${nodeId} is not a dictionary.`)
-            }
-            if (!node.children || node.children.length === 0) {
-                return nodeId
-            }
-        }
-    }
-    catch (e) {
-        console.error(`Error finding bottom-most node: ${e}`)
-    }
-
-    return null
 }
 
 function extractConversationResult(conversationData: Record<string, ConversationNode>, startNodeId: string): ConversationNode[] {
