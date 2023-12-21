@@ -61,32 +61,6 @@ function main() {
             })
         }
 
-        // dirty fix for unstable image url from unsplash
-        const imageMap = new Map<string, string>()
-
-        sentinel.on('img', (img: HTMLImageElement) => {
-            const src = img.src
-            if (src.startsWith('https://source.unsplash.com/')) {
-                if (imageMap.has(src)) {
-                    img.src = imageMap.get(src)!
-                    return
-                }
-
-                const xhr = new XMLHttpRequest()
-                xhr.open('HEAD', src, true)
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === 4 && xhr.status === 200) {
-                        const finalUrl = xhr.responseURL
-                        img.src = finalUrl
-                        // @ts-expect-error private field
-                        img.originalSrc = src
-                        imageMap.set(src, finalUrl)
-                    }
-                }
-                xhr.send()
-            }
-        })
-
         /** Insert timestamp to the bottom right of each message */
         let chatId = ''
         sentinel.on('main .group', async () => {

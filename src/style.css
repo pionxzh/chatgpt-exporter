@@ -1,12 +1,3 @@
-img[src*="https://source.unsplash.com/"] {
-    visibility: hidden;
-}
-
-/* hide the flickering */
-p > img[src*="https://images.unsplash.com/"] {
-    animation: fadeIn .3s;
-}
-
 span[data-time-format] {
     display: none;
 }
