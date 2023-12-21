@@ -424,6 +424,9 @@ function extractConversationResult(conversationData: Record<string, Conversation
         if (!node) {
             break// Node not found
         }
+        if (node.message?.author.role === 'system') {
+            break// Stop at system message
+        }
 
         result.push(node)
 
