@@ -1,9 +1,9 @@
 {
   "eslint.experimental.useFlatConfig": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll": false,
-    "source.fixAll.eslint": true, // this allows ESLint to auto fix on save
-    "source.organizeImports": false
+    "source.fixAll": "never",
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "never"
   },
   "editor.formatOnSave": false,
   "eslint.validate": [
