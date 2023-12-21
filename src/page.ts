@@ -75,23 +75,15 @@ export function getConversationFromSharePage() {
     return null
 }
 
-export const conversationChoiceSelector = '.flex.justify-center span.flex-grow'
-export const conversationChoiceSelectorGizmo = '.flex-grow.flex-shrink-0.tabular-nums'
-
-export function isGizmoMode() {
-    return document.documentElement.classList.contains('gizmo')
-}
+const conversationChoiceSelector = '.flex-grow.flex-shrink-0.tabular-nums'
 
 export function getConversationChoice() {
     // parse x from `< x / y >` to get the index of the selected response
-    const nodes = isGizmoMode()
-        ? Array.from(document.querySelectorAll('[data-testid^="conversation-turn-"]'))
-            .map(turn => turn.querySelector(conversationChoiceSelectorGizmo))
-        : Array.from(document.querySelectorAll('main .group'))
-            .map(group => group.querySelector(conversationChoiceSelector))
+    const nodes = Array.from(document.querySelectorAll('[data-testid^="conversation-turn-"]'))
+        .map(turn => turn.querySelector(conversationChoiceSelector))
     const conversationChoices: Array<number | null> = nodes
-        // non-existing element will produce null here, which will point to the last child
-        // just in case the selector changed
+    // non-existing element will produce null here, which will point to the last child
+    // just in case the selector changed
         .map(span => Number.parseInt(span?.textContent?.trim().split(' / ')[0] ?? '0') - 1)
         .map(x => x === -1 ? null : x)
 
