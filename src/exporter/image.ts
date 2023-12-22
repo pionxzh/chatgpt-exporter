@@ -24,60 +24,16 @@ export async function exportToPng(fileNameFormat: string) {
         return false
     }
 
-    effect.add(() => {
-        document.documentElement.style.setProperty('font-size', '12px')
-        return () => document.documentElement.style.removeProperty('font-size')
-    })
-
-    // pre-calculated rem to px for tailwindcss
-    // effect.add(() => {
-    //     const stylesheet = new CSSStyleSheet()
-    //     stylesheet.replaceSync(`
-    //         .text-xs {
-    //             font-size: 12px; // 0.75rem
-    //             line-height: 16px; // 1rem
-    //         }
-
-    //         .text-sm {
-    //             font-size: 14px; // 0.875rem
-    //             line-height: 20px; // 1.25rem
-    //         }
-
-    //         .text-base {
-    //             font-size: 16px; // 1rem
-    //             line-height: 24px; // 1.5rem
-    //         }
-
-    //         .text-xl {
-    //             font-size: 24px; // 1.5rem
-    //             line-height: 32px; // 2rem
-    //         }
-
-    //         .px-4 {
-    //             padding-left: 16px; // 1rem
-    //             padding-right: 16px; // 1rem
-    //         }
-
-    //         .py-2 {
-    //             padding-top: 8px; // 0.5rem
-    //             padding-bottom: 8px; // 0.5rem
-    //         }
-
-    //         .font-semibold {
-    //             line-height: 20px;
-    //         }
-    //     `)
-    //     const oldAdoptedStyleSheets = document.adoptedStyleSheets
-    //     document.adoptedStyleSheets = [...oldAdoptedStyleSheets, stylesheet]
-    //     return () => {
-    //         stylesheet.replaceSync('')
-    //         document.adoptedStyleSheets = oldAdoptedStyleSheets
-    //     }
-    // })
+    const isDarkMode = document.documentElement.classList.contains('dark')
 
     effect.add(() => {
         const style = document.createElement('style')
         style.textContent = `
+            [data-testid^="conversation-turn-"] {
+                color: ${isDarkMode ? '#ececf1' : '#0f0f0f'};
+                background-color: ${isDarkMode ? 'rgb(52,53,65)' : '#fff'};
+            }
+
             pre {
                 margin-top: 8px !important;
             }
@@ -91,14 +47,6 @@ export async function exportToPng(fileNameFormat: string) {
         return () => style.remove()
     })
 
-    const conversationNodes = document.querySelectorAll<HTMLDivElement>('[data-testid^="conversation-turn-"]')
-    conversationNodes.forEach((node) => {
-        effect.add(() => {
-            node.style.height = `${node.clientHeight}px`
-            return () => node.style.removeProperty('height')
-        })
-    })
-
     // hide top header
     const topHeader = thread.querySelector('.sticky.top-0')
     if (topHeader) {
@@ -109,7 +57,7 @@ export async function exportToPng(fileNameFormat: string) {
     }
 
     // hide buttons
-    const buttonWrappers = document.querySelectorAll<HTMLDivElement>('main .flex.justify-between')
+    const buttonWrappers = document.querySelectorAll<HTMLDivElement>('main .flex.empty\\:hidden')
     buttonWrappers.forEach((wrapper) => {
         if (!wrapper.querySelector('button')) return
         // ignore codeblock
@@ -139,15 +87,6 @@ export async function exportToPng(fileNameFormat: string) {
         })
     })
 
-    // hide weird cover on avatar
-    const shadowStrokes = thread.querySelectorAll('.gizmo-shadow-stroke')
-    shadowStrokes.forEach((stroke) => {
-        effect.add(() => {
-            stroke.classList.remove('gizmo-shadow-stroke')
-            return () => stroke.classList.add('gizmo-shadow-stroke')
-        })
-    })
-
     const threadEl = thread as HTMLElement
 
     effect.run()
@@ -162,8 +101,8 @@ export async function exportToPng(fileNameFormat: string) {
             useCORS: true,
             scrollX: -window.scrollX,
             scrollY: -window.scrollY,
-            windowWidth: threadEl.scrollWidth,
-            windowHeight: threadEl.scrollHeight,
+            windowWidth: width,
+            windowHeight: height,
             ignoreElements: fnIgnoreElements,
         })
 
