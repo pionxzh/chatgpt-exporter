@@ -357,15 +357,6 @@ async function fetchSession(): Promise<ApiSession> {
     return session!
 }
 
-class LinkedListItem<T> {
-    value: T
-    child: LinkedListItem<T> | null = null
-
-    constructor(value: T) {
-        this.value = value
-    }
-}
-
 export interface ConversationResult {
     id: string
     title: string
@@ -387,7 +378,7 @@ const modelMapping: { [key in ModelSlug]: string } & { [key: string]: string } =
     'text-davinci-002': 'GTP-3.5',
 }
 
-export function processConversation(conversation: ApiConversationWithId, conversationChoices: Array<number | null> = []): ConversationResult {
+export function processConversation(conversation: ApiConversationWithId, _conversationChoices: Array<number | null> = []): ConversationResult {
     const title = conversation.title || 'ChatGPT Conversation'
     const createTime = conversation.create_time
     const updateTime = conversation.update_time
@@ -406,74 +397,11 @@ export function processConversation(conversation: ApiConversationWithId, convers
         }
     }
 
-    const result: ConversationNode[] = []
-    const nodes = Object.values(conversation.mapping)
-    const root = nodes.find(node => !node.parent)
-    if (!root) throw new Error('No root node found.')
+    let result: ConversationNode[] = []
 
-    const nodeMap = new Map(Object.entries(conversation.mapping))
-    const tail = new LinkedListItem(root)
-    const queue = [tail]
-    let index = -1
-    while (queue.length > 0) {
-        const current = queue.shift()!
-        const node = nodeMap.get(current.value.id)
-        if (!node) throw new Error('No node found.')
-
-        const role = node.message?.author.role
-        let isContinueGeneration = false
-        if (role === 'assistant' || role === 'user' || role === 'tool') {
-            const prevNode = result[result.length - 1]
-
-            // If the previous node is also an assistant, we merge them together.
-            // This is to improve the output of the conversation when an official
-            // continuation is used. (#146)
-            if (role === 'assistant'
-                && prevNode?.message
-                && prevNode.message.author.role === 'assistant'
-                && prevNode.message.recipient === 'all'
-                && prevNode.message.content.content_type === 'text'
-                && node.message
-                && node.message.recipient === 'all'
-                && node.message.content.content_type === 'text'
-            ) {
-                isContinueGeneration = true
-                // the last part of the previous node should directly concat to the first part of the current node
-                prevNode.message.content.parts[prevNode.message.content.parts.length - 1] += node.message.content.parts[0]
-                prevNode.message.content.parts.push(...node.message.content.parts.slice(1))
-            }
-            else {
-                result.push(node)
-            }
-        }
-
-        if (node.children.length === 0) continue
-
-        const _last = node.children.length - 1
-        let choice = 0
-        // If the current node is an continue generation like [A -> B], A will always
-        // only have one child which is the continue generation node B. In this case,
-        // when we are processing A, we don't know we have a continue generation node
-        // and no matter what choice we choose, we will always get B, so it's acceptable
-        // And here in B, we will use the previous choice to get the correct child node
-        if (isContinueGeneration) {
-            choice = conversationChoices[index] ?? _last
-        }
-        // Conversation choices will only applied to nodes with message
-        else if ('message' in node && node.message?.recipient === 'all' && node.message.author.role !== 'tool') {
-            index++
-            choice = conversationChoices[index] ?? _last
-        }
-
-        const childId = node.children[choice] ?? node.children[_last]
-        if (!childId) throw new Error('No child node found.')
-
-        const child = nodeMap.get(childId)
-        if (!child) throw new Error('No child node found.')
-
-        const childItem = new LinkedListItem(child)
-        current.child = childItem
-        queue.push(childItem)
+    const bottomMostNodeId = conversation.current_node
+    if (bottomMostNodeId) {
+        result = extractConversationResult(conversation.mapping, bottomMostNodeId)
     }
 
     return {
@@ -485,4 +413,25 @@ export function processConversation(conversation: ApiConversationWithId, convers
         updateTime,
         conversationNodes: result,
     }
+}
+
+function extractConversationResult(conversationData: Record<string, ConversationNode>, startNodeId: string): ConversationNode[] {
+    const result: ConversationNode[] = []
+    let currentNodeId: string | undefined = startNodeId
+
+    while (currentNodeId) {
+        const node: ConversationNode = conversationData[currentNodeId]
+        if (!node) {
+            break// Node not found
+        }
+        if (node.message?.author.role === 'system') {
+            break// Stop at system message
+        }
+
+        result.push(node)
+
+        currentNodeId = node.parent
+    }
+
+    return result.reverse()// Reverse the result to start from the root
 }
