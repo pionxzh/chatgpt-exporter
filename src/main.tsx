@@ -1,33 +1,12 @@
 import { render } from 'preact'
 import sentinel from 'sentinel-js'
-import { GM_deleteValue, GM_getValue, GM_setValue } from 'vite-plugin-monkey/dist/client'
 import { fetchConversation, processConversation } from './api'
-import { KEY_FILENAME_FORMAT, LEGACY_KEY_FILENAME_FORMAT } from './constants'
 import { getChatIdFromUrl, getConversationChoice, isSharePage } from './page'
 import { Menu } from './ui/Menu'
 import { onloadSafe } from './utils/utils'
 
 import './i18n'
 import './styles/missing-tailwind.css'
-
-/**
- * Migrate legacy filename format
- */
-try {
-    const legacyFormat = GM_getValue?.(LEGACY_KEY_FILENAME_FORMAT, '')
-    const localLegacyFormat = localStorage.getItem(LEGACY_KEY_FILENAME_FORMAT)
-    if (legacyFormat) {
-        GM_deleteValue?.(LEGACY_KEY_FILENAME_FORMAT)
-        GM_setValue?.(KEY_FILENAME_FORMAT, JSON.stringify(legacyFormat))
-    }
-    else if (localLegacyFormat) {
-        localStorage.removeItem(LEGACY_KEY_FILENAME_FORMAT)
-        localStorage.setItem(KEY_FILENAME_FORMAT, JSON.stringify(localLegacyFormat))
-    }
-}
-catch (error) {
-    console.error('Failed to migrate legacy filename format', error)
-}
 
 main()
 

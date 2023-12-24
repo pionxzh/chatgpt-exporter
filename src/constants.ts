@@ -7,7 +7,6 @@ const API_MAPPING: Record<string, string> = {
 export const baseUrl = new URL(location.href).origin
 export const apiUrl = API_MAPPING[baseUrl]
 
-export const LEGACY_KEY_FILENAME_FORMAT = 'exporter-format'
 export const KEY_LANGUAGE = 'exporter:language'
 export const KEY_FILENAME_FORMAT = 'exporter:filename_format'
 export const KEY_OFFICIAL_JSON_FORMAT = 'exporter:official_json_format'
