@@ -331,7 +331,8 @@ async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
     const response = await fetch(url, {
         ...options,
         headers: {
-            Authorization: `Bearer ${accessToken}`,
+            'Authorization': `Bearer ${accessToken}`,
+            'X-Authorization': `Bearer ${accessToken}`,
             ...options?.headers,
         },
     })

@@ -48,6 +48,12 @@ export default defineConfig({
                     'https://chat.zhile.io/c/*',
                     'https://chat.zhile.io/share/*',
                     'https://chat.zhile.io/share/*/continue',
+
+                    'https://chat.oaifree.com/',
+                    'https://chat.oaifree.com/?model=*',
+                    'https://chat.oaifree.com/c/*',
+                    'https://chat.oaifree.com/share/*',
+                    'https://chat.oaifree.com/share/*/continue',
                 ],
                 'icon': 'https://chat.openai.com/favicon.ico',
                 'run-at': 'document-end',
