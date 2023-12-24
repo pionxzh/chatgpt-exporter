@@ -42,8 +42,8 @@ function main() {
 
         /** Insert timestamp to the bottom right of each message */
         let chatId = ''
-        sentinel.on('main .group', async () => {
-            const threadContents = Array.from(document.querySelectorAll('main .group > .text-base > .relative:nth-child(2)'))
+        sentinel.on('[role="presentation"]', async () => {
+            const threadContents = Array.from(document.querySelectorAll('main [data-testid^="conversation-turn-"] [data-message-id]'))
 
             const currentChatId = getChatIdFromUrl()
             if (!currentChatId || currentChatId === chatId) return
@@ -59,7 +59,7 @@ function main() {
                 const date = new Date(createTime * 1000)
 
                 const timestamp = document.createElement('time')
-                timestamp.className = 'text-gray-500 dark:text-gray-400 text-sm text-right'
+                timestamp.className = 'w-full text-gray-500 dark:text-gray-400 text-sm text-right'
                 timestamp.dateTime = date.toISOString()
                 timestamp.title = date.toLocaleString()
 
