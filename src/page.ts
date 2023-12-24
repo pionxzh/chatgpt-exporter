@@ -75,21 +75,6 @@ export function getConversationFromSharePage() {
     return null
 }
 
-const conversationChoiceSelector = '.flex-grow.flex-shrink-0.tabular-nums'
-
-export function getConversationChoice() {
-    // parse x from `< x / y >` to get the index of the selected response
-    const nodes = Array.from(document.querySelectorAll('[data-testid^="conversation-turn-"]'))
-        .map(turn => turn.querySelector(conversationChoiceSelector))
-    const conversationChoices: Array<number | null> = nodes
-    // non-existing element will produce null here, which will point to the last child
-    // just in case the selector changed
-        .map(span => Number.parseInt(span?.textContent?.trim().split(' / ')[0] ?? '0') - 1)
-        .map(x => x === -1 ? null : x)
-
-    return conversationChoices
-}
-
 const defaultAvatar = 'data:image/svg+xml,%3Csvg%20stroke%3D%22currentColor%22%20fill%3D%22none%22%20stroke-width%3D%221.5%22%20viewBox%3D%22-6%20-6%2036%2036%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20style%3D%22color%3A%20white%3B%20background%3A%20%23ab68ff%3B%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M20%2021v-2a4%204%200%200%200-4-4H8a4%204%200%200%200-4%204v2%22%3E%3C%2Fpath%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%227%22%20r%3D%224%22%3E%3C%2Fcircle%3E%3C%2Fsvg%3E'
 export async function getUserAvatar(): Promise<string> {
     try {

@@ -1,6 +1,6 @@
 import { fetchConversation, getCurrentChatId, processConversation } from '../api'
 import i18n from '../i18n'
-import { checkIfConversationStarted, getConversationChoice } from '../page'
+import { checkIfConversationStarted } from '../page'
 import { copyToClipboard } from '../utils/clipboard'
 import { flatMap, fromMarkdown, toMarkdown } from '../utils/markdown'
 import { standardizeLineBreaks } from '../utils/text'
@@ -18,8 +18,7 @@ export async function exportToText() {
     // So we don't need to waste time to download them
     const rawConversation = await fetchConversation(chatId, false)
 
-    const conversationChoices = getConversationChoice()
-    const { conversationNodes } = processConversation(rawConversation, conversationChoices)
+    const { conversationNodes } = processConversation(rawConversation)
     const text = conversationNodes
         .map(({ message }) => transformMessage(message))
         .filter(Boolean)

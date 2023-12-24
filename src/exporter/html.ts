@@ -2,7 +2,7 @@ import JSZip from 'jszip'
 import { fetchConversation, getCurrentChatId, processConversation } from '../api'
 import { KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_HTML, baseUrl } from '../constants'
 import i18n from '../i18n'
-import { checkIfConversationStarted, getConversationChoice, getUserAvatar } from '../page'
+import { checkIfConversationStarted, getUserAvatar } from '../page'
 import templateHtml from '../template.html?raw'
 import { downloadFile, getFileNameWithFormat } from '../utils/download'
 import { fromMarkdown, toHtml } from '../utils/markdown'
@@ -22,8 +22,7 @@ export async function exportToHtml(fileNameFormat: string, metaList: ExportMeta[
 
     const chatId = await getCurrentChatId()
     const rawConversation = await fetchConversation(chatId, true)
-    const conversationChoices = getConversationChoice()
-    const conversation = processConversation(rawConversation, conversationChoices)
+    const conversation = processConversation(rawConversation)
     const html = conversationToHtml(conversation, userAvatar, metaList)
 
     const fileName = getFileNameWithFormat(fileNameFormat, 'html', { title: conversation.title, chatId, createTime: conversation.createTime, updateTime: conversation.updateTime })

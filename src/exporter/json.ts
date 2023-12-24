@@ -1,7 +1,7 @@
 import JSZip from 'jszip'
 import { fetchConversation, getCurrentChatId, processConversation } from '../api'
 import i18n from '../i18n'
-import { checkIfConversationStarted, getConversationChoice } from '../page'
+import { checkIfConversationStarted } from '../page'
 import { downloadFile, getFileNameWithFormat } from '../utils/download'
 import type { ApiConversationWithId } from '../api'
 
@@ -13,8 +13,7 @@ export async function exportToJson(fileNameFormat: string, options: { officialFo
 
     const chatId = await getCurrentChatId()
     const rawConversation = await fetchConversation(chatId, false)
-    const conversationChoices = getConversationChoice()
-    const conversation = processConversation(rawConversation, conversationChoices)
+    const conversation = processConversation(rawConversation)
 
     const fileName = getFileNameWithFormat(fileNameFormat, 'json', { title: conversation.title, chatId })
     /**

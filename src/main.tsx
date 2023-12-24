@@ -1,7 +1,7 @@
 import { render } from 'preact'
 import sentinel from 'sentinel-js'
 import { fetchConversation, processConversation } from './api'
-import { getChatIdFromUrl, getConversationChoice, isSharePage } from './page'
+import { getChatIdFromUrl, isSharePage } from './page'
 import { Menu } from './ui/Menu'
 import { onloadSafe } from './utils/utils'
 
@@ -50,8 +50,7 @@ function main() {
             chatId = currentChatId
 
             const rawConversation = await fetchConversation(chatId, false)
-            const conversationChoices = getConversationChoice()
-            const { conversationNodes } = processConversation(rawConversation, conversationChoices)
+            const { conversationNodes } = processConversation(rawConversation)
 
             threadContents.forEach((thread, index) => {
                 const createTime = conversationNodes[index]?.message?.create_time

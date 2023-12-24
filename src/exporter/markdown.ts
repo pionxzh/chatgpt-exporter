@@ -2,7 +2,7 @@ import JSZip from 'jszip'
 import { fetchConversation, getCurrentChatId, processConversation } from '../api'
 import { KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_HTML, baseUrl } from '../constants'
 import i18n from '../i18n'
-import { checkIfConversationStarted, getConversationChoice } from '../page'
+import { checkIfConversationStarted } from '../page'
 import { downloadFile, getFileNameWithFormat } from '../utils/download'
 import { fromMarkdown, toMarkdown } from '../utils/markdown'
 import { ScriptStorage } from '../utils/storage'
@@ -19,8 +19,7 @@ export async function exportToMarkdown(fileNameFormat: string, metaList: ExportM
 
     const chatId = await getCurrentChatId()
     const rawConversation = await fetchConversation(chatId, true)
-    const conversationChoices = getConversationChoice()
-    const conversation = processConversation(rawConversation, conversationChoices)
+    const conversation = processConversation(rawConversation)
     const markdown = conversationToMarkdown(conversation, metaList)
 
     const fileName = getFileNameWithFormat(fileNameFormat, 'md', { title: conversation.title, chatId, createTime: conversation.createTime, updateTime: conversation.updateTime })
