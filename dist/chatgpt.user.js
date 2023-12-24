@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.18.0
+// @version            2.18.1
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -82,15 +82,6 @@
     font-size: 1rem;
     line-height: 1.5;
 }
-img[src*="https://source.unsplash.com/"] {
-    visibility: hidden;
-}
-
-/* hide the flickering */
-p > img[src*="https://images.unsplash.com/"] {
-    animation: fadeIn .3s;
-}
-
 span[data-time-format] {
     display: none;
 }
@@ -935,10 +926,6 @@ body[data-time-format="24"] span[data-time-format="24"] {
   })(sentinel_umd);
   var sentinel_umdExports = sentinel_umd.exports;
   const sentinel = /* @__PURE__ */ getDefaultExportFromCjs(sentinel_umdExports);
-  var _GM_deleteValue = /* @__PURE__ */ (() => typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0)();
-  var _GM_getValue = /* @__PURE__ */ (() => typeof GM_getValue != "undefined" ? GM_getValue : void 0)();
-  var _GM_setValue = /* @__PURE__ */ (() => typeof GM_setValue != "undefined" ? GM_setValue : void 0)();
-  var _unsafeWindow = /* @__PURE__ */ (() => typeof unsafeWindow != "undefined" ? unsafeWindow : void 0)();
   var dist = {};
   var __assign$1 = commonjsGlobal && commonjsGlobal.__assign || function() {
     __assign$1 = Object.assign || function(t2) {
@@ -1031,7 +1018,6 @@ body[data-time-format="24"] span[data-time-format="24"] {
   };
   const baseUrl = new URL(location.href).origin;
   const apiUrl = API_MAPPING[baseUrl];
-  const LEGACY_KEY_FILENAME_FORMAT = "exporter-format";
   const KEY_LANGUAGE = "exporter:language";
   const KEY_FILENAME_FORMAT = "exporter:filename_format";
   const KEY_OFFICIAL_JSON_FORMAT = "exporter:official_json_format";
@@ -1041,6 +1027,10 @@ body[data-time-format="24"] span[data-time-format="24"] {
   const KEY_TIMESTAMP_HTML = "exporter:timestamp_html";
   const KEY_META_ENABLED = "exporter:enable_meta";
   const KEY_META_LIST = "exporter:meta_list";
+  var _GM_deleteValue = /* @__PURE__ */ (() => typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0)();
+  var _GM_getValue = /* @__PURE__ */ (() => typeof GM_getValue != "undefined" ? GM_getValue : void 0)();
+  var _GM_setValue = /* @__PURE__ */ (() => typeof GM_setValue != "undefined" ? GM_setValue : void 0)();
+  var _unsafeWindow = /* @__PURE__ */ (() => typeof unsafeWindow != "undefined" ? unsafeWindow : void 0)();
   function getBase64FromImg(el) {
     const canvas = document.createElement("canvas");
     canvas.width = el.naturalWidth;
@@ -1098,19 +1088,6 @@ body[data-time-format="24"] span[data-time-format="24"] {
       return JSON.parse(JSON.stringify(window.__NEXT_DATA__.props.pageProps.serverResponse.data));
     }
     return null;
-  }
-  const conversationChoiceSelector = ".flex.justify-center span.flex-grow";
-  const conversationChoiceSelectorGizmo = ".flex-grow.flex-shrink-0.tabular-nums";
-  function isGizmoMode() {
-    return document.documentElement.classList.contains("gizmo");
-  }
-  function getConversationChoice() {
-    const nodes = isGizmoMode() ? Array.from(document.querySelectorAll('[data-testid^="conversation-turn-"]')).map((turn) => turn.querySelector(conversationChoiceSelectorGizmo)) : Array.from(document.querySelectorAll("main .group")).map((group) => group.querySelector(conversationChoiceSelector));
-    const conversationChoices = nodes.map((span) => {
-      var _a;
-      return Number.parseInt(((_a = span == null ? void 0 : span.textContent) == null ? void 0 : _a.trim().split(" / ")[0]) ?? "0") - 1;
-    }).map((x2) => x2 === -1 ? null : x2);
-    return conversationChoices;
   }
   const defaultAvatar = "data:image/svg+xml,%3Csvg%20stroke%3D%22currentColor%22%20fill%3D%22none%22%20stroke-width%3D%221.5%22%20viewBox%3D%22-6%20-6%2036%2036%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20style%3D%22color%3A%20white%3B%20background%3A%20%23ab68ff%3B%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M20%2021v-2a4%204%200%200%200-4-4H8a4%204%200%200%200-4%204v2%22%3E%3C%2Fpath%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%227%22%20r%3D%224%22%3E%3C%2Fcircle%3E%3C%2Fsvg%3E";
   async function getUserAvatar() {
@@ -1292,14 +1269,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
     session = await response.json();
     return session;
   }
-  class LinkedListItem {
-    constructor(value) {
-      __publicField(this, "value");
-      __publicField(this, "child", null);
-      this.value = value;
-    }
-  }
-  const modelMapping = {
+  const ModelMapping = {
     "text-davinci-002-render-sha": "GTP-3.5",
     "text-davinci-002-render-paid": "GTP-3.5",
     "text-davinci-002-browse": "GTP-3.5",
@@ -1308,82 +1278,83 @@ body[data-time-format="24"] span[data-time-format="24"] {
     // fuzzy matching
     "text-davinci-002": "GTP-3.5"
   };
-  function processConversation(conversation, conversationChoices = []) {
-    var _a, _b, _c, _d, _e;
+  function processConversation(conversation) {
+    var _a;
     const title2 = conversation.title || "ChatGPT Conversation";
     const createTime = conversation.create_time;
     const updateTime = conversation.update_time;
-    const modelSlug = ((_c = (_b = (_a = Object.values(conversation.mapping).find((node2) => {
+    const {
+      model,
+      modelSlug
+    } = extractModel(conversation.mapping);
+    const startNodeId = conversation.current_node || ((_a = Object.values(conversation.mapping).find((node2) => !node2.children || node2.children.length === 0)) == null ? void 0 : _a.id);
+    if (!startNodeId)
+      throw new Error("Failed to find start node.");
+    const conversationNodes = extractConversationResult(conversation.mapping, startNodeId);
+    const mergedConversationNodes = mergeContinuationNodes(conversationNodes);
+    return {
+      id: conversation.id,
+      title: title2,
+      model,
+      modelSlug,
+      createTime,
+      updateTime,
+      conversationNodes: mergedConversationNodes
+    };
+  }
+  function extractModel(conversationMapping) {
+    var _a, _b, _c;
+    let model = "";
+    const modelSlug = ((_c = (_b = (_a = Object.values(conversationMapping).find((node2) => {
       var _a2, _b2;
       return (_b2 = (_a2 = node2.message) == null ? void 0 : _a2.metadata) == null ? void 0 : _b2.model_slug;
     })) == null ? void 0 : _a.message) == null ? void 0 : _b.metadata) == null ? void 0 : _c.model_slug) || "";
-    let model = "";
     if (modelSlug) {
-      if (modelMapping[modelSlug]) {
-        model = modelMapping[modelSlug];
+      if (ModelMapping[modelSlug]) {
+        model = ModelMapping[modelSlug];
       } else {
-        Object.keys(modelMapping).forEach((key2) => {
+        Object.keys(ModelMapping).forEach((key2) => {
           if (modelSlug.startsWith(key2)) {
             model = key2;
           }
         });
       }
     }
-    const result = [];
-    const nodes = Object.values(conversation.mapping);
-    const root2 = nodes.find((node2) => !node2.parent);
-    if (!root2)
-      throw new Error("No root node found.");
-    const nodeMap = new Map(Object.entries(conversation.mapping));
-    const tail = new LinkedListItem(root2);
-    const queue = [tail];
-    let index2 = -1;
-    while (queue.length > 0) {
-      const current = queue.shift();
-      const node2 = nodeMap.get(current.value.id);
-      if (!node2)
-        throw new Error("No node found.");
-      const role = (_d = node2.message) == null ? void 0 : _d.author.role;
-      let isContinueGeneration = false;
-      if (role === "assistant" || role === "user" || role === "tool") {
-        const prevNode = result[result.length - 1];
-        if (role === "assistant" && (prevNode == null ? void 0 : prevNode.message) && prevNode.message.author.role === "assistant" && prevNode.message.recipient === "all" && prevNode.message.content.content_type === "text" && node2.message && node2.message.recipient === "all" && node2.message.content.content_type === "text") {
-          isContinueGeneration = true;
-          prevNode.message.content.parts[prevNode.message.content.parts.length - 1] += node2.message.content.parts[0];
-          prevNode.message.content.parts.push(...node2.message.content.parts.slice(1));
-        } else {
-          result.push(node2);
-        }
-      }
-      if (node2.children.length === 0)
-        continue;
-      const _last = node2.children.length - 1;
-      let choice = 0;
-      if (isContinueGeneration) {
-        choice = conversationChoices[index2] ?? _last;
-      } else if ("message" in node2 && ((_e = node2.message) == null ? void 0 : _e.recipient) === "all" && node2.message.author.role !== "tool") {
-        index2++;
-        choice = conversationChoices[index2] ?? _last;
-      }
-      const childId = node2.children[choice] ?? node2.children[_last];
-      if (!childId)
-        throw new Error("No child node found.");
-      const child = nodeMap.get(childId);
-      if (!child)
-        throw new Error("No child node found.");
-      const childItem = new LinkedListItem(child);
-      current.child = childItem;
-      queue.push(childItem);
-    }
     return {
-      id: conversation.id,
-      title: title2,
-      modelSlug,
       model,
-      createTime,
-      updateTime,
-      conversationNodes: result
+      modelSlug
     };
+  }
+  function extractConversationResult(conversationMapping, startNodeId) {
+    var _a;
+    const result = [];
+    let currentNodeId = startNodeId;
+    while (currentNodeId) {
+      const node2 = conversationMapping[currentNodeId];
+      if (!node2) {
+        break;
+      }
+      if (((_a = node2.message) == null ? void 0 : _a.author.role) === "system") {
+        break;
+      }
+      result.unshift(node2);
+      currentNodeId = node2.parent;
+    }
+    return result;
+  }
+  function mergeContinuationNodes(nodes) {
+    var _a, _b;
+    const result = [];
+    for (const node2 of nodes) {
+      const prevNode = result[result.length - 1];
+      if (((_a = prevNode == null ? void 0 : prevNode.message) == null ? void 0 : _a.author.role) === "assistant" && ((_b = node2.message) == null ? void 0 : _b.author.role) === "assistant" && prevNode.message.recipient === "all" && node2.message.recipient === "all" && prevNode.message.content.content_type === "text" && node2.message.content.content_type === "text") {
+        prevNode.message.content.parts[prevNode.message.content.parts.length - 1] += node2.message.content.parts[0];
+        prevNode.message.content.parts.push(...node2.message.content.parts.slice(1));
+      } else {
+        result.push(node2);
+      }
+    }
+    return result;
   }
   function _extends() {
     _extends = Object.assign ? Object.assign.bind() : function(target) {
@@ -19492,8 +19463,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
     const userAvatar = await getUserAvatar();
     const chatId = await getCurrentChatId();
     const rawConversation = await fetchConversation(chatId, true);
-    const conversationChoices = getConversationChoice();
-    const conversation = processConversation(rawConversation, conversationChoices);
+    const conversation = processConversation(rawConversation);
     const html2 = conversationToHtml(conversation, userAvatar, metaList);
     const fileName = getFileNameWithFormat(fileNameFormat, "html", {
       title: conversation.title,
@@ -19748,31 +19718,25 @@ ${content2.text}
     return typeof el.shadowRoot === "object" && el.shadowRoot !== null;
   }
   async function exportToPng(fileNameFormat) {
-    var _a, _b;
     if (!checkIfConversationStarted()) {
       alert(instance.t("Please start a conversation first"));
       return false;
     }
     const effect = new Effect();
-    let thread = null;
-    const isGizmo = isGizmoMode();
-    if (isGizmo) {
-      thread = document.querySelector("main [class^='react-scroll-to-bottom'] > div > div");
-      if (!thread || thread.children.length === 0 || thread.scrollHeight < 50) {
-        alert(instance.t("Failed to export to PNG. Failed to find the element node."));
-        return false;
-      }
-      effect.add(() => {
-        document.documentElement.classList.remove("gizmo");
-        return () => document.documentElement.classList.add("gizmo");
-      });
-      effect.add(() => {
-        document.documentElement.style.setProperty("font-size", "12px");
-        return () => document.documentElement.style.removeProperty("font-size");
-      });
-      effect.add(() => {
-        const style2 = document.createElement("style");
-        style2.textContent = `
+    const thread = document.querySelector("main [class^='react-scroll-to-bottom'] > div > div");
+    if (!thread || thread.children.length === 0 || thread.scrollHeight < 50) {
+      alert(instance.t("Failed to export to PNG. Failed to find the element node."));
+      return false;
+    }
+    const isDarkMode = document.documentElement.classList.contains("dark");
+    effect.add(() => {
+      const style2 = document.createElement("style");
+      style2.textContent = `
+            [data-testid^="conversation-turn-"] {
+                color: ${isDarkMode ? "#ececf1" : "#0f0f0f"};
+                background-color: ${isDarkMode ? "rgb(52,53,65)" : "#fff"};
+            }
+
             pre {
                 margin-top: 8px !important;
             }
@@ -19782,117 +19746,41 @@ ${content2.text}
                 padding-bottom: 2px;
             }
             `;
-        thread.appendChild(style2);
-        return () => style2.remove();
-      });
-      const conversationNodes = document.querySelectorAll('[data-testid^="conversation-turn-"]');
-      conversationNodes.forEach((node2) => {
-        effect.add(() => {
-          node2.style.height = `${node2.clientHeight}px`;
-          return () => node2.style.removeProperty("height");
-        });
-      });
-      const topHeader = thread.querySelector(".sticky.top-0");
-      if (topHeader) {
-        effect.add(() => {
-          topHeader.classList.add("hidden");
-          return () => topHeader.classList.remove("hidden");
-        });
-      }
-      const buttonWrappers = document.querySelectorAll("main .flex.justify-between");
-      buttonWrappers.forEach((wrapper) => {
-        if (!wrapper.querySelector("button"))
-          return;
-        if (wrapper.closest("pre"))
-          return;
-        effect.add(() => {
-          wrapper.style.display = "none";
-          return () => wrapper.style.display = "";
-        });
-      });
-      const copyButtons = thread.querySelectorAll("pre button");
-      copyButtons.forEach((button) => {
-        effect.add(() => {
-          button.classList.add("hidden");
-          return () => button.classList.remove("hidden");
-        });
-      });
-      const backToTop = thread.querySelectorAll("button.absolute");
-      backToTop.forEach((button) => {
-        effect.add(() => {
-          button.classList.add("hidden");
-          return () => button.classList.remove("hidden");
-        });
-      });
-      const shadowStrokes = thread.querySelectorAll(".gizmo-shadow-stroke");
-      shadowStrokes.forEach((stroke) => {
-        effect.add(() => {
-          stroke.classList.remove("gizmo-shadow-stroke");
-          return () => stroke.classList.add("gizmo-shadow-stroke");
-        });
-      });
-    } else {
-      thread = ((_a = document.querySelector("main .group")) == null ? void 0 : _a.parentElement) ?? null;
-      if (!thread || thread.children.length === 0 || thread.scrollHeight < 50) {
-        alert(instance.t("Failed to export to PNG. Failed to find the element node."));
-        return false;
-      }
-      const threadEl2 = thread;
-      const modelBar = threadEl2.firstElementChild;
-      if ((_b = modelBar == null ? void 0 : modelBar.textContent) == null ? void 0 : _b.startsWith("Model:")) {
-        effect.add(() => {
-          modelBar.classList.add("hidden");
-          return () => modelBar.classList.remove("hidden");
-        });
-      }
+      thread.appendChild(style2);
+      return () => style2.remove();
+    });
+    const topHeader = thread.querySelector(".sticky.top-0");
+    if (topHeader) {
       effect.add(() => {
-        const bottomBar = threadEl2.children[threadEl2.children.length - 1];
-        bottomBar.classList.add("hidden");
-        return () => bottomBar.classList.remove("hidden");
-      });
-      const buttonWrappers = document.querySelectorAll("main .flex.justify-between");
-      buttonWrappers.forEach((wrapper) => {
-        if (!wrapper.querySelector("button"))
-          return;
-        if (wrapper.closest("pre"))
-          return;
-        effect.add(() => {
-          wrapper.style.display = "none";
-          return () => wrapper.style.display = "";
-        });
-      });
-      const conversationChoices = document.querySelectorAll(conversationChoiceSelector);
-      conversationChoices.forEach((choice) => {
-        effect.add(() => {
-          const parent = choice.parentElement;
-          if (!parent)
-            return;
-          parent.classList.add("hidden");
-          return () => parent.classList.remove("hidden");
-        });
-      });
-      const avatarEls = Array.from(document.querySelectorAll("img[alt]:not([aria-hidden])"));
-      avatarEls.forEach((el) => {
-        const srcset = el.getAttribute("srcset");
-        if (srcset) {
-          effect.add(() => {
-            el.setAttribute("data-srcset", srcset);
-            el.removeAttribute("srcset");
-            return () => {
-              el.setAttribute("srcset", srcset);
-              el.removeAttribute("data-srcset");
-            };
-          });
-        }
-      });
-      const messageEls = Array.from(threadEl2.querySelectorAll(".group .whitespace-pre-wrap"));
-      messageEls.forEach((el) => {
-        effect.add(() => {
-          el.classList.add("break-words");
-          return () => el.classList.remove("break-words");
-        });
+        topHeader.classList.add("hidden");
+        return () => topHeader.classList.remove("hidden");
       });
     }
+    const buttonWrappers = document.querySelectorAll("main .flex.empty\\:hidden");
+    buttonWrappers.forEach((wrapper) => {
+      if (!wrapper.querySelector("button"))
+        return;
+      if (wrapper.closest("pre"))
+        return;
+      effect.add(() => {
+        wrapper.style.display = "none";
+        return () => wrapper.style.display = "";
+      });
+    });
+    const copyButtons = thread.querySelectorAll("pre button");
+    copyButtons.forEach((button) => {
+      effect.add(() => {
+        button.classList.add("hidden");
+        return () => button.classList.remove("hidden");
+      });
+    });
+    const backToTop = thread.querySelectorAll("button.absolute");
+    backToTop.forEach((button) => {
+      effect.add(() => {
+        button.classList.add("hidden");
+        return () => button.classList.remove("hidden");
+      });
+    });
     const threadEl = thread;
     effect.run();
     await sleep(100);
@@ -19905,8 +19793,8 @@ ${content2.text}
         useCORS: true,
         scrollX: -window.scrollX,
         scrollY: -window.scrollY,
-        windowWidth: threadEl.scrollWidth,
-        windowHeight: threadEl.scrollHeight,
+        windowWidth: width,
+        windowHeight: height,
         ignoreElements: fnIgnoreElements
       });
       const context = canvas.getContext("2d");
@@ -19941,8 +19829,7 @@ ${content2.text}
     }
     const chatId = await getCurrentChatId();
     const rawConversation = await fetchConversation(chatId, false);
-    const conversationChoices = getConversationChoice();
-    const conversation = processConversation(rawConversation, conversationChoices);
+    const conversation = processConversation(rawConversation);
     const fileName = getFileNameWithFormat(fileNameFormat, "json", {
       title: conversation.title,
       chatId
@@ -20003,8 +19890,7 @@ ${content2.text}
     }
     const chatId = await getCurrentChatId();
     const rawConversation = await fetchConversation(chatId, true);
-    const conversationChoices = getConversationChoice();
-    const conversation = processConversation(rawConversation, conversationChoices);
+    const conversation = processConversation(rawConversation);
     const markdown = conversationToMarkdown(conversation, metaList);
     const fileName = getFileNameWithFormat(fileNameFormat, "md", {
       title: conversation.title,
@@ -20227,10 +20113,9 @@ ${content2.text}
     }
     const chatId = await getCurrentChatId();
     const rawConversation = await fetchConversation(chatId, false);
-    const conversationChoices = getConversationChoice();
     const {
       conversationNodes
-    } = processConversation(rawConversation, conversationChoices);
+    } = processConversation(rawConversation);
     const text2 = conversationNodes.map(({
       message
     }) => transformMessage(message)).filter(Boolean).join("\n\n");
@@ -23422,19 +23307,6 @@ ${content2}`;
       })
     });
   }
-  try {
-    const legacyFormat = _GM_getValue == null ? void 0 : _GM_getValue(LEGACY_KEY_FILENAME_FORMAT, "");
-    const localLegacyFormat = localStorage.getItem(LEGACY_KEY_FILENAME_FORMAT);
-    if (legacyFormat) {
-      _GM_deleteValue == null ? void 0 : _GM_deleteValue(LEGACY_KEY_FILENAME_FORMAT);
-      _GM_setValue == null ? void 0 : _GM_setValue(KEY_FILENAME_FORMAT, JSON.stringify(legacyFormat));
-    } else if (localLegacyFormat) {
-      localStorage.removeItem(LEGACY_KEY_FILENAME_FORMAT);
-      localStorage.setItem(KEY_FILENAME_FORMAT, JSON.stringify(localLegacyFormat));
-    }
-  } catch (error2) {
-    console.error("Failed to migrate legacy filename format", error2);
-  }
   main();
   function main() {
     onloadSafe(() => {
@@ -23460,39 +23332,17 @@ ${content2}`;
           link2.after(container);
         });
       }
-      const imageMap = /* @__PURE__ */ new Map();
-      sentinel.on("img", (img) => {
-        const src = img.src;
-        if (src.startsWith("https://source.unsplash.com/")) {
-          if (imageMap.has(src)) {
-            img.src = imageMap.get(src);
-            return;
-          }
-          const xhr = new XMLHttpRequest();
-          xhr.open("HEAD", src, true);
-          xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-              const finalUrl = xhr.responseURL;
-              img.src = finalUrl;
-              img.originalSrc = src;
-              imageMap.set(src, finalUrl);
-            }
-          };
-          xhr.send();
-        }
-      });
       let chatId = "";
-      sentinel.on("main .group", async () => {
-        const threadContents = Array.from(document.querySelectorAll("main .group > .text-base > .relative:nth-child(2)"));
+      sentinel.on('[role="presentation"]', async () => {
+        const threadContents = Array.from(document.querySelectorAll('main [data-testid^="conversation-turn-"] [data-message-id]'));
         const currentChatId = getChatIdFromUrl();
         if (!currentChatId || currentChatId === chatId)
           return;
         chatId = currentChatId;
         const rawConversation = await fetchConversation(chatId, false);
-        const conversationChoices = getConversationChoice();
         const {
           conversationNodes
-        } = processConversation(rawConversation, conversationChoices);
+        } = processConversation(rawConversation);
         threadContents.forEach((thread, index2) => {
           var _a, _b;
           const createTime = (_b = (_a = conversationNodes[index2]) == null ? void 0 : _a.message) == null ? void 0 : _b.create_time;
@@ -23500,7 +23350,7 @@ ${content2}`;
             return;
           const date = new Date(createTime * 1e3);
           const timestamp2 = document.createElement("time");
-          timestamp2.className = "text-gray-500 dark:text-gray-400 text-sm text-right";
+          timestamp2.className = "w-full text-gray-500 dark:text-gray-400 text-sm text-right";
           timestamp2.dateTime = date.toISOString();
           timestamp2.title = date.toLocaleString();
           const hour12 = document.createElement("span");
