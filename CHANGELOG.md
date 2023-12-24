@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.18.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.18.0...userscript-v2.18.1) (2023-12-24)
+
+
+### Bug Fixes
+
+* build conversation list with bottom-up method ([#193](https://github.com/pionxzh/chatgpt-exporter/issues/193)) ([dc157f7](https://github.com/pionxzh/chatgpt-exporter/commit/dc157f7dc29af6b5eded46287bf75e219197f694))
+* fix broken timestamp ([613247f](https://github.com/pionxzh/chatgpt-exporter/commit/613247f2a914fc4c1f6459d8e922b09d5b2c57ef))
+* fix screenshot export ([b65515c](https://github.com/pionxzh/chatgpt-exporter/commit/b65515c899aee813560ad76c016dcd2dfb366ed5))
+* gizmo mode is now the detaul mode ([7d83072](https://github.com/pionxzh/chatgpt-exporter/commit/7d830723dba87e46b278831aad16acce72c418e5))
+* port continuation merging back and remove conversation choice ([b1ff972](https://github.com/pionxzh/chatgpt-exporter/commit/b1ff97235d41204937c12b28cb59d50387ee9984))
+* remove localstorage legacy migrator ([00ad390](https://github.com/pionxzh/chatgpt-exporter/commit/00ad3902f2044dfe05a918a3671f81abe6e35cd3))
+* remove unsplash related workarounds ([ba6f2f7](https://github.com/pionxzh/chatgpt-exporter/commit/ba6f2f7e57bb0c7b73a39e401a9343f954da978e))
+
 ## [2.18.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.17.2...userscript-v2.18.0) (2023-11-22)
 
 
