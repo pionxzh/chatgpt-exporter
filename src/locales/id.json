@@ -9,6 +9,7 @@
   "Markdown": "Markdown",
   "HTML": "HTML",
   "JSON": "JSON",
+  "Archive": "Arsip",
   "Save": "Simpan",
   "Delete": "Hapus",
   "Select All": "Pilih Semua",
@@ -33,6 +34,8 @@
   "Export JSON Format Description": "Ekspor JSON dalam Format Resmi OpenAI",
   "Export Metadata": "Ekspor Metadata",
   "Export Metadata Description": "Tambahkan metadata ke file Markdown dan HTML yang diekspor.",
+  "Conversation Archive Alert": "Apakah Anda yakin ingin mengarsipkan semua percakapan yang dipilih?",
+  "Conversation Archived Message": "Semua percakapan yang dipilih telah diarsipkan. Harap segarkan halaman untuk melihat perubahan.",
   "Conversation Delete Alert": "Apakah Anda yakin ingin menghapus semua percakapan yang dipilih?",
   "Conversation Deleted Message": "Semua percakapan yang dipilih telah dihapus. Harap segarkan halaman untuk melihat perubahan.",
   "Please start a conversation first": "Harap mulai percakapan terlebih dahulu."

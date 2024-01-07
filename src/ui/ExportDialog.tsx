@@ -1,7 +1,7 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import { useTranslation } from 'react-i18next'
-import { deleteConversation, fetchAllConversations, fetchConversation } from '../api'
+import { archiveConversation, deleteConversation, fetchAllConversations, fetchConversation } from '../api'
 import { exportAllToHtml } from '../exporter/html'
 import { exportAllToJson, exportAllToOfficialJson } from '../exporter/json'
 import { exportAllToMarkdown } from '../exporter/markdown'
@@ -98,6 +98,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
     const disabled = loading || processing || !!error || selected.length === 0
 
     const requestQueue = useMemo(() => new RequestQueue<ApiConversationWithId>(200, 1600), [])
+    const archiveQueue = useMemo(() => new RequestQueue<boolean>(200, 1600), [])
     const deleteQueue = useMemo(() => new RequestQueue<boolean>(200, 1600), [])
     const [progress, setProgress] = useState({
         total: 0,
@@ -134,6 +135,15 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
     }, [requestQueue])
 
     useEffect(() => {
+        const off = archiveQueue.on('progress', (progress) => {
+            setProcessing(true)
+            setProgress(progress)
+        })
+
+        return () => off()
+    }, [archiveQueue])
+
+    useEffect(() => {
         const off = deleteQueue.on('progress', (progress) => {
             setProcessing(true)
             setProgress(progress)
@@ -150,6 +160,16 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
         })
         return () => off()
     }, [requestQueue, exportAllOptions, exportType, format, metaList])
+
+    useEffect(() => {
+        const off = archiveQueue.on('done', () => {
+            setProcessing(false)
+            setApiConversations(apiConversations.filter(c => !selected.some(s => s.id === c.id)))
+            setSelected([])
+            alert(t('Conversation Archived Message'))
+        })
+        return () => off()
+    }, [archiveQueue, apiConversations, selected, t])
 
     useEffect(() => {
         const off = deleteQueue.on('done', () => {
@@ -206,6 +226,24 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
         deleteQueue.start()
     }, [disabled, selected, deleteQueue, t])
 
+    const archiveAll = useCallback(() => {
+        if (disabled) return
+
+        const result = confirm(t('Conversation Archive Alert'))
+        if (!result) return
+
+        archiveQueue.clear()
+
+        selected.forEach(({ id, title }) => {
+            archiveQueue.add({
+                name: title,
+                request: () => archiveConversation(id),
+            })
+        })
+
+        archiveQueue.start()
+    }, [disabled, selected, archiveQueue, t])
+
     useEffect(() => {
         setLoading(true)
         fetchAllConversations()
@@ -252,7 +290,10 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                     ))}
                 </select>
                 <div className="flex flex-grow"></div>
-                <button className="Button red" disabled={disabled || exportSource === 'Local'} onClick={deleteAll}>
+                <button className="Button red" disabled={disabled || exportSource === 'Local'} onClick={archiveAll}>
+                    {t('Archive')}
+                </button>
+                <button className="Button red ml-4" disabled={disabled || exportSource === 'Local'} onClick={deleteAll}>
                     {t('Delete')}
                 </button>
                 <button className="Button green ml-4" disabled={disabled} onClick={exportAll}>

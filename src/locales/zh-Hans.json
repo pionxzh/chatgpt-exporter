@@ -9,6 +9,7 @@
   "Markdown": "Markdown",
   "HTML": "HTML",
   "JSON": "JSON",
+  "Archive": "归档",
   "Save": "保存",
   "Delete": "删除",
   "Select All": "全选",
@@ -33,6 +34,8 @@
   "Export JSON Format Description": "以 OpenAI 官方格式导出JSON",
   "Export Metadata": "导出元数据",
   "Export Metadata Description": "会添加至 Markdown 以及 HTML 导出。",
+  "Conversation Archive Alert": "确定要归档所有选取的对话？",
+  "Conversation Archived Message": "所有所选的对话已归档。请刷新页面。",
   "Conversation Delete Alert": "确定要删除所有选取的对话？",
   "Conversation Deleted Message": "所有所选的对话已删除。请刷新页面。",
   "Please start a conversation first": "请先开始一次对话。"

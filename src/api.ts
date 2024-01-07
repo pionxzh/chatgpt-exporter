@@ -315,6 +315,16 @@ export async function fetchAllConversations(): Promise<ApiConversationItem[]> {
     return conversations
 }
 
+export async function archiveConversation(chatId: string): Promise<boolean> {
+    const url = conversationApi(chatId)
+    const { success } = await fetchApi<{ success: boolean }>(url, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_archived: true }),
+    })
+    return success
+}
+
 export async function deleteConversation(chatId: string): Promise<boolean> {
     const url = conversationApi(chatId)
     const { success } = await fetchApi<{ success: boolean }>(url, {
