@@ -221,7 +221,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                 {t('Export from official export file')} (conversations.json)&nbsp;
                 {exportSource === 'API' && (
                     <button className="btn relative btn-neutral" onClick={() => fileInputRef.current?.click()}>
-                        <IconUpload className="w-4 h-4 text-white" />
+                        <IconUpload className="w-4 h-4" />
                     </button>
                 )}
             </div>
