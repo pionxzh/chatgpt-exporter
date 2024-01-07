@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.19.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.18.1...userscript-v2.19.0) (2024-01-07)
+
+
+### Features
+
+* support "archive conversation" in Export Conversations dialog ([706cef2](https://github.com/pionxzh/chatgpt-exporter/commit/706cef2b5a45a0fa5fe853d0cc889502f60027a0)), closes [#199](https://github.com/pionxzh/chatgpt-exporter/issues/199)
+
+
+### Bug Fixes
+
+* fix conversation started detection ([c5bbb82](https://github.com/pionxzh/chatgpt-exporter/commit/c5bbb82f2861294c9f2f6cd56da18c0fa20728a6))
+* fix upload button style ([2960a92](https://github.com/pionxzh/chatgpt-exporter/commit/2960a92ae47eab5b88b05be19223b98ea32ca3e6))
+* **i18n:** improve minor issues in translation ([e35bb3a](https://github.com/pionxzh/chatgpt-exporter/commit/e35bb3aed92f03cde20a561d829be5a9b47060f7))
+* support pandoar-next ([2d8a6ce](https://github.com/pionxzh/chatgpt-exporter/commit/2d8a6ce5c1d3988af709b2ca59efb08305cbb3a3)), closes [#194](https://github.com/pionxzh/chatgpt-exporter/issues/194)
+
 ## [2.18.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.18.0...userscript-v2.18.1) (2023-12-24)
 
 
