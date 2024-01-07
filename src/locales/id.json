@@ -32,7 +32,7 @@
   "Use 24-hour format": "Gunakan format 24 jam (mis. 23:59)",
   "Export Format": "Format Ekspor",
   "Export JSON Format Description": "Ekspor JSON dalam Format Resmi OpenAI",
-  "Export Metadata": "Ekspor Metadata",
+  "Export Metadata": "Ekspor Metada",
   "Export Metadata Description": "Tambahkan metadata ke file Markdown dan HTML yang diekspor.",
   "Conversation Archive Alert": "Apakah Anda yakin ingin mengarsipkan semua percakapan yang dipilih?",
   "Conversation Archived Message": "Semua percakapan yang dipilih telah diarsipkan. Harap segarkan halaman untuk melihat perubahan.",
