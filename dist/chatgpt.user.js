@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.18.1
+// @version            2.19.0
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -21,6 +21,11 @@
 // @match              https://chat.zhile.io/c/*
 // @match              https://chat.zhile.io/share/*
 // @match              https://chat.zhile.io/share/*/continue
+// @match              https://chat.oaifree.com/
+// @match              https://chat.oaifree.com/?model=*
+// @match              https://chat.oaifree.com/c/*
+// @match              https://chat.oaifree.com/share/*
+// @match              https://chat.oaifree.com/share/*/continue
 // @require            https://cdn.jsdelivr.net/npm/jszip@3.9.1/dist/jszip.min.js
 // @require            https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js
 // @grant              GM_addStyle
@@ -1014,7 +1019,8 @@ body[data-time-format="24"] span[data-time-format="24"] {
   }
   const API_MAPPING = {
     "https://chat.openai.com": "https://chat.openai.com/backend-api",
-    "https://chat.zhile.io": "https://proxy1.fakegpt.org/api"
+    "https://chat.zhile.io": "https://chat.zhile.io/backend-api",
+    "https://chat.oaifree.com": "https://chat.oaifree.com/backend-api"
   };
   const baseUrl = new URL(location.href).origin;
   const apiUrl = API_MAPPING[baseUrl];
@@ -1111,7 +1117,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
     return defaultAvatar;
   }
   function checkIfConversationStarted() {
-    return !!document.querySelector("main .group");
+    return !!document.querySelector('[data-testid^="conversation-turn-"]');
   }
   const sessionApi = _default(baseUrl, "/api/auth/session");
   const conversationApi = (id) => _default(apiUrl, "/conversation/:id", {
@@ -1225,6 +1231,21 @@ body[data-time-format="24"] span[data-time-format="24"] {
     }
     return conversations;
   }
+  async function archiveConversation(chatId) {
+    const url = conversationApi(chatId);
+    const {
+      success
+    } = await fetchApi(url, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        is_archived: true
+      })
+    });
+    return success;
+  }
   async function deleteConversation(chatId) {
     const url = conversationApi(chatId);
     const {
@@ -1245,7 +1266,8 @@ body[data-time-format="24"] span[data-time-format="24"] {
     const response = await fetch(url, {
       ...options,
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        "Authorization": `Bearer ${accessToken}`,
+        "X-Authorization": `Bearer ${accessToken}`,
         ...options == null ? void 0 : options.headers
       }
     });
@@ -7100,6 +7122,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
   const Screenshot$6 = "Screenshot";
   const Markdown$6 = "Markdown";
   const HTML$6 = "HTML";
+  const Archive$6 = "Archive";
   const Save$6 = "Save";
   const Delete$6 = "Delete";
   const Export$6 = "Export";
@@ -7116,6 +7139,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
     Markdown: Markdown$6,
     HTML: HTML$6,
     "JSON": "JSON",
+    Archive: Archive$6,
     Save: Save$6,
     Delete: Delete$6,
     "Select All": "Select All",
@@ -7140,6 +7164,8 @@ body[data-time-format="24"] span[data-time-format="24"] {
     "Export JSON Format Description": "Export JSON in OpenAI Official Format",
     "Export Metadata": "Export Metadata",
     "Export Metadata Description": "Add metadata to exported Markdown and HTML files.",
+    "Conversation Archive Alert": "Are you sure you want to archive all selected conversations?",
+    "Conversation Archived Message": "All selected conversations have been archived. Please refresh the page to see the changes.",
     "Conversation Delete Alert": "Are you sure you want to delete all selected conversations?",
     "Conversation Deleted Message": "All selected conversations have been deleted. Please refresh the page to see the changes.",
     "Please start a conversation first": "Please start a conversation first."
@@ -7151,6 +7177,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
   const Screenshot$5 = "Captura De Pantalla";
   const Markdown$5 = "Markdown";
   const HTML$5 = "HTML";
+  const Archive$5 = "Archivo";
   const Save$5 = "Guardar";
   const Delete$5 = "Borrar";
   const Export$5 = "Exportar";
@@ -7167,32 +7194,35 @@ body[data-time-format="24"] span[data-time-format="24"] {
     Markdown: Markdown$5,
     HTML: HTML$5,
     "JSON": "JSON",
+    Archive: Archive$5,
     Save: Save$5,
     Delete: Delete$5,
-    "Select All": "Seleccionar Todas",
+    "Select All": "Seleccionar Todos",
     Export: Export$5,
     "Error": "Error",
     Loading: Loading$5,
     Preview: Preview$5,
-    "File Name": "Nombre Archivo",
-    "Export All": "Exportar Todas",
+    "File Name": "Nombre del Archivo",
+    "Export All": "Exportar Todos",
     "Exporter Settings": "Ajustes De Exportación",
     "Export Dialog Title": "Exportar Conversaciones",
     "Invalid File Format": "Formato de archivo inválido",
     "Export from official export file": "Exportar desde archivo de exportación oficial",
     "Export from API": "Exportar desde API",
-    "Available variables": "Formatos Disponibles",
+    "Available variables": "Variables Disponibles",
     "Conversation Timestamp": "Marca de Tiempo",
     "Conversation Timestamp Description": "Aparecerá en la página.",
     "Enable on HTML": "Habilitar en archivos HTML",
     "Enable on Markdown": "Habilitar en archivos Markdown",
-    "Use 24-hour format": "Usar formato de 24 horas(ej. 23:59)",
+    "Use 24-hour format": "Usar formato de 24 horas (ej. 23:59)",
     "Export Format": "Formato de Exportación",
     "Export JSON Format Description": "Exportar JSON en el Formato Oficial de OpenAI",
-    "Export Metadata": "Exportar Metadata",
-    "Export Metadata Description": "Añadir Metadata a Markdown y a HTML exportados.",
+    "Export Metadata": "Exportar Metadatos",
+    "Export Metadata Description": "Añadir Metadatos a los archivos Markdown y HTML exportados.",
+    "Conversation Archive Alert": "¿Estás seguro que quieres archivar todas las conversaciones seleccionadas?",
+    "Conversation Archived Message": "Todos las conversaciones seleccionadas se han archivado. Por favor refresca la página para ver los cambios.",
     "Conversation Delete Alert": "¿Estás seguro que quieres borrar todas las conversaciones seleccionadas?",
-    "Conversation Deleted Message": "Todas las conversaciones seleccionadas se han borrado. Por favor refresca la página para ver los cambios.",
+    "Conversation Deleted Message": "Todos las conversaciones seleccionadas se han borrado. Por favor refresca la página para ver los cambios.",
     "Please start a conversation first": "Por favor empieza una conversación antes."
   };
   const title$4 = "ChatGPT Exporter";
@@ -7202,6 +7232,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
   const Screenshot$4 = "Tangkapan Layar";
   const Markdown$4 = "Markdown";
   const HTML$4 = "HTML";
+  const Archive$4 = "Arsip";
   const Save$4 = "Simpan";
   const Delete$4 = "Hapus";
   const Export$4 = "Ekspor";
@@ -7218,6 +7249,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
     Markdown: Markdown$4,
     HTML: HTML$4,
     "JSON": "JSON",
+    Archive: Archive$4,
     Save: Save$4,
     Delete: Delete$4,
     "Select All": "Pilih Semua",
@@ -7240,8 +7272,10 @@ body[data-time-format="24"] span[data-time-format="24"] {
     "Use 24-hour format": "Gunakan format 24 jam (mis. 23:59)",
     "Export Format": "Format Ekspor",
     "Export JSON Format Description": "Ekspor JSON dalam Format Resmi OpenAI",
-    "Export Metadata": "Ekspor Metadata",
+    "Export Metadata": "Ekspor Metada",
     "Export Metadata Description": "Tambahkan metadata ke file Markdown dan HTML yang diekspor.",
+    "Conversation Archive Alert": "Apakah Anda yakin ingin mengarsipkan semua percakapan yang dipilih?",
+    "Conversation Archived Message": "Semua percakapan yang dipilih telah diarsipkan. Harap segarkan halaman untuk melihat perubahan.",
     "Conversation Delete Alert": "Apakah Anda yakin ingin menghapus semua percakapan yang dipilih?",
     "Conversation Deleted Message": "Semua percakapan yang dipilih telah dihapus. Harap segarkan halaman untuk melihat perubahan.",
     "Please start a conversation first": "Harap mulai percakapan terlebih dahulu."
@@ -7253,6 +7287,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
   const Screenshot$3 = "スクリーンショット";
   const Markdown$3 = "Markdown";
   const HTML$3 = "HTML";
+  const Archive$3 = "アーカイブ";
   const Save$3 = "保存";
   const Delete$3 = "削除";
   const Export$3 = "エクスポート";
@@ -7269,6 +7304,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
     Markdown: Markdown$3,
     HTML: HTML$3,
     "JSON": "JSON",
+    Archive: Archive$3,
     Save: Save$3,
     Delete: Delete$3,
     "Select All": "すべて選択",
@@ -7293,6 +7329,8 @@ body[data-time-format="24"] span[data-time-format="24"] {
     "Export JSON Format Description": "OpenAI公式フォーマットでのJSONのエクスポート",
     "Export Metadata": "メタデータをエクスポート",
     "Export Metadata Description": "エクスポートされたMarkdownおよびHTMLファイルにメタデータを追加します。",
+    "Conversation Archive Alert": "選択したすべての会話をアーカイブしてもよろしいですか？",
+    "Conversation Archived Message": "選択したすべての会話がアーカイブされました。変更を表示するには、ページを更新してください。",
     "Conversation Delete Alert": "選択したすべての会話を削除してもよろしいですか？",
     "Conversation Deleted Message": "選択したすべての会話が削除されました。変更を表示するには、ページを更新してください。",
     "Please start a conversation first": "まず会話を開始してください。"
@@ -7304,6 +7342,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
   const Screenshot$2 = "Ekran Alıntısı";
   const Markdown$2 = "Markdown";
   const HTML$2 = "HTML";
+  const Archive$2 = "Arşiv";
   const Save$2 = "Kaydet";
   const Delete$2 = "Sil";
   const Export$2 = "Dışa Aktar";
@@ -7320,6 +7359,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
     Markdown: Markdown$2,
     HTML: HTML$2,
     "JSON": "JSON",
+    Archive: Archive$2,
     Save: Save$2,
     Delete: Delete$2,
     "Select All": "Tümünü Seç",
@@ -7344,6 +7384,8 @@ body[data-time-format="24"] span[data-time-format="24"] {
     "Export JSON Format Description": "OpenAI Resmi Formatında JSON Dışa Aktarma",
     "Export Metadata": "Üst veriyi dışa aktar",
     "Export Metadata Description": "Dışa aktarılan Markdown ve HTML dosyalarına üst veri ekle",
+    "Conversation Archive Alert": "Seçilen tüm konuşmaları arşivlemek istediğinizden emin misiniz?",
+    "Conversation Archived Message": "Seçilen tüm konuşmalar arşivlendi. Değişiklikleri görmek için sayfayı yenileyin.",
     "Conversation Delete Alert": "Seçilen tüm konuşmaları silmek istediğinizden emin misiniz?",
     "Conversation Deleted Message": "Seçilen tüm konuşmalar silindi. Değişiklikleri görmek için sayfayı yenileyin.",
     "Please start a conversation first": "Lütfen önce bir konuşma başlatın."
@@ -7355,6 +7397,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
   const Screenshot$1 = "截屏";
   const Markdown$1 = "Markdown";
   const HTML$1 = "HTML";
+  const Archive$1 = "归档";
   const Save$1 = "保存";
   const Delete$1 = "删除";
   const Export$1 = "导出";
@@ -7371,6 +7414,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
     Markdown: Markdown$1,
     HTML: HTML$1,
     "JSON": "JSON",
+    Archive: Archive$1,
     Save: Save$1,
     Delete: Delete$1,
     "Select All": "全选",
@@ -7395,9 +7439,11 @@ body[data-time-format="24"] span[data-time-format="24"] {
     "Export JSON Format Description": "以 OpenAI 官方格式导出JSON",
     "Export Metadata": "导出元数据",
     "Export Metadata Description": "会添加至 Markdown 以及 HTML 导出。",
+    "Conversation Archive Alert": "确定要归档所有选取的对话？",
+    "Conversation Archived Message": "所有所选的对话已归档。请刷新页面。",
     "Conversation Delete Alert": "确定要删除所有选取的对话？",
     "Conversation Deleted Message": "所有所选的对话已删除。请刷新页面。",
-    "Please start a conversation first": "请先开始一次对话。"
+    "Please start a conversation first": "请先开始对话。"
   };
   const title = "ChatGPT Exporter";
   const ExportHelper = "Export";
@@ -7406,6 +7452,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
   const Screenshot = "截圖";
   const Markdown = "Markdown";
   const HTML = "HTML";
+  const Archive = "封存";
   const Save = "保存";
   const Delete = "刪除";
   const Export = "匯出";
@@ -7422,6 +7469,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
     Markdown,
     HTML,
     "JSON": "JSON",
+    Archive,
     Save,
     Delete,
     "Select All": "全選",
@@ -7446,9 +7494,11 @@ body[data-time-format="24"] span[data-time-format="24"] {
     "Export JSON Format Description": "以 OpenAI 官方格式匯出 JSON",
     "Export Metadata": "匯出元資料",
     "Export Metadata Description": "會添加至 Markdown 以及 HTML 匯出。",
+    "Conversation Archive Alert": "確定要封存所有選取的對話？",
+    "Conversation Archived Message": "所有選取的對話已封存。請重新整理頁面。",
     "Conversation Delete Alert": "確定要刪除所有選取的對話？",
     "Conversation Deleted Message": "所有選取的對話已刪除。請重新整理頁面。",
-    "Please start a conversation first": "請先開始一次對話。"
+    "Please start a conversation first": "請先開始對話。"
   };
   class GMStorage {
     static get(key2) {
@@ -22183,6 +22233,7 @@ ${content2}`;
     const [exportType, setExportType] = h$4(exportAllOptions[0].label);
     const disabled = loading || processing || !!error2 || selected.length === 0;
     const requestQueue = F$1(() => new RequestQueue(200, 1600), []);
+    const archiveQueue = F$1(() => new RequestQueue(200, 1600), []);
     const deleteQueue = F$1(() => new RequestQueue(200, 1600), []);
     const [progress, setProgress] = h$4({
       total: 0,
@@ -22216,6 +22267,13 @@ ${content2}`;
       return () => off();
     }, [requestQueue]);
     p$6(() => {
+      const off = archiveQueue.on("progress", (progress2) => {
+        setProcessing(true);
+        setProgress(progress2);
+      });
+      return () => off();
+    }, [archiveQueue]);
+    p$6(() => {
       const off = deleteQueue.on("progress", (progress2) => {
         setProcessing(true);
         setProgress(progress2);
@@ -22232,6 +22290,15 @@ ${content2}`;
       });
       return () => off();
     }, [requestQueue, exportAllOptions, exportType, format, metaList]);
+    p$6(() => {
+      const off = archiveQueue.on("done", () => {
+        setProcessing(false);
+        setApiConversations(apiConversations.filter((c2) => !selected.some((s2) => s2.id === c2.id)));
+        setSelected([]);
+        alert(t2("Conversation Archived Message"));
+      });
+      return () => off();
+    }, [archiveQueue, apiConversations, selected, t2]);
     p$6(() => {
       const off = deleteQueue.on("done", () => {
         setProcessing(false);
@@ -22286,6 +22353,24 @@ ${content2}`;
       });
       deleteQueue.start();
     }, [disabled, selected, deleteQueue, t2]);
+    const archiveAll = T$4(() => {
+      if (disabled)
+        return;
+      const result = confirm(t2("Conversation Archive Alert"));
+      if (!result)
+        return;
+      archiveQueue.clear();
+      selected.forEach(({
+        id,
+        title: title2
+      }) => {
+        archiveQueue.add({
+          name: title2,
+          request: () => archiveConversation(id)
+        });
+      });
+      archiveQueue.start();
+    }, [disabled, selected, archiveQueue, t2]);
     p$6(() => {
       setLoading(true);
       fetchAllConversations().then(setApiConversations).catch(setError).finally(() => setLoading(false));
@@ -22303,7 +22388,7 @@ ${content2}`;
             return (_a = fileInputRef.current) == null ? void 0 : _a.click();
           },
           children: o$5(IconUpload, {
-            className: "w-4 h-4 text-white"
+            className: "w-4 h-4"
           })
         })]
       }), o$5("input", {
@@ -22342,6 +22427,11 @@ ${content2}`;
           className: "flex flex-grow"
         }), o$5("button", {
           className: "Button red",
+          disabled: disabled || exportSource === "Local",
+          onClick: archiveAll,
+          children: t2("Archive")
+        }), o$5("button", {
+          className: "Button red ml-4",
           disabled: disabled || exportSource === "Local",
           onClick: deleteAll,
           children: t2("Delete")
