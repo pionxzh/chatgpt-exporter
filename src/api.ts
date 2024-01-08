@@ -506,8 +506,8 @@ const endpoints = {
 const chatgpt = {
     openAIaccessToken: {},
 
-actAs: function(persona) {
-// Prompts ChatGPT to act as a persona from https://github.com/KudoAI/chat-prompts/blob/main/personas.json
+    actAs: function(persona) {
+    // Prompts ChatGPT to act as a persona from https://github.com/KudoAI/chat-prompts/blob/main/personas.json
 
     const promptsUrl = 'https://raw.githubusercontent.com/KudoAI/chat-prompts/main/dist/personas.min.json';
     return new Promise((resolve, reject) => {
