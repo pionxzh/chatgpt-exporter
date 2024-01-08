@@ -488,3 +488,59 @@ function mergeContinuationNodes(nodes: ConversationNode[]): ConversationNode[] {
     }
     return result
 }
+
+//ChatGPT.js Extracts-----------------------
+
+const endpoints = {
+    assets: 'https://raw.githubusercontent.com/KudoAI/chatgpt.js/main',
+    openAI: {
+        session: 'https://chat.openai.com/api/auth/session',
+        chats: 'https://chat.openai.com/backend-api/conversations',
+        chat: 'https://chat.openai.com/backend-api/conversation',
+        share_create: 'https://chat.openai.com/backend-api/share/create',
+        share: 'https://chat.openai.com/backend-api/share',
+        instructions: 'https://chat.openai.com/backend-api/user_system_messages'
+    }
+};
+
+const chatgpt = {
+    openAIaccessToken: {},
+
+actAs: function(persona) {
+// Prompts ChatGPT to act as a persona from https://github.com/KudoAI/chat-prompts/blob/main/personas.json
+
+    const promptsUrl = 'https://raw.githubusercontent.com/KudoAI/chat-prompts/main/dist/personas.min.json';
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', promptsUrl, true); xhr.send();
+        xhr.onload = () => {
+            if (xhr.status !== 200) return reject('🤖 chatgpt.js >> Request failed. Cannot retrieve prompts data.');
+            const data = JSON.parse(xhr.responseText).personas;
+            if (!persona) {
+                console.log('\n%c🤖 chatgpt.js personas\n',
+                    'font-family: sans-serif ; font-size: xxx-large ; font-weight: bold');
+                for (const prompt of data) // list personas
+                    console.log(`%c${ prompt.title }`, 'font-family: monospace ; font-size: larger ;');
+                return resolve();
+            }
+            const selectedPrompt = data.find(obj => obj.title.toLowerCase() == persona.toLowerCase());
+            if (!selectedPrompt)
+                return reject(`🤖 chatgpt.js >> Persona '${ persona }' was not found!`);
+            chatgpt.send(selectedPrompt.prompt, 'click');
+            console.info(`Loading ${ persona } persona...`);
+            chatgpt.isIdle().then(() => { console.info('Persona activated!'); });
+            return resolve();
+        };
+    });
+},
+
+askAndGetReply: async function(query) {
+    chatgpt.send(query); await chatgpt.isIdle();
+    return chatgpt.getChatData('active', 'msg', 'chatgpt', 'latest');
+},
+    
+askAndGetReply: async function(query) {
+        chatgpt.send(query); await chatgpt.isIdle();
+        return chatgpt.getChatData('active', 'msg', 'chatgpt', 'latest');
+    },
+
