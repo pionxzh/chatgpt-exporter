@@ -54,6 +54,8 @@ export default defineConfig({
                     'https://chat.oaifree.com/c/*',
                     'https://chat.oaifree.com/share/*',
                     'https://chat.oaifree.com/share/*/continue',
+
+                    'https://cc.plusai.me/',
                 ],
                 'icon': 'https://chat.openai.com/favicon.ico',
                 'run-at': 'document-end',

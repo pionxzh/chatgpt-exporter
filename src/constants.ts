@@ -2,6 +2,7 @@ const API_MAPPING: Record<string, string> = {
     'https://chat.openai.com': 'https://chat.openai.com/backend-api',
     'https://chat.zhile.io': 'https://chat.zhile.io/backend-api',
     'https://chat.oaifree.com': 'https://chat.oaifree.com/backend-api',
+    'https://cc.plusai.me': 'https://cc.plusai.me/backend-api',
 }
 
 // export const baseUrl = 'https://chat.openai.com'
