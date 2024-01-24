@@ -1,9 +1,9 @@
 {
   "name": "@pionxzh/chatgpt-exporter",
   "type": "module",
-  "version": "2.18.1",
+  "version": "2.19.0",
   "private": true,
-  "packageManager": "pnpm@8.10.2",
+  "packageManager": "pnpm@8.14.1",
   "title": "ChatGPT Exporter",
   "title:zh-CN": "ChatGPT Exporter",
   "title:zh-TW": "ChatGPT Exporter",
@@ -50,21 +50,21 @@
     "sanitize-filename": "^1.6.3",
     "sentinel-js": "^0.0.7",
     "urlcat": "^2.0.4",
-    "vite-plugin-monkey": "^3.5.0"
+    "vite-plugin-monkey": "^3.5.1"
   },
   "devDependencies": {
-    "@commitlint/cli": "^18.2.0",
-    "@commitlint/config-conventional": "^18.1.0",
+    "@commitlint/cli": "^18.4.4",
+    "@commitlint/config-conventional": "^18.4.4",
     "@pionxzh/eslint-config": "^1.0.1",
-    "@preact/preset-vite": "^2.6.0",
-    "@types/mdast": "^3.0.12",
-    "@types/node": "^20.5.1",
-    "@types/unist": "^2.0.7",
-    "eslint": "^8.53.0",
+    "@preact/preset-vite": "^2.8.1",
+    "@types/mdast": "^3.0.15",
+    "@types/node": "^20.11.5",
+    "@types/unist": "^2.0.10",
+    "eslint": "^8.56.0",
     "husky": "^8.0.3",
-    "lint-staged": "^15.0.2",
+    "lint-staged": "^15.2.0",
     "typescript": "^5.2.2",
-    "vite": "^4.5.0"
+    "vite": "^5.0.12"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "pnpm exec eslint"

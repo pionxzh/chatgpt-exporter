@@ -43,14 +43,15 @@ function main() {
         /** Insert timestamp to the bottom right of each message */
         let chatId = ''
         sentinel.on('[role="presentation"]', async () => {
-            const threadContents = Array.from(document.querySelectorAll('main [data-testid^="conversation-turn-"] [data-message-id]'))
-
             const currentChatId = getChatIdFromUrl()
             if (!currentChatId || currentChatId === chatId) return
             chatId = currentChatId
 
             const rawConversation = await fetchConversation(chatId, false)
             const { conversationNodes } = processConversation(rawConversation)
+
+            const threadContents = Array.from(document.querySelectorAll('main [data-testid^="conversation-turn-"] [data-message-id]'))
+            if (threadContents.length === 0) return
 
             threadContents.forEach((thread, index) => {
                 const createTime = conversationNodes[index]?.message?.create_time

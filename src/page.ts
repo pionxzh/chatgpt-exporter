@@ -99,5 +99,5 @@ export async function getUserAvatar(): Promise<string> {
 }
 
 export function checkIfConversationStarted() {
-    return !!document.querySelector('main .group')
+    return !!document.querySelector('[data-testid^="conversation-turn-"]')
 }

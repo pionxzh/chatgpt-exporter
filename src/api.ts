@@ -48,6 +48,7 @@ interface CiteMetadata {
 interface MessageMeta {
     aggregate_result?: {
         code: string
+        final_expression_output?: string
         end_time: number
         jupyter_messages: unknown[]
         messages: Array<{
@@ -63,14 +64,17 @@ interface MessageMeta {
         status: 'success' | 'error' & (string & {})
         update_time: number
     }
-    args: unknown
-    command: 'click' | 'search' | 'quote' | 'quote_lines' | 'scroll' & (string & {})
+    args?: unknown
+    command?: 'click' | 'search' | 'quote' | 'quote_lines' | 'scroll' & (string & {})
     finish_details?: {
-        stop: string
+        // stop: string
+        stop_tokens?: number[]
         type: 'stop' | 'interrupted' & (string & {})
     }
+    is_complete?: boolean
     model_slug?: ModelSlug & (string & {})
-    timestamp_: 'absolute' & (string & {})
+    parent_id?: string
+    timestamp_?: 'absolute' & (string & {})
     citations?: Citation[]
     _cite_metadata?: CiteMetadata
 }
@@ -101,7 +105,7 @@ interface MultiModalInputImage {
 export interface ConversationNodeMessage {
     author: {
         role: AuthorRole
-        name?: 'browser' & (string & {})
+        name?: 'browser' | 'python' & (string & {})
         metadata: unknown
     }
     content: {
@@ -134,12 +138,14 @@ export interface ConversationNodeMessage {
         content_type: 'multimodal_text'
         parts: Array<MultiModalInputImage | string>
     }
-    create_time: number
-    end_turn: boolean
+    create_time?: number
+    update_time?: number
+    // end_turn: boolean
     id: string
     metadata?: MessageMeta
     recipient: 'all' | 'browser' | 'python' | 'dalle.text2im' & (string & {})
     status: string
+    end_turn?: boolean
     weight: number
 }
 
@@ -152,13 +158,16 @@ export interface ConversationNode {
 
 export interface ApiConversation {
     create_time: number
+    conversation_id?: string
     current_node: string
     mapping: {
         [key: string]: ConversationNode
     }
     moderation_results: unknown[]
     title: string
+    is_archived: boolean
     update_time: number
+    safe_urls?: string[]
 }
 
 export type ApiConversationWithId = ApiConversation & {
@@ -313,6 +322,16 @@ export async function fetchAllConversations(): Promise<ApiConversationItem[]> {
         offset += limit
     }
     return conversations
+}
+
+export async function archiveConversation(chatId: string): Promise<boolean> {
+    const url = conversationApi(chatId)
+    const { success } = await fetchApi<{ success: boolean }>(url, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_archived: true }),
+    })
+    return success
 }
 
 export async function deleteConversation(chatId: string): Promise<boolean> {

@@ -9,6 +9,7 @@
   "Markdown": "Markdown",
   "HTML": "HTML",
   "JSON": "JSON",
+  "Archive": "Archive",
   "Save": "Save",
   "Delete": "Delete",
   "Select All": "Select All",
@@ -33,6 +34,8 @@
   "Export JSON Format Description": "Export JSON in OpenAI Official Format",
   "Export Metadata": "Export Metadata",
   "Export Metadata Description": "Add metadata to exported Markdown and HTML files.",
+  "Conversation Archive Alert": "Are you sure you want to archive all selected conversations?",
+  "Conversation Archived Message": "All selected conversations have been archived. Please refresh the page to see the changes.",
   "Conversation Delete Alert": "Are you sure you want to delete all selected conversations?",
   "Conversation Deleted Message": "All selected conversations have been deleted. Please refresh the page to see the changes.",
   "Please start a conversation first": "Please start a conversation first."
