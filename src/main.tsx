@@ -12,6 +12,11 @@ main()
 
 function main() {
     onloadSafe(() => {
+        // 检查页面是否包含ID为'prompt-textarea'的<textarea>元素
+        const promptTextarea = document.getElementById('prompt-textarea')
+        if (!promptTextarea) {
+            return // 如果不存在，则不执行后续操作
+        }
         const container = document.createElement('div')
         // to overlap on the list section
         container.style.zIndex = '20'

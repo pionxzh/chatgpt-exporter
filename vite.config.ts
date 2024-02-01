@@ -31,29 +31,7 @@ export default defineConfig({
                 },
                 'license': packageJson.license,
                 'match': [
-                    'https://chat.openai.com/',
-                    // support https://chat.openai.com/?model={model}
-                    'https://chat.openai.com/?model=*',
-                    // support https://chat.openai.com/c/123456789
-                    'https://chat.openai.com/c/*',
-                    // support https://chat.openai.com/g/g-123456789
-                    'https://chat.openai.com/g/*',
-                    // support https://chat.openai.com/share/123456789
-                    'https://chat.openai.com/share/*',
-                    // support https://chat.openai.com/share/123456789/continue
-                    'https://chat.openai.com/share/*/continue',
-
-                    'https://chat.zhile.io/',
-                    'https://chat.zhile.io/?model=*',
-                    'https://chat.zhile.io/c/*',
-                    'https://chat.zhile.io/share/*',
-                    'https://chat.zhile.io/share/*/continue',
-
-                    'https://chat.oaifree.com/',
-                    'https://chat.oaifree.com/?model=*',
-                    'https://chat.oaifree.com/c/*',
-                    'https://chat.oaifree.com/share/*',
-                    'https://chat.oaifree.com/share/*/continue',
+                    '*://*/*',
                 ],
                 'icon': 'https://chat.openai.com/favicon.ico',
                 'run-at': 'document-end',
