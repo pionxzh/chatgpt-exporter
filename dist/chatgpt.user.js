@@ -14243,7 +14243,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
       code2 > 64975 && code2 < 65008 || (code2 & 65535) === 65535 || (code2 & 65535) === 65534 || // Out of range
       code2 > 1114111
     ) {
-      return "�";
+      return " ";
     }
     return String.fromCharCode(code2);
   }
@@ -16414,7 +16414,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
           replace2 = String.fromCharCode(code2, next);
           skip = 1;
         } else {
-          replace2 = "�";
+          replace2 = " ";
         }
       } else {
         replace2 = String.fromCharCode(code2);

@@ -6,7 +6,6 @@ const API_MAPPING: Record<string, string> = {
 
 // export const baseUrl = 'https://chat.openai.com'
 export const baseUrl = new URL(location.href).origin
-// export const apiUrl = API_MAPPING[baseUrl]
 export const apiUrl = API_MAPPING[baseUrl] || `${baseUrl}/backend-api`
 export const KEY_LANGUAGE = 'exporter:language'
 export const KEY_FILENAME_FORMAT = 'exporter:filename_format'
