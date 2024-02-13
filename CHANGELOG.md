@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.20.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.19.0...userscript-v2.20.0) (2024-02-13)
+
+
+### Features
+
+* support /gpts paths ([efbd662](https://github.com/pionxzh/chatgpt-exporter/commit/efbd662c772c6e6188b93c166397f1a98cb9baaf))
+
+
+### Bug Fixes
+
+* fix broken style becasue of the updates and improve light style ([ab246ac](https://github.com/pionxzh/chatgpt-exporter/commit/ab246acf905cdb1a550adaeefc90ffc612d03549))
+* improve timestamp injection ([e0eaa65](https://github.com/pionxzh/chatgpt-exporter/commit/e0eaa656f8bdf410e6c3ec78116c427a7fbd57b7))
+* remove weird white rect from the bottom of screenshot export ([fdcf86d](https://github.com/pionxzh/chatgpt-exporter/commit/fdcf86d5d25a3e5cc44fb9db9f5366617bbf0e55))
+
 ## [2.19.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.18.1...userscript-v2.19.0) (2024-01-07)
 
 
