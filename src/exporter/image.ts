@@ -29,7 +29,8 @@ export async function exportToPng(fileNameFormat: string) {
     effect.add(() => {
         const style = document.createElement('style')
         style.textContent = `
-            [data-testid^="conversation-turn-"] {
+        main [class^=\'react-scroll-to-bottom\'] > div > div,
+        [data-testid^="conversation-turn-"] {
                 color: ${isDarkMode ? '#ececf1' : '#0f0f0f'};
                 background-color: ${isDarkMode ? 'rgb(52,53,65)' : '#fff'};
             }
