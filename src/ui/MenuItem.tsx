@@ -42,7 +42,14 @@ export const MenuItem: FC<MenuItemProps> = ({ text, successText, disabled = fals
 
     return (
         <div
-            className={`menu-item flex py-3 px-3 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm mb-2 flex-shrink-0 border border-white/20 ${className}`}
+            className={`
+            menu-item
+            flex flex-shrink-0 py-3 px-3 items-center gap-3 rounded-lg mb-2
+            bg-menu hover:bg-gray-500/10
+            transition-colors duration-200
+            text-black dark:text-white text-sm
+            cursor-pointer
+            border border-menu ${className}`}
             onClick={handleClick}
             onTouchStart={handleClick}
             disabled={disabled}

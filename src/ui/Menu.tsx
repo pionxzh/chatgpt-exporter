@@ -98,9 +98,14 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                     forceMount={open || settingOpen || exportOpen}
                 >
                     <HoverCard.Content
-                        className={isMobile
-                            ? 'grid grid-cols-2 gap-x-1 px-1.5 pt-2 rounded bg-gray-900 shadow-md transition-opacity duration-200 animate-slideUp'
-                            : 'grid grid-cols-2 gap-x-1 px-1.5 py-2 pb-0 rounded-md bg-gray-900 shadow-md transition-opacity duration-200 animate-fadeIn'}
+                        className={`
+                        grid grid-cols-2
+                        bg-menu
+                        border border-menu
+                        transition-opacity duration-200 shadow-md
+                        ${isMobile
+                            ? 'gap-x-1 px-1.5 pt-2 rounded animate-slideUp'
+                            : 'gap-x-1 px-1.5 py-2 pb-0 rounded-md animate-fadeIn'}`}
                         style={{
                             width: isMobile ? 316 : 268,
                             left: -6,
@@ -165,7 +170,17 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                             </div>
                         </ExportDialog>
 
-                        {!isMobile && <HoverCard.Arrow width="16" height="8" className="text-gray-900 fill-current" />}
+                        {!isMobile && (
+                            <HoverCard.Arrow
+                                width="16"
+                                height="8"
+                                style={{
+                                    'fill': 'var(--ce-menu-primary)',
+                                    'stroke': 'var(--ce-border-light)',
+                                    'stoke-width': '2px',
+                                }}
+                            />
+                        )}
                     </HoverCard.Content>
                 </Portal>
             </HoverCard.Root>

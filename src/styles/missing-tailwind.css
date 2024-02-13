@@ -7,8 +7,7 @@
 }
 
 .bg-blue-600 {
-    --tw-bg-opacity: 1;
-    background-color: rgb(28 100 242/var(--tw-bg-opacity));
+    background-color: rgb(28 100 242);
 }
 
 .border-\[\#6f6e77\] {
@@ -20,17 +19,19 @@
 }
 
 .dark .dark\:bg-white\/5 {
-    --tw-bg-opacity: 1;
     background-color: rgb(255 255 255 / 5%);
+}
+
+.dark .dark\:text-gray-200 {
+    color: rgb(229 231 235 / 1);
+}
+
+.dark .dark\:text-gray-300 {
+    color: rgb(209 213 219 / 1);
 }
 
 .dark .dark\:border-gray-\[\#86858d\] {
     border-color: #86858d;
-}
-
-
-.fill-current {
-    fill: currentColor;
 }
 
 .gap-x-1 {
@@ -43,10 +44,6 @@
 
 .h-4 {
     height: 1rem;
-}
-
-.h-5 {
-    height: 1.25rem;
 }
 
 .ml-3 {

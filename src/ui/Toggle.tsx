@@ -16,11 +16,11 @@ export function Toggle({ label, checked = true, onCheckedUpdate }: ToggleProps) 
                 checked={checked}
                 onChange={onCheckedUpdate}
                 data-state={checked ? 'checked' : 'unchecked'}
-                className="bg-gray-200 radix-state-checked:bg-green-600 relative h-6 w-[42px] cursor-pointer rounded-full shrink-0"
+                className="bg-gray-200 radix-state-checked:bg-green-600 relative h-[20px] w-[32px] cursor-pointer rounded-full shrink-0"
             >
                 <span
                     data-state={checked ? 'checked' : 'unchecked'}
-                    className="block h-5 w-5 rounded-full translate-x-0.5 transition-transform duration-100 will-change-transform radix-state-checked:translate-x-[19px] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.45)]"
+                    className="block h-[16px] w-[16px] rounded-full translate-x-0.5 transition-transform duration-100 will-change-transform radix-state-checked:translate-x-[14px] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.45)]"
                 >
                 </span>
             </Switch>

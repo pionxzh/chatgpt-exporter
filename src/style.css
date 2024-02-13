@@ -23,6 +23,24 @@ body[data-time-format="24"] span[data-time-format="24"] {
     box-shadow: 0 0 0 1px #6f6e77;
 }
 
+html {
+    --ce-menu-primary: var(--popover-surface-primary, #fff);
+    --ce-menu-secondary: var(--popover-surface-secondary, #ececec);
+    --ce-border-light: var(--border-light, rgba(0, 0, 0, .1));
+}
+
+.dark {
+    --ce-menu-primary: var(--popover-surface-primary, #2f2f2f);
+}
+
+.bg-menu {
+    background-color: var(--ce-menu-primary);
+}
+
+.border-menu {
+    border-color: var(--ce-border-light);
+}
+
 .menu-item {
     height: 46px;
 }

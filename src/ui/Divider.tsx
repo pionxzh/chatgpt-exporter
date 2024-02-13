@@ -1,1 +1,1 @@
-export const Divider = () => <div className="border-b border-white/20"></div>
+export const Divider = () => <div className="h-px bg-token-border-light"></div>
