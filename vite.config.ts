@@ -38,6 +38,9 @@ export default defineConfig({
                     'https://chat.openai.com/c/*',
                     // support https://chat.openai.com/g/g-123456789
                     'https://chat.openai.com/g/*',
+                    // support https://chat.openai.com/gpts/
+                    'https://chat.openai.com/gpts',
+                    'https://chat.openai.com/gpts/*',
                     // support https://chat.openai.com/share/123456789
                     'https://chat.openai.com/share/*',
                     // support https://chat.openai.com/share/123456789/continue
