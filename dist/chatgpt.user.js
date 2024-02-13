@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.19.0
+// @version            2.20.0
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -14,6 +14,8 @@
 // @match              https://chat.openai.com/?model=*
 // @match              https://chat.openai.com/c/*
 // @match              https://chat.openai.com/g/*
+// @match              https://chat.openai.com/gpts
+// @match              https://chat.openai.com/gpts/*
 // @match              https://chat.openai.com/share/*
 // @match              https://chat.openai.com/share/*/continue
 // @match              https://chat.zhile.io/
@@ -110,6 +112,24 @@ body[data-time-format="24"] span[data-time-format="24"] {
     background-color: #2f2f2f;
     color: #fff;
     box-shadow: 0 0 0 1px #6f6e77;
+}
+
+html {
+    --ce-menu-primary: var(--popover-surface-primary, #fff);
+    --ce-menu-secondary: var(--popover-surface-secondary, #ececec);
+    --ce-border-light: var(--border-light, rgba(0, 0, 0, .1));
+}
+
+.dark {
+    --ce-menu-primary: var(--popover-surface-primary, #2f2f2f);
+}
+
+.bg-menu {
+    background-color: var(--ce-menu-primary);
+}
+
+.border-menu {
+    border-color: var(--ce-border-light);
 }
 
 .menu-item {
@@ -412,8 +432,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
 }
 
 .bg-blue-600 {
-    --tw-bg-opacity: 1;
-    background-color: rgb(28 100 242/var(--tw-bg-opacity));
+    background-color: rgb(28 100 242);
 }
 
 .border-\\[\\#6f6e77\\] {
@@ -425,17 +444,19 @@ body[data-time-format="24"] span[data-time-format="24"] {
 }
 
 .dark .dark\\:bg-white\\/5 {
-    --tw-bg-opacity: 1;
     background-color: rgb(255 255 255 / 5%);
+}
+
+.dark .dark\\:text-gray-200 {
+    color: rgb(229 231 235 / 1);
+}
+
+.dark .dark\\:text-gray-300 {
+    color: rgb(209 213 219 / 1);
 }
 
 .dark .dark\\:border-gray-\\[\\#86858d\\] {
     border-color: #86858d;
-}
-
-
-.fill-current {
-    fill: currentColor;
 }
 
 .gap-x-1 {
@@ -448,10 +469,6 @@ body[data-time-format="24"] span[data-time-format="24"] {
 
 .h-4 {
     height: 1rem;
-}
-
-.h-5 {
-    height: 1.25rem;
 }
 
 .ml-3 {
@@ -16205,16 +16222,16 @@ body[data-time-format="24"] span[data-time-format="24"] {
     return marker;
   }
   function checkListItemIndent(state) {
-    const style2 = state.options.listItemIndent || "tab";
-    if (style2 === 1 || style2 === "1") {
+    const style = state.options.listItemIndent || "tab";
+    if (style === 1 || style === "1") {
       return "one";
     }
-    if (style2 !== "tab" && style2 !== "one" && style2 !== "mixed") {
+    if (style !== "tab" && style !== "one" && style !== "mixed") {
       throw new Error(
-        "Cannot serialize items with `" + style2 + "` for `options.listItemIndent`, expected `tab`, `one`, or `mixed`"
+        "Cannot serialize items with `" + style + "` for `options.listItemIndent`, expected `tab`, `one`, or `mixed`"
       );
     }
-    return style2;
+    return style;
   }
   function listItem$1(node2, parent, state, info) {
     const listItemIndent = checkListItemIndent(state);
@@ -19780,9 +19797,10 @@ ${content2.text}
     }
     const isDarkMode = document.documentElement.classList.contains("dark");
     effect.add(() => {
-      const style2 = document.createElement("style");
-      style2.textContent = `
-            [data-testid^="conversation-turn-"] {
+      const style = document.createElement("style");
+      style.textContent = `
+        main [class^='react-scroll-to-bottom'] > div > div,
+        [data-testid^="conversation-turn-"] {
                 color: ${isDarkMode ? "#ececf1" : "#0f0f0f"};
                 background-color: ${isDarkMode ? "rgb(52,53,65)" : "#fff"};
             }
@@ -19796,8 +19814,8 @@ ${content2.text}
                 padding-bottom: 2px;
             }
             `;
-      thread.appendChild(style2);
-      return () => style2.remove();
+      thread.appendChild(style);
+      return () => style.remove();
     });
     const topHeader = thread.querySelector(".sticky.top-0");
     if (topHeader) {
@@ -20292,7 +20310,7 @@ ${content2}`;
     return l$5.vnode && l$5.vnode(i2), i2;
   }
   const Divider = () => o$5("div", {
-    className: "border-b border-white/20"
+    className: "h-px bg-token-border-light"
   });
   const $1746a345f3d73bb7$var$useReactId = e$2["useId".toString()] || (() => void 0);
   let $1746a345f3d73bb7$var$count = 0;
@@ -20809,10 +20827,10 @@ ${content2}`;
     var counter = 0;
     var stylesheet = null;
     return {
-      add: function(style2) {
+      add: function(style) {
         if (counter == 0) {
           if (stylesheet = makeStyleTag()) {
-            injectStyles(stylesheet, style2);
+            injectStyles(stylesheet, style);
             insertStyleTag(stylesheet);
           }
         }
@@ -21809,13 +21827,13 @@ ${content2}`;
   }
   function IconCopy({
     className,
-    style: style2
+    style
   }) {
     return o$5("svg", {
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: "0 0 512 512",
       className,
-      style: style2,
+      style,
       fill: "currentColor",
       children: o$5("path", {
         d: "M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"
@@ -21922,7 +21940,7 @@ ${content2}`;
   }
   function IconLoading({
     className,
-    style: style2
+    style
   }) {
     return o$5("span", {
       style: {
@@ -21934,7 +21952,7 @@ ${content2}`;
         className,
         style: {
           animation: "1.4s ease-in-out 0s infinite normal none running circularDash",
-          ...style2
+          ...style
         },
         fill: "none",
         stroke: "currentColor",
@@ -21985,13 +22003,13 @@ ${content2}`;
   }
   function IconTrash({
     className,
-    style: style2
+    style
   }) {
     return o$5("svg", {
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: "0 0 24 24",
       className,
-      style: style2,
+      style,
       fill: "none",
       "stroke-linecap": "round",
       "stroke-linejoin": "round",
@@ -22012,13 +22030,13 @@ ${content2}`;
   }
   function IconUpload({
     className,
-    style: style2
+    style
   }) {
     return o$5("svg", {
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: "0 0 24 24",
       className,
-      style: style2,
+      style,
       fill: "none",
       "stroke-linecap": "round",
       "stroke-linejoin": "round",
@@ -22523,7 +22541,14 @@ ${content2}`;
       }
     } : void 0;
     return o$5("div", {
-      className: `menu-item flex py-3 px-3 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm mb-2 flex-shrink-0 border border-white/20 ${className}`,
+      className: `
+            menu-item
+            flex flex-shrink-0 py-3 px-3 items-center gap-3 rounded-lg mb-2
+            bg-menu hover:bg-gray-500/10
+            transition-colors duration-200
+            text-black dark:text-white text-sm
+            cursor-pointer
+            border border-menu ${className}`,
       onClick: handleClick,
       onTouchStart: handleClick,
       disabled,
@@ -22926,10 +22951,10 @@ ${content2}`;
         checked,
         onChange: onCheckedUpdate,
         "data-state": checked ? "checked" : "unchecked",
-        className: "bg-gray-200 radix-state-checked:bg-green-600 relative h-6 w-[42px] cursor-pointer rounded-full shrink-0",
+        className: "bg-gray-200 radix-state-checked:bg-green-600 relative h-[20px] w-[32px] cursor-pointer rounded-full shrink-0",
         children: o$5("span", {
           "data-state": checked ? "checked" : "unchecked",
-          className: "block h-5 w-5 rounded-full translate-x-0.5 transition-transform duration-100 will-change-transform radix-state-checked:translate-x-[19px] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.45)]"
+          className: "block h-[16px] w-[16px] rounded-full translate-x-0.5 transition-transform duration-100 will-change-transform radix-state-checked:translate-x-[14px] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.45)]"
         })
       }), label && o$5("span", {
         className: "ml-3 text-sm font-medium text-gray-900 dark:text-gray-300",
@@ -23318,7 +23343,12 @@ ${content2}`;
           container: isMobile ? container : document.body,
           forceMount: open || settingOpen || exportOpen,
           children: o$5($cef8881cdc69808e$export$7c6e2c02157bb7d2, {
-            className: isMobile ? "grid grid-cols-2 gap-x-1 px-1.5 pt-2 rounded bg-gray-900 shadow-md transition-opacity duration-200 animate-slideUp" : "grid grid-cols-2 gap-x-1 px-1.5 py-2 pb-0 rounded-md bg-gray-900 shadow-md transition-opacity duration-200 animate-fadeIn",
+            className: `
+                        grid grid-cols-2
+                        bg-menu
+                        border border-menu
+                        transition-opacity duration-200 shadow-md
+                        ${isMobile ? "gap-x-1 px-1.5 pt-2 rounded animate-slideUp" : "gap-x-1 px-1.5 py-2 pb-0 rounded-md animate-fadeIn"}`,
             style: {
               width: isMobile ? 316 : 268,
               left: -6,
@@ -23381,7 +23411,11 @@ ${content2}`;
             }), !isMobile && o$5($cef8881cdc69808e$export$21b07c8f274aebd5, {
               width: "16",
               height: "8",
-              className: "text-gray-900 fill-current"
+              style: {
+                "fill": "var(--ce-menu-primary)",
+                "stroke": "var(--ce-border-light)",
+                "stoke-width": "2px"
+              }
             })]
           })
         })]
@@ -23424,7 +23458,6 @@ ${content2}`;
       }
       let chatId = "";
       sentinel.on('[role="presentation"]', async () => {
-        const threadContents = Array.from(document.querySelectorAll('main [data-testid^="conversation-turn-"] [data-message-id]'));
         const currentChatId = getChatIdFromUrl();
         if (!currentChatId || currentChatId === chatId)
           return;
@@ -23433,6 +23466,9 @@ ${content2}`;
         const {
           conversationNodes
         } = processConversation(rawConversation);
+        const threadContents = Array.from(document.querySelectorAll('main [data-testid^="conversation-turn-"] [data-message-id]'));
+        if (threadContents.length === 0)
+          return;
         threadContents.forEach((thread, index2) => {
           var _a, _b;
           const createTime = (_b = (_a = conversationNodes[index2]) == null ? void 0 : _a.message) == null ? void 0 : _b.create_time;
