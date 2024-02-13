@@ -45,18 +45,6 @@ export default defineConfig({
                     'https://chat.openai.com/share/*',
                     // support https://chat.openai.com/share/123456789/continue
                     'https://chat.openai.com/share/*/continue',
-
-                    'https://chat.zhile.io/',
-                    'https://chat.zhile.io/?model=*',
-                    'https://chat.zhile.io/c/*',
-                    'https://chat.zhile.io/share/*',
-                    'https://chat.zhile.io/share/*/continue',
-
-                    'https://chat.oaifree.com/',
-                    'https://chat.oaifree.com/?model=*',
-                    'https://chat.oaifree.com/c/*',
-                    'https://chat.oaifree.com/share/*',
-                    'https://chat.oaifree.com/share/*/continue',
                 ],
                 'icon': 'https://chat.openai.com/favicon.ico',
                 'run-at': 'document-end',
