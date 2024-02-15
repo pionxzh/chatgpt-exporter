@@ -388,14 +388,14 @@ export interface ConversationResult {
 }
 
 const ModelMapping: { [key in ModelSlug]: string } & { [key: string]: string } = {
-    'text-davinci-002-render-sha': 'GTP-3.5',
-    'text-davinci-002-render-paid': 'GTP-3.5',
-    'text-davinci-002-browse': 'GTP-3.5',
+    'text-davinci-002-render-sha': 'GPT-3.5',
+    'text-davinci-002-render-paid': 'GPT-3.5',
+    'text-davinci-002-browse': 'GPT-3.5',
     'gpt-4': 'GPT-4',
     'gpt-4-browsing': 'GPT-4 (Browser)',
 
     // fuzzy matching
-    'text-davinci-002': 'GTP-3.5',
+    'text-davinci-002': 'GPT-3.5',
 }
 
 export function processConversation(conversation: ApiConversationWithId): ConversationResult {
