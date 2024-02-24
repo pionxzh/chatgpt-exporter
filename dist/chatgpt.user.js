@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.20.0
+// @version            2.21.0
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -18,16 +18,6 @@
 // @match              https://chat.openai.com/gpts/*
 // @match              https://chat.openai.com/share/*
 // @match              https://chat.openai.com/share/*/continue
-// @match              https://chat.zhile.io/
-// @match              https://chat.zhile.io/?model=*
-// @match              https://chat.zhile.io/c/*
-// @match              https://chat.zhile.io/share/*
-// @match              https://chat.zhile.io/share/*/continue
-// @match              https://chat.oaifree.com/
-// @match              https://chat.oaifree.com/?model=*
-// @match              https://chat.oaifree.com/c/*
-// @match              https://chat.oaifree.com/share/*
-// @match              https://chat.oaifree.com/share/*/continue
 // @require            https://cdn.jsdelivr.net/npm/jszip@3.9.1/dist/jszip.min.js
 // @require            https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js
 // @grant              GM_addStyle
@@ -38,495 +28,507 @@
 // @run-at             document-end
 // ==/UserScript==
 
-(n=>{if(typeof GM_addStyle=="function"){GM_addStyle(n);return}const e=document.createElement("style");e.textContent=n,document.head.append(e)})(` .CheckBoxLabel {
-    position: relative;
-    display: flex;
-    font-size: 16px;
-    vertical-align: middle;
-}
-
-.CheckBoxLabel * {
-    cursor: pointer;
-}
-
-.CheckBoxLabel[disabled] {
-    opacity: 0.7;
-}
-
-.CheckBoxLabel[disabled] * {
-    cursor: not-allowed;
-}
-
-.CheckBoxLabel input {
-    position: absolute;
-    opacity: 0;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    margin: 0;
-    padding: 0;
-}
-
-.CheckBoxLabel .IconWrapper {
-    display: inline-flex;
-    align-items: center;
-    position: relative;
-    vertical-align: middle;
-    font-size: 1.5rem;
-}
-
-.CheckBoxLabel input:checked ~ svg {
-    color: rgb(28 100 242);
-}
-
-.dark .CheckBoxLabel input:checked ~ svg {
-    color: rgb(144, 202, 249);
-}
-
-.CheckBoxLabel .LabelText {
-    margin-left: 0.5rem;
-    font-size: 1rem;
-    line-height: 1.5;
-}
-span[data-time-format] {
-    display: none;
-}
-
-body[data-time-format="12"] span[data-time-format="12"] {
-    display: inline;
-}
-
-body[data-time-format="24"] span[data-time-format="24"] {
-    display: inline;
-}
-
-.Select {
-    padding: 0 0 0 0.5rem;
-    width: 7.5rem;
-    border-radius: 4px;
-    box-shadow: 0 0 0 1px #6f6e77;
-}
-
-.dark .Select {
-    background-color: #2f2f2f;
-    color: #fff;
-    box-shadow: 0 0 0 1px #6f6e77;
-}
-
-html {
-    --ce-menu-primary: var(--popover-surface-primary, #fff);
-    --ce-menu-secondary: var(--popover-surface-secondary, #ececec);
-    --ce-border-light: var(--border-light, rgba(0, 0, 0, .1));
-}
-
-.dark {
-    --ce-menu-primary: var(--popover-surface-primary, #2f2f2f);
-}
-
-.bg-menu {
-    background-color: var(--ce-menu-primary);
-}
-
-.border-menu {
-    border-color: var(--ce-border-light);
-}
-
-.menu-item {
-    height: 46px;
-}
-
-.menu-item[disabled] {
-    filter: brightness(0.5);
-}
-
-.inputFieldSet {
-    display: block;
-    border-width: 2px;
-    border-style: groove;
-}
-
-.inputFieldSet legend {
-    margin-left: 4px;
-}
-
-.inputFieldSet input {
-    background-color: transparent;
-    box-shadow: none!important;
-}
-
-.row-half {
-    grid-column: auto / span 1;
-}
-
-.row-full {
-    grid-column: auto / span 2;
-}
-
-.dropdown-backdrop {
-    display: block;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: rgba(0,0,0,.5);
-    animation-name: pointerFadeIn;
-    animation-duration: .3s;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes slideUp {
-    from {
-        transform: translateY(100%);
-    }
-    to {
-        transform: translateY(0);
-    }
-}
-
-@keyframes pointerFadeIn {
-    from {
-        opacity: 0;
-        pointer-events: none;
-    }
-    to {
-        opacity: 1;
-        pointer-events: auto;
-    }
-}
-
-@keyframes rotate {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes circularDash {
-    0% {
-        stroke-dasharray: 1px, 200px;
-        stroke-dashoffset: 0;
-    }
-    50% {
-        stroke-dasharray: 100px, 200px;
-        stroke-dashoffset: -15px;
-    }
-    100% {
-        stroke-dasharray: 100px, 200px;
-        stroke-dashoffset: -125px;
-    }
-}
-.DialogOverlay {
-    background-color: rgba(0, 0, 0, 0.44);
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-    animation: fadeIn 150ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.DialogContent {
-    background-color: #f3f3f3;
-    border-radius: 6px;
-    box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90vw;
-    max-width: 560px;
-    max-height: 85vh;
-    overflow-x: hidden;
-    overflow-y: auto;
-    padding: 16px 24px;
-    z-index: 1001;
-    animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.dark .DialogContent {
-    background-color: #2a2a2a;
-    border-color: #40414f;
-    border-width: 1px;
-}
-
-.DialogContent input[type="checkbox"] {
-    border: none;
-    outline: none;
-    box-shadow: none;
-}
-
-.DialogTitle {
-    margin: 0 0 16px 0;
-    font-weight: 500;
-    color: #1a1523;
-    font-size: 20px;
-}
-
-.dark .DialogTitle {
-    color: #fff;
-}
-
-.Button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    padding: 0 15px;
-    font-size: 15px;
-    line-height: 1;
-    height: 35px;
-}
-.Button.green {
-    background-color: #ddf3e4;
-    color: #18794e;
-}
-.Button.red {
-    background-color: #f9d9d9;
-    color: #a71d2a;
-}
-.Button.green:hover {
-    background-color: #ccebd7;
-}
-.Button:disabled {
-    opacity: 0.5;
-    color: #6f6e77;
-    background-color: #e0e0e0;
-    cursor: not-allowed;
-}
-.Button:disabled:hover {
-    background-color: #e0e0e0;
-}
-
-.IconButton {
-    font-family: inherit;
-    border-radius: 100%;
-    height: 25px;
-    width: 25px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: #6f6e77;
-}
-.IconButton:hover {
-    background-color: rgba(0, 0, 0, 0.06);
-}
-
-.CloseButton {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-}
-
-.Fieldset {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.Label {
-    font-size: 15px;
-    color: #1a1523;
-    min-width: 90px;
-    text-align: right;
-}
-
-.dark .Label {
-    color: #fff;
-}
-
-.Input {
-    width: 100%;
-    flex: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    padding: 0 10px;
-    font-size: 15px;
-    line-height: 1;
-    color: #000;
-    background-color: #fafafa;
-    box-shadow: 0 0 0 1px #6f6e77;
-    height: 35px;
-    outline: none;
-}
-
-.dark .Input {
-    background-color: #2f2f2f;
-    color: #fff;
-    box-shadow: 0 0 0 1px #6f6e77;
-}
-
-.Description {
-    font-size: 13px;
-    color: #5a5865;
-    text-align: right;
-    margin-bottom: 4px;
-}
-
-.dark .Description {
-    color: #bcbcbc;
-}
-
-.SelectToolbar {
-    display: flex;
-    align-items: center;
-    padding: 12px 16px;
-    border-radius: 4px 4px 0 0;
-    border: 1px solid #6f6e77;
-    border-bottom: none;
-}
-
-.SelectList {
-    position: relative;
-    width: 100%;
-    height: 270px;
-    padding: 12px 16px;
-    overflow-x: hidden;
-    overflow-y: auto;
-    border: 1px solid #6f6e77;
-    border-radius: 0 0 4px 4px;
-    white-space: nowrap;
-}
-
-.SelectItem {
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.SelectItem label, .SelectItem input {
-    cursor: pointer;
-}
-
-.SelectItem span {
-    vertical-align: middle;
-}
-
-@keyframes contentShow {
-    from {
-        opacity: 0;
-        transform: translate(-50%, -48%) scale(0.96);
-    }
-    to {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-    }
-}
-.animate-fadeIn  {
-    animation: fadeIn .3s;
-}
-
-.animate-slideUp  {
-    animation: slideUp .3s;
-}
-
-.bg-blue-600 {
-    background-color: rgb(28 100 242);
-}
-
-.border-\\[\\#6f6e77\\] {
-    border-color: #6f6e77;
-}
-
-.cursor-help {
-    cursor: help;
-}
-
-.dark .dark\\:bg-white\\/5 {
-    background-color: rgb(255 255 255 / 5%);
-}
-
-.dark .dark\\:text-gray-200 {
-    color: rgb(229 231 235 / 1);
-}
-
-.dark .dark\\:text-gray-300 {
-    color: rgb(209 213 219 / 1);
-}
-
-.dark .dark\\:border-gray-\\[\\#86858d\\] {
-    border-color: #86858d;
-}
-
-.gap-x-1 {
-    column-gap: 0.25rem;
-}
-
-.h-2\\.5 {
-    height: 0.625rem;
-}
-
-.h-4 {
-    height: 1rem;
-}
-
-.ml-3 {
-    margin-left: 0.75rem;
-}
-
-.ml-4 {
-    margin-left: 1rem;
-}
-
-.mr-8 {
-    margin-right: 2rem;
-}
-
-.pb-0 {
-    padding-bottom: 0;
-}
-
-.pr-8 {
-    padding-right: 2rem;
-}
-
-.rounded-full {
-    border-radius: 9999px;
-}
-
-.select-all {
-    user-select: all!important;
-}
-
-.space-y-6>:not([hidden])~:not([hidden]) {
-    --tw-space-y-reverse: 0;
-    margin-top: calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));
-    margin-bottom: calc(1.5rem * var(--tw-space-y-reverse));
-}
-
-.truncate {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.whitespace-nowrap {
-    white-space: nowrap;
-}
-
-@media (min-width:768px) {
-    /* md */
-}
-
-@media (min-width:1024px) {
-    .lg\\:mt-0 {
-        margin-top: 0;
-    }
-
-    .lg\\:top-8 {
-        top: 2rem;
-    }
+(r=>{if(typeof GM_addStyle=="function"){GM_addStyle(r);return}const n=document.createElement("style");n.textContent=r,document.head.append(n)})(` .CheckBoxLabel {\r
+    position: relative;\r
+    display: flex;\r
+    font-size: 16px;\r
+    vertical-align: middle;\r
+}\r
+\r
+.CheckBoxLabel * {\r
+    cursor: pointer;\r
+}\r
+\r
+.CheckBoxLabel[disabled] {\r
+    opacity: 0.7;\r
+}\r
+\r
+.CheckBoxLabel[disabled] * {\r
+    cursor: not-allowed;\r
+}\r
+\r
+.CheckBoxLabel input {\r
+    position: absolute;\r
+    opacity: 0;\r
+    width: 100%;\r
+    height: 100%;\r
+    top: 0;\r
+    left: 0;\r
+    margin: 0;\r
+    padding: 0;\r
+}\r
+\r
+.CheckBoxLabel .IconWrapper {\r
+    display: inline-flex;\r
+    align-items: center;\r
+    position: relative;\r
+    vertical-align: middle;\r
+    font-size: 1.5rem;\r
+}\r
+\r
+.CheckBoxLabel input:checked ~ svg {\r
+    color: rgb(28 100 242);\r
+}\r
+\r
+.dark .CheckBoxLabel input:checked ~ svg {\r
+    color: rgb(144, 202, 249);\r
+}\r
+\r
+.CheckBoxLabel .LabelText {\r
+    margin-left: 0.5rem;\r
+    font-size: 1rem;\r
+    line-height: 1.5;\r
+}\r
+span[data-time-format] {\r
+    display: none;\r
+}\r
+\r
+body[data-time-format="12"] span[data-time-format="12"] {\r
+    display: inline;\r
+}\r
+\r
+body[data-time-format="24"] span[data-time-format="24"] {\r
+    display: inline;\r
+}\r
+\r
+.Select {\r
+    padding: 0 0 0 0.5rem;\r
+    width: 7.5rem;\r
+    border-radius: 4px;\r
+    box-shadow: 0 0 0 1px #6f6e77;\r
+}\r
+\r
+.dark .Select {\r
+    background-color: #2f2f2f;\r
+    color: #fff;\r
+    box-shadow: 0 0 0 1px #6f6e77;\r
+}\r
+\r
+html {\r
+    --ce-text-primary: var(--text-primary, #0d0d0d);\r
+    --ce-menu-primary: var(--sidebar-surface-primary, #f9f9f9);\r
+    --ce-menu-secondary: var(--sidebar-surface-secondary, #ececec);\r
+    --ce-border-light: var(--border-light, rgba(0, 0, 0, .1));\r
+}\r
+\r
+.dark {\r
+    --ce-text-primary: var(--text-primary, #ececec);\r
+    --ce-menu-primary: var(--sidebar-surface-primary, #171717);\r
+    --ce-menu-secondary: var(--sidebar-surface-secondary, #212121);\r
+}\r
+\r
+.text-menu {\r
+    color: var(--ce-text-primary);\r
+}\r
+\r
+.bg-menu {\r
+    background-color: var(--ce-menu-primary);\r
+}\r
+\r
+.border-menu {\r
+    border-color: var(--ce-border-light);\r
+}\r
+\r
+.menu-item {\r
+    height: 46px;\r
+}\r
+\r
+.menu-item[disabled] {\r
+    filter: brightness(0.5);\r
+}\r
+\r
+.inputFieldSet {\r
+    display: block;\r
+    border-width: 2px;\r
+    border-style: groove;\r
+}\r
+\r
+.inputFieldSet legend {\r
+    margin-left: 4px;\r
+}\r
+\r
+.inputFieldSet input {\r
+    background-color: transparent;\r
+    box-shadow: none!important;\r
+}\r
+\r
+.row-half {\r
+    grid-column: auto / span 1;\r
+}\r
+\r
+.row-full {\r
+    grid-column: auto / span 2;\r
+}\r
+\r
+.dropdown-backdrop {\r
+    display: block;\r
+    position: fixed;\r
+    top: 0;\r
+    bottom: 0;\r
+    left: 0;\r
+    right: 0;\r
+    background-color: rgba(0,0,0,.5);\r
+    animation-name: pointerFadeIn;\r
+    animation-duration: .3s;\r
+}\r
+\r
+@keyframes fadeIn {\r
+    from {\r
+        opacity: 0;\r
+    }\r
+    to {\r
+        opacity: 1;\r
+    }\r
+}\r
+\r
+@keyframes slideUp {\r
+    from {\r
+        transform: translateY(100%);\r
+    }\r
+    to {\r
+        transform: translateY(0);\r
+    }\r
+}\r
+\r
+@keyframes pointerFadeIn {\r
+    from {\r
+        opacity: 0;\r
+        pointer-events: none;\r
+    }\r
+    to {\r
+        opacity: 1;\r
+        pointer-events: auto;\r
+    }\r
+}\r
+\r
+@keyframes rotate {\r
+    from {\r
+        transform: rotate(0deg);\r
+    }\r
+    to {\r
+        transform: rotate(360deg);\r
+    }\r
+}\r
+\r
+@keyframes circularDash {\r
+    0% {\r
+        stroke-dasharray: 1px, 200px;\r
+        stroke-dashoffset: 0;\r
+    }\r
+    50% {\r
+        stroke-dasharray: 100px, 200px;\r
+        stroke-dashoffset: -15px;\r
+    }\r
+    100% {\r
+        stroke-dasharray: 100px, 200px;\r
+        stroke-dashoffset: -125px;\r
+    }\r
+}\r
+.DialogOverlay {\r
+    background-color: rgba(0, 0, 0, 0.44);\r
+    position: fixed;\r
+    inset: 0;\r
+    z-index: 1000;\r
+    animation: fadeIn 150ms cubic-bezier(0.16, 1, 0.3, 1);\r
+}\r
+\r
+.DialogContent {\r
+    background-color: #f3f3f3;\r
+    border-radius: 6px;\r
+    box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;\r
+    position: fixed;\r
+    top: 50%;\r
+    left: 50%;\r
+    transform: translate(-50%, -50%);\r
+    width: 90vw;\r
+    max-width: 560px;\r
+    max-height: 85vh;\r
+    overflow-x: hidden;\r
+    overflow-y: auto;\r
+    padding: 16px 24px;\r
+    z-index: 1001;\r
+    outline: none;\r
+    animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);\r
+}\r
+\r
+.dark .DialogContent {\r
+    background-color: #2a2a2a;\r
+    border-color: #40414f;\r
+    border-width: 1px;\r
+}\r
+\r
+.DialogContent input[type="checkbox"] {\r
+    border: none;\r
+    outline: none;\r
+    box-shadow: none;\r
+}\r
+\r
+.DialogTitle {\r
+    margin: 0 0 16px 0;\r
+    font-weight: 500;\r
+    color: #1a1523;\r
+    font-size: 20px;\r
+}\r
+\r
+.dark .DialogTitle {\r
+    color: #fff;\r
+}\r
+\r
+.Button {\r
+    display: inline-flex;\r
+    align-items: center;\r
+    justify-content: center;\r
+    border-radius: 4px;\r
+    padding: 0 15px;\r
+    font-size: 15px;\r
+    line-height: 1;\r
+    height: 35px;\r
+}\r
+.Button.green {\r
+    background-color: #ddf3e4;\r
+    color: #18794e;\r
+}\r
+.Button.red {\r
+    background-color: #f9d9d9;\r
+    color: #a71d2a;\r
+}\r
+.Button.green:hover {\r
+    background-color: #ccebd7;\r
+}\r
+.Button:disabled {\r
+    opacity: 0.5;\r
+    color: #6f6e77;\r
+    background-color: #e0e0e0;\r
+    cursor: not-allowed;\r
+}\r
+.Button:disabled:hover {\r
+    background-color: #e0e0e0;\r
+}\r
+\r
+.IconButton {\r
+    font-family: inherit;\r
+    border-radius: 100%;\r
+    height: 25px;\r
+    width: 25px;\r
+    display: inline-flex;\r
+    align-items: center;\r
+    justify-content: center;\r
+    color: #6f6e77;\r
+}\r
+.IconButton:hover {\r
+    background-color: rgba(0, 0, 0, 0.06);\r
+}\r
+\r
+.CloseButton {\r
+    position: absolute;\r
+    top: 10px;\r
+    right: 10px;\r
+}\r
+\r
+.Fieldset {\r
+    display: flex;\r
+    gap: 20px;\r
+    align-items: center;\r
+    margin-bottom: 15px;\r
+}\r
+\r
+.Label {\r
+    font-size: 15px;\r
+    color: #1a1523;\r
+    min-width: 90px;\r
+    text-align: right;\r
+}\r
+\r
+.dark .Label {\r
+    color: #fff;\r
+}\r
+\r
+.Input {\r
+    width: 100%;\r
+    flex: 1;\r
+    display: inline-flex;\r
+    align-items: center;\r
+    justify-content: center;\r
+    border-radius: 4px;\r
+    padding: 0 10px;\r
+    font-size: 15px;\r
+    line-height: 1;\r
+    color: #000;\r
+    background-color: #fafafa;\r
+    box-shadow: 0 0 0 1px #6f6e77;\r
+    height: 35px;\r
+    outline: none;\r
+}\r
+\r
+.dark .Input {\r
+    background-color: #2f2f2f;\r
+    color: #fff;\r
+    box-shadow: 0 0 0 1px #6f6e77;\r
+}\r
+\r
+.Description {\r
+    font-size: 13px;\r
+    color: #5a5865;\r
+    text-align: right;\r
+    margin-bottom: 4px;\r
+}\r
+\r
+.dark .Description {\r
+    color: #bcbcbc;\r
+}\r
+\r
+.SelectToolbar {\r
+    display: flex;\r
+    align-items: center;\r
+    padding: 12px 16px;\r
+    border-radius: 4px 4px 0 0;\r
+    border: 1px solid #6f6e77;\r
+    border-bottom: none;\r
+}\r
+\r
+.SelectList {\r
+    position: relative;\r
+    width: 100%;\r
+    height: 270px;\r
+    padding: 12px 16px;\r
+    overflow-x: hidden;\r
+    overflow-y: auto;\r
+    border: 1px solid #6f6e77;\r
+    border-radius: 0 0 4px 4px;\r
+    white-space: nowrap;\r
+}\r
+\r
+.SelectItem {\r
+    overflow: hidden;\r
+    text-overflow: ellipsis;\r
+}\r
+\r
+.SelectItem label, .SelectItem input {\r
+    cursor: pointer;\r
+}\r
+\r
+.SelectItem span {\r
+    vertical-align: middle;\r
+}\r
+\r
+@keyframes contentShow {\r
+    from {\r
+        opacity: 0;\r
+        transform: translate(-50%, -48%) scale(0.96);\r
+    }\r
+    to {\r
+        opacity: 1;\r
+        transform: translate(-50%, -50%) scale(1);\r
+    }\r
+}\r
+.animate-fadeIn  {\r
+    animation: fadeIn .3s;\r
+}\r
+\r
+.animate-slideUp  {\r
+    animation: slideUp .3s;\r
+}\r
+\r
+.bg-blue-600 {\r
+    background-color: rgb(28 100 242);\r
+}\r
+\r
+.hover\\:bg-gray-500\\/10:hover {\r
+    background-color: hsla(0, 0%, 61%, .1)\r
+}\r
+\r
+.border-\\[\\#6f6e77\\] {\r
+    border-color: #6f6e77;\r
+}\r
+\r
+.cursor-help {\r
+    cursor: help;\r
+}\r
+\r
+.dark .dark\\:bg-white\\/5 {\r
+    background-color: rgb(255 255 255 / 5%);\r
+}\r
+\r
+.dark .dark\\:text-gray-200 {\r
+    color: rgb(229 231 235 / 1);\r
+}\r
+\r
+.dark .dark\\:text-gray-300 {\r
+    color: rgb(209 213 219 / 1);\r
+}\r
+\r
+.dark .dark\\:border-gray-\\[\\#86858d\\] {\r
+    border-color: #86858d;\r
+}\r
+\r
+.gap-x-1 {\r
+    column-gap: 0.25rem;\r
+}\r
+\r
+.h-2\\.5 {\r
+    height: 0.625rem;\r
+}\r
+\r
+.h-4 {\r
+    height: 1rem;\r
+}\r
+\r
+.ml-3 {\r
+    margin-left: 0.75rem;\r
+}\r
+\r
+.ml-4 {\r
+    margin-left: 1rem;\r
+}\r
+\r
+.mr-8 {\r
+    margin-right: 2rem;\r
+}\r
+\r
+.pb-0 {\r
+    padding-bottom: 0;\r
+}\r
+\r
+.pr-8 {\r
+    padding-right: 2rem;\r
+}\r
+\r
+.rounded-full {\r
+    border-radius: 9999px;\r
+}\r
+\r
+.select-all {\r
+    user-select: all!important;\r
+}\r
+\r
+.space-y-6>:not([hidden])~:not([hidden]) {\r
+    --tw-space-y-reverse: 0;\r
+    margin-top: calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));\r
+    margin-bottom: calc(1.5rem * var(--tw-space-y-reverse));\r
+}\r
+\r
+.truncate {\r
+    overflow: hidden;\r
+    text-overflow: ellipsis;\r
+    white-space: nowrap;\r
+}\r
+\r
+.whitespace-nowrap {\r
+    white-space: nowrap;\r
+}\r
+\r
+@media (min-width:768px) {\r
+    /* md */\r
+}\r
+\r
+@media (min-width:1024px) {\r
+    .lg\\:mt-0 {\r
+        margin-top: 0;\r
+    }\r
+\r
+    .lg\\:top-8 {\r
+        top: 2rem;\r
+    }\r
 } `);
 
 (function (JSZip, html2canvas) {
@@ -1035,15 +1037,12 @@ html {
     return v2 !== void 0 && v2 !== null;
   }
   const API_MAPPING = {
-    "https://chat.openai.com": "https://chat.openai.com/backend-api",
-    "https://chat.zhile.io": "https://chat.zhile.io/backend-api",
-    "https://chat.oaifree.com": "https://chat.oaifree.com/backend-api"
+    "https://chat.openai.com": "https://chat.openai.com/backend-api"
   };
   const baseUrl = new URL(location.href).origin;
   const apiUrl = API_MAPPING[baseUrl];
   const KEY_LANGUAGE = "exporter:language";
   const KEY_FILENAME_FORMAT = "exporter:filename_format";
-  const KEY_OFFICIAL_JSON_FORMAT = "exporter:official_json_format";
   const KEY_TIMESTAMP_ENABLED = "exporter:enable_timestamp";
   const KEY_TIMESTAMP_24H = "exporter:timestamp_24h";
   const KEY_TIMESTAMP_MARKDOWN = "exporter:timestamp_markdown";
@@ -1309,13 +1308,13 @@ html {
     return session;
   }
   const ModelMapping = {
-    "text-davinci-002-render-sha": "GTP-3.5",
-    "text-davinci-002-render-paid": "GTP-3.5",
-    "text-davinci-002-browse": "GTP-3.5",
+    "text-davinci-002-render-sha": "GPT-3.5",
+    "text-davinci-002-render-paid": "GPT-3.5",
+    "text-davinci-002-browse": "GPT-3.5",
     "gpt-4": "GPT-4",
     "gpt-4-browsing": "GPT-4 (Browser)",
     // fuzzy matching
-    "text-davinci-002": "GTP-3.5"
+    "text-davinci-002": "GPT-3.5"
   };
   function processConversation(conversation) {
     var _a;
@@ -1927,6 +1926,20 @@ html {
         return ourEventHandler === null || ourEventHandler === void 0 ? void 0 : ourEventHandler(event);
     };
   }
+  function $6ed0406888f73fc4$var$setRef(ref, value) {
+    if (typeof ref === "function")
+      ref(value);
+    else if (ref !== null && ref !== void 0)
+      ref.current = value;
+  }
+  function $6ed0406888f73fc4$export$43e446d32b3d21af(...refs) {
+    return (node2) => refs.forEach(
+      (ref) => $6ed0406888f73fc4$var$setRef(ref, node2)
+    );
+  }
+  function $6ed0406888f73fc4$export$c7b2cbe3552a0d05(...refs) {
+    return T$4($6ed0406888f73fc4$export$43e446d32b3d21af(...refs), refs);
+  }
   function $c512c27ab02ef895$export$50c7b4e9d9f19c1(scopeName, createContextScopeDeps = []) {
     let defaultContexts = [];
     function $c512c27ab02ef895$export$fd42f52fd3ae1109(rootComponentName, defaultContext) {
@@ -2021,6 +2034,22 @@ html {
     createScope1.scopeName = baseScope.scopeName;
     return createScope1;
   }
+  const $9f79659886946c16$export$e5c5a5f917a5871c = Boolean(globalThis === null || globalThis === void 0 ? void 0 : globalThis.document) ? y$5 : () => {
+  };
+  const $1746a345f3d73bb7$var$useReactId = e$2["useId".toString()] || (() => void 0);
+  let $1746a345f3d73bb7$var$count = 0;
+  function $1746a345f3d73bb7$export$f680877a34711e37(deterministicId) {
+    const [id, setId] = h$4($1746a345f3d73bb7$var$useReactId());
+    $9f79659886946c16$export$e5c5a5f917a5871c(() => {
+      if (!deterministicId)
+        setId(
+          (reactId) => reactId !== null && reactId !== void 0 ? reactId : String($1746a345f3d73bb7$var$count++)
+        );
+    }, [
+      deterministicId
+    ]);
+    return deterministicId || (id ? `radix-${id}` : "");
+  }
   function $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(callback) {
     const callbackRef = _$1(callback);
     p$6(() => {
@@ -2079,20 +2108,1660 @@ html {
     ]);
     return uncontrolledState;
   }
-  function $6ed0406888f73fc4$var$setRef(ref, value) {
-    if (typeof ref === "function")
-      ref(value);
-    else if (ref !== null && ref !== void 0)
-      ref.current = value;
+  const $5e63c961fc1ce211$export$8c6ed5c666ac1360 = /* @__PURE__ */ k$1((props, forwardedRef) => {
+    const { children, ...slotProps } = props;
+    const childrenArray = O$1.toArray(children);
+    const slottable = childrenArray.find($5e63c961fc1ce211$var$isSlottable);
+    if (slottable) {
+      const newElement = slottable.props.children;
+      const newChildren = childrenArray.map((child) => {
+        if (child === slottable) {
+          if (O$1.count(newElement) > 1)
+            return O$1.only(null);
+          return /* @__PURE__ */ an(newElement) ? newElement.props.children : null;
+        } else
+          return child;
+      });
+      return /* @__PURE__ */ y$6($5e63c961fc1ce211$var$SlotClone, _extends({}, slotProps, {
+        ref: forwardedRef
+      }), /* @__PURE__ */ an(newElement) ? /* @__PURE__ */ hn(newElement, void 0, newChildren) : null);
+    }
+    return /* @__PURE__ */ y$6($5e63c961fc1ce211$var$SlotClone, _extends({}, slotProps, {
+      ref: forwardedRef
+    }), children);
+  });
+  $5e63c961fc1ce211$export$8c6ed5c666ac1360.displayName = "Slot";
+  const $5e63c961fc1ce211$var$SlotClone = /* @__PURE__ */ k$1((props, forwardedRef) => {
+    const { children, ...slotProps } = props;
+    if (/* @__PURE__ */ an(children))
+      return /* @__PURE__ */ hn(children, {
+        ...$5e63c961fc1ce211$var$mergeProps(slotProps, children.props),
+        ref: $6ed0406888f73fc4$export$43e446d32b3d21af(forwardedRef, children.ref)
+      });
+    return O$1.count(children) > 1 ? O$1.only(null) : null;
+  });
+  $5e63c961fc1ce211$var$SlotClone.displayName = "SlotClone";
+  const $5e63c961fc1ce211$export$d9f1ccf0bdb05d45 = ({ children }) => {
+    return /* @__PURE__ */ y$6(k$3, null, children);
+  };
+  function $5e63c961fc1ce211$var$isSlottable(child) {
+    return /* @__PURE__ */ an(child) && child.type === $5e63c961fc1ce211$export$d9f1ccf0bdb05d45;
   }
-  function $6ed0406888f73fc4$export$43e446d32b3d21af(...refs) {
-    return (node2) => refs.forEach(
-      (ref) => $6ed0406888f73fc4$var$setRef(ref, node2)
+  function $5e63c961fc1ce211$var$mergeProps(slotProps, childProps) {
+    const overrideProps = {
+      ...childProps
+    };
+    for (const propName in childProps) {
+      const slotPropValue = slotProps[propName];
+      const childPropValue = childProps[propName];
+      const isHandler = /^on[A-Z]/.test(propName);
+      if (isHandler) {
+        if (slotPropValue && childPropValue)
+          overrideProps[propName] = (...args) => {
+            childPropValue(...args);
+            slotPropValue(...args);
+          };
+        else if (slotPropValue)
+          overrideProps[propName] = slotPropValue;
+      } else if (propName === "style")
+        overrideProps[propName] = {
+          ...slotPropValue,
+          ...childPropValue
+        };
+      else if (propName === "className")
+        overrideProps[propName] = [
+          slotPropValue,
+          childPropValue
+        ].filter(Boolean).join(" ");
+    }
+    return {
+      ...slotProps,
+      ...overrideProps
+    };
+  }
+  const $8927f6f2acc4f386$var$NODES = [
+    "a",
+    "button",
+    "div",
+    "form",
+    "h2",
+    "h3",
+    "img",
+    "input",
+    "label",
+    "li",
+    "nav",
+    "ol",
+    "p",
+    "span",
+    "svg",
+    "ul"
+  ];
+  const $8927f6f2acc4f386$export$250ffa63cdc0d034 = $8927f6f2acc4f386$var$NODES.reduce((primitive, node2) => {
+    const Node = /* @__PURE__ */ k$1((props, forwardedRef) => {
+      const { asChild, ...primitiveProps } = props;
+      const Comp = asChild ? $5e63c961fc1ce211$export$8c6ed5c666ac1360 : node2;
+      p$6(() => {
+        window[Symbol.for("radix-ui")] = true;
+      }, []);
+      return /* @__PURE__ */ y$6(Comp, _extends({}, primitiveProps, {
+        ref: forwardedRef
+      }));
+    });
+    Node.displayName = `Primitive.${node2}`;
+    return {
+      ...primitive,
+      [node2]: Node
+    };
+  }, {});
+  function $8927f6f2acc4f386$export$6d1a0317bde7de7f(target, event) {
+    if (target)
+      mn(
+        () => target.dispatchEvent(event)
+      );
+  }
+  function $addc16e1bbe58fd0$export$3a72a57244d6e765(onEscapeKeyDownProp, ownerDocument = globalThis === null || globalThis === void 0 ? void 0 : globalThis.document) {
+    const onEscapeKeyDown = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onEscapeKeyDownProp);
+    p$6(() => {
+      const handleKeyDown = (event) => {
+        if (event.key === "Escape")
+          onEscapeKeyDown(event);
+      };
+      ownerDocument.addEventListener("keydown", handleKeyDown);
+      return () => ownerDocument.removeEventListener("keydown", handleKeyDown);
+    }, [
+      onEscapeKeyDown,
+      ownerDocument
+    ]);
+  }
+  const $5cb92bef7577960e$var$CONTEXT_UPDATE = "dismissableLayer.update";
+  const $5cb92bef7577960e$var$POINTER_DOWN_OUTSIDE = "dismissableLayer.pointerDownOutside";
+  const $5cb92bef7577960e$var$FOCUS_OUTSIDE = "dismissableLayer.focusOutside";
+  let $5cb92bef7577960e$var$originalBodyPointerEvents;
+  const $5cb92bef7577960e$var$DismissableLayerContext = /* @__PURE__ */ G$1({
+    layers: /* @__PURE__ */ new Set(),
+    layersWithOutsidePointerEventsDisabled: /* @__PURE__ */ new Set(),
+    branches: /* @__PURE__ */ new Set()
+  });
+  const $5cb92bef7577960e$export$177fb62ff3ec1f22 = /* @__PURE__ */ k$1((props, forwardedRef) => {
+    var _node$ownerDocument;
+    const { disableOutsidePointerEvents = false, onEscapeKeyDown, onPointerDownOutside, onFocusOutside, onInteractOutside, onDismiss, ...layerProps } = props;
+    const context = q$1($5cb92bef7577960e$var$DismissableLayerContext);
+    const [node1, setNode] = h$4(null);
+    const ownerDocument = (_node$ownerDocument = node1 === null || node1 === void 0 ? void 0 : node1.ownerDocument) !== null && _node$ownerDocument !== void 0 ? _node$ownerDocument : globalThis === null || globalThis === void 0 ? void 0 : globalThis.document;
+    const [, force] = h$4({});
+    const composedRefs = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(
+      forwardedRef,
+      (node2) => setNode(node2)
+    );
+    const layers = Array.from(context.layers);
+    const [highestLayerWithOutsidePointerEventsDisabled] = [
+      ...context.layersWithOutsidePointerEventsDisabled
+    ].slice(-1);
+    const highestLayerWithOutsidePointerEventsDisabledIndex = layers.indexOf(highestLayerWithOutsidePointerEventsDisabled);
+    const index2 = node1 ? layers.indexOf(node1) : -1;
+    const isBodyPointerEventsDisabled = context.layersWithOutsidePointerEventsDisabled.size > 0;
+    const isPointerEventsEnabled = index2 >= highestLayerWithOutsidePointerEventsDisabledIndex;
+    const pointerDownOutside = $5cb92bef7577960e$var$usePointerDownOutside((event) => {
+      const target = event.target;
+      const isPointerDownOnBranch = [
+        ...context.branches
+      ].some(
+        (branch) => branch.contains(target)
+      );
+      if (!isPointerEventsEnabled || isPointerDownOnBranch)
+        return;
+      onPointerDownOutside === null || onPointerDownOutside === void 0 || onPointerDownOutside(event);
+      onInteractOutside === null || onInteractOutside === void 0 || onInteractOutside(event);
+      if (!event.defaultPrevented)
+        onDismiss === null || onDismiss === void 0 || onDismiss();
+    }, ownerDocument);
+    const focusOutside = $5cb92bef7577960e$var$useFocusOutside((event) => {
+      const target = event.target;
+      const isFocusInBranch = [
+        ...context.branches
+      ].some(
+        (branch) => branch.contains(target)
+      );
+      if (isFocusInBranch)
+        return;
+      onFocusOutside === null || onFocusOutside === void 0 || onFocusOutside(event);
+      onInteractOutside === null || onInteractOutside === void 0 || onInteractOutside(event);
+      if (!event.defaultPrevented)
+        onDismiss === null || onDismiss === void 0 || onDismiss();
+    }, ownerDocument);
+    $addc16e1bbe58fd0$export$3a72a57244d6e765((event) => {
+      const isHighestLayer = index2 === context.layers.size - 1;
+      if (!isHighestLayer)
+        return;
+      onEscapeKeyDown === null || onEscapeKeyDown === void 0 || onEscapeKeyDown(event);
+      if (!event.defaultPrevented && onDismiss) {
+        event.preventDefault();
+        onDismiss();
+      }
+    }, ownerDocument);
+    p$6(() => {
+      if (!node1)
+        return;
+      if (disableOutsidePointerEvents) {
+        if (context.layersWithOutsidePointerEventsDisabled.size === 0) {
+          $5cb92bef7577960e$var$originalBodyPointerEvents = ownerDocument.body.style.pointerEvents;
+          ownerDocument.body.style.pointerEvents = "none";
+        }
+        context.layersWithOutsidePointerEventsDisabled.add(node1);
+      }
+      context.layers.add(node1);
+      $5cb92bef7577960e$var$dispatchUpdate();
+      return () => {
+        if (disableOutsidePointerEvents && context.layersWithOutsidePointerEventsDisabled.size === 1)
+          ownerDocument.body.style.pointerEvents = $5cb92bef7577960e$var$originalBodyPointerEvents;
+      };
+    }, [
+      node1,
+      ownerDocument,
+      disableOutsidePointerEvents,
+      context
+    ]);
+    p$6(() => {
+      return () => {
+        if (!node1)
+          return;
+        context.layers.delete(node1);
+        context.layersWithOutsidePointerEventsDisabled.delete(node1);
+        $5cb92bef7577960e$var$dispatchUpdate();
+      };
+    }, [
+      node1,
+      context
+    ]);
+    p$6(() => {
+      const handleUpdate = () => force({});
+      document.addEventListener($5cb92bef7577960e$var$CONTEXT_UPDATE, handleUpdate);
+      return () => document.removeEventListener($5cb92bef7577960e$var$CONTEXT_UPDATE, handleUpdate);
+    }, []);
+    return /* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({}, layerProps, {
+      ref: composedRefs,
+      style: {
+        pointerEvents: isBodyPointerEventsDisabled ? isPointerEventsEnabled ? "auto" : "none" : void 0,
+        ...props.style
+      },
+      onFocusCapture: $e42e1063c40fb3ef$export$b9ecd428b558ff10(props.onFocusCapture, focusOutside.onFocusCapture),
+      onBlurCapture: $e42e1063c40fb3ef$export$b9ecd428b558ff10(props.onBlurCapture, focusOutside.onBlurCapture),
+      onPointerDownCapture: $e42e1063c40fb3ef$export$b9ecd428b558ff10(props.onPointerDownCapture, pointerDownOutside.onPointerDownCapture)
+    }));
+  });
+  function $5cb92bef7577960e$var$usePointerDownOutside(onPointerDownOutside, ownerDocument = globalThis === null || globalThis === void 0 ? void 0 : globalThis.document) {
+    const handlePointerDownOutside = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onPointerDownOutside);
+    const isPointerInsideReactTreeRef = _$1(false);
+    const handleClickRef = _$1(() => {
+    });
+    p$6(() => {
+      const handlePointerDown = (event) => {
+        if (event.target && !isPointerInsideReactTreeRef.current) {
+          let handleAndDispatchPointerDownOutsideEvent = function() {
+            $5cb92bef7577960e$var$handleAndDispatchCustomEvent($5cb92bef7577960e$var$POINTER_DOWN_OUTSIDE, handlePointerDownOutside, eventDetail, {
+              discrete: true
+            });
+          };
+          const eventDetail = {
+            originalEvent: event
+          };
+          if (event.pointerType === "touch") {
+            ownerDocument.removeEventListener("click", handleClickRef.current);
+            handleClickRef.current = handleAndDispatchPointerDownOutsideEvent;
+            ownerDocument.addEventListener("click", handleClickRef.current, {
+              once: true
+            });
+          } else
+            handleAndDispatchPointerDownOutsideEvent();
+        }
+        isPointerInsideReactTreeRef.current = false;
+      };
+      const timerId = window.setTimeout(() => {
+        ownerDocument.addEventListener("pointerdown", handlePointerDown);
+      }, 0);
+      return () => {
+        window.clearTimeout(timerId);
+        ownerDocument.removeEventListener("pointerdown", handlePointerDown);
+        ownerDocument.removeEventListener("click", handleClickRef.current);
+      };
+    }, [
+      ownerDocument,
+      handlePointerDownOutside
+    ]);
+    return {
+      // ensures we check React component tree (not just DOM tree)
+      onPointerDownCapture: () => isPointerInsideReactTreeRef.current = true
+    };
+  }
+  function $5cb92bef7577960e$var$useFocusOutside(onFocusOutside, ownerDocument = globalThis === null || globalThis === void 0 ? void 0 : globalThis.document) {
+    const handleFocusOutside = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onFocusOutside);
+    const isFocusInsideReactTreeRef = _$1(false);
+    p$6(() => {
+      const handleFocus = (event) => {
+        if (event.target && !isFocusInsideReactTreeRef.current) {
+          const eventDetail = {
+            originalEvent: event
+          };
+          $5cb92bef7577960e$var$handleAndDispatchCustomEvent($5cb92bef7577960e$var$FOCUS_OUTSIDE, handleFocusOutside, eventDetail, {
+            discrete: false
+          });
+        }
+      };
+      ownerDocument.addEventListener("focusin", handleFocus);
+      return () => ownerDocument.removeEventListener("focusin", handleFocus);
+    }, [
+      ownerDocument,
+      handleFocusOutside
+    ]);
+    return {
+      onFocusCapture: () => isFocusInsideReactTreeRef.current = true,
+      onBlurCapture: () => isFocusInsideReactTreeRef.current = false
+    };
+  }
+  function $5cb92bef7577960e$var$dispatchUpdate() {
+    const event = new CustomEvent($5cb92bef7577960e$var$CONTEXT_UPDATE);
+    document.dispatchEvent(event);
+  }
+  function $5cb92bef7577960e$var$handleAndDispatchCustomEvent(name, handler, detail, { discrete }) {
+    const target = detail.originalEvent.target;
+    const event = new CustomEvent(name, {
+      bubbles: false,
+      cancelable: true,
+      detail
+    });
+    if (handler)
+      target.addEventListener(name, handler, {
+        once: true
+      });
+    if (discrete)
+      $8927f6f2acc4f386$export$6d1a0317bde7de7f(target, event);
+    else
+      target.dispatchEvent(event);
+  }
+  const $d3863c46a17e8a28$var$AUTOFOCUS_ON_MOUNT = "focusScope.autoFocusOnMount";
+  const $d3863c46a17e8a28$var$AUTOFOCUS_ON_UNMOUNT = "focusScope.autoFocusOnUnmount";
+  const $d3863c46a17e8a28$var$EVENT_OPTIONS = {
+    bubbles: false,
+    cancelable: true
+  };
+  const $d3863c46a17e8a28$export$20e40289641fbbb6 = /* @__PURE__ */ k$1((props, forwardedRef) => {
+    const { loop = false, trapped = false, onMountAutoFocus: onMountAutoFocusProp, onUnmountAutoFocus: onUnmountAutoFocusProp, ...scopeProps } = props;
+    const [container1, setContainer] = h$4(null);
+    const onMountAutoFocus = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onMountAutoFocusProp);
+    const onUnmountAutoFocus = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onUnmountAutoFocusProp);
+    const lastFocusedElementRef = _$1(null);
+    const composedRefs = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(
+      forwardedRef,
+      (node2) => setContainer(node2)
+    );
+    const focusScope = _$1({
+      paused: false,
+      pause() {
+        this.paused = true;
+      },
+      resume() {
+        this.paused = false;
+      }
+    }).current;
+    p$6(() => {
+      if (trapped) {
+        let handleFocusIn = function(event) {
+          if (focusScope.paused || !container1)
+            return;
+          const target = event.target;
+          if (container1.contains(target))
+            lastFocusedElementRef.current = target;
+          else
+            $d3863c46a17e8a28$var$focus(lastFocusedElementRef.current, {
+              select: true
+            });
+        }, handleFocusOut = function(event) {
+          if (focusScope.paused || !container1)
+            return;
+          if (!container1.contains(event.relatedTarget))
+            $d3863c46a17e8a28$var$focus(lastFocusedElementRef.current, {
+              select: true
+            });
+        };
+        document.addEventListener("focusin", handleFocusIn);
+        document.addEventListener("focusout", handleFocusOut);
+        return () => {
+          document.removeEventListener("focusin", handleFocusIn);
+          document.removeEventListener("focusout", handleFocusOut);
+        };
+      }
+    }, [
+      trapped,
+      container1,
+      focusScope.paused
+    ]);
+    p$6(() => {
+      if (container1) {
+        $d3863c46a17e8a28$var$focusScopesStack.add(focusScope);
+        const previouslyFocusedElement = document.activeElement;
+        const hasFocusedCandidate = container1.contains(previouslyFocusedElement);
+        if (!hasFocusedCandidate) {
+          const mountEvent = new CustomEvent($d3863c46a17e8a28$var$AUTOFOCUS_ON_MOUNT, $d3863c46a17e8a28$var$EVENT_OPTIONS);
+          container1.addEventListener($d3863c46a17e8a28$var$AUTOFOCUS_ON_MOUNT, onMountAutoFocus);
+          container1.dispatchEvent(mountEvent);
+          if (!mountEvent.defaultPrevented) {
+            $d3863c46a17e8a28$var$focusFirst($d3863c46a17e8a28$var$removeLinks($d3863c46a17e8a28$var$getTabbableCandidates(container1)), {
+              select: true
+            });
+            if (document.activeElement === previouslyFocusedElement)
+              $d3863c46a17e8a28$var$focus(container1);
+          }
+        }
+        return () => {
+          container1.removeEventListener($d3863c46a17e8a28$var$AUTOFOCUS_ON_MOUNT, onMountAutoFocus);
+          setTimeout(() => {
+            const unmountEvent = new CustomEvent($d3863c46a17e8a28$var$AUTOFOCUS_ON_UNMOUNT, $d3863c46a17e8a28$var$EVENT_OPTIONS);
+            container1.addEventListener($d3863c46a17e8a28$var$AUTOFOCUS_ON_UNMOUNT, onUnmountAutoFocus);
+            container1.dispatchEvent(unmountEvent);
+            if (!unmountEvent.defaultPrevented)
+              $d3863c46a17e8a28$var$focus(previouslyFocusedElement !== null && previouslyFocusedElement !== void 0 ? previouslyFocusedElement : document.body, {
+                select: true
+              });
+            container1.removeEventListener($d3863c46a17e8a28$var$AUTOFOCUS_ON_UNMOUNT, onUnmountAutoFocus);
+            $d3863c46a17e8a28$var$focusScopesStack.remove(focusScope);
+          }, 0);
+        };
+      }
+    }, [
+      container1,
+      onMountAutoFocus,
+      onUnmountAutoFocus,
+      focusScope
+    ]);
+    const handleKeyDown = T$4((event) => {
+      if (!loop && !trapped)
+        return;
+      if (focusScope.paused)
+        return;
+      const isTabKey = event.key === "Tab" && !event.altKey && !event.ctrlKey && !event.metaKey;
+      const focusedElement = document.activeElement;
+      if (isTabKey && focusedElement) {
+        const container = event.currentTarget;
+        const [first, last] = $d3863c46a17e8a28$var$getTabbableEdges(container);
+        const hasTabbableElementsInside = first && last;
+        if (!hasTabbableElementsInside) {
+          if (focusedElement === container)
+            event.preventDefault();
+        } else {
+          if (!event.shiftKey && focusedElement === last) {
+            event.preventDefault();
+            if (loop)
+              $d3863c46a17e8a28$var$focus(first, {
+                select: true
+              });
+          } else if (event.shiftKey && focusedElement === first) {
+            event.preventDefault();
+            if (loop)
+              $d3863c46a17e8a28$var$focus(last, {
+                select: true
+              });
+          }
+        }
+      }
+    }, [
+      loop,
+      trapped,
+      focusScope.paused
+    ]);
+    return /* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({
+      tabIndex: -1
+    }, scopeProps, {
+      ref: composedRefs,
+      onKeyDown: handleKeyDown
+    }));
+  });
+  function $d3863c46a17e8a28$var$focusFirst(candidates, { select = false } = {}) {
+    const previouslyFocusedElement = document.activeElement;
+    for (const candidate of candidates) {
+      $d3863c46a17e8a28$var$focus(candidate, {
+        select
+      });
+      if (document.activeElement !== previouslyFocusedElement)
+        return;
+    }
+  }
+  function $d3863c46a17e8a28$var$getTabbableEdges(container) {
+    const candidates = $d3863c46a17e8a28$var$getTabbableCandidates(container);
+    const first = $d3863c46a17e8a28$var$findVisible(candidates, container);
+    const last = $d3863c46a17e8a28$var$findVisible(candidates.reverse(), container);
+    return [
+      first,
+      last
+    ];
+  }
+  function $d3863c46a17e8a28$var$getTabbableCandidates(container) {
+    const nodes = [];
+    const walker = document.createTreeWalker(container, NodeFilter.SHOW_ELEMENT, {
+      acceptNode: (node2) => {
+        const isHiddenInput = node2.tagName === "INPUT" && node2.type === "hidden";
+        if (node2.disabled || node2.hidden || isHiddenInput)
+          return NodeFilter.FILTER_SKIP;
+        return node2.tabIndex >= 0 ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+      }
+    });
+    while (walker.nextNode())
+      nodes.push(walker.currentNode);
+    return nodes;
+  }
+  function $d3863c46a17e8a28$var$findVisible(elements, container) {
+    for (const element2 of elements) {
+      if (!$d3863c46a17e8a28$var$isHidden(element2, {
+        upTo: container
+      }))
+        return element2;
+    }
+  }
+  function $d3863c46a17e8a28$var$isHidden(node2, { upTo }) {
+    if (getComputedStyle(node2).visibility === "hidden")
+      return true;
+    while (node2) {
+      if (upTo !== void 0 && node2 === upTo)
+        return false;
+      if (getComputedStyle(node2).display === "none")
+        return true;
+      node2 = node2.parentElement;
+    }
+    return false;
+  }
+  function $d3863c46a17e8a28$var$isSelectableInput(element2) {
+    return element2 instanceof HTMLInputElement && "select" in element2;
+  }
+  function $d3863c46a17e8a28$var$focus(element2, { select = false } = {}) {
+    if (element2 && element2.focus) {
+      const previouslyFocusedElement = document.activeElement;
+      element2.focus({
+        preventScroll: true
+      });
+      if (element2 !== previouslyFocusedElement && $d3863c46a17e8a28$var$isSelectableInput(element2) && select)
+        element2.select();
+    }
+  }
+  const $d3863c46a17e8a28$var$focusScopesStack = $d3863c46a17e8a28$var$createFocusScopesStack();
+  function $d3863c46a17e8a28$var$createFocusScopesStack() {
+    let stack = [];
+    return {
+      add(focusScope) {
+        const activeFocusScope = stack[0];
+        if (focusScope !== activeFocusScope)
+          activeFocusScope === null || activeFocusScope === void 0 || activeFocusScope.pause();
+        stack = $d3863c46a17e8a28$var$arrayRemove(stack, focusScope);
+        stack.unshift(focusScope);
+      },
+      remove(focusScope) {
+        var _stack$;
+        stack = $d3863c46a17e8a28$var$arrayRemove(stack, focusScope);
+        (_stack$ = stack[0]) === null || _stack$ === void 0 || _stack$.resume();
+      }
+    };
+  }
+  function $d3863c46a17e8a28$var$arrayRemove(array, item) {
+    const updatedArray = [
+      ...array
+    ];
+    const index2 = updatedArray.indexOf(item);
+    if (index2 !== -1)
+      updatedArray.splice(index2, 1);
+    return updatedArray;
+  }
+  function $d3863c46a17e8a28$var$removeLinks(items) {
+    return items.filter(
+      (item) => item.tagName !== "A"
     );
   }
-  function $6ed0406888f73fc4$export$c7b2cbe3552a0d05(...refs) {
-    return T$4($6ed0406888f73fc4$export$43e446d32b3d21af(...refs), refs);
+  const $f1701beae083dbae$export$602eac185826482c = /* @__PURE__ */ k$1((props, forwardedRef) => {
+    var _globalThis$document;
+    const { container = globalThis === null || globalThis === void 0 ? void 0 : (_globalThis$document = globalThis.document) === null || _globalThis$document === void 0 ? void 0 : _globalThis$document.body, ...portalProps } = props;
+    return container ? /* @__PURE__ */ wn.createPortal(/* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({}, portalProps, {
+      ref: forwardedRef
+    })), container) : null;
+  });
+  function $fe963b355347cc68$export$3e6543de14f8614f(initialState, machine) {
+    return s$6((state, event) => {
+      const nextState = machine[state][event];
+      return nextState !== null && nextState !== void 0 ? nextState : state;
+    }, initialState);
   }
+  const $921a889cee6df7e8$export$99c2b779aa4e8b8b = (props) => {
+    const { present, children } = props;
+    const presence = $921a889cee6df7e8$var$usePresence(present);
+    const child = typeof children === "function" ? children({
+      present: presence.isPresent
+    }) : O$1.only(children);
+    const ref = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(presence.ref, child.ref);
+    const forceMount = typeof children === "function";
+    return forceMount || presence.isPresent ? /* @__PURE__ */ hn(child, {
+      ref
+    }) : null;
+  };
+  $921a889cee6df7e8$export$99c2b779aa4e8b8b.displayName = "Presence";
+  function $921a889cee6df7e8$var$usePresence(present) {
+    const [node1, setNode] = h$4();
+    const stylesRef = _$1({});
+    const prevPresentRef = _$1(present);
+    const prevAnimationNameRef = _$1("none");
+    const initialState = present ? "mounted" : "unmounted";
+    const [state, send] = $fe963b355347cc68$export$3e6543de14f8614f(initialState, {
+      mounted: {
+        UNMOUNT: "unmounted",
+        ANIMATION_OUT: "unmountSuspended"
+      },
+      unmountSuspended: {
+        MOUNT: "mounted",
+        ANIMATION_END: "unmounted"
+      },
+      unmounted: {
+        MOUNT: "mounted"
+      }
+    });
+    p$6(() => {
+      const currentAnimationName = $921a889cee6df7e8$var$getAnimationName(stylesRef.current);
+      prevAnimationNameRef.current = state === "mounted" ? currentAnimationName : "none";
+    }, [
+      state
+    ]);
+    $9f79659886946c16$export$e5c5a5f917a5871c(() => {
+      const styles = stylesRef.current;
+      const wasPresent = prevPresentRef.current;
+      const hasPresentChanged = wasPresent !== present;
+      if (hasPresentChanged) {
+        const prevAnimationName = prevAnimationNameRef.current;
+        const currentAnimationName = $921a889cee6df7e8$var$getAnimationName(styles);
+        if (present)
+          send("MOUNT");
+        else if (currentAnimationName === "none" || (styles === null || styles === void 0 ? void 0 : styles.display) === "none")
+          send("UNMOUNT");
+        else {
+          const isAnimating = prevAnimationName !== currentAnimationName;
+          if (wasPresent && isAnimating)
+            send("ANIMATION_OUT");
+          else
+            send("UNMOUNT");
+        }
+        prevPresentRef.current = present;
+      }
+    }, [
+      present,
+      send
+    ]);
+    $9f79659886946c16$export$e5c5a5f917a5871c(() => {
+      if (node1) {
+        const handleAnimationEnd = (event) => {
+          const currentAnimationName = $921a889cee6df7e8$var$getAnimationName(stylesRef.current);
+          const isCurrentAnimation = currentAnimationName.includes(event.animationName);
+          if (event.target === node1 && isCurrentAnimation)
+            mn(
+              () => send("ANIMATION_END")
+            );
+        };
+        const handleAnimationStart = (event) => {
+          if (event.target === node1)
+            prevAnimationNameRef.current = $921a889cee6df7e8$var$getAnimationName(stylesRef.current);
+        };
+        node1.addEventListener("animationstart", handleAnimationStart);
+        node1.addEventListener("animationcancel", handleAnimationEnd);
+        node1.addEventListener("animationend", handleAnimationEnd);
+        return () => {
+          node1.removeEventListener("animationstart", handleAnimationStart);
+          node1.removeEventListener("animationcancel", handleAnimationEnd);
+          node1.removeEventListener("animationend", handleAnimationEnd);
+        };
+      } else
+        send("ANIMATION_END");
+    }, [
+      node1,
+      send
+    ]);
+    return {
+      isPresent: [
+        "mounted",
+        "unmountSuspended"
+      ].includes(state),
+      ref: T$4((node2) => {
+        if (node2)
+          stylesRef.current = getComputedStyle(node2);
+        setNode(node2);
+      }, [])
+    };
+  }
+  function $921a889cee6df7e8$var$getAnimationName(styles) {
+    return (styles === null || styles === void 0 ? void 0 : styles.animationName) || "none";
+  }
+  let $3db38b7d1fb3fe6a$var$count = 0;
+  function $3db38b7d1fb3fe6a$export$b7ece24a22aeda8c() {
+    p$6(() => {
+      var _edgeGuards$, _edgeGuards$2;
+      const edgeGuards = document.querySelectorAll("[data-radix-focus-guard]");
+      document.body.insertAdjacentElement("afterbegin", (_edgeGuards$ = edgeGuards[0]) !== null && _edgeGuards$ !== void 0 ? _edgeGuards$ : $3db38b7d1fb3fe6a$var$createFocusGuard());
+      document.body.insertAdjacentElement("beforeend", (_edgeGuards$2 = edgeGuards[1]) !== null && _edgeGuards$2 !== void 0 ? _edgeGuards$2 : $3db38b7d1fb3fe6a$var$createFocusGuard());
+      $3db38b7d1fb3fe6a$var$count++;
+      return () => {
+        if ($3db38b7d1fb3fe6a$var$count === 1)
+          document.querySelectorAll("[data-radix-focus-guard]").forEach(
+            (node2) => node2.remove()
+          );
+        $3db38b7d1fb3fe6a$var$count--;
+      };
+    }, []);
+  }
+  function $3db38b7d1fb3fe6a$var$createFocusGuard() {
+    const element2 = document.createElement("span");
+    element2.setAttribute("data-radix-focus-guard", "");
+    element2.tabIndex = 0;
+    element2.style.cssText = "outline: none; opacity: 0; position: fixed; pointer-events: none";
+    return element2;
+  }
+  var __assign = function() {
+    __assign = Object.assign || function __assign2(t2) {
+      for (var s2, i2 = 1, n2 = arguments.length; i2 < n2; i2++) {
+        s2 = arguments[i2];
+        for (var p2 in s2)
+          if (Object.prototype.hasOwnProperty.call(s2, p2))
+            t2[p2] = s2[p2];
+      }
+      return t2;
+    };
+    return __assign.apply(this, arguments);
+  };
+  function __rest(s2, e2) {
+    var t2 = {};
+    for (var p2 in s2)
+      if (Object.prototype.hasOwnProperty.call(s2, p2) && e2.indexOf(p2) < 0)
+        t2[p2] = s2[p2];
+    if (s2 != null && typeof Object.getOwnPropertySymbols === "function")
+      for (var i2 = 0, p2 = Object.getOwnPropertySymbols(s2); i2 < p2.length; i2++) {
+        if (e2.indexOf(p2[i2]) < 0 && Object.prototype.propertyIsEnumerable.call(s2, p2[i2]))
+          t2[p2[i2]] = s2[p2[i2]];
+      }
+    return t2;
+  }
+  function __spreadArray(to, from, pack) {
+    if (pack || arguments.length === 2)
+      for (var i2 = 0, l2 = from.length, ar; i2 < l2; i2++) {
+        if (ar || !(i2 in from)) {
+          if (!ar)
+            ar = Array.prototype.slice.call(from, 0, i2);
+          ar[i2] = from[i2];
+        }
+      }
+    return to.concat(ar || Array.prototype.slice.call(from));
+  }
+  var zeroRightClassName = "right-scroll-bar-position";
+  var fullWidthClassName = "width-before-scroll-bar";
+  var noScrollbarsClassName = "with-scroll-bars-hidden";
+  var removedBarSizeVariable = "--removed-body-scroll-bar-size";
+  function assignRef(ref, value) {
+    if (typeof ref === "function") {
+      ref(value);
+    } else if (ref) {
+      ref.current = value;
+    }
+    return ref;
+  }
+  function useCallbackRef(initialValue, callback) {
+    var ref = h$4(function() {
+      return {
+        // value
+        value: initialValue,
+        // last callback
+        callback,
+        // "memoized" public interface
+        facade: {
+          get current() {
+            return ref.value;
+          },
+          set current(value) {
+            var last = ref.value;
+            if (last !== value) {
+              ref.value = value;
+              ref.callback(value, last);
+            }
+          }
+        }
+      };
+    })[0];
+    ref.callback = callback;
+    return ref.facade;
+  }
+  function useMergeRefs(refs, defaultValue) {
+    return useCallbackRef(defaultValue || null, function(newValue) {
+      return refs.forEach(function(ref) {
+        return assignRef(ref, newValue);
+      });
+    });
+  }
+  function ItoI(a2) {
+    return a2;
+  }
+  function innerCreateMedium(defaults, middleware) {
+    if (middleware === void 0) {
+      middleware = ItoI;
+    }
+    var buffer = [];
+    var assigned = false;
+    var medium = {
+      read: function() {
+        if (assigned) {
+          throw new Error("Sidecar: could not `read` from an `assigned` medium. `read` could be used only with `useMedium`.");
+        }
+        if (buffer.length) {
+          return buffer[buffer.length - 1];
+        }
+        return defaults;
+      },
+      useMedium: function(data) {
+        var item = middleware(data, assigned);
+        buffer.push(item);
+        return function() {
+          buffer = buffer.filter(function(x2) {
+            return x2 !== item;
+          });
+        };
+      },
+      assignSyncMedium: function(cb) {
+        assigned = true;
+        while (buffer.length) {
+          var cbs = buffer;
+          buffer = [];
+          cbs.forEach(cb);
+        }
+        buffer = {
+          push: function(x2) {
+            return cb(x2);
+          },
+          filter: function() {
+            return buffer;
+          }
+        };
+      },
+      assignMedium: function(cb) {
+        assigned = true;
+        var pendingQueue = [];
+        if (buffer.length) {
+          var cbs = buffer;
+          buffer = [];
+          cbs.forEach(cb);
+          pendingQueue = buffer;
+        }
+        var executeQueue = function() {
+          var cbs2 = pendingQueue;
+          pendingQueue = [];
+          cbs2.forEach(cb);
+        };
+        var cycle = function() {
+          return Promise.resolve().then(executeQueue);
+        };
+        cycle();
+        buffer = {
+          push: function(x2) {
+            pendingQueue.push(x2);
+            cycle();
+          },
+          filter: function(filter) {
+            pendingQueue = pendingQueue.filter(filter);
+            return buffer;
+          }
+        };
+      }
+    };
+    return medium;
+  }
+  function createSidecarMedium(options) {
+    if (options === void 0) {
+      options = {};
+    }
+    var medium = innerCreateMedium(null);
+    medium.options = __assign({ async: true, ssr: false }, options);
+    return medium;
+  }
+  var SideCar$1 = function(_a) {
+    var sideCar = _a.sideCar, rest = __rest(_a, ["sideCar"]);
+    if (!sideCar) {
+      throw new Error("Sidecar: please provide `sideCar` property to import the right car");
+    }
+    var Target = sideCar.read();
+    if (!Target) {
+      throw new Error("Sidecar medium not found");
+    }
+    return y$6(Target, __assign({}, rest));
+  };
+  SideCar$1.isSideCarExport = true;
+  function exportSidecar(medium, exported) {
+    medium.useMedium(exported);
+    return SideCar$1;
+  }
+  var effectCar = createSidecarMedium();
+  var nothing = function() {
+    return;
+  };
+  var RemoveScroll = k$1(function(props, parentRef) {
+    var ref = _$1(null);
+    var _a = h$4({
+      onScrollCapture: nothing,
+      onWheelCapture: nothing,
+      onTouchMoveCapture: nothing
+    }), callbacks = _a[0], setCallbacks = _a[1];
+    var forwardProps = props.forwardProps, children = props.children, className = props.className, removeScrollBar = props.removeScrollBar, enabled = props.enabled, shards = props.shards, sideCar = props.sideCar, noIsolation = props.noIsolation, inert = props.inert, allowPinchZoom = props.allowPinchZoom, _b = props.as, Container = _b === void 0 ? "div" : _b, rest = __rest(props, ["forwardProps", "children", "className", "removeScrollBar", "enabled", "shards", "sideCar", "noIsolation", "inert", "allowPinchZoom", "as"]);
+    var SideCar2 = sideCar;
+    var containerRef = useMergeRefs([ref, parentRef]);
+    var containerProps = __assign(__assign({}, rest), callbacks);
+    return y$6(
+      k$3,
+      null,
+      enabled && y$6(SideCar2, { sideCar: effectCar, removeScrollBar, shards, noIsolation, inert, setCallbacks, allowPinchZoom: !!allowPinchZoom, lockRef: ref }),
+      forwardProps ? hn(O$1.only(children), __assign(__assign({}, containerProps), { ref: containerRef })) : y$6(Container, __assign({}, containerProps, { className, ref: containerRef }), children)
+    );
+  });
+  RemoveScroll.defaultProps = {
+    enabled: true,
+    removeScrollBar: true,
+    inert: false
+  };
+  RemoveScroll.classNames = {
+    fullWidth: fullWidthClassName,
+    zeroRight: zeroRightClassName
+  };
+  var getNonce = function() {
+    if (typeof __webpack_nonce__ !== "undefined") {
+      return __webpack_nonce__;
+    }
+    return void 0;
+  };
+  function makeStyleTag() {
+    if (!document)
+      return null;
+    var tag = document.createElement("style");
+    tag.type = "text/css";
+    var nonce = getNonce();
+    if (nonce) {
+      tag.setAttribute("nonce", nonce);
+    }
+    return tag;
+  }
+  function injectStyles(tag, css) {
+    if (tag.styleSheet) {
+      tag.styleSheet.cssText = css;
+    } else {
+      tag.appendChild(document.createTextNode(css));
+    }
+  }
+  function insertStyleTag(tag) {
+    var head2 = document.head || document.getElementsByTagName("head")[0];
+    head2.appendChild(tag);
+  }
+  var stylesheetSingleton = function() {
+    var counter = 0;
+    var stylesheet = null;
+    return {
+      add: function(style) {
+        if (counter == 0) {
+          if (stylesheet = makeStyleTag()) {
+            injectStyles(stylesheet, style);
+            insertStyleTag(stylesheet);
+          }
+        }
+        counter++;
+      },
+      remove: function() {
+        counter--;
+        if (!counter && stylesheet) {
+          stylesheet.parentNode && stylesheet.parentNode.removeChild(stylesheet);
+          stylesheet = null;
+        }
+      }
+    };
+  };
+  var styleHookSingleton = function() {
+    var sheet = stylesheetSingleton();
+    return function(styles, isDynamic) {
+      p$6(function() {
+        sheet.add(styles);
+        return function() {
+          sheet.remove();
+        };
+      }, [styles && isDynamic]);
+    };
+  };
+  var styleSingleton = function() {
+    var useStyle = styleHookSingleton();
+    var Sheet = function(_a) {
+      var styles = _a.styles, dynamic = _a.dynamic;
+      useStyle(styles, dynamic);
+      return null;
+    };
+    return Sheet;
+  };
+  var zeroGap = {
+    left: 0,
+    top: 0,
+    right: 0,
+    gap: 0
+  };
+  var parse$1 = function(x2) {
+    return parseInt(x2 || "", 10) || 0;
+  };
+  var getOffset = function(gapMode) {
+    var cs = window.getComputedStyle(document.body);
+    var left = cs[gapMode === "padding" ? "paddingLeft" : "marginLeft"];
+    var top = cs[gapMode === "padding" ? "paddingTop" : "marginTop"];
+    var right = cs[gapMode === "padding" ? "paddingRight" : "marginRight"];
+    return [parse$1(left), parse$1(top), parse$1(right)];
+  };
+  var getGapWidth = function(gapMode) {
+    if (gapMode === void 0) {
+      gapMode = "margin";
+    }
+    if (typeof window === "undefined") {
+      return zeroGap;
+    }
+    var offsets = getOffset(gapMode);
+    var documentWidth = document.documentElement.clientWidth;
+    var windowWidth = window.innerWidth;
+    return {
+      left: offsets[0],
+      top: offsets[1],
+      right: offsets[2],
+      gap: Math.max(0, windowWidth - documentWidth + offsets[2] - offsets[0])
+    };
+  };
+  var Style = styleSingleton();
+  var getStyles = function(_a, allowRelative, gapMode, important) {
+    var left = _a.left, top = _a.top, right = _a.right, gap = _a.gap;
+    if (gapMode === void 0) {
+      gapMode = "margin";
+    }
+    return "\n  .".concat(noScrollbarsClassName, " {\n   overflow: hidden ").concat(important, ";\n   padding-right: ").concat(gap, "px ").concat(important, ";\n  }\n  body {\n    overflow: hidden ").concat(important, ";\n    overscroll-behavior: contain;\n    ").concat([
+      allowRelative && "position: relative ".concat(important, ";"),
+      gapMode === "margin" && "\n    padding-left: ".concat(left, "px;\n    padding-top: ").concat(top, "px;\n    padding-right: ").concat(right, "px;\n    margin-left:0;\n    margin-top:0;\n    margin-right: ").concat(gap, "px ").concat(important, ";\n    "),
+      gapMode === "padding" && "padding-right: ".concat(gap, "px ").concat(important, ";")
+    ].filter(Boolean).join(""), "\n  }\n  \n  .").concat(zeroRightClassName, " {\n    right: ").concat(gap, "px ").concat(important, ";\n  }\n  \n  .").concat(fullWidthClassName, " {\n    margin-right: ").concat(gap, "px ").concat(important, ";\n  }\n  \n  .").concat(zeroRightClassName, " .").concat(zeroRightClassName, " {\n    right: 0 ").concat(important, ";\n  }\n  \n  .").concat(fullWidthClassName, " .").concat(fullWidthClassName, " {\n    margin-right: 0 ").concat(important, ";\n  }\n  \n  body {\n    ").concat(removedBarSizeVariable, ": ").concat(gap, "px;\n  }\n");
+  };
+  var RemoveScrollBar = function(props) {
+    var noRelative = props.noRelative, noImportant = props.noImportant, _a = props.gapMode, gapMode = _a === void 0 ? "margin" : _a;
+    var gap = F$1(function() {
+      return getGapWidth(gapMode);
+    }, [gapMode]);
+    return y$6(Style, { styles: getStyles(gap, !noRelative, gapMode, !noImportant ? "!important" : "") });
+  };
+  var passiveSupported = false;
+  if (typeof window !== "undefined") {
+    try {
+      var options = Object.defineProperty({}, "passive", {
+        get: function() {
+          passiveSupported = true;
+          return true;
+        }
+      });
+      window.addEventListener("test", options, options);
+      window.removeEventListener("test", options, options);
+    } catch (err) {
+      passiveSupported = false;
+    }
+  }
+  var nonPassive = passiveSupported ? { passive: false } : false;
+  var alwaysContainsScroll = function(node2) {
+    return node2.tagName === "TEXTAREA";
+  };
+  var elementCanBeScrolled = function(node2, overflow) {
+    var styles = window.getComputedStyle(node2);
+    return (
+      // not-not-scrollable
+      styles[overflow] !== "hidden" && // contains scroll inside self
+      !(styles.overflowY === styles.overflowX && !alwaysContainsScroll(node2) && styles[overflow] === "visible")
+    );
+  };
+  var elementCouldBeVScrolled = function(node2) {
+    return elementCanBeScrolled(node2, "overflowY");
+  };
+  var elementCouldBeHScrolled = function(node2) {
+    return elementCanBeScrolled(node2, "overflowX");
+  };
+  var locationCouldBeScrolled = function(axis, node2) {
+    var current = node2;
+    do {
+      if (typeof ShadowRoot !== "undefined" && current instanceof ShadowRoot) {
+        current = current.host;
+      }
+      var isScrollable = elementCouldBeScrolled(axis, current);
+      if (isScrollable) {
+        var _a = getScrollVariables(axis, current), s2 = _a[1], d2 = _a[2];
+        if (s2 > d2) {
+          return true;
+        }
+      }
+      current = current.parentNode;
+    } while (current && current !== document.body);
+    return false;
+  };
+  var getVScrollVariables = function(_a) {
+    var scrollTop = _a.scrollTop, scrollHeight = _a.scrollHeight, clientHeight = _a.clientHeight;
+    return [
+      scrollTop,
+      scrollHeight,
+      clientHeight
+    ];
+  };
+  var getHScrollVariables = function(_a) {
+    var scrollLeft = _a.scrollLeft, scrollWidth = _a.scrollWidth, clientWidth = _a.clientWidth;
+    return [
+      scrollLeft,
+      scrollWidth,
+      clientWidth
+    ];
+  };
+  var elementCouldBeScrolled = function(axis, node2) {
+    return axis === "v" ? elementCouldBeVScrolled(node2) : elementCouldBeHScrolled(node2);
+  };
+  var getScrollVariables = function(axis, node2) {
+    return axis === "v" ? getVScrollVariables(node2) : getHScrollVariables(node2);
+  };
+  var getDirectionFactor = function(axis, direction) {
+    return axis === "h" && direction === "rtl" ? -1 : 1;
+  };
+  var handleScroll = function(axis, endTarget, event, sourceDelta, noOverscroll) {
+    var directionFactor = getDirectionFactor(axis, window.getComputedStyle(endTarget).direction);
+    var delta = directionFactor * sourceDelta;
+    var target = event.target;
+    var targetInLock = endTarget.contains(target);
+    var shouldCancelScroll = false;
+    var isDeltaPositive = delta > 0;
+    var availableScroll = 0;
+    var availableScrollTop = 0;
+    do {
+      var _a = getScrollVariables(axis, target), position2 = _a[0], scroll_1 = _a[1], capacity = _a[2];
+      var elementScroll = scroll_1 - capacity - directionFactor * position2;
+      if (position2 || elementScroll) {
+        if (elementCouldBeScrolled(axis, target)) {
+          availableScroll += elementScroll;
+          availableScrollTop += position2;
+        }
+      }
+      target = target.parentNode;
+    } while (
+      // portaled content
+      !targetInLock && target !== document.body || // self content
+      targetInLock && (endTarget.contains(target) || endTarget === target)
+    );
+    if (isDeltaPositive && (noOverscroll && availableScroll === 0 || !noOverscroll && delta > availableScroll)) {
+      shouldCancelScroll = true;
+    } else if (!isDeltaPositive && (noOverscroll && availableScrollTop === 0 || !noOverscroll && -delta > availableScrollTop)) {
+      shouldCancelScroll = true;
+    }
+    return shouldCancelScroll;
+  };
+  var getTouchXY = function(event) {
+    return "changedTouches" in event ? [event.changedTouches[0].clientX, event.changedTouches[0].clientY] : [0, 0];
+  };
+  var getDeltaXY = function(event) {
+    return [event.deltaX, event.deltaY];
+  };
+  var extractRef = function(ref) {
+    return ref && "current" in ref ? ref.current : ref;
+  };
+  var deltaCompare = function(x2, y2) {
+    return x2[0] === y2[0] && x2[1] === y2[1];
+  };
+  var generateStyle = function(id) {
+    return "\n  .block-interactivity-".concat(id, " {pointer-events: none;}\n  .allow-interactivity-").concat(id, " {pointer-events: all;}\n");
+  };
+  var idCounter = 0;
+  var lockStack = [];
+  function RemoveScrollSideCar(props) {
+    var shouldPreventQueue = _$1([]);
+    var touchStartRef = _$1([0, 0]);
+    var activeAxis = _$1();
+    var id = h$4(idCounter++)[0];
+    var Style2 = h$4(function() {
+      return styleSingleton();
+    })[0];
+    var lastProps = _$1(props);
+    p$6(function() {
+      lastProps.current = props;
+    }, [props]);
+    p$6(function() {
+      if (props.inert) {
+        document.body.classList.add("block-interactivity-".concat(id));
+        var allow_1 = __spreadArray([props.lockRef.current], (props.shards || []).map(extractRef), true).filter(Boolean);
+        allow_1.forEach(function(el) {
+          return el.classList.add("allow-interactivity-".concat(id));
+        });
+        return function() {
+          document.body.classList.remove("block-interactivity-".concat(id));
+          allow_1.forEach(function(el) {
+            return el.classList.remove("allow-interactivity-".concat(id));
+          });
+        };
+      }
+      return;
+    }, [props.inert, props.lockRef.current, props.shards]);
+    var shouldCancelEvent = T$4(function(event, parent) {
+      if ("touches" in event && event.touches.length === 2) {
+        return !lastProps.current.allowPinchZoom;
+      }
+      var touch = getTouchXY(event);
+      var touchStart = touchStartRef.current;
+      var deltaX = "deltaX" in event ? event.deltaX : touchStart[0] - touch[0];
+      var deltaY = "deltaY" in event ? event.deltaY : touchStart[1] - touch[1];
+      var currentAxis;
+      var target = event.target;
+      var moveDirection = Math.abs(deltaX) > Math.abs(deltaY) ? "h" : "v";
+      if ("touches" in event && moveDirection === "h" && target.type === "range") {
+        return false;
+      }
+      var canBeScrolledInMainDirection = locationCouldBeScrolled(moveDirection, target);
+      if (!canBeScrolledInMainDirection) {
+        return true;
+      }
+      if (canBeScrolledInMainDirection) {
+        currentAxis = moveDirection;
+      } else {
+        currentAxis = moveDirection === "v" ? "h" : "v";
+        canBeScrolledInMainDirection = locationCouldBeScrolled(moveDirection, target);
+      }
+      if (!canBeScrolledInMainDirection) {
+        return false;
+      }
+      if (!activeAxis.current && "changedTouches" in event && (deltaX || deltaY)) {
+        activeAxis.current = currentAxis;
+      }
+      if (!currentAxis) {
+        return true;
+      }
+      var cancelingAxis = activeAxis.current || currentAxis;
+      return handleScroll(cancelingAxis, parent, event, cancelingAxis === "h" ? deltaX : deltaY, true);
+    }, []);
+    var shouldPrevent = T$4(function(_event) {
+      var event = _event;
+      if (!lockStack.length || lockStack[lockStack.length - 1] !== Style2) {
+        return;
+      }
+      var delta = "deltaY" in event ? getDeltaXY(event) : getTouchXY(event);
+      var sourceEvent = shouldPreventQueue.current.filter(function(e2) {
+        return e2.name === event.type && e2.target === event.target && deltaCompare(e2.delta, delta);
+      })[0];
+      if (sourceEvent && sourceEvent.should) {
+        if (event.cancelable) {
+          event.preventDefault();
+        }
+        return;
+      }
+      if (!sourceEvent) {
+        var shardNodes = (lastProps.current.shards || []).map(extractRef).filter(Boolean).filter(function(node2) {
+          return node2.contains(event.target);
+        });
+        var shouldStop = shardNodes.length > 0 ? shouldCancelEvent(event, shardNodes[0]) : !lastProps.current.noIsolation;
+        if (shouldStop) {
+          if (event.cancelable) {
+            event.preventDefault();
+          }
+        }
+      }
+    }, []);
+    var shouldCancel = T$4(function(name, delta, target, should) {
+      var event = { name, delta, target, should };
+      shouldPreventQueue.current.push(event);
+      setTimeout(function() {
+        shouldPreventQueue.current = shouldPreventQueue.current.filter(function(e2) {
+          return e2 !== event;
+        });
+      }, 1);
+    }, []);
+    var scrollTouchStart = T$4(function(event) {
+      touchStartRef.current = getTouchXY(event);
+      activeAxis.current = void 0;
+    }, []);
+    var scrollWheel = T$4(function(event) {
+      shouldCancel(event.type, getDeltaXY(event), event.target, shouldCancelEvent(event, props.lockRef.current));
+    }, []);
+    var scrollTouchMove = T$4(function(event) {
+      shouldCancel(event.type, getTouchXY(event), event.target, shouldCancelEvent(event, props.lockRef.current));
+    }, []);
+    p$6(function() {
+      lockStack.push(Style2);
+      props.setCallbacks({
+        onScrollCapture: scrollWheel,
+        onWheelCapture: scrollWheel,
+        onTouchMoveCapture: scrollTouchMove
+      });
+      document.addEventListener("wheel", shouldPrevent, nonPassive);
+      document.addEventListener("touchmove", shouldPrevent, nonPassive);
+      document.addEventListener("touchstart", scrollTouchStart, nonPassive);
+      return function() {
+        lockStack = lockStack.filter(function(inst) {
+          return inst !== Style2;
+        });
+        document.removeEventListener("wheel", shouldPrevent, nonPassive);
+        document.removeEventListener("touchmove", shouldPrevent, nonPassive);
+        document.removeEventListener("touchstart", scrollTouchStart, nonPassive);
+      };
+    }, []);
+    var removeScrollBar = props.removeScrollBar, inert = props.inert;
+    return y$6(
+      k$3,
+      null,
+      inert ? y$6(Style2, { styles: generateStyle(id) }) : null,
+      removeScrollBar ? y$6(RemoveScrollBar, { gapMode: "margin" }) : null
+    );
+  }
+  const SideCar = exportSidecar(effectCar, RemoveScrollSideCar);
+  var ReactRemoveScroll = k$1(function(props, ref) {
+    return y$6(RemoveScroll, __assign({}, props, { ref, sideCar: SideCar }));
+  });
+  ReactRemoveScroll.classNames = RemoveScroll.classNames;
+  const $67UHm$RemoveScroll = ReactRemoveScroll;
+  var getDefaultParent = function(originalTarget) {
+    if (typeof document === "undefined") {
+      return null;
+    }
+    var sampleTarget = Array.isArray(originalTarget) ? originalTarget[0] : originalTarget;
+    return sampleTarget.ownerDocument.body;
+  };
+  var counterMap = /* @__PURE__ */ new WeakMap();
+  var uncontrolledNodes = /* @__PURE__ */ new WeakMap();
+  var markerMap = {};
+  var lockCount = 0;
+  var unwrapHost = function(node2) {
+    return node2 && (node2.host || unwrapHost(node2.parentNode));
+  };
+  var correctTargets = function(parent, targets) {
+    return targets.map(function(target) {
+      if (parent.contains(target)) {
+        return target;
+      }
+      var correctedTarget = unwrapHost(target);
+      if (correctedTarget && parent.contains(correctedTarget)) {
+        return correctedTarget;
+      }
+      console.error("aria-hidden", target, "in not contained inside", parent, ". Doing nothing");
+      return null;
+    }).filter(function(x2) {
+      return Boolean(x2);
+    });
+  };
+  var applyAttributeToOthers = function(originalTarget, parentNode, markerName, controlAttribute) {
+    var targets = correctTargets(parentNode, Array.isArray(originalTarget) ? originalTarget : [originalTarget]);
+    if (!markerMap[markerName]) {
+      markerMap[markerName] = /* @__PURE__ */ new WeakMap();
+    }
+    var markerCounter = markerMap[markerName];
+    var hiddenNodes = [];
+    var elementsToKeep = /* @__PURE__ */ new Set();
+    var elementsToStop = new Set(targets);
+    var keep = function(el) {
+      if (!el || elementsToKeep.has(el)) {
+        return;
+      }
+      elementsToKeep.add(el);
+      keep(el.parentNode);
+    };
+    targets.forEach(keep);
+    var deep = function(parent) {
+      if (!parent || elementsToStop.has(parent)) {
+        return;
+      }
+      Array.prototype.forEach.call(parent.children, function(node2) {
+        if (elementsToKeep.has(node2)) {
+          deep(node2);
+        } else {
+          var attr = node2.getAttribute(controlAttribute);
+          var alreadyHidden = attr !== null && attr !== "false";
+          var counterValue = (counterMap.get(node2) || 0) + 1;
+          var markerValue = (markerCounter.get(node2) || 0) + 1;
+          counterMap.set(node2, counterValue);
+          markerCounter.set(node2, markerValue);
+          hiddenNodes.push(node2);
+          if (counterValue === 1 && alreadyHidden) {
+            uncontrolledNodes.set(node2, true);
+          }
+          if (markerValue === 1) {
+            node2.setAttribute(markerName, "true");
+          }
+          if (!alreadyHidden) {
+            node2.setAttribute(controlAttribute, "true");
+          }
+        }
+      });
+    };
+    deep(parentNode);
+    elementsToKeep.clear();
+    lockCount++;
+    return function() {
+      hiddenNodes.forEach(function(node2) {
+        var counterValue = counterMap.get(node2) - 1;
+        var markerValue = markerCounter.get(node2) - 1;
+        counterMap.set(node2, counterValue);
+        markerCounter.set(node2, markerValue);
+        if (!counterValue) {
+          if (!uncontrolledNodes.has(node2)) {
+            node2.removeAttribute(controlAttribute);
+          }
+          uncontrolledNodes.delete(node2);
+        }
+        if (!markerValue) {
+          node2.removeAttribute(markerName);
+        }
+      });
+      lockCount--;
+      if (!lockCount) {
+        counterMap = /* @__PURE__ */ new WeakMap();
+        counterMap = /* @__PURE__ */ new WeakMap();
+        uncontrolledNodes = /* @__PURE__ */ new WeakMap();
+        markerMap = {};
+      }
+    };
+  };
+  var hideOthers = function(originalTarget, parentNode, markerName) {
+    if (markerName === void 0) {
+      markerName = "data-aria-hidden";
+    }
+    var targets = Array.from(Array.isArray(originalTarget) ? originalTarget : [originalTarget]);
+    var activeParentNode = parentNode || getDefaultParent(originalTarget);
+    if (!activeParentNode) {
+      return function() {
+        return null;
+      };
+    }
+    targets.push.apply(targets, Array.from(activeParentNode.querySelectorAll("[aria-live]")));
+    return applyAttributeToOthers(targets, activeParentNode, markerName, "aria-hidden");
+  };
+  const $5d3850c4d0b4e6c7$var$DIALOG_NAME = "Dialog";
+  const [$5d3850c4d0b4e6c7$var$createDialogContext, $5d3850c4d0b4e6c7$export$cc702773b8ea3e41] = $c512c27ab02ef895$export$50c7b4e9d9f19c1($5d3850c4d0b4e6c7$var$DIALOG_NAME);
+  const [$5d3850c4d0b4e6c7$var$DialogProvider, $5d3850c4d0b4e6c7$var$useDialogContext] = $5d3850c4d0b4e6c7$var$createDialogContext($5d3850c4d0b4e6c7$var$DIALOG_NAME);
+  const $5d3850c4d0b4e6c7$export$3ddf2d174ce01153 = (props) => {
+    const { __scopeDialog, children, open: openProp, defaultOpen, onOpenChange, modal = true } = props;
+    const triggerRef = _$1(null);
+    const contentRef = _$1(null);
+    const [open = false, setOpen] = $71cd76cc60e0454e$export$6f32135080cb4c3({
+      prop: openProp,
+      defaultProp: defaultOpen,
+      onChange: onOpenChange
+    });
+    return /* @__PURE__ */ y$6($5d3850c4d0b4e6c7$var$DialogProvider, {
+      scope: __scopeDialog,
+      triggerRef,
+      contentRef,
+      contentId: $1746a345f3d73bb7$export$f680877a34711e37(),
+      titleId: $1746a345f3d73bb7$export$f680877a34711e37(),
+      descriptionId: $1746a345f3d73bb7$export$f680877a34711e37(),
+      open,
+      onOpenChange: setOpen,
+      onOpenToggle: T$4(
+        () => setOpen(
+          (prevOpen) => !prevOpen
+        ),
+        [
+          setOpen
+        ]
+      ),
+      modal
+    }, children);
+  };
+  const $5d3850c4d0b4e6c7$var$TRIGGER_NAME = "DialogTrigger";
+  const $5d3850c4d0b4e6c7$export$2e1e1122cf0cba88 = /* @__PURE__ */ k$1((props, forwardedRef) => {
+    const { __scopeDialog, ...triggerProps } = props;
+    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$TRIGGER_NAME, __scopeDialog);
+    const composedTriggerRef = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(forwardedRef, context.triggerRef);
+    return /* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.button, _extends({
+      type: "button",
+      "aria-haspopup": "dialog",
+      "aria-expanded": context.open,
+      "aria-controls": context.contentId,
+      "data-state": $5d3850c4d0b4e6c7$var$getState(context.open)
+    }, triggerProps, {
+      ref: composedTriggerRef,
+      onClick: $e42e1063c40fb3ef$export$b9ecd428b558ff10(props.onClick, context.onOpenToggle)
+    }));
+  });
+  const $5d3850c4d0b4e6c7$var$PORTAL_NAME = "DialogPortal";
+  const [$5d3850c4d0b4e6c7$var$PortalProvider, $5d3850c4d0b4e6c7$var$usePortalContext] = $5d3850c4d0b4e6c7$var$createDialogContext($5d3850c4d0b4e6c7$var$PORTAL_NAME, {
+    forceMount: void 0
+  });
+  const $5d3850c4d0b4e6c7$export$dad7c95542bacce0 = (props) => {
+    const { __scopeDialog, forceMount, children, container } = props;
+    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$PORTAL_NAME, __scopeDialog);
+    return /* @__PURE__ */ y$6($5d3850c4d0b4e6c7$var$PortalProvider, {
+      scope: __scopeDialog,
+      forceMount
+    }, O$1.map(
+      children,
+      (child) => /* @__PURE__ */ y$6($921a889cee6df7e8$export$99c2b779aa4e8b8b, {
+        present: forceMount || context.open
+      }, /* @__PURE__ */ y$6($f1701beae083dbae$export$602eac185826482c, {
+        asChild: true,
+        container
+      }, child))
+    ));
+  };
+  const $5d3850c4d0b4e6c7$var$OVERLAY_NAME = "DialogOverlay";
+  const $5d3850c4d0b4e6c7$export$bd1d06c79be19e17 = /* @__PURE__ */ k$1((props, forwardedRef) => {
+    const portalContext = $5d3850c4d0b4e6c7$var$usePortalContext($5d3850c4d0b4e6c7$var$OVERLAY_NAME, props.__scopeDialog);
+    const { forceMount = portalContext.forceMount, ...overlayProps } = props;
+    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$OVERLAY_NAME, props.__scopeDialog);
+    return context.modal ? /* @__PURE__ */ y$6($921a889cee6df7e8$export$99c2b779aa4e8b8b, {
+      present: forceMount || context.open
+    }, /* @__PURE__ */ y$6($5d3850c4d0b4e6c7$var$DialogOverlayImpl, _extends({}, overlayProps, {
+      ref: forwardedRef
+    }))) : null;
+  });
+  const $5d3850c4d0b4e6c7$var$DialogOverlayImpl = /* @__PURE__ */ k$1((props, forwardedRef) => {
+    const { __scopeDialog, ...overlayProps } = props;
+    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$OVERLAY_NAME, __scopeDialog);
+    return (
+      // Make sure `Content` is scrollable even when it doesn't live inside `RemoveScroll`
+      // ie. when `Overlay` and `Content` are siblings
+      /* @__PURE__ */ y$6($67UHm$RemoveScroll, {
+        as: $5e63c961fc1ce211$export$8c6ed5c666ac1360,
+        allowPinchZoom: true,
+        shards: [
+          context.contentRef
+        ]
+      }, /* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({
+        "data-state": $5d3850c4d0b4e6c7$var$getState(context.open)
+      }, overlayProps, {
+        ref: forwardedRef,
+        style: {
+          pointerEvents: "auto",
+          ...overlayProps.style
+        }
+      })))
+    );
+  });
+  const $5d3850c4d0b4e6c7$var$CONTENT_NAME = "DialogContent";
+  const $5d3850c4d0b4e6c7$export$b6d9565de1e068cf = /* @__PURE__ */ k$1((props, forwardedRef) => {
+    const portalContext = $5d3850c4d0b4e6c7$var$usePortalContext($5d3850c4d0b4e6c7$var$CONTENT_NAME, props.__scopeDialog);
+    const { forceMount = portalContext.forceMount, ...contentProps } = props;
+    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$CONTENT_NAME, props.__scopeDialog);
+    return /* @__PURE__ */ y$6($921a889cee6df7e8$export$99c2b779aa4e8b8b, {
+      present: forceMount || context.open
+    }, context.modal ? /* @__PURE__ */ y$6($5d3850c4d0b4e6c7$var$DialogContentModal, _extends({}, contentProps, {
+      ref: forwardedRef
+    })) : /* @__PURE__ */ y$6($5d3850c4d0b4e6c7$var$DialogContentNonModal, _extends({}, contentProps, {
+      ref: forwardedRef
+    })));
+  });
+  const $5d3850c4d0b4e6c7$var$DialogContentModal = /* @__PURE__ */ k$1((props, forwardedRef) => {
+    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$CONTENT_NAME, props.__scopeDialog);
+    const contentRef = _$1(null);
+    const composedRefs = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(forwardedRef, context.contentRef, contentRef);
+    p$6(() => {
+      const content2 = contentRef.current;
+      if (content2)
+        return hideOthers(content2);
+    }, []);
+    return /* @__PURE__ */ y$6($5d3850c4d0b4e6c7$var$DialogContentImpl, _extends({}, props, {
+      ref: composedRefs,
+      trapFocus: context.open,
+      disableOutsidePointerEvents: true,
+      onCloseAutoFocus: $e42e1063c40fb3ef$export$b9ecd428b558ff10(props.onCloseAutoFocus, (event) => {
+        var _context$triggerRef$c;
+        event.preventDefault();
+        (_context$triggerRef$c = context.triggerRef.current) === null || _context$triggerRef$c === void 0 || _context$triggerRef$c.focus();
+      }),
+      onPointerDownOutside: $e42e1063c40fb3ef$export$b9ecd428b558ff10(props.onPointerDownOutside, (event) => {
+        const originalEvent = event.detail.originalEvent;
+        const ctrlLeftClick = originalEvent.button === 0 && originalEvent.ctrlKey === true;
+        const isRightClick = originalEvent.button === 2 || ctrlLeftClick;
+        if (isRightClick)
+          event.preventDefault();
+      }),
+      onFocusOutside: $e42e1063c40fb3ef$export$b9ecd428b558ff10(
+        props.onFocusOutside,
+        (event) => event.preventDefault()
+      )
+    }));
+  });
+  const $5d3850c4d0b4e6c7$var$DialogContentNonModal = /* @__PURE__ */ k$1((props, forwardedRef) => {
+    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$CONTENT_NAME, props.__scopeDialog);
+    const hasInteractedOutsideRef = _$1(false);
+    return /* @__PURE__ */ y$6($5d3850c4d0b4e6c7$var$DialogContentImpl, _extends({}, props, {
+      ref: forwardedRef,
+      trapFocus: false,
+      disableOutsidePointerEvents: false,
+      onCloseAutoFocus: (event) => {
+        var _props$onCloseAutoFoc;
+        (_props$onCloseAutoFoc = props.onCloseAutoFocus) === null || _props$onCloseAutoFoc === void 0 || _props$onCloseAutoFoc.call(props, event);
+        if (!event.defaultPrevented) {
+          var _context$triggerRef$c2;
+          if (!hasInteractedOutsideRef.current)
+            (_context$triggerRef$c2 = context.triggerRef.current) === null || _context$triggerRef$c2 === void 0 || _context$triggerRef$c2.focus();
+          event.preventDefault();
+        }
+        hasInteractedOutsideRef.current = false;
+      },
+      onInteractOutside: (event) => {
+        var _props$onInteractOuts, _context$triggerRef$c3;
+        (_props$onInteractOuts = props.onInteractOutside) === null || _props$onInteractOuts === void 0 || _props$onInteractOuts.call(props, event);
+        if (!event.defaultPrevented)
+          hasInteractedOutsideRef.current = true;
+        const target = event.target;
+        const targetIsTrigger = (_context$triggerRef$c3 = context.triggerRef.current) === null || _context$triggerRef$c3 === void 0 ? void 0 : _context$triggerRef$c3.contains(target);
+        if (targetIsTrigger)
+          event.preventDefault();
+      }
+    }));
+  });
+  const $5d3850c4d0b4e6c7$var$DialogContentImpl = /* @__PURE__ */ k$1((props, forwardedRef) => {
+    const { __scopeDialog, trapFocus, onOpenAutoFocus, onCloseAutoFocus, ...contentProps } = props;
+    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$CONTENT_NAME, __scopeDialog);
+    const contentRef = _$1(null);
+    const composedRefs = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(forwardedRef, contentRef);
+    $3db38b7d1fb3fe6a$export$b7ece24a22aeda8c();
+    return /* @__PURE__ */ y$6(k$3, null, /* @__PURE__ */ y$6($d3863c46a17e8a28$export$20e40289641fbbb6, {
+      asChild: true,
+      loop: true,
+      trapped: trapFocus,
+      onMountAutoFocus: onOpenAutoFocus,
+      onUnmountAutoFocus: onCloseAutoFocus
+    }, /* @__PURE__ */ y$6($5cb92bef7577960e$export$177fb62ff3ec1f22, _extends({
+      role: "dialog",
+      id: context.contentId,
+      "aria-describedby": context.descriptionId,
+      "aria-labelledby": context.titleId,
+      "data-state": $5d3850c4d0b4e6c7$var$getState(context.open)
+    }, contentProps, {
+      ref: composedRefs,
+      onDismiss: () => context.onOpenChange(false)
+    }))), false);
+  });
+  const $5d3850c4d0b4e6c7$var$TITLE_NAME = "DialogTitle";
+  const $5d3850c4d0b4e6c7$export$16f7638e4a34b909 = /* @__PURE__ */ k$1((props, forwardedRef) => {
+    const { __scopeDialog, ...titleProps } = props;
+    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$TITLE_NAME, __scopeDialog);
+    return /* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.h2, _extends({
+      id: context.titleId
+    }, titleProps, {
+      ref: forwardedRef
+    }));
+  });
+  const $5d3850c4d0b4e6c7$var$CLOSE_NAME = "DialogClose";
+  const $5d3850c4d0b4e6c7$export$fba2fb7cd781b7ac = /* @__PURE__ */ k$1((props, forwardedRef) => {
+    const { __scopeDialog, ...closeProps } = props;
+    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$CLOSE_NAME, __scopeDialog);
+    return /* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.button, _extends({
+      type: "button"
+    }, closeProps, {
+      ref: forwardedRef,
+      onClick: $e42e1063c40fb3ef$export$b9ecd428b558ff10(
+        props.onClick,
+        () => context.onOpenChange(false)
+      )
+    }));
+  });
+  function $5d3850c4d0b4e6c7$var$getState(open) {
+    return open ? "open" : "closed";
+  }
+  const $5d3850c4d0b4e6c7$export$be92b6f5f03c0fe9 = $5d3850c4d0b4e6c7$export$3ddf2d174ce01153;
+  const $5d3850c4d0b4e6c7$export$41fb9f06171c75f4 = $5d3850c4d0b4e6c7$export$2e1e1122cf0cba88;
+  const $5d3850c4d0b4e6c7$export$602eac185826482c = $5d3850c4d0b4e6c7$export$dad7c95542bacce0;
+  const $5d3850c4d0b4e6c7$export$c6fdb837b070b4ff = $5d3850c4d0b4e6c7$export$bd1d06c79be19e17;
+  const $5d3850c4d0b4e6c7$export$7c6e2c02157bb7d2 = $5d3850c4d0b4e6c7$export$b6d9565de1e068cf;
+  const $5d3850c4d0b4e6c7$export$f99233281efd08a0 = $5d3850c4d0b4e6c7$export$16f7638e4a34b909;
+  const $5d3850c4d0b4e6c7$export$f39c2d165cd861fe = $5d3850c4d0b4e6c7$export$fba2fb7cd781b7ac;
   function t$1(t2) {
     return t2.split("-")[0];
   }
@@ -2688,118 +4357,6 @@ html {
       }
     };
   };
-  const $5e63c961fc1ce211$export$8c6ed5c666ac1360 = /* @__PURE__ */ k$1((props, forwardedRef) => {
-    const { children, ...slotProps } = props;
-    const childrenArray = O$1.toArray(children);
-    const slottable = childrenArray.find($5e63c961fc1ce211$var$isSlottable);
-    if (slottable) {
-      const newElement = slottable.props.children;
-      const newChildren = childrenArray.map((child) => {
-        if (child === slottable) {
-          if (O$1.count(newElement) > 1)
-            return O$1.only(null);
-          return /* @__PURE__ */ an(newElement) ? newElement.props.children : null;
-        } else
-          return child;
-      });
-      return /* @__PURE__ */ y$6($5e63c961fc1ce211$var$SlotClone, _extends({}, slotProps, {
-        ref: forwardedRef
-      }), /* @__PURE__ */ an(newElement) ? /* @__PURE__ */ hn(newElement, void 0, newChildren) : null);
-    }
-    return /* @__PURE__ */ y$6($5e63c961fc1ce211$var$SlotClone, _extends({}, slotProps, {
-      ref: forwardedRef
-    }), children);
-  });
-  $5e63c961fc1ce211$export$8c6ed5c666ac1360.displayName = "Slot";
-  const $5e63c961fc1ce211$var$SlotClone = /* @__PURE__ */ k$1((props, forwardedRef) => {
-    const { children, ...slotProps } = props;
-    if (/* @__PURE__ */ an(children))
-      return /* @__PURE__ */ hn(children, {
-        ...$5e63c961fc1ce211$var$mergeProps(slotProps, children.props),
-        ref: $6ed0406888f73fc4$export$43e446d32b3d21af(forwardedRef, children.ref)
-      });
-    return O$1.count(children) > 1 ? O$1.only(null) : null;
-  });
-  $5e63c961fc1ce211$var$SlotClone.displayName = "SlotClone";
-  const $5e63c961fc1ce211$export$d9f1ccf0bdb05d45 = ({ children }) => {
-    return /* @__PURE__ */ y$6(k$3, null, children);
-  };
-  function $5e63c961fc1ce211$var$isSlottable(child) {
-    return /* @__PURE__ */ an(child) && child.type === $5e63c961fc1ce211$export$d9f1ccf0bdb05d45;
-  }
-  function $5e63c961fc1ce211$var$mergeProps(slotProps, childProps) {
-    const overrideProps = {
-      ...childProps
-    };
-    for (const propName in childProps) {
-      const slotPropValue = slotProps[propName];
-      const childPropValue = childProps[propName];
-      const isHandler = /^on[A-Z]/.test(propName);
-      if (isHandler) {
-        if (slotPropValue && childPropValue)
-          overrideProps[propName] = (...args) => {
-            childPropValue(...args);
-            slotPropValue(...args);
-          };
-        else if (slotPropValue)
-          overrideProps[propName] = slotPropValue;
-      } else if (propName === "style")
-        overrideProps[propName] = {
-          ...slotPropValue,
-          ...childPropValue
-        };
-      else if (propName === "className")
-        overrideProps[propName] = [
-          slotPropValue,
-          childPropValue
-        ].filter(Boolean).join(" ");
-    }
-    return {
-      ...slotProps,
-      ...overrideProps
-    };
-  }
-  const $8927f6f2acc4f386$var$NODES = [
-    "a",
-    "button",
-    "div",
-    "form",
-    "h2",
-    "h3",
-    "img",
-    "input",
-    "label",
-    "li",
-    "nav",
-    "ol",
-    "p",
-    "span",
-    "svg",
-    "ul"
-  ];
-  const $8927f6f2acc4f386$export$250ffa63cdc0d034 = $8927f6f2acc4f386$var$NODES.reduce((primitive, node2) => {
-    const Node = /* @__PURE__ */ k$1((props, forwardedRef) => {
-      const { asChild, ...primitiveProps } = props;
-      const Comp = asChild ? $5e63c961fc1ce211$export$8c6ed5c666ac1360 : node2;
-      p$6(() => {
-        window[Symbol.for("radix-ui")] = true;
-      }, []);
-      return /* @__PURE__ */ y$6(Comp, _extends({}, primitiveProps, {
-        ref: forwardedRef
-      }));
-    });
-    Node.displayName = `Primitive.${node2}`;
-    return {
-      ...primitive,
-      [node2]: Node
-    };
-  }, {});
-  function $8927f6f2acc4f386$export$6d1a0317bde7de7f(target, event) {
-    if (target)
-      mn(
-        () => target.dispatchEvent(event)
-      );
-  }
   const $7e8f5cd07187803e$export$21b07c8f274aebd5 = /* @__PURE__ */ k$1((props, forwardedRef) => {
     const { children, width = 10, height = 5, ...arrowProps } = props;
     return /* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.svg, _extends({}, arrowProps, {
@@ -2813,8 +4370,6 @@ html {
     }));
   });
   const $7e8f5cd07187803e$export$be92b6f5f03c0fe9 = $7e8f5cd07187803e$export$21b07c8f274aebd5;
-  const $9f79659886946c16$export$e5c5a5f917a5871c = Boolean(globalThis === null || globalThis === void 0 ? void 0 : globalThis.document) ? y$5 : () => {
-  };
   function $db6c3485150b8e66$export$1ab7ae714698c4b8(element2) {
     const [size, setSize] = h$4(void 0);
     $9f79659886946c16$export$e5c5a5f917a5871c(() => {
@@ -3166,343 +4721,6 @@ html {
   const $cf1ac5d9fe0e8206$export$b688253958b8dfe7 = $cf1ac5d9fe0e8206$export$ecd4e1ccab6ed6d;
   const $cf1ac5d9fe0e8206$export$7c6e2c02157bb7d2 = $cf1ac5d9fe0e8206$export$bc4ae5855d3c4fc;
   const $cf1ac5d9fe0e8206$export$21b07c8f274aebd5 = $cf1ac5d9fe0e8206$export$79d62cd4e10a3fd0;
-  const $f1701beae083dbae$export$602eac185826482c = /* @__PURE__ */ k$1((props, forwardedRef) => {
-    var _globalThis$document;
-    const { container = globalThis === null || globalThis === void 0 ? void 0 : (_globalThis$document = globalThis.document) === null || _globalThis$document === void 0 ? void 0 : _globalThis$document.body, ...portalProps } = props;
-    return container ? /* @__PURE__ */ wn.createPortal(/* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({}, portalProps, {
-      ref: forwardedRef
-    })), container) : null;
-  });
-  function $fe963b355347cc68$export$3e6543de14f8614f(initialState, machine) {
-    return s$6((state, event) => {
-      const nextState = machine[state][event];
-      return nextState !== null && nextState !== void 0 ? nextState : state;
-    }, initialState);
-  }
-  const $921a889cee6df7e8$export$99c2b779aa4e8b8b = (props) => {
-    const { present, children } = props;
-    const presence = $921a889cee6df7e8$var$usePresence(present);
-    const child = typeof children === "function" ? children({
-      present: presence.isPresent
-    }) : O$1.only(children);
-    const ref = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(presence.ref, child.ref);
-    const forceMount = typeof children === "function";
-    return forceMount || presence.isPresent ? /* @__PURE__ */ hn(child, {
-      ref
-    }) : null;
-  };
-  $921a889cee6df7e8$export$99c2b779aa4e8b8b.displayName = "Presence";
-  function $921a889cee6df7e8$var$usePresence(present) {
-    const [node1, setNode] = h$4();
-    const stylesRef = _$1({});
-    const prevPresentRef = _$1(present);
-    const prevAnimationNameRef = _$1("none");
-    const initialState = present ? "mounted" : "unmounted";
-    const [state, send] = $fe963b355347cc68$export$3e6543de14f8614f(initialState, {
-      mounted: {
-        UNMOUNT: "unmounted",
-        ANIMATION_OUT: "unmountSuspended"
-      },
-      unmountSuspended: {
-        MOUNT: "mounted",
-        ANIMATION_END: "unmounted"
-      },
-      unmounted: {
-        MOUNT: "mounted"
-      }
-    });
-    p$6(() => {
-      const currentAnimationName = $921a889cee6df7e8$var$getAnimationName(stylesRef.current);
-      prevAnimationNameRef.current = state === "mounted" ? currentAnimationName : "none";
-    }, [
-      state
-    ]);
-    $9f79659886946c16$export$e5c5a5f917a5871c(() => {
-      const styles = stylesRef.current;
-      const wasPresent = prevPresentRef.current;
-      const hasPresentChanged = wasPresent !== present;
-      if (hasPresentChanged) {
-        const prevAnimationName = prevAnimationNameRef.current;
-        const currentAnimationName = $921a889cee6df7e8$var$getAnimationName(styles);
-        if (present)
-          send("MOUNT");
-        else if (currentAnimationName === "none" || (styles === null || styles === void 0 ? void 0 : styles.display) === "none")
-          send("UNMOUNT");
-        else {
-          const isAnimating = prevAnimationName !== currentAnimationName;
-          if (wasPresent && isAnimating)
-            send("ANIMATION_OUT");
-          else
-            send("UNMOUNT");
-        }
-        prevPresentRef.current = present;
-      }
-    }, [
-      present,
-      send
-    ]);
-    $9f79659886946c16$export$e5c5a5f917a5871c(() => {
-      if (node1) {
-        const handleAnimationEnd = (event) => {
-          const currentAnimationName = $921a889cee6df7e8$var$getAnimationName(stylesRef.current);
-          const isCurrentAnimation = currentAnimationName.includes(event.animationName);
-          if (event.target === node1 && isCurrentAnimation)
-            mn(
-              () => send("ANIMATION_END")
-            );
-        };
-        const handleAnimationStart = (event) => {
-          if (event.target === node1)
-            prevAnimationNameRef.current = $921a889cee6df7e8$var$getAnimationName(stylesRef.current);
-        };
-        node1.addEventListener("animationstart", handleAnimationStart);
-        node1.addEventListener("animationcancel", handleAnimationEnd);
-        node1.addEventListener("animationend", handleAnimationEnd);
-        return () => {
-          node1.removeEventListener("animationstart", handleAnimationStart);
-          node1.removeEventListener("animationcancel", handleAnimationEnd);
-          node1.removeEventListener("animationend", handleAnimationEnd);
-        };
-      } else
-        send("ANIMATION_END");
-    }, [
-      node1,
-      send
-    ]);
-    return {
-      isPresent: [
-        "mounted",
-        "unmountSuspended"
-      ].includes(state),
-      ref: T$4((node2) => {
-        if (node2)
-          stylesRef.current = getComputedStyle(node2);
-        setNode(node2);
-      }, [])
-    };
-  }
-  function $921a889cee6df7e8$var$getAnimationName(styles) {
-    return (styles === null || styles === void 0 ? void 0 : styles.animationName) || "none";
-  }
-  function $addc16e1bbe58fd0$export$3a72a57244d6e765(onEscapeKeyDownProp, ownerDocument = globalThis === null || globalThis === void 0 ? void 0 : globalThis.document) {
-    const onEscapeKeyDown = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onEscapeKeyDownProp);
-    p$6(() => {
-      const handleKeyDown = (event) => {
-        if (event.key === "Escape")
-          onEscapeKeyDown(event);
-      };
-      ownerDocument.addEventListener("keydown", handleKeyDown);
-      return () => ownerDocument.removeEventListener("keydown", handleKeyDown);
-    }, [
-      onEscapeKeyDown,
-      ownerDocument
-    ]);
-  }
-  const $5cb92bef7577960e$var$CONTEXT_UPDATE = "dismissableLayer.update";
-  const $5cb92bef7577960e$var$POINTER_DOWN_OUTSIDE = "dismissableLayer.pointerDownOutside";
-  const $5cb92bef7577960e$var$FOCUS_OUTSIDE = "dismissableLayer.focusOutside";
-  let $5cb92bef7577960e$var$originalBodyPointerEvents;
-  const $5cb92bef7577960e$var$DismissableLayerContext = /* @__PURE__ */ G$1({
-    layers: /* @__PURE__ */ new Set(),
-    layersWithOutsidePointerEventsDisabled: /* @__PURE__ */ new Set(),
-    branches: /* @__PURE__ */ new Set()
-  });
-  const $5cb92bef7577960e$export$177fb62ff3ec1f22 = /* @__PURE__ */ k$1((props, forwardedRef) => {
-    var _node$ownerDocument;
-    const { disableOutsidePointerEvents = false, onEscapeKeyDown, onPointerDownOutside, onFocusOutside, onInteractOutside, onDismiss, ...layerProps } = props;
-    const context = q$1($5cb92bef7577960e$var$DismissableLayerContext);
-    const [node1, setNode] = h$4(null);
-    const ownerDocument = (_node$ownerDocument = node1 === null || node1 === void 0 ? void 0 : node1.ownerDocument) !== null && _node$ownerDocument !== void 0 ? _node$ownerDocument : globalThis === null || globalThis === void 0 ? void 0 : globalThis.document;
-    const [, force] = h$4({});
-    const composedRefs = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(
-      forwardedRef,
-      (node2) => setNode(node2)
-    );
-    const layers = Array.from(context.layers);
-    const [highestLayerWithOutsidePointerEventsDisabled] = [
-      ...context.layersWithOutsidePointerEventsDisabled
-    ].slice(-1);
-    const highestLayerWithOutsidePointerEventsDisabledIndex = layers.indexOf(highestLayerWithOutsidePointerEventsDisabled);
-    const index2 = node1 ? layers.indexOf(node1) : -1;
-    const isBodyPointerEventsDisabled = context.layersWithOutsidePointerEventsDisabled.size > 0;
-    const isPointerEventsEnabled = index2 >= highestLayerWithOutsidePointerEventsDisabledIndex;
-    const pointerDownOutside = $5cb92bef7577960e$var$usePointerDownOutside((event) => {
-      const target = event.target;
-      const isPointerDownOnBranch = [
-        ...context.branches
-      ].some(
-        (branch) => branch.contains(target)
-      );
-      if (!isPointerEventsEnabled || isPointerDownOnBranch)
-        return;
-      onPointerDownOutside === null || onPointerDownOutside === void 0 || onPointerDownOutside(event);
-      onInteractOutside === null || onInteractOutside === void 0 || onInteractOutside(event);
-      if (!event.defaultPrevented)
-        onDismiss === null || onDismiss === void 0 || onDismiss();
-    }, ownerDocument);
-    const focusOutside = $5cb92bef7577960e$var$useFocusOutside((event) => {
-      const target = event.target;
-      const isFocusInBranch = [
-        ...context.branches
-      ].some(
-        (branch) => branch.contains(target)
-      );
-      if (isFocusInBranch)
-        return;
-      onFocusOutside === null || onFocusOutside === void 0 || onFocusOutside(event);
-      onInteractOutside === null || onInteractOutside === void 0 || onInteractOutside(event);
-      if (!event.defaultPrevented)
-        onDismiss === null || onDismiss === void 0 || onDismiss();
-    }, ownerDocument);
-    $addc16e1bbe58fd0$export$3a72a57244d6e765((event) => {
-      const isHighestLayer = index2 === context.layers.size - 1;
-      if (!isHighestLayer)
-        return;
-      onEscapeKeyDown === null || onEscapeKeyDown === void 0 || onEscapeKeyDown(event);
-      if (!event.defaultPrevented && onDismiss) {
-        event.preventDefault();
-        onDismiss();
-      }
-    }, ownerDocument);
-    p$6(() => {
-      if (!node1)
-        return;
-      if (disableOutsidePointerEvents) {
-        if (context.layersWithOutsidePointerEventsDisabled.size === 0) {
-          $5cb92bef7577960e$var$originalBodyPointerEvents = ownerDocument.body.style.pointerEvents;
-          ownerDocument.body.style.pointerEvents = "none";
-        }
-        context.layersWithOutsidePointerEventsDisabled.add(node1);
-      }
-      context.layers.add(node1);
-      $5cb92bef7577960e$var$dispatchUpdate();
-      return () => {
-        if (disableOutsidePointerEvents && context.layersWithOutsidePointerEventsDisabled.size === 1)
-          ownerDocument.body.style.pointerEvents = $5cb92bef7577960e$var$originalBodyPointerEvents;
-      };
-    }, [
-      node1,
-      ownerDocument,
-      disableOutsidePointerEvents,
-      context
-    ]);
-    p$6(() => {
-      return () => {
-        if (!node1)
-          return;
-        context.layers.delete(node1);
-        context.layersWithOutsidePointerEventsDisabled.delete(node1);
-        $5cb92bef7577960e$var$dispatchUpdate();
-      };
-    }, [
-      node1,
-      context
-    ]);
-    p$6(() => {
-      const handleUpdate = () => force({});
-      document.addEventListener($5cb92bef7577960e$var$CONTEXT_UPDATE, handleUpdate);
-      return () => document.removeEventListener($5cb92bef7577960e$var$CONTEXT_UPDATE, handleUpdate);
-    }, []);
-    return /* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({}, layerProps, {
-      ref: composedRefs,
-      style: {
-        pointerEvents: isBodyPointerEventsDisabled ? isPointerEventsEnabled ? "auto" : "none" : void 0,
-        ...props.style
-      },
-      onFocusCapture: $e42e1063c40fb3ef$export$b9ecd428b558ff10(props.onFocusCapture, focusOutside.onFocusCapture),
-      onBlurCapture: $e42e1063c40fb3ef$export$b9ecd428b558ff10(props.onBlurCapture, focusOutside.onBlurCapture),
-      onPointerDownCapture: $e42e1063c40fb3ef$export$b9ecd428b558ff10(props.onPointerDownCapture, pointerDownOutside.onPointerDownCapture)
-    }));
-  });
-  function $5cb92bef7577960e$var$usePointerDownOutside(onPointerDownOutside, ownerDocument = globalThis === null || globalThis === void 0 ? void 0 : globalThis.document) {
-    const handlePointerDownOutside = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onPointerDownOutside);
-    const isPointerInsideReactTreeRef = _$1(false);
-    const handleClickRef = _$1(() => {
-    });
-    p$6(() => {
-      const handlePointerDown = (event) => {
-        if (event.target && !isPointerInsideReactTreeRef.current) {
-          let handleAndDispatchPointerDownOutsideEvent = function() {
-            $5cb92bef7577960e$var$handleAndDispatchCustomEvent($5cb92bef7577960e$var$POINTER_DOWN_OUTSIDE, handlePointerDownOutside, eventDetail, {
-              discrete: true
-            });
-          };
-          const eventDetail = {
-            originalEvent: event
-          };
-          if (event.pointerType === "touch") {
-            ownerDocument.removeEventListener("click", handleClickRef.current);
-            handleClickRef.current = handleAndDispatchPointerDownOutsideEvent;
-            ownerDocument.addEventListener("click", handleClickRef.current, {
-              once: true
-            });
-          } else
-            handleAndDispatchPointerDownOutsideEvent();
-        }
-        isPointerInsideReactTreeRef.current = false;
-      };
-      const timerId = window.setTimeout(() => {
-        ownerDocument.addEventListener("pointerdown", handlePointerDown);
-      }, 0);
-      return () => {
-        window.clearTimeout(timerId);
-        ownerDocument.removeEventListener("pointerdown", handlePointerDown);
-        ownerDocument.removeEventListener("click", handleClickRef.current);
-      };
-    }, [
-      ownerDocument,
-      handlePointerDownOutside
-    ]);
-    return {
-      // ensures we check React component tree (not just DOM tree)
-      onPointerDownCapture: () => isPointerInsideReactTreeRef.current = true
-    };
-  }
-  function $5cb92bef7577960e$var$useFocusOutside(onFocusOutside, ownerDocument = globalThis === null || globalThis === void 0 ? void 0 : globalThis.document) {
-    const handleFocusOutside = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onFocusOutside);
-    const isFocusInsideReactTreeRef = _$1(false);
-    p$6(() => {
-      const handleFocus = (event) => {
-        if (event.target && !isFocusInsideReactTreeRef.current) {
-          const eventDetail = {
-            originalEvent: event
-          };
-          $5cb92bef7577960e$var$handleAndDispatchCustomEvent($5cb92bef7577960e$var$FOCUS_OUTSIDE, handleFocusOutside, eventDetail, {
-            discrete: false
-          });
-        }
-      };
-      ownerDocument.addEventListener("focusin", handleFocus);
-      return () => ownerDocument.removeEventListener("focusin", handleFocus);
-    }, [
-      ownerDocument,
-      handleFocusOutside
-    ]);
-    return {
-      onFocusCapture: () => isFocusInsideReactTreeRef.current = true,
-      onBlurCapture: () => isFocusInsideReactTreeRef.current = false
-    };
-  }
-  function $5cb92bef7577960e$var$dispatchUpdate() {
-    const event = new CustomEvent($5cb92bef7577960e$var$CONTEXT_UPDATE);
-    document.dispatchEvent(event);
-  }
-  function $5cb92bef7577960e$var$handleAndDispatchCustomEvent(name, handler, detail, { discrete }) {
-    const target = detail.originalEvent.target;
-    const event = new CustomEvent(name, {
-      bubbles: false,
-      cancelable: true,
-      detail
-    });
-    if (handler)
-      target.addEventListener(name, handler, {
-        once: true
-      });
-    if (discrete)
-      $8927f6f2acc4f386$export$6d1a0317bde7de7f(target, event);
-    else
-      target.dispatchEvent(event);
-  }
   let $cef8881cdc69808e$var$originalBodyUserSelect;
   const $cef8881cdc69808e$var$HOVERCARD_NAME = "HoverCard";
   const [$cef8881cdc69808e$var$createHoverCardContext, $cef8881cdc69808e$export$47b6998a836b7260] = $c512c27ab02ef895$export$50c7b4e9d9f19c1($cef8881cdc69808e$var$HOVERCARD_NAME, [
@@ -7178,9 +8396,9 @@ html {
     "Enable on Markdown": "Enable on Markdown files",
     "Use 24-hour format": "Use 24-hour format (eg. 23:59)",
     "Export Format": "Export Format",
-    "Export JSON Format Description": "Export JSON in OpenAI Official Format",
     "Export Metadata": "Export Metadata",
     "Export Metadata Description": "Add metadata to exported Markdown and HTML files.",
+    "OpenAI Official Format": "OpenAI Official Format",
     "Conversation Archive Alert": "Are you sure you want to archive all selected conversations?",
     "Conversation Archived Message": "All selected conversations have been archived. Please refresh the page to see the changes.",
     "Conversation Delete Alert": "Are you sure you want to delete all selected conversations?",
@@ -7233,9 +8451,9 @@ html {
     "Enable on Markdown": "Habilitar en archivos Markdown",
     "Use 24-hour format": "Usar formato de 24 horas (ej. 23:59)",
     "Export Format": "Formato de Exportación",
-    "Export JSON Format Description": "Exportar JSON en el Formato Oficial de OpenAI",
     "Export Metadata": "Exportar Metadatos",
     "Export Metadata Description": "Añadir Metadatos a los archivos Markdown y HTML exportados.",
+    "OpenAI Official Format": "Formato Oficial de OpenAI",
     "Conversation Archive Alert": "¿Estás seguro que quieres archivar todas las conversaciones seleccionadas?",
     "Conversation Archived Message": "Todos las conversaciones seleccionadas se han archivado. Por favor refresca la página para ver los cambios.",
     "Conversation Delete Alert": "¿Estás seguro que quieres borrar todas las conversaciones seleccionadas?",
@@ -7286,11 +8504,11 @@ html {
     "Conversation Timestamp Description": "Akan ditampilkan pada halaman.",
     "Enable on HTML": "Aktifkan pada file HTML",
     "Enable on Markdown": "Aktifkan pada file Markdown",
-    "Use 24-hour format": "Gunakan format 24 jam (mis. 23:59)",
+    "Use 24-hour format": "Gunakan format 24 jam (contohnya: 23:59)",
     "Export Format": "Format Ekspor",
-    "Export JSON Format Description": "Ekspor JSON dalam Format Resmi OpenAI",
     "Export Metadata": "Ekspor Metada",
     "Export Metadata Description": "Tambahkan metadata ke file Markdown dan HTML yang diekspor.",
+    "OpenAI Official Format": "Format Resmi OpenAI",
     "Conversation Archive Alert": "Apakah Anda yakin ingin mengarsipkan semua percakapan yang dipilih?",
     "Conversation Archived Message": "Semua percakapan yang dipilih telah diarsipkan. Harap segarkan halaman untuk melihat perubahan.",
     "Conversation Delete Alert": "Apakah Anda yakin ingin menghapus semua percakapan yang dipilih?",
@@ -7343,9 +8561,9 @@ html {
     "Enable on Markdown": "Markdown ファイルで有効にする",
     "Use 24-hour format": "24時間形式を使用する (例: 23:59)",
     "Export Format": "エクスポートフォーマット",
-    "Export JSON Format Description": "OpenAI公式フォーマットでのJSONのエクスポート",
     "Export Metadata": "メタデータをエクスポート",
     "Export Metadata Description": "エクスポートされたMarkdownおよびHTMLファイルにメタデータを追加します。",
+    "OpenAI Official Format": "OpenAI公式フォーマット",
     "Conversation Archive Alert": "選択したすべての会話をアーカイブしてもよろしいですか？",
     "Conversation Archived Message": "選択したすべての会話がアーカイブされました。変更を表示するには、ページを更新してください。",
     "Conversation Delete Alert": "選択したすべての会話を削除してもよろしいですか？",
@@ -7398,9 +8616,9 @@ html {
     "Enable on Markdown": "Markdown dosyalarında etkinleştir",
     "Use 24-hour format": "24 saat biçimini kullan (örn. 23:59)",
     "Export Format": "Dışa Aktarma Formatı",
-    "Export JSON Format Description": "OpenAI Resmi Formatında JSON Dışa Aktarma",
     "Export Metadata": "Üst veriyi dışa aktar",
     "Export Metadata Description": "Dışa aktarılan Markdown ve HTML dosyalarına üst veri ekle",
+    "OpenAI Official Format": "OpenAI Resmi Format",
     "Conversation Archive Alert": "Seçilen tüm konuşmaları arşivlemek istediğinizden emin misiniz?",
     "Conversation Archived Message": "Seçilen tüm konuşmalar arşivlendi. Değişiklikleri görmek için sayfayı yenileyin.",
     "Conversation Delete Alert": "Seçilen tüm konuşmaları silmek istediğinizden emin misiniz?",
@@ -7453,9 +8671,9 @@ html {
     "Enable on Markdown": "在 Markdown 文件上启用",
     "Use 24-hour format": "使用24小时制 (例如 23:59)",
     "Export Format": "导出格式",
-    "Export JSON Format Description": "以 OpenAI 官方格式导出JSON",
     "Export Metadata": "导出元数据",
     "Export Metadata Description": "会添加至 Markdown 以及 HTML 导出。",
+    "OpenAI Official Format": "OpenAI 官方格式",
     "Conversation Archive Alert": "确定要归档所有选取的对话？",
     "Conversation Archived Message": "所有所选的对话已归档。请刷新页面。",
     "Conversation Delete Alert": "确定要删除所有选取的对话？",
@@ -7508,9 +8726,9 @@ html {
     "Enable on Markdown": "在 Markdown 檔案上啟用",
     "Use 24-hour format": "使用24小時制 (例如 23:59)",
     "Export Format": "匯出格式",
-    "Export JSON Format Description": "以 OpenAI 官方格式匯出 JSON",
     "Export Metadata": "匯出元資料",
     "Export Metadata Description": "會添加至 Markdown 以及 HTML 匯出。",
+    "OpenAI Official Format": "OpenAI 官方格式",
     "Conversation Archive Alert": "確定要封存所有選取的對話？",
     "Conversation Archived Message": "所有選取的對話已封存。請重新整理頁面。",
     "Conversation Delete Alert": "確定要刪除所有選取的對話？",
@@ -7731,513 +8949,513 @@ html {
   instance.on("languageChanged", (lng) => {
     ScriptStorage.set(KEY_LANGUAGE, lng);
   });
-  const templateHtml = `<!DOCTYPE html>
-<html lang="{{lang}}" data-theme="{{theme}}">
-<head>
-    <meta charset="UTF-8" />
-    <link rel="icon" href="https://chat.openai.com/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{title}}</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"><\/script>
-    <script>
-        hljs.highlightAll()
-    <\/script>
-
-    <style>
-        :root {
-            --tw-prose-code: #111827;
-            --tw-prose-hr: #e5e7eb;
-            --tw-prose-links: #111827;
-            --tw-prose-headings: #111827;
-            --tw-prose-quotes: #111827;
-            --tw-prose-counters: #6b7280;
-            --page-bg: #f7f7f8;
-            --page-text: #374151;
-            --conversation-odd-bg: rgba(247,247,248);
-            --th-boarders: #4b5563;
-            --td-boarders: #374151;
-            --meta-title: #616c77;
-        }
-
-        [data-theme="dark"] {
-            --tw-prose-code: #f9fafb;
-            --tw-prose-hr: #374151;
-            --tw-prose-links: #fff;
-            --tw-prose-headings: #fff;
-            --tw-prose-quotes: #f3f4f6;
-            --tw-prose-counters: #9ca3af;
-            --page-bg: rgba(52,53,65);
-            --page-text: #fff;
-            --conversation-odd-bg: rgb(68,70,84);
-            --meta-title: #959faa;
-        }
-
-        * {
-            box-sizing: border-box;
-            font-size: 16px;
-        }
-
-        ::-webkit-scrollbar {
-            height: 1rem;
-            width: .5rem
-        }
-
-        ::-webkit-scrollbar:horizontal {
-            height: .5rem;
-            width: 1rem
-        }
-
-        ::-webkit-scrollbar-track {
-            background-color: transparent;
-            border-radius: 9999px
-        }
-
-        ::-webkit-scrollbar-thumb {
-            --tw-border-opacity: 1;
-            background-color: rgba(217,217,227,.8);
-            border-color: rgba(255,255,255,var(--tw-border-opacity));
-            border-radius: 9999px;
-            border-width: 1px
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            --tw-bg-opacity: 1;
-            background-color: rgba(236,236,241,var(--tw-bg-opacity))
-        }
-
-        .dark ::-webkit-scrollbar-thumb {
-            --tw-bg-opacity: 1;
-            background-color: rgba(86,88,105,var(--tw-bg-opacity))
-        }
-
-        .dark ::-webkit-scrollbar-thumb:hover {
-            --tw-bg-opacity: 1;
-            background-color: rgba(172,172,190,var(--tw-bg-opacity))
-        }
-
-        @media (min-width: 768px) {
-            .scrollbar-trigger ::-webkit-scrollbar-thumb {
-                visibility:hidden
-            }
-
-            .scrollbar-trigger:hover ::-webkit-scrollbar-thumb {
-                visibility: visible
-            }
-        }
-
-        body {
-            font-family: Söhne,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif,Helvetica Neue,Arial,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;
-            font-size: 14px;
-            line-height: 1.5;
-            color: var(--page-text);
-            background-color: var(--page-bg);
-            margin: 0;
-            padding: 0;
-        }
-
-        [data-theme="light"] .sun {
-            display: none;
-        }
-
-        [data-theme="dark"] .moon {
-            display: none;
-        }
-
-        .toggle {
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            width: 32px;
-            height: 32px;
-            border-radius: 4px;
-            background-color: #fff;
-            border: 1px solid #e2e8f0;
-        }
-
-        .metadata_container {
-            display: flex;
-            flex-direction: column;
-            margin-top: 8px;
-            padding-left: 1rem;
-        }
-
-        .metadata_item {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            border-radius: 16px;
-            padding: 4px 0.5rem;
-        }
-
-        .metadata_item:hover {
-            background-color: rgba(0,0,0,.1);
-        }
-
-        .metadata_item > div:first-child {
-            flex: 0 1 100px;
-            color: var(--meta-title);
-        }
-
-        .metadata_item > div:last-child {
-            flex: 1;
-        }
-
-        a {
-            color: var(--tw-prose-links);
-            font-size: 0.8rem;
-            text-decoration-line: underline;
-            text-underline-offset: 2px;
-        }
-
-        .conversation-content > p:first-child,
-        ol:first-child {
-            margin-top: 0;
-        }
-
-        p>code, li>code {
-            color: var(--tw-prose-code);
-            font-weight: 600;
-            font-size: .875em;
-        }
-
-        p>code::before,
-        p>code::after,
-        li>code::before,
-        li>code::after {
-            content: "\`";
-        }
-
-        hr {
-            width: 100%;
-            height: 0;
-            border: 1px solid var(--tw-prose-hr);
-            margin-bottom: 1em;
-            margin-top: 1em;
-        }
-
-        pre {
-            color: #ffffff;
-            background-color: #000000;
-            overflow-x: auto;
-            margin: 0 0 1rem 0;
-            border-radius: 0.375rem;
-        }
-
-        pre>code {
-            font-family: Söhne Mono, Monaco, Andale Mono, Ubuntu Mono, monospace !important;
-            font-weight: 400;
-            font-size: .875em;
-            line-height: 1.7142857;
-        }
-
-        h1, h2, h3, h4, h5, h6 {
-            color: var(--tw-prose-headings);
-            margin: 0;
-        }
-
-        h1 {
-            font-size: 2.25em;
-            font-weight: 600;
-            line-height: 1.1111111;
-            margin-bottom: 0.8888889em;
-            margin-top: 0;
-        }
-
-        h2 {
-            font-size: 1.5em;
-            font-weight: 700;
-            line-height: 1.3333333;
-            margin-bottom: 1em;
-            margin-top: 2em;
-        }
-
-        h3 {
-            font-size: 1.25em;
-            font-weight: 600;
-            line-height: 1.6;
-            margin-bottom: .6em;
-            margin-top: 1.6em;
-        }
-
-        h4 {
-            font-weight: 400;
-            line-height: 1.5;
-            margin-bottom: .5em;
-            margin-top: 1.5em
-        }
-
-        h3,h4 {
-            margin-bottom: .5rem;
-            margin-top: 1rem;
-        }
-
-        h5 {
-            font-weight: 600;
-        }
-
-        blockquote {
-            border-left: 2px solid rgba(142,142,160,1);
-            color: var(--tw-prose-quotes);
-            font-style: italic;
-            font-style: normal;
-            font-weight: 500;
-            line-height: 1rem;
-            margin: 1.6em 0;
-            padding-left: 1em;
-            quotes: "\\201C""\\201D""\\2018""\\2019";
-        }
-
-        blockquote p:first-of-type:before {
-            content: open-quote;
-        }
-
-        blockquote p:last-of-type:after {
-            content: close-quote;
-        }
-
-        ol, ul {
-            padding-left: 1.1rem;
-        }
-
-        ::marker {
-            color: var(--tw-prose-counters);
-            font-weight: 400;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 0;
-            table-layout: auto;
-            text-align: left;
-            font-size: .875em;
-            line-height: 1.7142857;
-        }
-
-        table * {
-            box-sizing: border-box;
-            border-width: 0;
-            border-style: solid;
-            border-color: #d9d9e3;
-        }
-
-        table thead {
-            border-bottom-color: var(--th-boarders);
-            border-bottom-width: 1px;
-        }
-
-        table th {
-            background-color: rgba(236,236,241,.2);
-            border-bottom-width: 1px;
-            border-left-width: 1px;
-            border-top-width: 1px;
-            padding: 0.25rem 0.75rem;
-        }
-
-        table th:first-child {
-            border-top-left-radius: 0.375rem;
-        }
-
-        table th:last-child {
-            border-right-width: 1px;
-            border-top-right-radius: 0.375rem;
-        }
-
-        table tbody tr {
-            border-bottom-color: var(--td-boarders);
-            border-bottom-width: 1px;
-        }
-
-        table tbody tr:last-child {
-            border-bottom-width: 0;
-        }
-
-        table tbody tr:last-child td:first-child {
-            border-bottom-left-radius: 0.375rem;
-        }
-
-        table tbody tr:last-child td:last-child {
-            border-bottom-right-radius: 0.375rem;
-        }
-
-        table td {
-            border-bottom-width: 1px;
-            border-left-width: 1px;
-            padding: 0.25rem 0.75rem;
-        }
-
-        table td:last-child {
-            border-right-width: 1px;
-        }
-
-        [type=checkbox], [type=radio] {
-            accent-color: #2563eb;
-        }
-
-        .conversation {
-            margin: 0 auto;
-            max-width: 800px;
-            padding: 1rem;
-        }
-
-        .conversation-header {
-            margin-bottom: 1rem;
-        }
-
-        .conversation-header h1 {
-            margin: 0;
-        }
-
-        .conversation-header h1 a {
-            font-size: 1.5rem;
-        }
-
-        .conversation-header .conversation-export {
-            margin-top: 0.5rem;
-            font-size: 0.8rem;
-        }
-
-        .conversation-header p {
-            margin-top: 0.5rem;
-            font-size: 0.8rem;
-        }
-
-        .conversation-item {
-            display: flex;
-            position: relative;
-            padding: 1rem;
-            border-left: 1px solid rgba(0,0,0,.1);
-            border-right: 1px solid rgba(0,0,0,.1);
-            border-bottom: 1px solid rgba(0,0,0,.1);
-        }
-
-        .conversation-item:first-of-type {
-            border-top: 1px solid rgba(0,0,0,.1);
-        }
-
-        .conversation-item:nth-child(odd) {
-            background-color: var(--conversation-odd-bg);
-        }
-
-        .author {
-            display: flex;
-            flex: 0 0 30px;
-            justify-content: center;
-            align-items: center;
-            width: 30px;
-            height: 30px;
-            border-radius: 0.125rem;
-            margin-right: 1rem;
-            overflow: hidden;
-        }
-
-        .author svg {
-            color: #fff;
-            width: 22px;
-            height: 22px;
-        }
-
-        .author img {
-            content: url({{avatar}});
-            width: 100%;
-            height: 100%;
-        }
-
-        .author.GPT-3 {
-            background-color: rgb(16, 163, 127);
-        }
-
-        .author.GPT-4 {
-            background-color: black;
-        }
-
-        .conversation-content-wrapper {
-            display: flex;
-            position: relative;
-            overflow: hidden;
-            flex: 1 1 auto;
-            flex-direction: column;
-        }
-
-        .conversation-content {
-            font-size: 1rem;
-            line-height: 1.5;
-        }
-
-        .conversation-content p {
-            white-space: pre-wrap;
-            line-height: 28px;
-        }
-
-        .conversation-content img, .conversation-content video {
-            display: block;
-            max-width: 100%;
-            height: auto;
-            margin-bottom: 2em;
-            margin-top: 2em;
-        }
-
-        .time {
-            position: absolute;
-            right: 8px;
-            bottom: 0;
-            font-size: 0.8rem;
-            color: #acacbe
-        }
-    </style>
-</head>
-
-<body>
-    <svg aria-hidden="true" style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-        <symbol id="chatgpt" viewBox="0 0 41 41">
-            <path d="M37.5324 16.8707C37.9808 15.5241 38.1363 14.0974 37.9886 12.6859C37.8409 11.2744 37.3934 9.91076 36.676 8.68622C35.6126 6.83404 33.9882 5.3676 32.0373 4.4985C30.0864 3.62941 27.9098 3.40259 25.8215 3.85078C24.8796 2.7893 23.7219 1.94125 22.4257 1.36341C21.1295 0.785575 19.7249 0.491269 18.3058 0.500197C16.1708 0.495044 14.0893 1.16803 12.3614 2.42214C10.6335 3.67624 9.34853 5.44666 8.6917 7.47815C7.30085 7.76286 5.98686 8.3414 4.8377 9.17505C3.68854 10.0087 2.73073 11.0782 2.02839 12.312C0.956464 14.1591 0.498905 16.2988 0.721698 18.4228C0.944492 20.5467 1.83612 22.5449 3.268 24.1293C2.81966 25.4759 2.66413 26.9026 2.81182 28.3141C2.95951 29.7256 3.40701 31.0892 4.12437 32.3138C5.18791 34.1659 6.8123 35.6322 8.76321 36.5013C10.7141 37.3704 12.8907 37.5973 14.9789 37.1492C15.9208 38.2107 17.0786 39.0587 18.3747 39.6366C19.6709 40.2144 21.0755 40.5087 22.4946 40.4998C24.6307 40.5054 26.7133 39.8321 28.4418 38.5772C30.1704 37.3223 31.4556 35.5506 32.1119 33.5179C33.5027 33.2332 34.8167 32.6547 35.9659 31.821C37.115 30.9874 38.0728 29.9178 38.7752 28.684C39.8458 26.8371 40.3023 24.6979 40.0789 22.5748C39.8556 20.4517 38.9639 18.4544 37.5324 16.8707ZM22.4978 37.8849C20.7443 37.8874 19.0459 37.2733 17.6994 36.1501C17.7601 36.117 17.8666 36.0586 17.936 36.0161L25.9004 31.4156C26.1003 31.3019 26.2663 31.137 26.3813 30.9378C26.4964 30.7386 26.5563 30.5124 26.5549 30.2825V19.0542L29.9213 20.998C29.9389 21.0068 29.9541 21.0198 29.9656 21.0359C29.977 21.052 29.9842 21.0707 29.9867 21.0902V30.3889C29.9842 32.375 29.1946 34.2791 27.7909 35.6841C26.3872 37.0892 24.4838 37.8806 22.4978 37.8849ZM6.39227 31.0064C5.51397 29.4888 5.19742 27.7107 5.49804 25.9832C5.55718 26.0187 5.66048 26.0818 5.73461 26.1244L13.699 30.7248C13.8975 30.8408 14.1233 30.902 14.3532 30.902C14.583 30.902 14.8088 30.8408 15.0073 30.7248L24.731 25.1103V28.9979C24.7321 29.0177 24.7283 29.0376 24.7199 29.0556C24.7115 29.0736 24.6988 29.0893 24.6829 29.1012L16.6317 33.7497C14.9096 34.7416 12.8643 35.0097 10.9447 34.4954C9.02506 33.9811 7.38785 32.7263 6.39227 31.0064ZM4.29707 13.6194C5.17156 12.0998 6.55279 10.9364 8.19885 10.3327C8.19885 10.4013 8.19491 10.5228 8.19491 10.6071V19.808C8.19351 20.0378 8.25334 20.2638 8.36823 20.4629C8.48312 20.6619 8.64893 20.8267 8.84863 20.9404L18.5723 26.5542L15.206 28.4979C15.1894 28.5089 15.1703 28.5155 15.1505 28.5173C15.1307 28.5191 15.1107 28.516 15.0924 28.5082L7.04046 23.8557C5.32135 22.8601 4.06716 21.2235 3.55289 19.3046C3.03862 17.3858 3.30624 15.3413 4.29707 13.6194ZM31.955 20.0556L22.2312 14.4411L25.5976 12.4981C25.6142 12.4872 25.6333 12.4805 25.6531 12.4787C25.6729 12.4769 25.6928 12.4801 25.7111 12.4879L33.7631 17.1364C34.9967 17.849 36.0017 18.8982 36.6606 20.1613C37.3194 21.4244 37.6047 22.849 37.4832 24.2684C37.3617 25.6878 36.8382 27.0432 35.9743 28.1759C35.1103 29.3086 33.9415 30.1717 32.6047 30.6641C32.6047 30.5947 32.6047 30.4733 32.6047 30.3889V21.188C32.6066 20.9586 32.5474 20.7328 32.4332 20.5338C32.319 20.3348 32.154 20.1698 31.955 20.0556ZM35.3055 15.0128C35.2464 14.9765 35.1431 14.9142 35.069 14.8717L27.1045 10.2712C26.906 10.1554 26.6803 10.0943 26.4504 10.0943C26.2206 10.0943 25.9948 10.1554 25.7963 10.2712L16.0726 15.8858V11.9982C16.0715 11.9783 16.0753 11.9585 16.0837 11.9405C16.0921 11.9225 16.1048 11.9068 16.1207 11.8949L24.1719 7.25025C25.4053 6.53903 26.8158 6.19376 28.2383 6.25482C29.6608 6.31589 31.0364 6.78077 32.2044 7.59508C33.3723 8.40939 34.2842 9.53945 34.8334 10.8531C35.3826 12.1667 35.5464 13.6095 35.3055 15.0128ZM14.2424 21.9419L10.8752 19.9981C10.8576 19.9893 10.8423 19.9763 10.8309 19.9602C10.8195 19.9441 10.8122 19.9254 10.8098 19.9058V10.6071C10.8107 9.18295 11.2173 7.78848 11.9819 6.58696C12.7466 5.38544 13.8377 4.42659 15.1275 3.82264C16.4173 3.21869 17.8524 2.99464 19.2649 3.1767C20.6775 3.35876 22.0089 3.93941 23.1034 4.85067C23.0427 4.88379 22.937 4.94215 22.8668 4.98473L14.9024 9.58517C14.7025 9.69878 14.5366 9.86356 14.4215 10.0626C14.3065 10.2616 14.2466 10.4877 14.2479 10.7175L14.2424 21.9419ZM16.071 17.9991L20.4018 15.4978L24.7325 17.9975V22.9985L20.4018 25.4983L16.071 22.9985V17.9991Z" fill="currentColor"></path>
-        </symbol>
-    </svg>
-    <div class="conversation">
-        <div class="conversation-header">
-            <h1>
-                <a href="{{source}}" target="_blank" rel="noopener noreferrer">{{title}}</a>
-                <button class="toggle">
-                    <svg class="sun" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                    <svg class="moon" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                </button>
-            </h1>
-            <div class="conversation-export">
-                <p>Exported by
-                <a href="https://github.com/pionxzh/chatgpt-exporter">ChatGPT Exporter</a>
-                at {{time}}</p>
-            </div>
-            {{details}}
-        </div>
-
-        {{content}}
-    </div>
-
-
-    <script>
-        function toggleDarkMode(mode) {
-            const html = document.querySelector('html')
-            const isDarkMode = html.getAttribute('data-theme') === 'dark'
-            const newMode = mode || (isDarkMode ? 'light' : 'dark')
-            if (newMode !== 'dark' && newMode !== 'light') return
-            html.setAttribute('data-theme', newMode)
-
-            const url = new URL(window.location)
-            url.searchParams.set('theme', newMode)
-            window.history.replaceState({}, '', url)
-        }
-
-        // Support for ?theme=dark
-        const urlParams = new URLSearchParams(window.location.search)
-        const theme = urlParams.get('theme')
-        if (theme) toggleDarkMode(theme)
-
-        document.querySelector('.toggle').addEventListener('click', () => toggleDarkMode())
-    <\/script>
-</body>
-
-</html>
+  const templateHtml = `<!DOCTYPE html>\r
+<html lang="{{lang}}" data-theme="{{theme}}">\r
+<head>\r
+    <meta charset="UTF-8" />\r
+    <link rel="icon" href="https://chat.openai.com/favicon.ico" />\r
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />\r
+    <title>{{title}}</title>\r
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css">\r
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"><\/script>\r
+    <script>\r
+        hljs.highlightAll()\r
+    <\/script>\r
+\r
+    <style>\r
+        :root {\r
+            --tw-prose-code: #111827;\r
+            --tw-prose-hr: #e5e7eb;\r
+            --tw-prose-links: #111827;\r
+            --tw-prose-headings: #111827;\r
+            --tw-prose-quotes: #111827;\r
+            --tw-prose-counters: #6b7280;\r
+            --page-bg: #f7f7f8;\r
+            --page-text: #374151;\r
+            --conversation-odd-bg: rgba(247,247,248);\r
+            --th-boarders: #4b5563;\r
+            --td-boarders: #374151;\r
+            --meta-title: #616c77;\r
+        }\r
+\r
+        [data-theme="dark"] {\r
+            --tw-prose-code: #f9fafb;\r
+            --tw-prose-hr: #374151;\r
+            --tw-prose-links: #fff;\r
+            --tw-prose-headings: #fff;\r
+            --tw-prose-quotes: #f3f4f6;\r
+            --tw-prose-counters: #9ca3af;\r
+            --page-bg: rgba(52,53,65);\r
+            --page-text: #fff;\r
+            --conversation-odd-bg: rgb(68,70,84);\r
+            --meta-title: #959faa;\r
+        }\r
+\r
+        * {\r
+            box-sizing: border-box;\r
+            font-size: 16px;\r
+        }\r
+\r
+        ::-webkit-scrollbar {\r
+            height: 1rem;\r
+            width: .5rem\r
+        }\r
+\r
+        ::-webkit-scrollbar:horizontal {\r
+            height: .5rem;\r
+            width: 1rem\r
+        }\r
+\r
+        ::-webkit-scrollbar-track {\r
+            background-color: transparent;\r
+            border-radius: 9999px\r
+        }\r
+\r
+        ::-webkit-scrollbar-thumb {\r
+            --tw-border-opacity: 1;\r
+            background-color: rgba(217,217,227,.8);\r
+            border-color: rgba(255,255,255,var(--tw-border-opacity));\r
+            border-radius: 9999px;\r
+            border-width: 1px\r
+        }\r
+\r
+        ::-webkit-scrollbar-thumb:hover {\r
+            --tw-bg-opacity: 1;\r
+            background-color: rgba(236,236,241,var(--tw-bg-opacity))\r
+        }\r
+\r
+        .dark ::-webkit-scrollbar-thumb {\r
+            --tw-bg-opacity: 1;\r
+            background-color: rgba(86,88,105,var(--tw-bg-opacity))\r
+        }\r
+\r
+        .dark ::-webkit-scrollbar-thumb:hover {\r
+            --tw-bg-opacity: 1;\r
+            background-color: rgba(172,172,190,var(--tw-bg-opacity))\r
+        }\r
+\r
+        @media (min-width: 768px) {\r
+            .scrollbar-trigger ::-webkit-scrollbar-thumb {\r
+                visibility:hidden\r
+            }\r
+\r
+            .scrollbar-trigger:hover ::-webkit-scrollbar-thumb {\r
+                visibility: visible\r
+            }\r
+        }\r
+\r
+        body {\r
+            font-family: Söhne,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif,Helvetica Neue,Arial,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;\r
+            font-size: 14px;\r
+            line-height: 1.5;\r
+            color: var(--page-text);\r
+            background-color: var(--page-bg);\r
+            margin: 0;\r
+            padding: 0;\r
+        }\r
+\r
+        [data-theme="light"] .sun {\r
+            display: none;\r
+        }\r
+\r
+        [data-theme="dark"] .moon {\r
+            display: none;\r
+        }\r
+\r
+        .toggle {\r
+            display: inline-flex;\r
+            justify-content: center;\r
+            align-items: center;\r
+            width: 32px;\r
+            height: 32px;\r
+            border-radius: 4px;\r
+            background-color: #fff;\r
+            border: 1px solid #e2e8f0;\r
+        }\r
+\r
+        .metadata_container {\r
+            display: flex;\r
+            flex-direction: column;\r
+            margin-top: 8px;\r
+            padding-left: 1rem;\r
+        }\r
+\r
+        .metadata_item {\r
+            display: flex;\r
+            flex-direction: row;\r
+            align-items: center;\r
+            border-radius: 16px;\r
+            padding: 4px 0.5rem;\r
+        }\r
+\r
+        .metadata_item:hover {\r
+            background-color: rgba(0,0,0,.1);\r
+        }\r
+\r
+        .metadata_item > div:first-child {\r
+            flex: 0 1 100px;\r
+            color: var(--meta-title);\r
+        }\r
+\r
+        .metadata_item > div:last-child {\r
+            flex: 1;\r
+        }\r
+\r
+        a {\r
+            color: var(--tw-prose-links);\r
+            font-size: 0.8rem;\r
+            text-decoration-line: underline;\r
+            text-underline-offset: 2px;\r
+        }\r
+\r
+        .conversation-content > p:first-child,\r
+        ol:first-child {\r
+            margin-top: 0;\r
+        }\r
+\r
+        p>code, li>code {\r
+            color: var(--tw-prose-code);\r
+            font-weight: 600;\r
+            font-size: .875em;\r
+        }\r
+\r
+        p>code::before,\r
+        p>code::after,\r
+        li>code::before,\r
+        li>code::after {\r
+            content: "\`";\r
+        }\r
+\r
+        hr {\r
+            width: 100%;\r
+            height: 0;\r
+            border: 1px solid var(--tw-prose-hr);\r
+            margin-bottom: 1em;\r
+            margin-top: 1em;\r
+        }\r
+\r
+        pre {\r
+            color: #ffffff;\r
+            background-color: #000000;\r
+            overflow-x: auto;\r
+            margin: 0 0 1rem 0;\r
+            border-radius: 0.375rem;\r
+        }\r
+\r
+        pre>code {\r
+            font-family: Söhne Mono, Monaco, Andale Mono, Ubuntu Mono, monospace !important;\r
+            font-weight: 400;\r
+            font-size: .875em;\r
+            line-height: 1.7142857;\r
+        }\r
+\r
+        h1, h2, h3, h4, h5, h6 {\r
+            color: var(--tw-prose-headings);\r
+            margin: 0;\r
+        }\r
+\r
+        h1 {\r
+            font-size: 2.25em;\r
+            font-weight: 600;\r
+            line-height: 1.1111111;\r
+            margin-bottom: 0.8888889em;\r
+            margin-top: 0;\r
+        }\r
+\r
+        h2 {\r
+            font-size: 1.5em;\r
+            font-weight: 700;\r
+            line-height: 1.3333333;\r
+            margin-bottom: 1em;\r
+            margin-top: 2em;\r
+        }\r
+\r
+        h3 {\r
+            font-size: 1.25em;\r
+            font-weight: 600;\r
+            line-height: 1.6;\r
+            margin-bottom: .6em;\r
+            margin-top: 1.6em;\r
+        }\r
+\r
+        h4 {\r
+            font-weight: 400;\r
+            line-height: 1.5;\r
+            margin-bottom: .5em;\r
+            margin-top: 1.5em\r
+        }\r
+\r
+        h3,h4 {\r
+            margin-bottom: .5rem;\r
+            margin-top: 1rem;\r
+        }\r
+\r
+        h5 {\r
+            font-weight: 600;\r
+        }\r
+\r
+        blockquote {\r
+            border-left: 2px solid rgba(142,142,160,1);\r
+            color: var(--tw-prose-quotes);\r
+            font-style: italic;\r
+            font-style: normal;\r
+            font-weight: 500;\r
+            line-height: 1rem;\r
+            margin: 1.6em 0;\r
+            padding-left: 1em;\r
+            quotes: "\\201C""\\201D""\\2018""\\2019";\r
+        }\r
+\r
+        blockquote p:first-of-type:before {\r
+            content: open-quote;\r
+        }\r
+\r
+        blockquote p:last-of-type:after {\r
+            content: close-quote;\r
+        }\r
+\r
+        ol, ul {\r
+            padding-left: 1.1rem;\r
+        }\r
+\r
+        ::marker {\r
+            color: var(--tw-prose-counters);\r
+            font-weight: 400;\r
+        }\r
+\r
+        table {\r
+            width: 100%;\r
+            border-collapse: separate;\r
+            border-spacing: 0 0;\r
+            table-layout: auto;\r
+            text-align: left;\r
+            font-size: .875em;\r
+            line-height: 1.7142857;\r
+        }\r
+\r
+        table * {\r
+            box-sizing: border-box;\r
+            border-width: 0;\r
+            border-style: solid;\r
+            border-color: #d9d9e3;\r
+        }\r
+\r
+        table thead {\r
+            border-bottom-color: var(--th-boarders);\r
+            border-bottom-width: 1px;\r
+        }\r
+\r
+        table th {\r
+            background-color: rgba(236,236,241,.2);\r
+            border-bottom-width: 1px;\r
+            border-left-width: 1px;\r
+            border-top-width: 1px;\r
+            padding: 0.25rem 0.75rem;\r
+        }\r
+\r
+        table th:first-child {\r
+            border-top-left-radius: 0.375rem;\r
+        }\r
+\r
+        table th:last-child {\r
+            border-right-width: 1px;\r
+            border-top-right-radius: 0.375rem;\r
+        }\r
+\r
+        table tbody tr {\r
+            border-bottom-color: var(--td-boarders);\r
+            border-bottom-width: 1px;\r
+        }\r
+\r
+        table tbody tr:last-child {\r
+            border-bottom-width: 0;\r
+        }\r
+\r
+        table tbody tr:last-child td:first-child {\r
+            border-bottom-left-radius: 0.375rem;\r
+        }\r
+\r
+        table tbody tr:last-child td:last-child {\r
+            border-bottom-right-radius: 0.375rem;\r
+        }\r
+\r
+        table td {\r
+            border-bottom-width: 1px;\r
+            border-left-width: 1px;\r
+            padding: 0.25rem 0.75rem;\r
+        }\r
+\r
+        table td:last-child {\r
+            border-right-width: 1px;\r
+        }\r
+\r
+        [type=checkbox], [type=radio] {\r
+            accent-color: #2563eb;\r
+        }\r
+\r
+        .conversation {\r
+            margin: 0 auto;\r
+            max-width: 800px;\r
+            padding: 1rem;\r
+        }\r
+\r
+        .conversation-header {\r
+            margin-bottom: 1rem;\r
+        }\r
+\r
+        .conversation-header h1 {\r
+            margin: 0;\r
+        }\r
+\r
+        .conversation-header h1 a {\r
+            font-size: 1.5rem;\r
+        }\r
+\r
+        .conversation-header .conversation-export {\r
+            margin-top: 0.5rem;\r
+            font-size: 0.8rem;\r
+        }\r
+\r
+        .conversation-header p {\r
+            margin-top: 0.5rem;\r
+            font-size: 0.8rem;\r
+        }\r
+\r
+        .conversation-item {\r
+            display: flex;\r
+            position: relative;\r
+            padding: 1rem;\r
+            border-left: 1px solid rgba(0,0,0,.1);\r
+            border-right: 1px solid rgba(0,0,0,.1);\r
+            border-bottom: 1px solid rgba(0,0,0,.1);\r
+        }\r
+\r
+        .conversation-item:first-of-type {\r
+            border-top: 1px solid rgba(0,0,0,.1);\r
+        }\r
+\r
+        .conversation-item:nth-child(odd) {\r
+            background-color: var(--conversation-odd-bg);\r
+        }\r
+\r
+        .author {\r
+            display: flex;\r
+            flex: 0 0 30px;\r
+            justify-content: center;\r
+            align-items: center;\r
+            width: 30px;\r
+            height: 30px;\r
+            border-radius: 0.125rem;\r
+            margin-right: 1rem;\r
+            overflow: hidden;\r
+        }\r
+\r
+        .author svg {\r
+            color: #fff;\r
+            width: 22px;\r
+            height: 22px;\r
+        }\r
+\r
+        .author img {\r
+            content: url({{avatar}});\r
+            width: 100%;\r
+            height: 100%;\r
+        }\r
+\r
+        .author.GPT-3 {\r
+            background-color: rgb(16, 163, 127);\r
+        }\r
+\r
+        .author.GPT-4 {\r
+            background-color: black;\r
+        }\r
+\r
+        .conversation-content-wrapper {\r
+            display: flex;\r
+            position: relative;\r
+            overflow: hidden;\r
+            flex: 1 1 auto;\r
+            flex-direction: column;\r
+        }\r
+\r
+        .conversation-content {\r
+            font-size: 1rem;\r
+            line-height: 1.5;\r
+        }\r
+\r
+        .conversation-content p {\r
+            white-space: pre-wrap;\r
+            line-height: 28px;\r
+        }\r
+\r
+        .conversation-content img, .conversation-content video {\r
+            display: block;\r
+            max-width: 100%;\r
+            height: auto;\r
+            margin-bottom: 2em;\r
+            margin-top: 2em;\r
+        }\r
+\r
+        .time {\r
+            position: absolute;\r
+            right: 8px;\r
+            bottom: 0;\r
+            font-size: 0.8rem;\r
+            color: #acacbe\r
+        }\r
+    </style>\r
+</head>\r
+\r
+<body>\r
+    <svg aria-hidden="true" style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\r
+        <symbol id="chatgpt" viewBox="0 0 41 41">\r
+            <path d="M37.5324 16.8707C37.9808 15.5241 38.1363 14.0974 37.9886 12.6859C37.8409 11.2744 37.3934 9.91076 36.676 8.68622C35.6126 6.83404 33.9882 5.3676 32.0373 4.4985C30.0864 3.62941 27.9098 3.40259 25.8215 3.85078C24.8796 2.7893 23.7219 1.94125 22.4257 1.36341C21.1295 0.785575 19.7249 0.491269 18.3058 0.500197C16.1708 0.495044 14.0893 1.16803 12.3614 2.42214C10.6335 3.67624 9.34853 5.44666 8.6917 7.47815C7.30085 7.76286 5.98686 8.3414 4.8377 9.17505C3.68854 10.0087 2.73073 11.0782 2.02839 12.312C0.956464 14.1591 0.498905 16.2988 0.721698 18.4228C0.944492 20.5467 1.83612 22.5449 3.268 24.1293C2.81966 25.4759 2.66413 26.9026 2.81182 28.3141C2.95951 29.7256 3.40701 31.0892 4.12437 32.3138C5.18791 34.1659 6.8123 35.6322 8.76321 36.5013C10.7141 37.3704 12.8907 37.5973 14.9789 37.1492C15.9208 38.2107 17.0786 39.0587 18.3747 39.6366C19.6709 40.2144 21.0755 40.5087 22.4946 40.4998C24.6307 40.5054 26.7133 39.8321 28.4418 38.5772C30.1704 37.3223 31.4556 35.5506 32.1119 33.5179C33.5027 33.2332 34.8167 32.6547 35.9659 31.821C37.115 30.9874 38.0728 29.9178 38.7752 28.684C39.8458 26.8371 40.3023 24.6979 40.0789 22.5748C39.8556 20.4517 38.9639 18.4544 37.5324 16.8707ZM22.4978 37.8849C20.7443 37.8874 19.0459 37.2733 17.6994 36.1501C17.7601 36.117 17.8666 36.0586 17.936 36.0161L25.9004 31.4156C26.1003 31.3019 26.2663 31.137 26.3813 30.9378C26.4964 30.7386 26.5563 30.5124 26.5549 30.2825V19.0542L29.9213 20.998C29.9389 21.0068 29.9541 21.0198 29.9656 21.0359C29.977 21.052 29.9842 21.0707 29.9867 21.0902V30.3889C29.9842 32.375 29.1946 34.2791 27.7909 35.6841C26.3872 37.0892 24.4838 37.8806 22.4978 37.8849ZM6.39227 31.0064C5.51397 29.4888 5.19742 27.7107 5.49804 25.9832C5.55718 26.0187 5.66048 26.0818 5.73461 26.1244L13.699 30.7248C13.8975 30.8408 14.1233 30.902 14.3532 30.902C14.583 30.902 14.8088 30.8408 15.0073 30.7248L24.731 25.1103V28.9979C24.7321 29.0177 24.7283 29.0376 24.7199 29.0556C24.7115 29.0736 24.6988 29.0893 24.6829 29.1012L16.6317 33.7497C14.9096 34.7416 12.8643 35.0097 10.9447 34.4954C9.02506 33.9811 7.38785 32.7263 6.39227 31.0064ZM4.29707 13.6194C5.17156 12.0998 6.55279 10.9364 8.19885 10.3327C8.19885 10.4013 8.19491 10.5228 8.19491 10.6071V19.808C8.19351 20.0378 8.25334 20.2638 8.36823 20.4629C8.48312 20.6619 8.64893 20.8267 8.84863 20.9404L18.5723 26.5542L15.206 28.4979C15.1894 28.5089 15.1703 28.5155 15.1505 28.5173C15.1307 28.5191 15.1107 28.516 15.0924 28.5082L7.04046 23.8557C5.32135 22.8601 4.06716 21.2235 3.55289 19.3046C3.03862 17.3858 3.30624 15.3413 4.29707 13.6194ZM31.955 20.0556L22.2312 14.4411L25.5976 12.4981C25.6142 12.4872 25.6333 12.4805 25.6531 12.4787C25.6729 12.4769 25.6928 12.4801 25.7111 12.4879L33.7631 17.1364C34.9967 17.849 36.0017 18.8982 36.6606 20.1613C37.3194 21.4244 37.6047 22.849 37.4832 24.2684C37.3617 25.6878 36.8382 27.0432 35.9743 28.1759C35.1103 29.3086 33.9415 30.1717 32.6047 30.6641C32.6047 30.5947 32.6047 30.4733 32.6047 30.3889V21.188C32.6066 20.9586 32.5474 20.7328 32.4332 20.5338C32.319 20.3348 32.154 20.1698 31.955 20.0556ZM35.3055 15.0128C35.2464 14.9765 35.1431 14.9142 35.069 14.8717L27.1045 10.2712C26.906 10.1554 26.6803 10.0943 26.4504 10.0943C26.2206 10.0943 25.9948 10.1554 25.7963 10.2712L16.0726 15.8858V11.9982C16.0715 11.9783 16.0753 11.9585 16.0837 11.9405C16.0921 11.9225 16.1048 11.9068 16.1207 11.8949L24.1719 7.25025C25.4053 6.53903 26.8158 6.19376 28.2383 6.25482C29.6608 6.31589 31.0364 6.78077 32.2044 7.59508C33.3723 8.40939 34.2842 9.53945 34.8334 10.8531C35.3826 12.1667 35.5464 13.6095 35.3055 15.0128ZM14.2424 21.9419L10.8752 19.9981C10.8576 19.9893 10.8423 19.9763 10.8309 19.9602C10.8195 19.9441 10.8122 19.9254 10.8098 19.9058V10.6071C10.8107 9.18295 11.2173 7.78848 11.9819 6.58696C12.7466 5.38544 13.8377 4.42659 15.1275 3.82264C16.4173 3.21869 17.8524 2.99464 19.2649 3.1767C20.6775 3.35876 22.0089 3.93941 23.1034 4.85067C23.0427 4.88379 22.937 4.94215 22.8668 4.98473L14.9024 9.58517C14.7025 9.69878 14.5366 9.86356 14.4215 10.0626C14.3065 10.2616 14.2466 10.4877 14.2479 10.7175L14.2424 21.9419ZM16.071 17.9991L20.4018 15.4978L24.7325 17.9975V22.9985L20.4018 25.4983L16.071 22.9985V17.9991Z" fill="currentColor"></path>\r
+        </symbol>\r
+    </svg>\r
+    <div class="conversation">\r
+        <div class="conversation-header">\r
+            <h1>\r
+                <a href="{{source}}" target="_blank" rel="noopener noreferrer">{{title}}</a>\r
+                <button class="toggle">\r
+                    <svg class="sun" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>\r
+                    <svg class="moon" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>\r
+                </button>\r
+            </h1>\r
+            <div class="conversation-export">\r
+                <p>Exported by\r
+                <a href="https://github.com/pionxzh/chatgpt-exporter">ChatGPT Exporter</a>\r
+                at {{time}}</p>\r
+            </div>\r
+            {{details}}\r
+        </div>\r
+\r
+        {{content}}\r
+    </div>\r
+\r
+\r
+    <script>\r
+        function toggleDarkMode(mode) {\r
+            const html = document.querySelector('html')\r
+            const isDarkMode = html.getAttribute('data-theme') === 'dark'\r
+            const newMode = mode || (isDarkMode ? 'light' : 'dark')\r
+            if (newMode !== 'dark' && newMode !== 'light') return\r
+            html.setAttribute('data-theme', newMode)\r
+\r
+            const url = new URL(window.location)\r
+            url.searchParams.set('theme', newMode)\r
+            window.history.replaceState({}, '', url)\r
+        }\r
+\r
+        // Support for ?theme=dark\r
+        const urlParams = new URLSearchParams(window.location.search)\r
+        const theme = urlParams.get('theme')\r
+        if (theme) toggleDarkMode(theme)\r
+\r
+        document.querySelector('.toggle').addEventListener('click', () => toggleDarkMode())\r
+    <\/script>\r
+</body>\r
+\r
+</html>\r
 `;
   function isHighSurrogate$1(codePoint) {
     return codePoint >= 55296 && codePoint <= 56319;
@@ -8329,6 +9547,9 @@ html {
   const sanitize$1 = /* @__PURE__ */ getDefaultExportFromCjs(sanitizeFilename);
   function noop() {
   }
+  function nonNullable(x2) {
+    return x2 != null;
+  }
   function onloadSafe(fn2) {
     if (document.readyState === "complete") {
       fn2();
@@ -8355,6 +9576,9 @@ html {
     if (!timestamp2)
       return "";
     return new Date(timestamp2 * 1e3).toISOString();
+  }
+  function jsonlStringify(list2) {
+    return list2.map((msg) => JSON.stringify(msg)).join("\n");
   }
   function downloadFile(filename, type, content2) {
     const blob = content2 instanceof Blob ? content2 : new Blob([content2], {
@@ -14142,7 +15366,7 @@ html {
     string,
     text: text$3
   }, Symbol.toStringTag, { value: "Module" }));
-  function parse$1(options = {}) {
+  function parse(options = {}) {
     const constructs2 = combineExtensions(
       // @ts-expect-error Same as above.
       [defaultConstructs].concat(options.extensions || [])
@@ -14325,7 +15549,7 @@ html {
       }
       return compiler(options)(
         postprocess(
-          parse$1(options).document().write(preprocess()(value, encoding, true))
+          parse(options).document().write(preprocess()(value, encoding, true))
         )
       );
     }
@@ -19890,7 +21114,82 @@ ${content2.text}
     window.URL.revokeObjectURL(dataUrl);
     return true;
   }
-  async function exportToJson(fileNameFormat, options) {
+  function convertMessageToTavern(node2) {
+    if (!node2.message || node2.message.content.content_type !== "text") {
+      return null;
+    }
+    const authorRole = node2.message.author.role;
+    const createTime = node2.message.create_time || (/* @__PURE__ */ new Date()).getTime() / 1e3;
+    const text2 = node2.message.content.parts.join("\n");
+    return {
+      name: authorRole === "assistant" ? "Assistant" : "You",
+      is_user: authorRole === "user",
+      // This seems to be always true
+      is_name: true,
+      send_date: createTime,
+      mes: text2,
+      swipes: [text2],
+      swipe_id: 0
+    };
+  }
+  function convertToTavern(conversation) {
+    const messages = [{
+      user_name: "You",
+      character_name: "Assistant"
+    }, ...conversation.conversationNodes.map(convertMessageToTavern).filter(nonNullable)];
+    return jsonlStringify(messages);
+  }
+  function convertToOoba(conversation) {
+    const pairs = [];
+    const messages = conversation.conversationNodes.filter((node2) => {
+      var _a, _b;
+      return ((_a = node2.message) == null ? void 0 : _a.author.role) !== "tool" && ((_b = node2.message) == null ? void 0 : _b.content.content_type) === "text";
+    });
+    let idx = 0;
+    while (idx < messages.length - 1) {
+      const message = messages[idx];
+      const nextMessage = messages[idx + 1];
+      if (!message.message || !nextMessage.message || message.message.content.content_type !== "text" || nextMessage.message.content.content_type !== "text") {
+        idx += 1;
+        continue;
+      }
+      const role = message.message.author.role;
+      const text2 = message.message.content.parts[0];
+      const nextRole = nextMessage.message.author.role;
+      const nextText = nextMessage.message.content.parts[0];
+      if (role === "system") {
+        if (text2 !== "") {
+          pairs.push(["<|BEGIN-VISIBLE-CHAT|>", text2]);
+        }
+        idx += 1;
+        continue;
+      }
+      if (role === "user") {
+        if (nextRole === "assistant") {
+          pairs.push([text2, nextText]);
+          idx += 2;
+          continue;
+        } else if (nextRole === "user") {
+          pairs.push([text2, ""]);
+          idx += 1;
+          continue;
+        }
+      }
+      if (role === "assistant") {
+        pairs.push(["", text2]);
+        idx += 1;
+      }
+    }
+    const oobaData = {
+      internal: pairs,
+      visible: JSON.parse(JSON.stringify(pairs))
+    };
+    if (oobaData.visible[0] && oobaData.visible[0][0] === "<|BEGIN-VISIBLE-CHAT|>") {
+      oobaData.visible[0][0] = "";
+    }
+    return JSON.stringify(oobaData, null, 2);
+  }
+  async function exportToJson(fileNameFormat) {
     if (!checkIfConversationStarted()) {
       alert(instance.t("Please start a conversation first"));
       return false;
@@ -19902,7 +21201,39 @@ ${content2.text}
       title: conversation.title,
       chatId
     });
-    const content2 = conversationToJson(options.officialFormat ? [rawConversation] : rawConversation);
+    const content2 = conversationToJson([rawConversation]);
+    downloadFile(fileName, "application/json", content2);
+    return true;
+  }
+  async function exportToTavern(fileNameFormat) {
+    if (!checkIfConversationStarted()) {
+      alert(instance.t("Please start a conversation first"));
+      return false;
+    }
+    const chatId = await getCurrentChatId();
+    const rawConversation = await fetchConversation(chatId, false);
+    const conversation = processConversation(rawConversation);
+    const fileName = getFileNameWithFormat(`${fileNameFormat}.tavern`, "jsonl", {
+      title: conversation.title,
+      chatId
+    });
+    const content2 = convertToTavern(conversation);
+    downloadFile(fileName, "application/json-lines", content2);
+    return true;
+  }
+  async function exportToOoba(fileNameFormat) {
+    if (!checkIfConversationStarted()) {
+      alert(instance.t("Please start a conversation first"));
+      return false;
+    }
+    const chatId = await getCurrentChatId();
+    const rawConversation = await fetchConversation(chatId, false);
+    const conversation = processConversation(rawConversation);
+    const fileName = getFileNameWithFormat(`${fileNameFormat}.ooba`, "json", {
+      title: conversation.title,
+      chatId
+    });
+    const content2 = convertToOoba(conversation);
     downloadFile(fileName, "application/json", content2);
     return true;
   }
@@ -20312,1225 +21643,6 @@ ${content2}`;
   const Divider = () => o$5("div", {
     className: "h-px bg-token-border-light"
   });
-  const $1746a345f3d73bb7$var$useReactId = e$2["useId".toString()] || (() => void 0);
-  let $1746a345f3d73bb7$var$count = 0;
-  function $1746a345f3d73bb7$export$f680877a34711e37(deterministicId) {
-    const [id, setId] = h$4($1746a345f3d73bb7$var$useReactId());
-    $9f79659886946c16$export$e5c5a5f917a5871c(() => {
-      if (!deterministicId)
-        setId(
-          (reactId) => reactId !== null && reactId !== void 0 ? reactId : String($1746a345f3d73bb7$var$count++)
-        );
-    }, [
-      deterministicId
-    ]);
-    return deterministicId || (id ? `radix-${id}` : "");
-  }
-  const $d3863c46a17e8a28$var$AUTOFOCUS_ON_MOUNT = "focusScope.autoFocusOnMount";
-  const $d3863c46a17e8a28$var$AUTOFOCUS_ON_UNMOUNT = "focusScope.autoFocusOnUnmount";
-  const $d3863c46a17e8a28$var$EVENT_OPTIONS = {
-    bubbles: false,
-    cancelable: true
-  };
-  const $d3863c46a17e8a28$export$20e40289641fbbb6 = /* @__PURE__ */ k$1((props, forwardedRef) => {
-    const { loop = false, trapped = false, onMountAutoFocus: onMountAutoFocusProp, onUnmountAutoFocus: onUnmountAutoFocusProp, ...scopeProps } = props;
-    const [container1, setContainer] = h$4(null);
-    const onMountAutoFocus = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onMountAutoFocusProp);
-    const onUnmountAutoFocus = $b1b2314f5f9a1d84$export$25bec8c6f54ee79a(onUnmountAutoFocusProp);
-    const lastFocusedElementRef = _$1(null);
-    const composedRefs = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(
-      forwardedRef,
-      (node2) => setContainer(node2)
-    );
-    const focusScope = _$1({
-      paused: false,
-      pause() {
-        this.paused = true;
-      },
-      resume() {
-        this.paused = false;
-      }
-    }).current;
-    p$6(() => {
-      if (trapped) {
-        let handleFocusIn = function(event) {
-          if (focusScope.paused || !container1)
-            return;
-          const target = event.target;
-          if (container1.contains(target))
-            lastFocusedElementRef.current = target;
-          else
-            $d3863c46a17e8a28$var$focus(lastFocusedElementRef.current, {
-              select: true
-            });
-        }, handleFocusOut = function(event) {
-          if (focusScope.paused || !container1)
-            return;
-          if (!container1.contains(event.relatedTarget))
-            $d3863c46a17e8a28$var$focus(lastFocusedElementRef.current, {
-              select: true
-            });
-        };
-        document.addEventListener("focusin", handleFocusIn);
-        document.addEventListener("focusout", handleFocusOut);
-        return () => {
-          document.removeEventListener("focusin", handleFocusIn);
-          document.removeEventListener("focusout", handleFocusOut);
-        };
-      }
-    }, [
-      trapped,
-      container1,
-      focusScope.paused
-    ]);
-    p$6(() => {
-      if (container1) {
-        $d3863c46a17e8a28$var$focusScopesStack.add(focusScope);
-        const previouslyFocusedElement = document.activeElement;
-        const hasFocusedCandidate = container1.contains(previouslyFocusedElement);
-        if (!hasFocusedCandidate) {
-          const mountEvent = new CustomEvent($d3863c46a17e8a28$var$AUTOFOCUS_ON_MOUNT, $d3863c46a17e8a28$var$EVENT_OPTIONS);
-          container1.addEventListener($d3863c46a17e8a28$var$AUTOFOCUS_ON_MOUNT, onMountAutoFocus);
-          container1.dispatchEvent(mountEvent);
-          if (!mountEvent.defaultPrevented) {
-            $d3863c46a17e8a28$var$focusFirst($d3863c46a17e8a28$var$removeLinks($d3863c46a17e8a28$var$getTabbableCandidates(container1)), {
-              select: true
-            });
-            if (document.activeElement === previouslyFocusedElement)
-              $d3863c46a17e8a28$var$focus(container1);
-          }
-        }
-        return () => {
-          container1.removeEventListener($d3863c46a17e8a28$var$AUTOFOCUS_ON_MOUNT, onMountAutoFocus);
-          setTimeout(() => {
-            const unmountEvent = new CustomEvent($d3863c46a17e8a28$var$AUTOFOCUS_ON_UNMOUNT, $d3863c46a17e8a28$var$EVENT_OPTIONS);
-            container1.addEventListener($d3863c46a17e8a28$var$AUTOFOCUS_ON_UNMOUNT, onUnmountAutoFocus);
-            container1.dispatchEvent(unmountEvent);
-            if (!unmountEvent.defaultPrevented)
-              $d3863c46a17e8a28$var$focus(previouslyFocusedElement !== null && previouslyFocusedElement !== void 0 ? previouslyFocusedElement : document.body, {
-                select: true
-              });
-            container1.removeEventListener($d3863c46a17e8a28$var$AUTOFOCUS_ON_UNMOUNT, onUnmountAutoFocus);
-            $d3863c46a17e8a28$var$focusScopesStack.remove(focusScope);
-          }, 0);
-        };
-      }
-    }, [
-      container1,
-      onMountAutoFocus,
-      onUnmountAutoFocus,
-      focusScope
-    ]);
-    const handleKeyDown = T$4((event) => {
-      if (!loop && !trapped)
-        return;
-      if (focusScope.paused)
-        return;
-      const isTabKey = event.key === "Tab" && !event.altKey && !event.ctrlKey && !event.metaKey;
-      const focusedElement = document.activeElement;
-      if (isTabKey && focusedElement) {
-        const container = event.currentTarget;
-        const [first, last] = $d3863c46a17e8a28$var$getTabbableEdges(container);
-        const hasTabbableElementsInside = first && last;
-        if (!hasTabbableElementsInside) {
-          if (focusedElement === container)
-            event.preventDefault();
-        } else {
-          if (!event.shiftKey && focusedElement === last) {
-            event.preventDefault();
-            if (loop)
-              $d3863c46a17e8a28$var$focus(first, {
-                select: true
-              });
-          } else if (event.shiftKey && focusedElement === first) {
-            event.preventDefault();
-            if (loop)
-              $d3863c46a17e8a28$var$focus(last, {
-                select: true
-              });
-          }
-        }
-      }
-    }, [
-      loop,
-      trapped,
-      focusScope.paused
-    ]);
-    return /* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({
-      tabIndex: -1
-    }, scopeProps, {
-      ref: composedRefs,
-      onKeyDown: handleKeyDown
-    }));
-  });
-  function $d3863c46a17e8a28$var$focusFirst(candidates, { select = false } = {}) {
-    const previouslyFocusedElement = document.activeElement;
-    for (const candidate of candidates) {
-      $d3863c46a17e8a28$var$focus(candidate, {
-        select
-      });
-      if (document.activeElement !== previouslyFocusedElement)
-        return;
-    }
-  }
-  function $d3863c46a17e8a28$var$getTabbableEdges(container) {
-    const candidates = $d3863c46a17e8a28$var$getTabbableCandidates(container);
-    const first = $d3863c46a17e8a28$var$findVisible(candidates, container);
-    const last = $d3863c46a17e8a28$var$findVisible(candidates.reverse(), container);
-    return [
-      first,
-      last
-    ];
-  }
-  function $d3863c46a17e8a28$var$getTabbableCandidates(container) {
-    const nodes = [];
-    const walker = document.createTreeWalker(container, NodeFilter.SHOW_ELEMENT, {
-      acceptNode: (node2) => {
-        const isHiddenInput = node2.tagName === "INPUT" && node2.type === "hidden";
-        if (node2.disabled || node2.hidden || isHiddenInput)
-          return NodeFilter.FILTER_SKIP;
-        return node2.tabIndex >= 0 ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
-      }
-    });
-    while (walker.nextNode())
-      nodes.push(walker.currentNode);
-    return nodes;
-  }
-  function $d3863c46a17e8a28$var$findVisible(elements, container) {
-    for (const element2 of elements) {
-      if (!$d3863c46a17e8a28$var$isHidden(element2, {
-        upTo: container
-      }))
-        return element2;
-    }
-  }
-  function $d3863c46a17e8a28$var$isHidden(node2, { upTo }) {
-    if (getComputedStyle(node2).visibility === "hidden")
-      return true;
-    while (node2) {
-      if (upTo !== void 0 && node2 === upTo)
-        return false;
-      if (getComputedStyle(node2).display === "none")
-        return true;
-      node2 = node2.parentElement;
-    }
-    return false;
-  }
-  function $d3863c46a17e8a28$var$isSelectableInput(element2) {
-    return element2 instanceof HTMLInputElement && "select" in element2;
-  }
-  function $d3863c46a17e8a28$var$focus(element2, { select = false } = {}) {
-    if (element2 && element2.focus) {
-      const previouslyFocusedElement = document.activeElement;
-      element2.focus({
-        preventScroll: true
-      });
-      if (element2 !== previouslyFocusedElement && $d3863c46a17e8a28$var$isSelectableInput(element2) && select)
-        element2.select();
-    }
-  }
-  const $d3863c46a17e8a28$var$focusScopesStack = $d3863c46a17e8a28$var$createFocusScopesStack();
-  function $d3863c46a17e8a28$var$createFocusScopesStack() {
-    let stack = [];
-    return {
-      add(focusScope) {
-        const activeFocusScope = stack[0];
-        if (focusScope !== activeFocusScope)
-          activeFocusScope === null || activeFocusScope === void 0 || activeFocusScope.pause();
-        stack = $d3863c46a17e8a28$var$arrayRemove(stack, focusScope);
-        stack.unshift(focusScope);
-      },
-      remove(focusScope) {
-        var _stack$;
-        stack = $d3863c46a17e8a28$var$arrayRemove(stack, focusScope);
-        (_stack$ = stack[0]) === null || _stack$ === void 0 || _stack$.resume();
-      }
-    };
-  }
-  function $d3863c46a17e8a28$var$arrayRemove(array, item) {
-    const updatedArray = [
-      ...array
-    ];
-    const index2 = updatedArray.indexOf(item);
-    if (index2 !== -1)
-      updatedArray.splice(index2, 1);
-    return updatedArray;
-  }
-  function $d3863c46a17e8a28$var$removeLinks(items) {
-    return items.filter(
-      (item) => item.tagName !== "A"
-    );
-  }
-  let $3db38b7d1fb3fe6a$var$count = 0;
-  function $3db38b7d1fb3fe6a$export$b7ece24a22aeda8c() {
-    p$6(() => {
-      var _edgeGuards$, _edgeGuards$2;
-      const edgeGuards = document.querySelectorAll("[data-radix-focus-guard]");
-      document.body.insertAdjacentElement("afterbegin", (_edgeGuards$ = edgeGuards[0]) !== null && _edgeGuards$ !== void 0 ? _edgeGuards$ : $3db38b7d1fb3fe6a$var$createFocusGuard());
-      document.body.insertAdjacentElement("beforeend", (_edgeGuards$2 = edgeGuards[1]) !== null && _edgeGuards$2 !== void 0 ? _edgeGuards$2 : $3db38b7d1fb3fe6a$var$createFocusGuard());
-      $3db38b7d1fb3fe6a$var$count++;
-      return () => {
-        if ($3db38b7d1fb3fe6a$var$count === 1)
-          document.querySelectorAll("[data-radix-focus-guard]").forEach(
-            (node2) => node2.remove()
-          );
-        $3db38b7d1fb3fe6a$var$count--;
-      };
-    }, []);
-  }
-  function $3db38b7d1fb3fe6a$var$createFocusGuard() {
-    const element2 = document.createElement("span");
-    element2.setAttribute("data-radix-focus-guard", "");
-    element2.tabIndex = 0;
-    element2.style.cssText = "outline: none; opacity: 0; position: fixed; pointer-events: none";
-    return element2;
-  }
-  var __assign = function() {
-    __assign = Object.assign || function __assign2(t2) {
-      for (var s2, i2 = 1, n2 = arguments.length; i2 < n2; i2++) {
-        s2 = arguments[i2];
-        for (var p2 in s2)
-          if (Object.prototype.hasOwnProperty.call(s2, p2))
-            t2[p2] = s2[p2];
-      }
-      return t2;
-    };
-    return __assign.apply(this, arguments);
-  };
-  function __rest(s2, e2) {
-    var t2 = {};
-    for (var p2 in s2)
-      if (Object.prototype.hasOwnProperty.call(s2, p2) && e2.indexOf(p2) < 0)
-        t2[p2] = s2[p2];
-    if (s2 != null && typeof Object.getOwnPropertySymbols === "function")
-      for (var i2 = 0, p2 = Object.getOwnPropertySymbols(s2); i2 < p2.length; i2++) {
-        if (e2.indexOf(p2[i2]) < 0 && Object.prototype.propertyIsEnumerable.call(s2, p2[i2]))
-          t2[p2[i2]] = s2[p2[i2]];
-      }
-    return t2;
-  }
-  function __spreadArray(to, from, pack) {
-    if (pack || arguments.length === 2)
-      for (var i2 = 0, l2 = from.length, ar; i2 < l2; i2++) {
-        if (ar || !(i2 in from)) {
-          if (!ar)
-            ar = Array.prototype.slice.call(from, 0, i2);
-          ar[i2] = from[i2];
-        }
-      }
-    return to.concat(ar || Array.prototype.slice.call(from));
-  }
-  var zeroRightClassName = "right-scroll-bar-position";
-  var fullWidthClassName = "width-before-scroll-bar";
-  var noScrollbarsClassName = "with-scroll-bars-hidden";
-  var removedBarSizeVariable = "--removed-body-scroll-bar-size";
-  function assignRef(ref, value) {
-    if (typeof ref === "function") {
-      ref(value);
-    } else if (ref) {
-      ref.current = value;
-    }
-    return ref;
-  }
-  function useCallbackRef(initialValue, callback) {
-    var ref = h$4(function() {
-      return {
-        // value
-        value: initialValue,
-        // last callback
-        callback,
-        // "memoized" public interface
-        facade: {
-          get current() {
-            return ref.value;
-          },
-          set current(value) {
-            var last = ref.value;
-            if (last !== value) {
-              ref.value = value;
-              ref.callback(value, last);
-            }
-          }
-        }
-      };
-    })[0];
-    ref.callback = callback;
-    return ref.facade;
-  }
-  function useMergeRefs(refs, defaultValue) {
-    return useCallbackRef(defaultValue || null, function(newValue) {
-      return refs.forEach(function(ref) {
-        return assignRef(ref, newValue);
-      });
-    });
-  }
-  function ItoI(a2) {
-    return a2;
-  }
-  function innerCreateMedium(defaults, middleware) {
-    if (middleware === void 0) {
-      middleware = ItoI;
-    }
-    var buffer = [];
-    var assigned = false;
-    var medium = {
-      read: function() {
-        if (assigned) {
-          throw new Error("Sidecar: could not `read` from an `assigned` medium. `read` could be used only with `useMedium`.");
-        }
-        if (buffer.length) {
-          return buffer[buffer.length - 1];
-        }
-        return defaults;
-      },
-      useMedium: function(data) {
-        var item = middleware(data, assigned);
-        buffer.push(item);
-        return function() {
-          buffer = buffer.filter(function(x2) {
-            return x2 !== item;
-          });
-        };
-      },
-      assignSyncMedium: function(cb) {
-        assigned = true;
-        while (buffer.length) {
-          var cbs = buffer;
-          buffer = [];
-          cbs.forEach(cb);
-        }
-        buffer = {
-          push: function(x2) {
-            return cb(x2);
-          },
-          filter: function() {
-            return buffer;
-          }
-        };
-      },
-      assignMedium: function(cb) {
-        assigned = true;
-        var pendingQueue = [];
-        if (buffer.length) {
-          var cbs = buffer;
-          buffer = [];
-          cbs.forEach(cb);
-          pendingQueue = buffer;
-        }
-        var executeQueue = function() {
-          var cbs2 = pendingQueue;
-          pendingQueue = [];
-          cbs2.forEach(cb);
-        };
-        var cycle = function() {
-          return Promise.resolve().then(executeQueue);
-        };
-        cycle();
-        buffer = {
-          push: function(x2) {
-            pendingQueue.push(x2);
-            cycle();
-          },
-          filter: function(filter) {
-            pendingQueue = pendingQueue.filter(filter);
-            return buffer;
-          }
-        };
-      }
-    };
-    return medium;
-  }
-  function createSidecarMedium(options) {
-    if (options === void 0) {
-      options = {};
-    }
-    var medium = innerCreateMedium(null);
-    medium.options = __assign({ async: true, ssr: false }, options);
-    return medium;
-  }
-  var SideCar$1 = function(_a) {
-    var sideCar = _a.sideCar, rest = __rest(_a, ["sideCar"]);
-    if (!sideCar) {
-      throw new Error("Sidecar: please provide `sideCar` property to import the right car");
-    }
-    var Target = sideCar.read();
-    if (!Target) {
-      throw new Error("Sidecar medium not found");
-    }
-    return y$6(Target, __assign({}, rest));
-  };
-  SideCar$1.isSideCarExport = true;
-  function exportSidecar(medium, exported) {
-    medium.useMedium(exported);
-    return SideCar$1;
-  }
-  var effectCar = createSidecarMedium();
-  var nothing = function() {
-    return;
-  };
-  var RemoveScroll = k$1(function(props, parentRef) {
-    var ref = _$1(null);
-    var _a = h$4({
-      onScrollCapture: nothing,
-      onWheelCapture: nothing,
-      onTouchMoveCapture: nothing
-    }), callbacks = _a[0], setCallbacks = _a[1];
-    var forwardProps = props.forwardProps, children = props.children, className = props.className, removeScrollBar = props.removeScrollBar, enabled = props.enabled, shards = props.shards, sideCar = props.sideCar, noIsolation = props.noIsolation, inert = props.inert, allowPinchZoom = props.allowPinchZoom, _b = props.as, Container = _b === void 0 ? "div" : _b, rest = __rest(props, ["forwardProps", "children", "className", "removeScrollBar", "enabled", "shards", "sideCar", "noIsolation", "inert", "allowPinchZoom", "as"]);
-    var SideCar2 = sideCar;
-    var containerRef = useMergeRefs([ref, parentRef]);
-    var containerProps = __assign(__assign({}, rest), callbacks);
-    return y$6(
-      k$3,
-      null,
-      enabled && y$6(SideCar2, { sideCar: effectCar, removeScrollBar, shards, noIsolation, inert, setCallbacks, allowPinchZoom: !!allowPinchZoom, lockRef: ref }),
-      forwardProps ? hn(O$1.only(children), __assign(__assign({}, containerProps), { ref: containerRef })) : y$6(Container, __assign({}, containerProps, { className, ref: containerRef }), children)
-    );
-  });
-  RemoveScroll.defaultProps = {
-    enabled: true,
-    removeScrollBar: true,
-    inert: false
-  };
-  RemoveScroll.classNames = {
-    fullWidth: fullWidthClassName,
-    zeroRight: zeroRightClassName
-  };
-  var getNonce = function() {
-    if (typeof __webpack_nonce__ !== "undefined") {
-      return __webpack_nonce__;
-    }
-    return void 0;
-  };
-  function makeStyleTag() {
-    if (!document)
-      return null;
-    var tag = document.createElement("style");
-    tag.type = "text/css";
-    var nonce = getNonce();
-    if (nonce) {
-      tag.setAttribute("nonce", nonce);
-    }
-    return tag;
-  }
-  function injectStyles(tag, css) {
-    if (tag.styleSheet) {
-      tag.styleSheet.cssText = css;
-    } else {
-      tag.appendChild(document.createTextNode(css));
-    }
-  }
-  function insertStyleTag(tag) {
-    var head2 = document.head || document.getElementsByTagName("head")[0];
-    head2.appendChild(tag);
-  }
-  var stylesheetSingleton = function() {
-    var counter = 0;
-    var stylesheet = null;
-    return {
-      add: function(style) {
-        if (counter == 0) {
-          if (stylesheet = makeStyleTag()) {
-            injectStyles(stylesheet, style);
-            insertStyleTag(stylesheet);
-          }
-        }
-        counter++;
-      },
-      remove: function() {
-        counter--;
-        if (!counter && stylesheet) {
-          stylesheet.parentNode && stylesheet.parentNode.removeChild(stylesheet);
-          stylesheet = null;
-        }
-      }
-    };
-  };
-  var styleHookSingleton = function() {
-    var sheet = stylesheetSingleton();
-    return function(styles, isDynamic) {
-      p$6(function() {
-        sheet.add(styles);
-        return function() {
-          sheet.remove();
-        };
-      }, [styles && isDynamic]);
-    };
-  };
-  var styleSingleton = function() {
-    var useStyle = styleHookSingleton();
-    var Sheet = function(_a) {
-      var styles = _a.styles, dynamic = _a.dynamic;
-      useStyle(styles, dynamic);
-      return null;
-    };
-    return Sheet;
-  };
-  var zeroGap = {
-    left: 0,
-    top: 0,
-    right: 0,
-    gap: 0
-  };
-  var parse = function(x2) {
-    return parseInt(x2 || "", 10) || 0;
-  };
-  var getOffset = function(gapMode) {
-    var cs = window.getComputedStyle(document.body);
-    var left = cs[gapMode === "padding" ? "paddingLeft" : "marginLeft"];
-    var top = cs[gapMode === "padding" ? "paddingTop" : "marginTop"];
-    var right = cs[gapMode === "padding" ? "paddingRight" : "marginRight"];
-    return [parse(left), parse(top), parse(right)];
-  };
-  var getGapWidth = function(gapMode) {
-    if (gapMode === void 0) {
-      gapMode = "margin";
-    }
-    if (typeof window === "undefined") {
-      return zeroGap;
-    }
-    var offsets = getOffset(gapMode);
-    var documentWidth = document.documentElement.clientWidth;
-    var windowWidth = window.innerWidth;
-    return {
-      left: offsets[0],
-      top: offsets[1],
-      right: offsets[2],
-      gap: Math.max(0, windowWidth - documentWidth + offsets[2] - offsets[0])
-    };
-  };
-  var Style = styleSingleton();
-  var getStyles = function(_a, allowRelative, gapMode, important) {
-    var left = _a.left, top = _a.top, right = _a.right, gap = _a.gap;
-    if (gapMode === void 0) {
-      gapMode = "margin";
-    }
-    return "\n  .".concat(noScrollbarsClassName, " {\n   overflow: hidden ").concat(important, ";\n   padding-right: ").concat(gap, "px ").concat(important, ";\n  }\n  body {\n    overflow: hidden ").concat(important, ";\n    overscroll-behavior: contain;\n    ").concat([
-      allowRelative && "position: relative ".concat(important, ";"),
-      gapMode === "margin" && "\n    padding-left: ".concat(left, "px;\n    padding-top: ").concat(top, "px;\n    padding-right: ").concat(right, "px;\n    margin-left:0;\n    margin-top:0;\n    margin-right: ").concat(gap, "px ").concat(important, ";\n    "),
-      gapMode === "padding" && "padding-right: ".concat(gap, "px ").concat(important, ";")
-    ].filter(Boolean).join(""), "\n  }\n  \n  .").concat(zeroRightClassName, " {\n    right: ").concat(gap, "px ").concat(important, ";\n  }\n  \n  .").concat(fullWidthClassName, " {\n    margin-right: ").concat(gap, "px ").concat(important, ";\n  }\n  \n  .").concat(zeroRightClassName, " .").concat(zeroRightClassName, " {\n    right: 0 ").concat(important, ";\n  }\n  \n  .").concat(fullWidthClassName, " .").concat(fullWidthClassName, " {\n    margin-right: 0 ").concat(important, ";\n  }\n  \n  body {\n    ").concat(removedBarSizeVariable, ": ").concat(gap, "px;\n  }\n");
-  };
-  var RemoveScrollBar = function(props) {
-    var noRelative = props.noRelative, noImportant = props.noImportant, _a = props.gapMode, gapMode = _a === void 0 ? "margin" : _a;
-    var gap = F$1(function() {
-      return getGapWidth(gapMode);
-    }, [gapMode]);
-    return y$6(Style, { styles: getStyles(gap, !noRelative, gapMode, !noImportant ? "!important" : "") });
-  };
-  var passiveSupported = false;
-  if (typeof window !== "undefined") {
-    try {
-      var options = Object.defineProperty({}, "passive", {
-        get: function() {
-          passiveSupported = true;
-          return true;
-        }
-      });
-      window.addEventListener("test", options, options);
-      window.removeEventListener("test", options, options);
-    } catch (err) {
-      passiveSupported = false;
-    }
-  }
-  var nonPassive = passiveSupported ? { passive: false } : false;
-  var alwaysContainsScroll = function(node2) {
-    return node2.tagName === "TEXTAREA";
-  };
-  var elementCanBeScrolled = function(node2, overflow) {
-    var styles = window.getComputedStyle(node2);
-    return (
-      // not-not-scrollable
-      styles[overflow] !== "hidden" && // contains scroll inside self
-      !(styles.overflowY === styles.overflowX && !alwaysContainsScroll(node2) && styles[overflow] === "visible")
-    );
-  };
-  var elementCouldBeVScrolled = function(node2) {
-    return elementCanBeScrolled(node2, "overflowY");
-  };
-  var elementCouldBeHScrolled = function(node2) {
-    return elementCanBeScrolled(node2, "overflowX");
-  };
-  var locationCouldBeScrolled = function(axis, node2) {
-    var current = node2;
-    do {
-      if (typeof ShadowRoot !== "undefined" && current instanceof ShadowRoot) {
-        current = current.host;
-      }
-      var isScrollable = elementCouldBeScrolled(axis, current);
-      if (isScrollable) {
-        var _a = getScrollVariables(axis, current), s2 = _a[1], d2 = _a[2];
-        if (s2 > d2) {
-          return true;
-        }
-      }
-      current = current.parentNode;
-    } while (current && current !== document.body);
-    return false;
-  };
-  var getVScrollVariables = function(_a) {
-    var scrollTop = _a.scrollTop, scrollHeight = _a.scrollHeight, clientHeight = _a.clientHeight;
-    return [
-      scrollTop,
-      scrollHeight,
-      clientHeight
-    ];
-  };
-  var getHScrollVariables = function(_a) {
-    var scrollLeft = _a.scrollLeft, scrollWidth = _a.scrollWidth, clientWidth = _a.clientWidth;
-    return [
-      scrollLeft,
-      scrollWidth,
-      clientWidth
-    ];
-  };
-  var elementCouldBeScrolled = function(axis, node2) {
-    return axis === "v" ? elementCouldBeVScrolled(node2) : elementCouldBeHScrolled(node2);
-  };
-  var getScrollVariables = function(axis, node2) {
-    return axis === "v" ? getVScrollVariables(node2) : getHScrollVariables(node2);
-  };
-  var getDirectionFactor = function(axis, direction) {
-    return axis === "h" && direction === "rtl" ? -1 : 1;
-  };
-  var handleScroll = function(axis, endTarget, event, sourceDelta, noOverscroll) {
-    var directionFactor = getDirectionFactor(axis, window.getComputedStyle(endTarget).direction);
-    var delta = directionFactor * sourceDelta;
-    var target = event.target;
-    var targetInLock = endTarget.contains(target);
-    var shouldCancelScroll = false;
-    var isDeltaPositive = delta > 0;
-    var availableScroll = 0;
-    var availableScrollTop = 0;
-    do {
-      var _a = getScrollVariables(axis, target), position2 = _a[0], scroll_1 = _a[1], capacity = _a[2];
-      var elementScroll = scroll_1 - capacity - directionFactor * position2;
-      if (position2 || elementScroll) {
-        if (elementCouldBeScrolled(axis, target)) {
-          availableScroll += elementScroll;
-          availableScrollTop += position2;
-        }
-      }
-      target = target.parentNode;
-    } while (
-      // portaled content
-      !targetInLock && target !== document.body || // self content
-      targetInLock && (endTarget.contains(target) || endTarget === target)
-    );
-    if (isDeltaPositive && (noOverscroll && availableScroll === 0 || !noOverscroll && delta > availableScroll)) {
-      shouldCancelScroll = true;
-    } else if (!isDeltaPositive && (noOverscroll && availableScrollTop === 0 || !noOverscroll && -delta > availableScrollTop)) {
-      shouldCancelScroll = true;
-    }
-    return shouldCancelScroll;
-  };
-  var getTouchXY = function(event) {
-    return "changedTouches" in event ? [event.changedTouches[0].clientX, event.changedTouches[0].clientY] : [0, 0];
-  };
-  var getDeltaXY = function(event) {
-    return [event.deltaX, event.deltaY];
-  };
-  var extractRef = function(ref) {
-    return ref && "current" in ref ? ref.current : ref;
-  };
-  var deltaCompare = function(x2, y2) {
-    return x2[0] === y2[0] && x2[1] === y2[1];
-  };
-  var generateStyle = function(id) {
-    return "\n  .block-interactivity-".concat(id, " {pointer-events: none;}\n  .allow-interactivity-").concat(id, " {pointer-events: all;}\n");
-  };
-  var idCounter = 0;
-  var lockStack = [];
-  function RemoveScrollSideCar(props) {
-    var shouldPreventQueue = _$1([]);
-    var touchStartRef = _$1([0, 0]);
-    var activeAxis = _$1();
-    var id = h$4(idCounter++)[0];
-    var Style2 = h$4(function() {
-      return styleSingleton();
-    })[0];
-    var lastProps = _$1(props);
-    p$6(function() {
-      lastProps.current = props;
-    }, [props]);
-    p$6(function() {
-      if (props.inert) {
-        document.body.classList.add("block-interactivity-".concat(id));
-        var allow_1 = __spreadArray([props.lockRef.current], (props.shards || []).map(extractRef), true).filter(Boolean);
-        allow_1.forEach(function(el) {
-          return el.classList.add("allow-interactivity-".concat(id));
-        });
-        return function() {
-          document.body.classList.remove("block-interactivity-".concat(id));
-          allow_1.forEach(function(el) {
-            return el.classList.remove("allow-interactivity-".concat(id));
-          });
-        };
-      }
-      return;
-    }, [props.inert, props.lockRef.current, props.shards]);
-    var shouldCancelEvent = T$4(function(event, parent) {
-      if ("touches" in event && event.touches.length === 2) {
-        return !lastProps.current.allowPinchZoom;
-      }
-      var touch = getTouchXY(event);
-      var touchStart = touchStartRef.current;
-      var deltaX = "deltaX" in event ? event.deltaX : touchStart[0] - touch[0];
-      var deltaY = "deltaY" in event ? event.deltaY : touchStart[1] - touch[1];
-      var currentAxis;
-      var target = event.target;
-      var moveDirection = Math.abs(deltaX) > Math.abs(deltaY) ? "h" : "v";
-      if ("touches" in event && moveDirection === "h" && target.type === "range") {
-        return false;
-      }
-      var canBeScrolledInMainDirection = locationCouldBeScrolled(moveDirection, target);
-      if (!canBeScrolledInMainDirection) {
-        return true;
-      }
-      if (canBeScrolledInMainDirection) {
-        currentAxis = moveDirection;
-      } else {
-        currentAxis = moveDirection === "v" ? "h" : "v";
-        canBeScrolledInMainDirection = locationCouldBeScrolled(moveDirection, target);
-      }
-      if (!canBeScrolledInMainDirection) {
-        return false;
-      }
-      if (!activeAxis.current && "changedTouches" in event && (deltaX || deltaY)) {
-        activeAxis.current = currentAxis;
-      }
-      if (!currentAxis) {
-        return true;
-      }
-      var cancelingAxis = activeAxis.current || currentAxis;
-      return handleScroll(cancelingAxis, parent, event, cancelingAxis === "h" ? deltaX : deltaY, true);
-    }, []);
-    var shouldPrevent = T$4(function(_event) {
-      var event = _event;
-      if (!lockStack.length || lockStack[lockStack.length - 1] !== Style2) {
-        return;
-      }
-      var delta = "deltaY" in event ? getDeltaXY(event) : getTouchXY(event);
-      var sourceEvent = shouldPreventQueue.current.filter(function(e2) {
-        return e2.name === event.type && e2.target === event.target && deltaCompare(e2.delta, delta);
-      })[0];
-      if (sourceEvent && sourceEvent.should) {
-        if (event.cancelable) {
-          event.preventDefault();
-        }
-        return;
-      }
-      if (!sourceEvent) {
-        var shardNodes = (lastProps.current.shards || []).map(extractRef).filter(Boolean).filter(function(node2) {
-          return node2.contains(event.target);
-        });
-        var shouldStop = shardNodes.length > 0 ? shouldCancelEvent(event, shardNodes[0]) : !lastProps.current.noIsolation;
-        if (shouldStop) {
-          if (event.cancelable) {
-            event.preventDefault();
-          }
-        }
-      }
-    }, []);
-    var shouldCancel = T$4(function(name, delta, target, should) {
-      var event = { name, delta, target, should };
-      shouldPreventQueue.current.push(event);
-      setTimeout(function() {
-        shouldPreventQueue.current = shouldPreventQueue.current.filter(function(e2) {
-          return e2 !== event;
-        });
-      }, 1);
-    }, []);
-    var scrollTouchStart = T$4(function(event) {
-      touchStartRef.current = getTouchXY(event);
-      activeAxis.current = void 0;
-    }, []);
-    var scrollWheel = T$4(function(event) {
-      shouldCancel(event.type, getDeltaXY(event), event.target, shouldCancelEvent(event, props.lockRef.current));
-    }, []);
-    var scrollTouchMove = T$4(function(event) {
-      shouldCancel(event.type, getTouchXY(event), event.target, shouldCancelEvent(event, props.lockRef.current));
-    }, []);
-    p$6(function() {
-      lockStack.push(Style2);
-      props.setCallbacks({
-        onScrollCapture: scrollWheel,
-        onWheelCapture: scrollWheel,
-        onTouchMoveCapture: scrollTouchMove
-      });
-      document.addEventListener("wheel", shouldPrevent, nonPassive);
-      document.addEventListener("touchmove", shouldPrevent, nonPassive);
-      document.addEventListener("touchstart", scrollTouchStart, nonPassive);
-      return function() {
-        lockStack = lockStack.filter(function(inst) {
-          return inst !== Style2;
-        });
-        document.removeEventListener("wheel", shouldPrevent, nonPassive);
-        document.removeEventListener("touchmove", shouldPrevent, nonPassive);
-        document.removeEventListener("touchstart", scrollTouchStart, nonPassive);
-      };
-    }, []);
-    var removeScrollBar = props.removeScrollBar, inert = props.inert;
-    return y$6(
-      k$3,
-      null,
-      inert ? y$6(Style2, { styles: generateStyle(id) }) : null,
-      removeScrollBar ? y$6(RemoveScrollBar, { gapMode: "margin" }) : null
-    );
-  }
-  const SideCar = exportSidecar(effectCar, RemoveScrollSideCar);
-  var ReactRemoveScroll = k$1(function(props, ref) {
-    return y$6(RemoveScroll, __assign({}, props, { ref, sideCar: SideCar }));
-  });
-  ReactRemoveScroll.classNames = RemoveScroll.classNames;
-  const $67UHm$RemoveScroll = ReactRemoveScroll;
-  var getDefaultParent = function(originalTarget) {
-    if (typeof document === "undefined") {
-      return null;
-    }
-    var sampleTarget = Array.isArray(originalTarget) ? originalTarget[0] : originalTarget;
-    return sampleTarget.ownerDocument.body;
-  };
-  var counterMap = /* @__PURE__ */ new WeakMap();
-  var uncontrolledNodes = /* @__PURE__ */ new WeakMap();
-  var markerMap = {};
-  var lockCount = 0;
-  var unwrapHost = function(node2) {
-    return node2 && (node2.host || unwrapHost(node2.parentNode));
-  };
-  var correctTargets = function(parent, targets) {
-    return targets.map(function(target) {
-      if (parent.contains(target)) {
-        return target;
-      }
-      var correctedTarget = unwrapHost(target);
-      if (correctedTarget && parent.contains(correctedTarget)) {
-        return correctedTarget;
-      }
-      console.error("aria-hidden", target, "in not contained inside", parent, ". Doing nothing");
-      return null;
-    }).filter(function(x2) {
-      return Boolean(x2);
-    });
-  };
-  var applyAttributeToOthers = function(originalTarget, parentNode, markerName, controlAttribute) {
-    var targets = correctTargets(parentNode, Array.isArray(originalTarget) ? originalTarget : [originalTarget]);
-    if (!markerMap[markerName]) {
-      markerMap[markerName] = /* @__PURE__ */ new WeakMap();
-    }
-    var markerCounter = markerMap[markerName];
-    var hiddenNodes = [];
-    var elementsToKeep = /* @__PURE__ */ new Set();
-    var elementsToStop = new Set(targets);
-    var keep = function(el) {
-      if (!el || elementsToKeep.has(el)) {
-        return;
-      }
-      elementsToKeep.add(el);
-      keep(el.parentNode);
-    };
-    targets.forEach(keep);
-    var deep = function(parent) {
-      if (!parent || elementsToStop.has(parent)) {
-        return;
-      }
-      Array.prototype.forEach.call(parent.children, function(node2) {
-        if (elementsToKeep.has(node2)) {
-          deep(node2);
-        } else {
-          var attr = node2.getAttribute(controlAttribute);
-          var alreadyHidden = attr !== null && attr !== "false";
-          var counterValue = (counterMap.get(node2) || 0) + 1;
-          var markerValue = (markerCounter.get(node2) || 0) + 1;
-          counterMap.set(node2, counterValue);
-          markerCounter.set(node2, markerValue);
-          hiddenNodes.push(node2);
-          if (counterValue === 1 && alreadyHidden) {
-            uncontrolledNodes.set(node2, true);
-          }
-          if (markerValue === 1) {
-            node2.setAttribute(markerName, "true");
-          }
-          if (!alreadyHidden) {
-            node2.setAttribute(controlAttribute, "true");
-          }
-        }
-      });
-    };
-    deep(parentNode);
-    elementsToKeep.clear();
-    lockCount++;
-    return function() {
-      hiddenNodes.forEach(function(node2) {
-        var counterValue = counterMap.get(node2) - 1;
-        var markerValue = markerCounter.get(node2) - 1;
-        counterMap.set(node2, counterValue);
-        markerCounter.set(node2, markerValue);
-        if (!counterValue) {
-          if (!uncontrolledNodes.has(node2)) {
-            node2.removeAttribute(controlAttribute);
-          }
-          uncontrolledNodes.delete(node2);
-        }
-        if (!markerValue) {
-          node2.removeAttribute(markerName);
-        }
-      });
-      lockCount--;
-      if (!lockCount) {
-        counterMap = /* @__PURE__ */ new WeakMap();
-        counterMap = /* @__PURE__ */ new WeakMap();
-        uncontrolledNodes = /* @__PURE__ */ new WeakMap();
-        markerMap = {};
-      }
-    };
-  };
-  var hideOthers = function(originalTarget, parentNode, markerName) {
-    if (markerName === void 0) {
-      markerName = "data-aria-hidden";
-    }
-    var targets = Array.from(Array.isArray(originalTarget) ? originalTarget : [originalTarget]);
-    var activeParentNode = parentNode || getDefaultParent(originalTarget);
-    if (!activeParentNode) {
-      return function() {
-        return null;
-      };
-    }
-    targets.push.apply(targets, Array.from(activeParentNode.querySelectorAll("[aria-live]")));
-    return applyAttributeToOthers(targets, activeParentNode, markerName, "aria-hidden");
-  };
-  const $5d3850c4d0b4e6c7$var$DIALOG_NAME = "Dialog";
-  const [$5d3850c4d0b4e6c7$var$createDialogContext, $5d3850c4d0b4e6c7$export$cc702773b8ea3e41] = $c512c27ab02ef895$export$50c7b4e9d9f19c1($5d3850c4d0b4e6c7$var$DIALOG_NAME);
-  const [$5d3850c4d0b4e6c7$var$DialogProvider, $5d3850c4d0b4e6c7$var$useDialogContext] = $5d3850c4d0b4e6c7$var$createDialogContext($5d3850c4d0b4e6c7$var$DIALOG_NAME);
-  const $5d3850c4d0b4e6c7$export$3ddf2d174ce01153 = (props) => {
-    const { __scopeDialog, children, open: openProp, defaultOpen, onOpenChange, modal = true } = props;
-    const triggerRef = _$1(null);
-    const contentRef = _$1(null);
-    const [open = false, setOpen] = $71cd76cc60e0454e$export$6f32135080cb4c3({
-      prop: openProp,
-      defaultProp: defaultOpen,
-      onChange: onOpenChange
-    });
-    return /* @__PURE__ */ y$6($5d3850c4d0b4e6c7$var$DialogProvider, {
-      scope: __scopeDialog,
-      triggerRef,
-      contentRef,
-      contentId: $1746a345f3d73bb7$export$f680877a34711e37(),
-      titleId: $1746a345f3d73bb7$export$f680877a34711e37(),
-      descriptionId: $1746a345f3d73bb7$export$f680877a34711e37(),
-      open,
-      onOpenChange: setOpen,
-      onOpenToggle: T$4(
-        () => setOpen(
-          (prevOpen) => !prevOpen
-        ),
-        [
-          setOpen
-        ]
-      ),
-      modal
-    }, children);
-  };
-  const $5d3850c4d0b4e6c7$var$TRIGGER_NAME = "DialogTrigger";
-  const $5d3850c4d0b4e6c7$export$2e1e1122cf0cba88 = /* @__PURE__ */ k$1((props, forwardedRef) => {
-    const { __scopeDialog, ...triggerProps } = props;
-    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$TRIGGER_NAME, __scopeDialog);
-    const composedTriggerRef = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(forwardedRef, context.triggerRef);
-    return /* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.button, _extends({
-      type: "button",
-      "aria-haspopup": "dialog",
-      "aria-expanded": context.open,
-      "aria-controls": context.contentId,
-      "data-state": $5d3850c4d0b4e6c7$var$getState(context.open)
-    }, triggerProps, {
-      ref: composedTriggerRef,
-      onClick: $e42e1063c40fb3ef$export$b9ecd428b558ff10(props.onClick, context.onOpenToggle)
-    }));
-  });
-  const $5d3850c4d0b4e6c7$var$PORTAL_NAME = "DialogPortal";
-  const [$5d3850c4d0b4e6c7$var$PortalProvider, $5d3850c4d0b4e6c7$var$usePortalContext] = $5d3850c4d0b4e6c7$var$createDialogContext($5d3850c4d0b4e6c7$var$PORTAL_NAME, {
-    forceMount: void 0
-  });
-  const $5d3850c4d0b4e6c7$export$dad7c95542bacce0 = (props) => {
-    const { __scopeDialog, forceMount, children, container } = props;
-    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$PORTAL_NAME, __scopeDialog);
-    return /* @__PURE__ */ y$6($5d3850c4d0b4e6c7$var$PortalProvider, {
-      scope: __scopeDialog,
-      forceMount
-    }, O$1.map(
-      children,
-      (child) => /* @__PURE__ */ y$6($921a889cee6df7e8$export$99c2b779aa4e8b8b, {
-        present: forceMount || context.open
-      }, /* @__PURE__ */ y$6($f1701beae083dbae$export$602eac185826482c, {
-        asChild: true,
-        container
-      }, child))
-    ));
-  };
-  const $5d3850c4d0b4e6c7$var$OVERLAY_NAME = "DialogOverlay";
-  const $5d3850c4d0b4e6c7$export$bd1d06c79be19e17 = /* @__PURE__ */ k$1((props, forwardedRef) => {
-    const portalContext = $5d3850c4d0b4e6c7$var$usePortalContext($5d3850c4d0b4e6c7$var$OVERLAY_NAME, props.__scopeDialog);
-    const { forceMount = portalContext.forceMount, ...overlayProps } = props;
-    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$OVERLAY_NAME, props.__scopeDialog);
-    return context.modal ? /* @__PURE__ */ y$6($921a889cee6df7e8$export$99c2b779aa4e8b8b, {
-      present: forceMount || context.open
-    }, /* @__PURE__ */ y$6($5d3850c4d0b4e6c7$var$DialogOverlayImpl, _extends({}, overlayProps, {
-      ref: forwardedRef
-    }))) : null;
-  });
-  const $5d3850c4d0b4e6c7$var$DialogOverlayImpl = /* @__PURE__ */ k$1((props, forwardedRef) => {
-    const { __scopeDialog, ...overlayProps } = props;
-    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$OVERLAY_NAME, __scopeDialog);
-    return (
-      // Make sure `Content` is scrollable even when it doesn't live inside `RemoveScroll`
-      // ie. when `Overlay` and `Content` are siblings
-      /* @__PURE__ */ y$6($67UHm$RemoveScroll, {
-        as: $5e63c961fc1ce211$export$8c6ed5c666ac1360,
-        allowPinchZoom: true,
-        shards: [
-          context.contentRef
-        ]
-      }, /* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.div, _extends({
-        "data-state": $5d3850c4d0b4e6c7$var$getState(context.open)
-      }, overlayProps, {
-        ref: forwardedRef,
-        style: {
-          pointerEvents: "auto",
-          ...overlayProps.style
-        }
-      })))
-    );
-  });
-  const $5d3850c4d0b4e6c7$var$CONTENT_NAME = "DialogContent";
-  const $5d3850c4d0b4e6c7$export$b6d9565de1e068cf = /* @__PURE__ */ k$1((props, forwardedRef) => {
-    const portalContext = $5d3850c4d0b4e6c7$var$usePortalContext($5d3850c4d0b4e6c7$var$CONTENT_NAME, props.__scopeDialog);
-    const { forceMount = portalContext.forceMount, ...contentProps } = props;
-    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$CONTENT_NAME, props.__scopeDialog);
-    return /* @__PURE__ */ y$6($921a889cee6df7e8$export$99c2b779aa4e8b8b, {
-      present: forceMount || context.open
-    }, context.modal ? /* @__PURE__ */ y$6($5d3850c4d0b4e6c7$var$DialogContentModal, _extends({}, contentProps, {
-      ref: forwardedRef
-    })) : /* @__PURE__ */ y$6($5d3850c4d0b4e6c7$var$DialogContentNonModal, _extends({}, contentProps, {
-      ref: forwardedRef
-    })));
-  });
-  const $5d3850c4d0b4e6c7$var$DialogContentModal = /* @__PURE__ */ k$1((props, forwardedRef) => {
-    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$CONTENT_NAME, props.__scopeDialog);
-    const contentRef = _$1(null);
-    const composedRefs = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(forwardedRef, context.contentRef, contentRef);
-    p$6(() => {
-      const content2 = contentRef.current;
-      if (content2)
-        return hideOthers(content2);
-    }, []);
-    return /* @__PURE__ */ y$6($5d3850c4d0b4e6c7$var$DialogContentImpl, _extends({}, props, {
-      ref: composedRefs,
-      trapFocus: context.open,
-      disableOutsidePointerEvents: true,
-      onCloseAutoFocus: $e42e1063c40fb3ef$export$b9ecd428b558ff10(props.onCloseAutoFocus, (event) => {
-        var _context$triggerRef$c;
-        event.preventDefault();
-        (_context$triggerRef$c = context.triggerRef.current) === null || _context$triggerRef$c === void 0 || _context$triggerRef$c.focus();
-      }),
-      onPointerDownOutside: $e42e1063c40fb3ef$export$b9ecd428b558ff10(props.onPointerDownOutside, (event) => {
-        const originalEvent = event.detail.originalEvent;
-        const ctrlLeftClick = originalEvent.button === 0 && originalEvent.ctrlKey === true;
-        const isRightClick = originalEvent.button === 2 || ctrlLeftClick;
-        if (isRightClick)
-          event.preventDefault();
-      }),
-      onFocusOutside: $e42e1063c40fb3ef$export$b9ecd428b558ff10(
-        props.onFocusOutside,
-        (event) => event.preventDefault()
-      )
-    }));
-  });
-  const $5d3850c4d0b4e6c7$var$DialogContentNonModal = /* @__PURE__ */ k$1((props, forwardedRef) => {
-    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$CONTENT_NAME, props.__scopeDialog);
-    const hasInteractedOutsideRef = _$1(false);
-    return /* @__PURE__ */ y$6($5d3850c4d0b4e6c7$var$DialogContentImpl, _extends({}, props, {
-      ref: forwardedRef,
-      trapFocus: false,
-      disableOutsidePointerEvents: false,
-      onCloseAutoFocus: (event) => {
-        var _props$onCloseAutoFoc;
-        (_props$onCloseAutoFoc = props.onCloseAutoFocus) === null || _props$onCloseAutoFoc === void 0 || _props$onCloseAutoFoc.call(props, event);
-        if (!event.defaultPrevented) {
-          var _context$triggerRef$c2;
-          if (!hasInteractedOutsideRef.current)
-            (_context$triggerRef$c2 = context.triggerRef.current) === null || _context$triggerRef$c2 === void 0 || _context$triggerRef$c2.focus();
-          event.preventDefault();
-        }
-        hasInteractedOutsideRef.current = false;
-      },
-      onInteractOutside: (event) => {
-        var _props$onInteractOuts, _context$triggerRef$c3;
-        (_props$onInteractOuts = props.onInteractOutside) === null || _props$onInteractOuts === void 0 || _props$onInteractOuts.call(props, event);
-        if (!event.defaultPrevented)
-          hasInteractedOutsideRef.current = true;
-        const target = event.target;
-        const targetIsTrigger = (_context$triggerRef$c3 = context.triggerRef.current) === null || _context$triggerRef$c3 === void 0 ? void 0 : _context$triggerRef$c3.contains(target);
-        if (targetIsTrigger)
-          event.preventDefault();
-      }
-    }));
-  });
-  const $5d3850c4d0b4e6c7$var$DialogContentImpl = /* @__PURE__ */ k$1((props, forwardedRef) => {
-    const { __scopeDialog, trapFocus, onOpenAutoFocus, onCloseAutoFocus, ...contentProps } = props;
-    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$CONTENT_NAME, __scopeDialog);
-    const contentRef = _$1(null);
-    const composedRefs = $6ed0406888f73fc4$export$c7b2cbe3552a0d05(forwardedRef, contentRef);
-    $3db38b7d1fb3fe6a$export$b7ece24a22aeda8c();
-    return /* @__PURE__ */ y$6(k$3, null, /* @__PURE__ */ y$6($d3863c46a17e8a28$export$20e40289641fbbb6, {
-      asChild: true,
-      loop: true,
-      trapped: trapFocus,
-      onMountAutoFocus: onOpenAutoFocus,
-      onUnmountAutoFocus: onCloseAutoFocus
-    }, /* @__PURE__ */ y$6($5cb92bef7577960e$export$177fb62ff3ec1f22, _extends({
-      role: "dialog",
-      id: context.contentId,
-      "aria-describedby": context.descriptionId,
-      "aria-labelledby": context.titleId,
-      "data-state": $5d3850c4d0b4e6c7$var$getState(context.open)
-    }, contentProps, {
-      ref: composedRefs,
-      onDismiss: () => context.onOpenChange(false)
-    }))), false);
-  });
-  const $5d3850c4d0b4e6c7$var$TITLE_NAME = "DialogTitle";
-  const $5d3850c4d0b4e6c7$export$16f7638e4a34b909 = /* @__PURE__ */ k$1((props, forwardedRef) => {
-    const { __scopeDialog, ...titleProps } = props;
-    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$TITLE_NAME, __scopeDialog);
-    return /* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.h2, _extends({
-      id: context.titleId
-    }, titleProps, {
-      ref: forwardedRef
-    }));
-  });
-  const $5d3850c4d0b4e6c7$var$CLOSE_NAME = "DialogClose";
-  const $5d3850c4d0b4e6c7$export$fba2fb7cd781b7ac = /* @__PURE__ */ k$1((props, forwardedRef) => {
-    const { __scopeDialog, ...closeProps } = props;
-    const context = $5d3850c4d0b4e6c7$var$useDialogContext($5d3850c4d0b4e6c7$var$CLOSE_NAME, __scopeDialog);
-    return /* @__PURE__ */ y$6($8927f6f2acc4f386$export$250ffa63cdc0d034.button, _extends({
-      type: "button"
-    }, closeProps, {
-      ref: forwardedRef,
-      onClick: $e42e1063c40fb3ef$export$b9ecd428b558ff10(
-        props.onClick,
-        () => context.onOpenChange(false)
-      )
-    }));
-  });
-  function $5d3850c4d0b4e6c7$var$getState(open) {
-    return open ? "open" : "closed";
-  }
-  const $5d3850c4d0b4e6c7$export$be92b6f5f03c0fe9 = $5d3850c4d0b4e6c7$export$3ddf2d174ce01153;
-  const $5d3850c4d0b4e6c7$export$41fb9f06171c75f4 = $5d3850c4d0b4e6c7$export$2e1e1122cf0cba88;
-  const $5d3850c4d0b4e6c7$export$602eac185826482c = $5d3850c4d0b4e6c7$export$dad7c95542bacce0;
-  const $5d3850c4d0b4e6c7$export$c6fdb837b070b4ff = $5d3850c4d0b4e6c7$export$bd1d06c79be19e17;
-  const $5d3850c4d0b4e6c7$export$7c6e2c02157bb7d2 = $5d3850c4d0b4e6c7$export$b6d9565de1e068cf;
-  const $5d3850c4d0b4e6c7$export$f99233281efd08a0 = $5d3850c4d0b4e6c7$export$16f7638e4a34b909;
-  const $5d3850c4d0b4e6c7$export$f39c2d165cd861fe = $5d3850c4d0b4e6c7$export$fba2fb7cd781b7ac;
   var eventemitter3 = { exports: {} };
   (function(module) {
     var has = Object.prototype.hasOwnProperty, prefix = "~";
@@ -21825,15 +21937,11 @@ ${content2}`;
       })
     });
   }
-  function IconCopy({
-    className,
-    style
-  }) {
+  function IconCopy() {
     return o$5("svg", {
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: "0 0 512 512",
-      className,
-      style,
+      className: "w-4 h-4",
       fill: "currentColor",
       children: o$5("path", {
         d: "M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"
@@ -21884,7 +21992,11 @@ ${content2}`;
     return o$5("svg", {
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: "0 0 24 24",
-      className: "w-4 h-4",
+      className: "w-5 h-5",
+      style: {
+        marginInline: "-2px",
+        marginTop: "2px"
+      },
       "stroke-width": "2",
       stroke: "currentColor",
       fill: "none",
@@ -22109,9 +22221,6 @@ ${content2}`;
     format: defaultFormat,
     setFormat: (_24) => {
     },
-    exportOfficialJsonFormat: false,
-    setExportOfficialJsonFormat: (_24) => {
-    },
     enableTimestamp: false,
     setEnableTimestamp: (_24) => {
     },
@@ -22137,7 +22246,6 @@ ${content2}`;
     children
   }) => {
     const [format, setFormat] = useGMStorage(KEY_FILENAME_FORMAT, defaultFormat);
-    const [exportOfficialJsonFormat, setExportOfficialJsonFormat] = useGMStorage(KEY_OFFICIAL_JSON_FORMAT, false);
     const [enableTimestamp, setEnableTimestamp] = useGMStorage(KEY_TIMESTAMP_ENABLED, false);
     const [timeStamp24H, setTimeStamp24H] = useGMStorage(KEY_TIMESTAMP_24H, false);
     const [enableTimestampHTML, setEnableTimestampHTML] = useGMStorage(KEY_TIMESTAMP_HTML, false);
@@ -22153,8 +22261,6 @@ ${content2}`;
       value: {
         format,
         setFormat,
-        exportOfficialJsonFormat,
-        setExportOfficialJsonFormat,
         enableTimestamp,
         setEnableTimestamp,
         timeStamp24H,
@@ -22225,20 +22331,22 @@ ${content2}`;
     } = useTranslation();
     const {
       enableMeta,
-      exportMetaList,
-      exportOfficialJsonFormat
+      exportMetaList
     } = useSettingContext();
     const metaList = F$1(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList]);
     const exportAllOptions = F$1(() => [{
       label: "Markdown",
       callback: exportAllToMarkdown
     }, {
-      label: "JSON",
-      callback: exportOfficialJsonFormat ? exportAllToOfficialJson : exportAllToJson
-    }, {
       label: "HTML",
       callback: exportAllToHtml
-    }], [exportOfficialJsonFormat]);
+    }, {
+      label: "JSON",
+      callback: exportAllToOfficialJson
+    }, {
+      label: "JSON (ZIP)",
+      callback: exportAllToJson
+    }], []);
     const fileInputRef = _$1(null);
     const [exportSource, setExportSource] = h$4("API");
     const [apiConversations, setApiConversations] = h$4([]);
@@ -22546,7 +22654,7 @@ ${content2}`;
             flex flex-shrink-0 py-3 px-3 items-center gap-3 rounded-lg mb-2
             bg-menu hover:bg-gray-500/10
             transition-colors duration-200
-            text-black dark:text-white text-sm
+            text-menu text-sm
             cursor-pointer
             border border-menu ${className}`,
       onClick: handleClick,
@@ -22989,8 +23097,6 @@ ${content2}`;
       setEnableTimestampHTML,
       enableTimestampMarkdown,
       setEnableTimestampMarkdown,
-      exportOfficialJsonFormat,
-      setExportOfficialJsonFormat,
       enableMeta,
       setEnableMeta,
       exportMetaList,
@@ -23097,24 +23203,6 @@ ${content2}`;
                       children: preview
                     })]
                   })]
-                })]
-              })
-            }), o$5("div", {
-              className: "relative flex bg-white dark:bg-white/5 rounded p-4",
-              children: o$5("div", {
-                children: [o$5("dt", {
-                  className: "text-md font-medium text-gray-800 dark:text-white",
-                  children: t2("Export Format")
-                }), o$5("dd", {
-                  className: "text-sm text-gray-700 dark:text-gray-300",
-                  children: o$5("div", {
-                    className: "mt-2",
-                    children: o$5(Toggle, {
-                      label: t2("Export JSON Format Description"),
-                      checked: exportOfficialJsonFormat,
-                      onCheckedUpdate: setExportOfficialJsonFormat
-                    })
-                  })
                 })]
               })
             }), o$5("div", {
@@ -23284,11 +23372,11 @@ ${content2}`;
     } = useTranslation();
     const disabled = getHistoryDisabled();
     const [open, setOpen] = h$4(false);
+    const [jsonOpen, setJsonOpen] = h$4(false);
     const [exportOpen, setExportOpen] = h$4(false);
     const [settingOpen, setSettingOpen] = h$4(false);
     const {
       format,
-      exportOfficialJsonFormat,
       enableTimestamp,
       timeStamp24H,
       enableMeta,
@@ -23306,9 +23394,13 @@ ${content2}`;
     const onClickPng = T$4(() => exportToPng(format), [format]);
     const onClickMarkdown = T$4(() => exportToMarkdown(format, metaList), [format, metaList]);
     const onClickHtml = T$4(() => exportToHtml(format, metaList), [format, metaList]);
-    const onClickJSON = T$4(() => exportToJson(format, {
-      officialFormat: exportOfficialJsonFormat
-    }), [format, exportOfficialJsonFormat]);
+    const onClickJSON = T$4(() => {
+      setJsonOpen(true);
+      return true;
+    }, []);
+    const onClickOfficialJSON = T$4(() => exportToJson(format), [format]);
+    const onClickTavern = T$4(() => exportToTavern(format), [format]);
+    const onClickOoba = T$4(() => exportToOoba(format), [format]);
     const width = useWindowResize(() => window.innerWidth);
     const isMobile = width < 768;
     const Portal = isMobile ? "div" : $cef8881cdc69808e$export$602eac185826482c;
@@ -23341,7 +23433,7 @@ ${content2}`;
           })
         }), o$5(Portal, {
           container: isMobile ? container : document.body,
-          forceMount: open || settingOpen || exportOpen,
+          forceMount: open || jsonOpen || settingOpen || exportOpen,
           children: o$5($cef8881cdc69808e$export$7c6e2c02157bb7d2, {
             className: `
                         grid grid-cols-2
@@ -23372,9 +23464,7 @@ ${content2}`;
             }), o$5(MenuItem, {
               text: t2("Copy Text"),
               successText: t2("Copied!"),
-              icon: () => o$5(IconCopy, {
-                className: "w-4 h-4"
-              }),
+              icon: IconCopy,
               className: "row-full",
               onClick: onClickText
             }), o$5(MenuItem, {
@@ -23392,11 +23482,46 @@ ${content2}`;
               icon: FileCode,
               className: "row-half",
               onClick: onClickHtml
-            }), o$5(MenuItem, {
-              text: t2("JSON"),
-              icon: IconJSON,
-              className: "row-half",
-              onClick: onClickJSON
+            }), o$5($5d3850c4d0b4e6c7$export$be92b6f5f03c0fe9, {
+              open: jsonOpen,
+              onOpenChange: setJsonOpen,
+              children: [o$5($5d3850c4d0b4e6c7$export$41fb9f06171c75f4, {
+                asChild: true,
+                children: o$5(MenuItem, {
+                  text: t2("JSON"),
+                  icon: IconJSON,
+                  className: "row-half",
+                  onClick: onClickJSON
+                })
+              }), o$5($5d3850c4d0b4e6c7$export$602eac185826482c, {
+                children: [o$5($5d3850c4d0b4e6c7$export$c6fdb837b070b4ff, {
+                  className: "DialogOverlay"
+                }), o$5($5d3850c4d0b4e6c7$export$7c6e2c02157bb7d2, {
+                  className: "DialogContent",
+                  style: {
+                    width: "320px"
+                  },
+                  children: [o$5($5d3850c4d0b4e6c7$export$f99233281efd08a0, {
+                    className: "DialogTitle",
+                    children: t2("JSON")
+                  }), o$5(MenuItem, {
+                    text: t2("OpenAI Official Format"),
+                    icon: IconCopy,
+                    className: "row-full",
+                    onClick: onClickOfficialJSON
+                  }), o$5(MenuItem, {
+                    text: "JSONL (TavernAI, SillyTavern)",
+                    icon: IconCopy,
+                    className: "row-full",
+                    onClick: onClickTavern
+                  }), o$5(MenuItem, {
+                    text: "Ooba (text-generation-webui)",
+                    icon: IconCopy,
+                    className: "row-full",
+                    onClick: onClickOoba
+                  })]
+                })]
+              })]
             }), o$5(ExportDialog, {
               format,
               open: exportOpen,
