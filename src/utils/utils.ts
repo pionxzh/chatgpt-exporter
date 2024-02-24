@@ -1,5 +1,9 @@
 export function noop() {}
 
+export function nonNullable<T>(x: T): x is NonNullable<T> {
+    return x != null
+}
+
 export function onloadSafe(fn: () => void) {
     if (document.readyState === 'complete') {
         fn()
@@ -31,4 +35,9 @@ export function getColorScheme(): 'light' | 'dark' {
 export function unixTimestampToISOString(timestamp: number) {
     if (!timestamp) return ''
     return (new Date(timestamp * 1000)).toISOString()
+}
+
+export function jsonlStringify(list: any[]): string {
+    // This _has_ to be stringified without adding any indentation
+    return list.map((msg: any) => JSON.stringify(msg)).join('\n')
 }

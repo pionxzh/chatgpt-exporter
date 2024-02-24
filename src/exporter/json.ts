@@ -2,10 +2,11 @@ import JSZip from 'jszip'
 import { fetchConversation, getCurrentChatId, processConversation } from '../api'
 import i18n from '../i18n'
 import { checkIfConversationStarted } from '../page'
+import { convertToOoba, convertToTavern } from '../utils/conversion'
 import { downloadFile, getFileNameWithFormat } from '../utils/download'
 import type { ApiConversationWithId } from '../api'
 
-export async function exportToJson(fileNameFormat: string, options: { officialFormat: boolean }) {
+export async function exportToJson(fileNameFormat: string) {
     if (!checkIfConversationStarted()) {
         alert(i18n.t('Please start a conversation first'))
         return false
@@ -19,7 +20,41 @@ export async function exportToJson(fileNameFormat: string, options: { officialFo
     /**
      * The official format is just an array of the API response.
      */
-    const content = conversationToJson(options.officialFormat ? [rawConversation] : rawConversation)
+    const content = conversationToJson([rawConversation])
+    downloadFile(fileName, 'application/json', content)
+
+    return true
+}
+
+export async function exportToTavern(fileNameFormat: string) {
+    if (!checkIfConversationStarted()) {
+        alert(i18n.t('Please start a conversation first'))
+        return false
+    }
+
+    const chatId = await getCurrentChatId()
+    const rawConversation = await fetchConversation(chatId, false)
+    const conversation = processConversation(rawConversation)
+
+    const fileName = getFileNameWithFormat(`${fileNameFormat}.tavern`, 'jsonl', { title: conversation.title, chatId })
+    const content = convertToTavern(conversation)
+    downloadFile(fileName, 'application/json-lines', content)
+
+    return true
+}
+
+export async function exportToOoba(fileNameFormat: string) {
+    if (!checkIfConversationStarted()) {
+        alert(i18n.t('Please start a conversation first'))
+        return false
+    }
+
+    const chatId = await getCurrentChatId()
+    const rawConversation = await fetchConversation(chatId, false)
+    const conversation = processConversation(rawConversation)
+
+    const fileName = getFileNameWithFormat(`${fileNameFormat}.ooba`, 'json', { title: conversation.title, chatId })
+    const content = convertToOoba(conversation)
     downloadFile(fileName, 'application/json', content)
 
     return true

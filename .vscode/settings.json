@@ -35,6 +35,7 @@
     "headlessui",
     "mdast",
     "micromark",
+    "ooba",
     "preact",
     "tabler",
     "unist"

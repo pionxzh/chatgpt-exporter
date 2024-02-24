@@ -33,7 +33,6 @@ export const SettingDialog: FC<SettingDialogProps> = ({
         timeStamp24H, setTimeStamp24H,
         enableTimestampHTML, setEnableTimestampHTML,
         enableTimestampMarkdown, setEnableTimestampMarkdown,
-        exportOfficialJsonFormat, setExportOfficialJsonFormat,
         enableMeta, setEnableMeta,
         exportMetaList, setExportMetaList,
         /* eslint-enable pionxzh/consistent-list-newline */
@@ -108,22 +107,6 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                                         {t('Preview')}:{' '}
                                         <span className="select-all" style={{ 'text-decoration': 'underline', 'text-underline-offset': 4 }}>{preview}</span>
                                     </p>
-                                </dd>
-                            </div>
-                        </div>
-                        <div className="relative flex bg-white dark:bg-white/5 rounded p-4">
-                            <div>
-                                <dt className="text-md font-medium text-gray-800 dark:text-white">
-                                    {t('Export Format')}
-                                </dt>
-                                <dd className="text-sm text-gray-700 dark:text-gray-300">
-                                    <div className="mt-2">
-                                        <Toggle
-                                            label={t('Export JSON Format Description')}
-                                            checked={exportOfficialJsonFormat}
-                                            onCheckedUpdate={setExportOfficialJsonFormat}
-                                        />
-                                    </div>
                                 </dd>
                             </div>
                         </div>

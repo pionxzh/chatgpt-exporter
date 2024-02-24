@@ -75,14 +75,15 @@ interface DialogContentProps {
 
 const DialogContent: FC<DialogContentProps> = ({ format }) => {
     const { t } = useTranslation()
-    const { enableMeta, exportMetaList, exportOfficialJsonFormat } = useSettingContext()
+    const { enableMeta, exportMetaList } = useSettingContext()
     const metaList = useMemo(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList])
 
     const exportAllOptions = useMemo(() => [
         { label: 'Markdown', callback: exportAllToMarkdown },
-        { label: 'JSON', callback: exportOfficialJsonFormat ? exportAllToOfficialJson : exportAllToJson },
         { label: 'HTML', callback: exportAllToHtml },
-    ], [exportOfficialJsonFormat])
+        { label: 'JSON', callback: exportAllToOfficialJson },
+        { label: 'JSON (ZIP)', callback: exportAllToJson },
+    ], [])
 
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [exportSource, setExportSource] = useState<ExportSource>('API')

@@ -4,7 +4,6 @@ import {
     KEY_FILENAME_FORMAT,
     KEY_META_ENABLED,
     KEY_META_LIST,
-    KEY_OFFICIAL_JSON_FORMAT,
     KEY_TIMESTAMP_24H,
     KEY_TIMESTAMP_ENABLED,
     KEY_TIMESTAMP_HTML,
@@ -29,9 +28,6 @@ const SettingContext = createContext({
     format: defaultFormat,
     setFormat: (_: string) => {},
 
-    exportOfficialJsonFormat: false,
-    setExportOfficialJsonFormat: (_: boolean) => {},
-
     enableTimestamp: false,
     setEnableTimestamp: (_: boolean) => {},
     timeStamp24H: false,
@@ -51,8 +47,6 @@ const SettingContext = createContext({
 
 export const SettingProvider: FC = ({ children }) => {
     const [format, setFormat] = useGMStorage(KEY_FILENAME_FORMAT, defaultFormat)
-
-    const [exportOfficialJsonFormat, setExportOfficialJsonFormat] = useGMStorage(KEY_OFFICIAL_JSON_FORMAT, false)
 
     const [enableTimestamp, setEnableTimestamp] = useGMStorage(KEY_TIMESTAMP_ENABLED, false)
     const [timeStamp24H, setTimeStamp24H] = useGMStorage(KEY_TIMESTAMP_24H, false)
@@ -74,9 +68,6 @@ export const SettingProvider: FC = ({ children }) => {
             value={{
                 format,
                 setFormat,
-
-                exportOfficialJsonFormat,
-                setExportOfficialJsonFormat,
 
                 enableTimestamp,
                 setEnableTimestamp,

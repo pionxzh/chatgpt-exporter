@@ -1,23 +1,9 @@
-interface Message {
-    parent?: string
-    message?: {
-        author: {
-            role: string
-        }
-        create_time: number
-        content: {
-            parts: string[]
-        }
-    }
-}
+import { jsonlStringify, nonNullable } from './utils'
+import type { ConversationNode, ConversationResult } from '../api'
 
-interface MessageMapping {
-    [key: string]: Message
-}
-
-interface ConversationData {
-    current_node: string
-    mapping: MessageMapping
+interface NameMessage {
+    user_name: string
+    character_name: string
 }
 
 interface TavernMessage {
@@ -30,50 +16,25 @@ interface TavernMessage {
     swipe_id: number
 }
 
-interface NameMessage {
-    user_name: string
-    character_name: string
-}
-
 interface OobaData {
     internal: [string, string][]
     visible: [string, string][]
 }
 
-function extractConversation(data: ConversationData): Message[] {
-    const currentNode = data.current_node
-    const mapping = data.mapping
-
-    const messagesReversed: Message[] = []
-    let nodeId: string | undefined = currentNode
-
-    while (nodeId !== null && nodeId !== undefined) {
-        const currentMessage: Message = mapping[nodeId]
-        messagesReversed.push(currentMessage)
-        nodeId = currentMessage.parent
-    }
-
-    return messagesReversed.reverse()
-}
-
-function convertMessageToTavern(messageData: Message): TavernMessage | null {
-    if (!messageData.message) {
+function convertMessageToTavern(node: ConversationNode): TavernMessage | null {
+    if (!node.message || node.message.content.content_type !== 'text') {
         return null
     }
 
-    const senderRole: string = messageData.message.author.role
-    if (senderRole === 'system') {
-        return null
-    }
-
-    const isAssistant = senderRole === 'assistant'
-    const createTime: number = messageData.message.create_time
-    const text: string = messageData.message.content.parts[0]
+    const authorRole = node.message.author.role
+    const createTime = node.message.create_time || (new Date()).getTime() / 1000
+    const text = node.message.content.parts.join('\n')
 
     return {
-        name: isAssistant ? 'Assistant' : 'You',
-        is_user: !isAssistant,
-        is_name: isAssistant,
+        name: authorRole === 'assistant' ? 'Assistant' : 'You',
+        is_user: authorRole === 'user',
+        // This seems to be always true
+        is_name: true,
         send_date: createTime,
         mes: text,
         swipes: [text],
@@ -81,55 +42,41 @@ function convertMessageToTavern(messageData: Message): TavernMessage | null {
     }
 }
 
-function jsonlStringify(messageArray: any[]): string {
-    return messageArray.map((msg: any) => JSON.stringify(msg)).join('\n')
+export function convertToTavern(conversation: ConversationResult): string {
+    const messages: (NameMessage | TavernMessage)[] = [
+        {
+            user_name: 'You',
+            character_name: 'Assistant',
+        },
+        ...conversation.conversationNodes.map(convertMessageToTavern).filter(nonNullable),
+    ]
+
+    return jsonlStringify(messages)
 }
 
-export function getTavernString(jsonData: ConversationData): string {
-    // Takes the OAI JSON data as input, outputs the JSONL string
-    const conversation = extractConversation(jsonData)
+export function convertToOoba(conversation: ConversationResult): string {
+    const pairs: [string, string][] = []
+    const messages = conversation.conversationNodes.filter(node => node.message?.author.role !== 'tool' && node.message?.content.content_type === 'text')
 
-    const convertedConvo: (TavernMessage | NameMessage)[] = [{
-        user_name: 'You',
-        character_name: 'Assistant',
-    }]
-
-    conversation.forEach((message) => {
-        const convertedMsg = convertMessageToTavern(message)
-        if (convertedMsg !== null) {
-            convertedConvo.push(convertedMsg)
-        }
-    })
-    // This _has_ to be stringified without adding any indentation, due to the JSONL format.
-    return jsonlStringify(convertedConvo)
-}
-
-export function getOobaString(jsonData: ConversationData): string {
-    // Takes the OAI JSON data as input, outputs the serialized JSON
-    const messages = extractConversation(jsonData)
-    const pairs: any[] = []
     let idx = 0
-
     while (idx < messages.length - 1) {
         const message = messages[idx]
         const nextMessage = messages[idx + 1]
-        let role: string, text: string, nextRole: string, nextText: string
 
-        if (!message.message || !nextMessage.message) {
+        if (
+            !message.message
+            || !nextMessage.message
+            || message.message.content.content_type !== 'text'
+            || nextMessage.message.content.content_type !== 'text'
+        ) {
             idx += 1
             continue
         }
 
-        try {
-            role = message.message.author.role
-            text = message.message.content.parts[0]
-            nextRole = nextMessage.message.author.role
-            nextText = nextMessage.message.content.parts[0]
-        }
-        catch (error) {
-            idx += 1
-            continue
-        }
+        const role = message.message.author.role
+        const text = message.message.content.parts[0]
+        const nextRole = nextMessage.message.author.role
+        const nextText = nextMessage.message.content.parts[0]
 
         if (role === 'system') {
             if (text !== '') {
@@ -157,6 +104,7 @@ export function getOobaString(jsonData: ConversationData): string {
             idx += 1
         }
     }
+
     const oobaData: OobaData = {
         internal: pairs,
         visible: JSON.parse(JSON.stringify(pairs)),
