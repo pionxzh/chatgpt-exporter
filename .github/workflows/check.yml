@@ -13,12 +13,12 @@ jobs:
     if: "!contains(github.event.head_commit.message, 'chore: release')"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v3
 
       - name: Use Node.js v20
         uses: actions/setup-node@v4
