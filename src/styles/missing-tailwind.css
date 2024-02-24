@@ -10,6 +10,10 @@
     background-color: rgb(28 100 242);
 }
 
+.hover\:bg-gray-500\/10:hover {
+    background-color: hsla(0, 0%, 61%, .1)
+}
+
 .border-\[\#6f6e77\] {
     border-color: #6f6e77;
 }

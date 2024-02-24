@@ -24,13 +24,20 @@ body[data-time-format="24"] span[data-time-format="24"] {
 }
 
 html {
-    --ce-menu-primary: var(--popover-surface-primary, #fff);
-    --ce-menu-secondary: var(--popover-surface-secondary, #ececec);
+    --ce-text-primary: var(--text-primary, #0d0d0d);
+    --ce-menu-primary: var(--sidebar-surface-primary, #f9f9f9);
+    --ce-menu-secondary: var(--sidebar-surface-secondary, #ececec);
     --ce-border-light: var(--border-light, rgba(0, 0, 0, .1));
 }
 
 .dark {
-    --ce-menu-primary: var(--popover-surface-primary, #2f2f2f);
+    --ce-text-primary: var(--text-primary, #ececec);
+    --ce-menu-primary: var(--sidebar-surface-primary, #171717);
+    --ce-menu-secondary: var(--sidebar-surface-secondary, #212121);
+}
+
+.text-menu {
+    color: var(--ce-text-primary);
 }
 
 .bg-menu {
