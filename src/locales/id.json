@@ -29,7 +29,7 @@
   "Conversation Timestamp Description": "Akan ditampilkan pada halaman.",
   "Enable on HTML": "Aktifkan pada file HTML",
   "Enable on Markdown": "Aktifkan pada file Markdown",
-  "Use 24-hour format": "Gunakan format 24 jam (mis. 23:59)",
+  "Use 24-hour format": "Gunakan format 24 jam (contohnya: 23:59)",
   "Export Format": "Format Ekspor",
   "Export JSON Format Description": "Ekspor JSON dalam Format Resmi OpenAI",
   "Export Metadata": "Ekspor Metada",
