@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.21.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.20.0...userscript-v2.21.0) (2024-02-24)
+
+
+### Features
+
+* add getOobaString and getTavernString for conversion to other formats ([214111b](https://github.com/pionxzh/chatgpt-exporter/commit/214111bc6ce73cbf6ad0f8af9aa577b9eebe9798))
+* remove pandora ([115687d](https://github.com/pionxzh/chatgpt-exporter/commit/115687dbad7f48b3204025b244eb64187fb9ae9f))
+* support export to tavern and ooba format ([a28f9fd](https://github.com/pionxzh/chatgpt-exporter/commit/a28f9fdc353464d32d92a5d977272de324628e3a))
+
+
+### Bug Fixes
+
+* correct model names from 'GTP' to 'GPT' ([43f29e4](https://github.com/pionxzh/chatgpt-exporter/commit/43f29e41fbe95903a23a3763c6f3ba11768f6f9e))
+* **i18n:** use `contohnya` instead of `mis.` in Bahasa translation to avoid confusion ([02909ec](https://github.com/pionxzh/chatgpt-exporter/commit/02909ec0b1ccd3294a67496763d2cd9ba2a5ca4b))
+* update style to follow chatgpt updates ([8ee62f5](https://github.com/pionxzh/chatgpt-exporter/commit/8ee62f52cf2279fb1d06630a77f034bdf4271dd8))
+
 ## [2.20.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.19.0...userscript-v2.20.0) (2024-02-13)
 
 
