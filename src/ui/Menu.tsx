@@ -129,7 +129,7 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                         <MenuItem
                             text={t('Copy Text')}
                             successText={t('Copied!')}
-                            icon={() => <IconCopy className="w-4 h-4" />}
+                            icon={IconCopy}
                             className="row-full"
                             onClick={onClickText}
                         />
