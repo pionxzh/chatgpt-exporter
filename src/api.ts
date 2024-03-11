@@ -454,11 +454,14 @@ function extractConversationResult(conversationMapping: Record<string, Conversat
             break // Node not found
         }
 
-        if (node.message?.author.role === 'system') {
-            break // Stop at system message
+        if (node.parent === undefined) {
+            break // Stop at root message.
         }
 
-        result.unshift(node)
+        if (node.message?.author.role !== 'system') { // Skip system messages
+            result.unshift(node)
+        }
+
         currentNodeId = node.parent
     }
 

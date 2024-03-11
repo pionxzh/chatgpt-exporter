@@ -33,8 +33,8 @@ function convertMessageToTavern(node: ConversationNode): TavernMessage | null {
     return {
         name: authorRole === 'assistant' ? 'Assistant' : 'You',
         is_user: authorRole === 'user',
-        // This seems to be always true
-        is_name: true,
+        // This is the opposite of is_user! Not always true.
+        is_name: authorRole === 'assistant',
         send_date: createTime,
         mes: text,
         swipes: [text],
