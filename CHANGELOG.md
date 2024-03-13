@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.21.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.21.0...userscript-v2.21.1) (2024-03-13)
+
+
+### Bug Fixes
+
+* conversion problems listed in [#222](https://github.com/pionxzh/chatgpt-exporter/issues/222) ([56e6cef](https://github.com/pionxzh/chatgpt-exporter/commit/56e6cef513d8782ec11e1382f0b1a2204b8f77a1))
+* improve release ci ([0fd4af8](https://github.com/pionxzh/chatgpt-exporter/commit/0fd4af89959492791e8a05a65bad82a9bad1e4eb))
+
 ## [2.21.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.20.0...userscript-v2.21.0) (2024-02-24)
 
 
