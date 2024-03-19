@@ -44,7 +44,7 @@ English &nbsp;&nbsp;|&nbsp;&nbsp; [Indonesia](./README_ID.md) &nbsp;&nbsp;|&nbsp
 
 #
 
-[📚 Supported Formats](#-supported-formats) &nbsp;&nbsp;|&nbsp;&nbsp; [💡 Example](#-example) &nbsp;&nbsp;|&nbsp;&nbsp; [🤝 Contribution](#-contribution) &nbsp;&nbsp;|&nbsp;&nbsp; [⭐ Star History](#-star-history)
+[📚 Supported Formats](#-supported-formats) &nbsp;&nbsp;|&nbsp;&nbsp; [💡 Example](#-example) &nbsp;&nbsp;|&nbsp;&nbsp; [📤 Export Multiple Conversations](#-export-multiple-conversations) &nbsp;&nbsp;|&nbsp;&nbsp; [🤝 Contribution](#-contribution) &nbsp;&nbsp;|&nbsp;&nbsp; [⭐ Star History](#-star-history)
 
 </div>
 
@@ -109,7 +109,6 @@ It sounds like you're planning on creating a tool that uses the ChatGPT model to
 ### Screenshot
 
 <div align="center">
-
 <img width="480" src="https://user-images.githubusercontent.com/9910706/205663680-6ac97fac-39b0-495c-bee4-8ef37713a9ae.png" />
 
 </div>
@@ -219,6 +218,31 @@ the raw content from API `https://chat.openai.com/backend-api/conversation/[id]`
 }
 ```
 </details>
+
+## 📤 Export Multiple Conversations
+
+When you click the "Export All" button, the **Export Conversations** dialog pops up. Here are the functions you can access.
+
+**Export from official export file (conversations.json)**
+
+Click the upload icon button to upload a JSON file of conversations, such as one downloaded from OpenAI.
+
+**Export from API**
+
+In the list of all your conversations, select which conversations you want to export. Check the "Select All" checkbox to export all your conversations.
+
+Choose the format you want to export to using the format pull-down selector under the list of your conversations at the left. You can choose from the following formats.
+
+- **Markdown**
+- **HTML**
+- **JSON**
+- **JSON (ZIP)**
+
+Click the button to perform the action you want.
+
+- **Archive** -  Archived chat sessions will disappear from the sidebar and can be managed in ChatGPT settings. See [#199](https://github.com/pionxzh/chatgpt-exporter/issues/199) for more details.
+- **Delete** - Deletes the selected conversations.
+- **Export** - Exports the selected conversations in the format chosen using the format selector.
 
 ## 🤝 Contribution
 
