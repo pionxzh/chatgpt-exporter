@@ -231,7 +231,7 @@ Click the upload icon button to upload a JSON file of conversations, such as one
 
 In the list of all your conversations, select which conversations you want to export. Check the "Select All" checkbox to export all your conversations.
 
-Choose the format you want to export to using the format pull-down selector under the list of your conversations at the left. You can choose from the following formats.
+Select your export format from the dropdown on the bottom left. You can choose from the following formats.
 
 - **Markdown**
 - **HTML**
