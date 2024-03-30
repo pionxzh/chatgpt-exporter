@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.21.1
+// @version            2.21.2
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -1364,7 +1364,7 @@ html {
     };
   }
   function extractConversationResult(conversationMapping, startNodeId) {
-    var _a;
+    var _a, _b;
     const result = [];
     let currentNodeId = startNodeId;
     while (currentNodeId) {
@@ -1375,7 +1375,10 @@ html {
       if (node2.parent === void 0) {
         break;
       }
-      if (((_a = node2.message) == null ? void 0 : _a.author.role) !== "system") {
+      if (
+        // Skip system messages
+        ((_a = node2.message) == null ? void 0 : _a.author.role) !== "system" && ((_b = node2.message) == null ? void 0 : _b.content.content_type) !== "model_editable_context"
+      ) {
         result.unshift(node2);
       }
       currentNodeId = node2.parent;
@@ -8966,30 +8969,28 @@ html {
 
     <style>
         :root {
-            --tw-prose-code: #111827;
-            --tw-prose-hr: #e5e7eb;
-            --tw-prose-links: #111827;
-            --tw-prose-headings: #111827;
-            --tw-prose-quotes: #111827;
-            --tw-prose-counters: #6b7280;
-            --page-bg: #f7f7f8;
-            --page-text: #374151;
-            --conversation-odd-bg: rgba(247,247,248);
-            --th-boarders: #4b5563;
-            --td-boarders: #374151;
+            --page-text: #0d0d0d;
+            --page-bg: #fff;
+            --td-borders: #374151;
+            --th-borders: #4b5563;
+            --tw-prose-code: var(--page-text);
+            --tw-prose-counters: #9b9b9b;
+            --tw-prose-headings: var(--page-text);
+            --tw-prose-hr: rgba(0,0,0,.25);
+            --tw-prose-links: var(--page-text);
+            --tw-prose-quotes: var(--page-text);
             --meta-title: #616c77;
         }
 
         [data-theme="dark"] {
-            --tw-prose-code: #f9fafb;
-            --tw-prose-hr: #374151;
-            --tw-prose-links: #fff;
-            --tw-prose-headings: #fff;
-            --tw-prose-quotes: #f3f4f6;
-            --tw-prose-counters: #9ca3af;
-            --page-bg: rgba(52,53,65);
-            --page-text: #fff;
-            --conversation-odd-bg: rgb(68,70,84);
+            --page-text: #ececec;
+            --page-bg: #212121;
+            --tw-prose-code: var(--page-text);
+            --tw-prose-counters: #9b9b9b;
+            --tw-prose-headings: var(--page-text);
+            --tw-prose-hr: hsla(0,0%,100%,.25);
+            --tw-prose-links: var(--page-text);
+            --tw-prose-quotes: var(--page-text);
             --meta-title: #959faa;
         }
 
@@ -9243,7 +9244,7 @@ html {
         }
 
         table thead {
-            border-bottom-color: var(--th-boarders);
+            border-bottom-color: var(--th-borders);
             border-bottom-width: 1px;
         }
 
@@ -9265,7 +9266,7 @@ html {
         }
 
         table tbody tr {
-            border-bottom-color: var(--td-boarders);
+            border-bottom-color: var(--td-borders);
             border-bottom-width: 1px;
         }
 
@@ -9334,10 +9335,6 @@ html {
 
         .conversation-item:first-of-type {
             border-top: 1px solid rgba(0,0,0,.1);
-        }
-
-        .conversation-item:nth-child(odd) {
-            background-color: var(--conversation-odd-bg);
         }
 
         .author {
@@ -21027,8 +21024,8 @@ ${content2.text}
       style.textContent = `
         main [class^='react-scroll-to-bottom'] > div > div,
         [data-testid^="conversation-turn-"] {
-                color: ${isDarkMode ? "#ececf1" : "#0f0f0f"};
-                background-color: ${isDarkMode ? "rgb(52,53,65)" : "#fff"};
+                color: ${isDarkMode ? "#ececec" : "#0d0d0d"};
+                background-color: ${isDarkMode ? "#212121" : "#fff"};
             }
 
             pre {
