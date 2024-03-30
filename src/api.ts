@@ -137,6 +137,9 @@ export interface ConversationNodeMessage {
         // multi-modal input
         content_type: 'multimodal_text'
         parts: Array<MultiModalInputImage | string>
+    } | {
+        content_type: 'model_editable_context'
+        model_set_context: string
     }
     create_time?: number
     update_time?: number
@@ -458,7 +461,12 @@ function extractConversationResult(conversationMapping: Record<string, Conversat
             break // Stop at root message.
         }
 
-        if (node.message?.author.role !== 'system') { // Skip system messages
+        if (
+            // Skip system messages
+            node.message?.author.role !== 'system'
+            // Skip model memory context
+            && node.message?.content.content_type !== 'model_editable_context'
+        ) {
             result.unshift(node)
         }
 
