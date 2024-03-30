@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.21.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.21.1...userscript-v2.21.2) (2024-03-30)
+
+
+### Bug Fixes
+
+* filter model memory context message ([a99c9f1](https://github.com/pionxzh/chatgpt-exporter/commit/a99c9f127b3bbdfc3b7d2b1e302a27af4bdaa39d))
+* remove HTML export odd child highlighting ([c3cd253](https://github.com/pionxzh/chatgpt-exporter/commit/c3cd2538f2c1c081783c325bcddcf17ac48ebbb7))
+* update HTML export colors to match ChatGPT UI ([646b3f5](https://github.com/pionxzh/chatgpt-exporter/commit/646b3f5a919330a43b9fba32d847347b80a34d6f))
+* update image export colors to match ChatGPT UI ([dbb7022](https://github.com/pionxzh/chatgpt-exporter/commit/dbb70228e4caf74bc32915207b071a205686c878))
+
 ## [2.21.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.21.0...userscript-v2.21.1) (2024-03-13)
 
 
