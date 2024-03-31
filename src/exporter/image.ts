@@ -35,6 +35,11 @@ export async function exportToPng(fileNameFormat: string) {
                 background-color: ${isDarkMode ? '#212121' : '#fff'};
             }
 
+            /* https://github.com/niklasvh/html2canvas/issues/2775#issuecomment-1204988157 */
+            img {
+                display: initial !important;
+            }
+
             pre {
                 margin-top: 8px !important;
             }
