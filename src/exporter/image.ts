@@ -57,6 +57,15 @@ export async function exportToPng(fileNameFormat: string) {
         })
     }
 
+    // hide feedback bar
+    const feedbackBar = thread.querySelector('[data-testid^="conversation-turn-"] + .mx-auto')
+    if (feedbackBar) {
+        effect.add(() => {
+            feedbackBar.classList.add('hidden')
+            return () => feedbackBar.classList.remove('hidden')
+        })
+    }
+
     // hide buttons
     const buttonWrappers = document.querySelectorAll<HTMLDivElement>('main .flex.empty\\:hidden')
     buttonWrappers.forEach((wrapper) => {
