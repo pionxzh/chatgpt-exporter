@@ -2,15 +2,24 @@ import urlcat from 'urlcat'
 import { apiUrl, baseUrl } from './constants'
 import { getChatIdFromUrl, getConversationFromSharePage, isSharePage } from './page'
 import { blobToDataURL } from './utils/dom'
+import { memorize } from './utils/memorize'
 
 interface ApiSession {
     accessToken: string
+    authProvider: string
     expires: string
     user: {
         email: string
         groups: string[]
+        // token's issued_at timestamp
+        iat: number
         id: string
+        // token's expiration timestamp
+        idp: string
         image: string
+        intercom_hash: string
+        // whether the user has multi-factor authentication enabled
+        mfa: boolean
         name: string
         picture: string
     }
@@ -192,6 +201,46 @@ export interface ApiConversations {
     total: number
 }
 
+interface ApiAccountsCheckAccountDetail {
+    account_user_role: 'account-owner' | string
+    account_user_id: string | null
+    processor: Record<string, boolean>
+    account_id: string | null
+    organization_id?: string | null
+    is_most_recent_expired_subscription_gratis: boolean
+    has_previously_paid_subscription: boolean
+    name?: string | null
+    profile_picture_id?: string | null
+    profile_picture_url?: string | null
+    structure: 'workspace' | 'personal'
+    plan_type: 'team' | 'free'
+    is_deactivated: boolean
+    promo_data: Record<string, unknown>
+}
+
+interface ApiAccountsCheckEntitlement {
+    subscription_id?: string | null
+    has_active_subscription?: boolean
+    subscription_plan?: 'chatgptteamplan' | 'chatgptplusplan'
+    expires_at?: string | null
+    billing_period?: 'monthly' | string | null
+}
+
+interface ApiAccountsCheckAccount {
+    account: ApiAccountsCheckAccountDetail
+    features: string[]
+    entitlement: ApiAccountsCheckEntitlement
+    last_active_subscription?: Record<string, unknown> | null
+    is_eligible_for_yearly_plus_subscription: boolean
+}
+
+interface ApiAccountsCheck {
+    accounts: {
+        [key: string]: ApiAccountsCheckAccount
+    }
+    account_ordering: string[]
+}
+
 type ApiFileDownload = {
     status: 'success'
     /** signed download url */
@@ -210,6 +259,7 @@ const sessionApi = urlcat(baseUrl, '/api/auth/session')
 const conversationApi = (id: string) => urlcat(apiUrl, '/conversation/:id', { id })
 const conversationsApi = (offset: number, limit: number) => urlcat(apiUrl, '/conversations', { offset, limit })
 const fileDownloadApi = (id: string) => urlcat(apiUrl, '/files/:id/download', { id })
+const accountsCheckApi = urlcat(apiUrl, '/accounts/check/v4-2023-04-27')
 
 export async function getCurrentChatId(): Promise<string> {
     if (isSharePage()) {
@@ -349,12 +399,14 @@ export async function deleteConversation(chatId: string): Promise<boolean> {
 
 async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
     const accessToken = await getAccessToken()
+    const accountId = await getTeamAccountId()
 
     const response = await fetch(url, {
         ...options,
         headers: {
             'Authorization': `Bearer ${accessToken}`,
             'X-Authorization': `Bearer ${accessToken}`,
+            ...(accountId ? { 'Chatgpt-Account-Id': accountId } : {}),
             ...options?.headers,
         },
     })
@@ -364,20 +416,46 @@ async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
     return response.json()
 }
 
+async function _fetchSession(): Promise<ApiSession> {
+    const response = await fetch(sessionApi)
+    if (!response.ok) {
+        throw new Error(response.statusText)
+    }
+    return response.json()
+}
+
+const fetchSession = memorize(_fetchSession)
+
 async function getAccessToken(): Promise<string> {
     const session = await fetchSession()
     return session.accessToken
 }
 
-let session: ApiSession | null = null
-async function fetchSession(): Promise<ApiSession> {
-    if (session) return session
-    const response = await fetch(sessionApi)
+async function _fetchAccountsCheck(): Promise<ApiAccountsCheck> {
+    const accessToken = await getAccessToken()
+
+    const response = await fetch(accountsCheckApi, {
+        headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'X-Authorization': `Bearer ${accessToken}`,
+        },
+    })
     if (!response.ok) {
         throw new Error(response.statusText)
     }
-    session = await response.json()
-    return session!
+    return response.json()
+}
+
+const fetchAccountsCheck = memorize(_fetchAccountsCheck)
+
+export async function getTeamAccountId(): Promise<string | null> {
+    const accountsCheck = await fetchAccountsCheck()
+    const accountKey = accountsCheck.account_ordering?.[0] || 'default'
+    const account = accountsCheck.accounts[accountKey]
+    if (!account) return null
+    if (account.account.plan_type !== 'team') return null
+
+    return account.account.account_id
 }
 
 export interface ConversationResult {
