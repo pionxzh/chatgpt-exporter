@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.22.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.21.2...userscript-v2.22.0) (2024-04-04)
+
+
+### Features
+
+* try support team account ([7937b05](https://github.com/pionxzh/chatgpt-exporter/commit/7937b051bb7cca94053ee2f34054989ad7e4bb24))
+
+
+### Bug Fixes
+
+* fix characters overlap in screenshot ([aef813c](https://github.com/pionxzh/chatgpt-exporter/commit/aef813c2a0bfff66e8c37fdbfb08a6536446dd34)), closes [#216](https://github.com/pionxzh/chatgpt-exporter/issues/216)
+* hide feedback bar in screenshot ([3763ad7](https://github.com/pionxzh/chatgpt-exporter/commit/3763ad71ac90f0a1e0a35bd0a6a0d7f038cf843e))
+
 ## [2.21.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.21.1...userscript-v2.21.2) (2024-03-30)
 
 
