@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.21.2
+// @version            2.22.0
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -1135,6 +1135,20 @@ html {
   function checkIfConversationStarted() {
     return !!document.querySelector('[data-testid^="conversation-turn-"]');
   }
+  const generateKey = (args) => JSON.stringify(args);
+  function memorize(fn2) {
+    const cache = /* @__PURE__ */ new Map();
+    const memorized = (...args) => {
+      const key2 = generateKey(args);
+      if (cache.has(key2)) {
+        return cache.get(key2);
+      }
+      const result = fn2(...args);
+      cache.set(key2, result);
+      return result;
+    };
+    return memorized;
+  }
   const sessionApi = _default(baseUrl, "/api/auth/session");
   const conversationApi = (id) => _default(apiUrl, "/conversation/:id", {
     id
@@ -1146,6 +1160,7 @@ html {
   const fileDownloadApi = (id) => _default(apiUrl, "/files/:id/download", {
     id
   });
+  const accountsCheckApi = _default(apiUrl, "/accounts/check/v4-2023-04-27");
   async function getCurrentChatId() {
     if (isSharePage()) {
       return `__share__${getChatIdFromUrl()}`;
@@ -1279,11 +1294,15 @@ html {
   }
   async function fetchApi(url, options) {
     const accessToken = await getAccessToken();
+    const accountId = await getTeamAccountId();
     const response = await fetch(url, {
       ...options,
       headers: {
         "Authorization": `Bearer ${accessToken}`,
         "X-Authorization": `Bearer ${accessToken}`,
+        ...accountId ? {
+          "Chatgpt-Account-Id": accountId
+        } : {},
         ...options == null ? void 0 : options.headers
       }
     });
@@ -1292,20 +1311,42 @@ html {
     }
     return response.json();
   }
-  async function getAccessToken() {
-    const session2 = await fetchSession();
-    return session2.accessToken;
-  }
-  let session = null;
-  async function fetchSession() {
-    if (session)
-      return session;
+  async function _fetchSession() {
     const response = await fetch(sessionApi);
     if (!response.ok) {
       throw new Error(response.statusText);
     }
-    session = await response.json();
-    return session;
+    return response.json();
+  }
+  const fetchSession = memorize(_fetchSession);
+  async function getAccessToken() {
+    const session = await fetchSession();
+    return session.accessToken;
+  }
+  async function _fetchAccountsCheck() {
+    const accessToken = await getAccessToken();
+    const response = await fetch(accountsCheckApi, {
+      headers: {
+        "Authorization": `Bearer ${accessToken}`,
+        "X-Authorization": `Bearer ${accessToken}`
+      }
+    });
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+    return response.json();
+  }
+  const fetchAccountsCheck = memorize(_fetchAccountsCheck);
+  async function getTeamAccountId() {
+    var _a;
+    const accountsCheck = await fetchAccountsCheck();
+    const accountKey = ((_a = accountsCheck.account_ordering) == null ? void 0 : _a[0]) || "default";
+    const account = accountsCheck.accounts[accountKey];
+    if (!account)
+      return null;
+    if (account.account.plan_type !== "team")
+      return null;
+    return account.account.account_id;
   }
   const ModelMapping = {
     "text-davinci-002-render-sha": "GPT-3.5",
@@ -21028,6 +21069,11 @@ ${content2.text}
                 background-color: ${isDarkMode ? "#212121" : "#fff"};
             }
 
+            /* https://github.com/niklasvh/html2canvas/issues/2775#issuecomment-1204988157 */
+            img {
+                display: initial !important;
+            }
+
             pre {
                 margin-top: 8px !important;
             }
@@ -21045,6 +21091,13 @@ ${content2.text}
       effect.add(() => {
         topHeader.classList.add("hidden");
         return () => topHeader.classList.remove("hidden");
+      });
+    }
+    const feedbackBar = thread.querySelector('[data-testid^="conversation-turn-"] + .mx-auto');
+    if (feedbackBar) {
+      effect.add(() => {
+        feedbackBar.classList.add("hidden");
+        return () => feedbackBar.classList.remove("hidden");
       });
     }
     const buttonWrappers = document.querySelectorAll("main .flex.empty\\:hidden");
