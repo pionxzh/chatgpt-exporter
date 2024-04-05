@@ -100,10 +100,10 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
         // Skip tool's intermediate message.
         if (message.author.role === 'tool') {
             if (
-            // HACK: we special case the content_type 'multimodal_text' here because it is used by
-            // the dalle tool to return the image result, and we do want to show that.
+                // HACK: we special case the content_type 'multimodal_text' here because it is used by
+                // the dalle tool to return the image result, and we do want to show that.
                 message.content.content_type !== 'multimodal_text'
-            // Code execution result with image
+                // Code execution result with image
             && !(
                 message.content.content_type === 'execution_output'
                 && message.metadata?.aggregate_result?.messages?.some(msg => msg.message_type === 'image')
