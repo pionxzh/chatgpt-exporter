@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.22.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.22.0...userscript-v2.22.1) (2024-04-23)
+
+
+### Bug Fixes
+
+* try fix team workspace authentication issue ([1b9d3c1](https://github.com/pionxzh/chatgpt-exporter/commit/1b9d3c13566a8c768990028229ef5082cb1b3a2d))
+
 ## [2.22.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.21.2...userscript-v2.22.0) (2024-04-04)
 
 
