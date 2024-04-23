@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.22.0
+// @version            2.22.1
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -1337,16 +1337,23 @@ html {
     return response.json();
   }
   const fetchAccountsCheck = memorize(_fetchAccountsCheck);
-  async function getTeamAccountId() {
+  const getCookie = (key2) => {
     var _a;
+    return ((_a = document.cookie.match(`(^|;)\\s*${key2}\\s*=\\s*([^;]+)`)) == null ? void 0 : _a.pop()) || "";
+  };
+  async function getTeamAccountId() {
     const accountsCheck = await fetchAccountsCheck();
-    const accountKey = ((_a = accountsCheck.account_ordering) == null ? void 0 : _a[0]) || "default";
-    const account = accountsCheck.accounts[accountKey];
-    if (!account)
-      return null;
-    if (account.account.plan_type !== "team")
-      return null;
-    return account.account.account_id;
+    const workspaceId = getCookie(
+      "_account"
+      /* Workspace */
+    );
+    if (workspaceId) {
+      const account = accountsCheck.accounts[workspaceId];
+      if (account) {
+        return account.account.account_id;
+      }
+    }
+    return null;
   }
   const ModelMapping = {
     "text-davinci-002-render-sha": "GPT-3.5",
