@@ -255,6 +255,29 @@ type ApiFileDownload = {
     error_message: string | null
 }
 
+// eslint-disable-next-line no-restricted-syntax
+const enum ChatGPTCookie {
+    AgeVerification = 'oai-av-seen',
+    AllowNonessential = 'oai-allow-ne',
+    DeviceId = 'oai-did',
+    DomainMigrationSourceCompleted = 'oai-dm-src-c-240329',
+    DomainMigrationTargetCompleted = 'oai-dm-tgt-c-240329',
+    HasClickedOnTryItFirstLink = 'oai-tif-20240402',
+    HasLoggedInBefore = 'oai-hlib',
+    HideLoggedOutBanner = 'hide-logged-out-banner',
+    IntercomDeviceIdDev = 'intercom-device-id-izw1u7l7',
+    IntercomDeviceIdProd = 'intercom-device-id-dgkjq2bp',
+    IpOverride = 'oai-ip-country',
+    IsEmployee = '_oaiauth',
+    IsPaidUser = '_puid',
+    LastLocation = 'oai-ll',
+    SegmentUserId = 'ajs_user_id',
+    SegmentUserTraits = 'ajs_user_traits',
+    ShowPaymentModal = 'ui-show-payment-modal',
+    TempEnableUnauthedCompliance = 'temp-oai-compliance',
+    Workspace = '_account',
+}
+
 const sessionApi = urlcat(baseUrl, '/api/auth/session')
 const conversationApi = (id: string) => urlcat(apiUrl, '/conversation/:id', { id })
 const conversationsApi = (offset: number, limit: number) => urlcat(apiUrl, '/conversations', { offset, limit })
@@ -448,14 +471,19 @@ async function _fetchAccountsCheck(): Promise<ApiAccountsCheck> {
 
 const fetchAccountsCheck = memorize(_fetchAccountsCheck)
 
+const getCookie = (key: string) => document.cookie.match(`(^|;)\\s*${key}\\s*=\\s*([^;]+)`)?.pop() || ''
+
 export async function getTeamAccountId(): Promise<string | null> {
     const accountsCheck = await fetchAccountsCheck()
-    const accountKey = accountsCheck.account_ordering?.[0] || 'default'
-    const account = accountsCheck.accounts[accountKey]
-    if (!account) return null
-    if (account.account.plan_type !== 'team') return null
+    const workspaceId = getCookie(ChatGPTCookie.Workspace)
+    if (workspaceId) {
+        const account = accountsCheck.accounts[workspaceId]
+        if (account) {
+            return account.account.account_id
+        }
+    }
 
-    return account.account.account_id
+    return null
 }
 
 export interface ConversationResult {
