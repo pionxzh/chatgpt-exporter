@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.22.1
+// @version            2.23.0
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -18,6 +18,14 @@
 // @match              https://chat.openai.com/gpts/*
 // @match              https://chat.openai.com/share/*
 // @match              https://chat.openai.com/share/*/continue
+// @match              https://chatgpt.com/
+// @match              https://chatgpt.com/?model=*
+// @match              https://chatgpt.com/c/*
+// @match              https://chatgpt.com/g/*
+// @match              https://chatgpt.com/gpts
+// @match              https://chatgpt.com/gpts/*
+// @match              https://chatgpt.com/share/*
+// @match              https://chatgpt.com/share/*/continue
 // @require            https://cdn.jsdelivr.net/npm/jszip@3.9.1/dist/jszip.min.js
 // @require            https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js
 // @grant              GM_addStyle
@@ -1037,7 +1045,8 @@ html {
     return v2 !== void 0 && v2 !== null;
   }
   const API_MAPPING = {
-    "https://chat.openai.com": "https://chat.openai.com/backend-api"
+    "https://chat.openai.com": "https://chat.openai.com/backend-api",
+    "https://chatgpt.com": "https://chatgpt.com/backend-api"
   };
   const baseUrl = new URL(location.href).origin;
   const apiUrl = API_MAPPING[baseUrl];
