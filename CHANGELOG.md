@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.23.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.22.1...userscript-v2.23.0) (2024-05-04)
+
+
+### Features
+
+* support chatgpt.com ([07bcf0b](https://github.com/pionxzh/chatgpt-exporter/commit/07bcf0b30f96d4157915eb88d220ddf11923f21c)), closes [#232](https://github.com/pionxzh/chatgpt-exporter/issues/232)
+
 ## [2.22.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.22.0...userscript-v2.22.1) (2024-04-23)
 
 
