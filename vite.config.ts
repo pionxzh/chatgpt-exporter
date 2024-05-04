@@ -45,6 +45,15 @@ export default defineConfig({
                     'https://chat.openai.com/share/*',
                     // support https://chat.openai.com/share/123456789/continue
                     'https://chat.openai.com/share/*/continue',
+
+                    'https://chatgpt.com/',
+                    'https://chatgpt.com/?model=*',
+                    'https://chatgpt.com/c/*',
+                    'https://chatgpt.com/g/*',
+                    'https://chatgpt.com/gpts',
+                    'https://chatgpt.com/gpts/*',
+                    'https://chatgpt.com/share/*',
+                    'https://chatgpt.com/share/*/continue',
                 ],
                 'icon': 'https://chat.openai.com/favicon.ico',
                 'run-at': 'document-end',
