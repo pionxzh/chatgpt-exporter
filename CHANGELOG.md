@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.24.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.23.0...userscript-v2.24.0) (2024-05-18)
+
+
+### Features
+
+* support new.oaifree.com ([6bf6ae0](https://github.com/pionxzh/chatgpt-exporter/commit/6bf6ae0b928a91c9af30be21c3aea16fe19a6816)), closes [#236](https://github.com/pionxzh/chatgpt-exporter/issues/236)
+
 ## [2.23.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.22.1...userscript-v2.23.0) (2024-05-04)
 
 
