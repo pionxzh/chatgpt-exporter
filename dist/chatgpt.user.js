@@ -19,6 +19,7 @@
 // @match              https://chat.openai.com/share/*
 // @match              https://chat.openai.com/share/*/continue
 // @match              https://chatgpt.com/
+// @match              https://chatgpt.com/?oai-dm=1
 // @match              https://chatgpt.com/?model=*
 // @match              https://chatgpt.com/c/*
 // @match              https://chatgpt.com/g/*
