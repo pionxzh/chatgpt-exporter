@@ -25,7 +25,7 @@ interface ApiSession {
     }
 }
 
-type ModelSlug = 'text-davinci-002-render-sha' | 'text-davinci-002-render-paid' | 'text-davinci-002-browse' | 'gpt-4' | 'gpt-4-browsing'
+type ModelSlug = 'text-davinci-002-render-sha' | 'text-davinci-002-render-paid' | 'text-davinci-002-browse' | 'gpt-4' | 'gpt-4-browsing' | 'gpt-4o'
 
 export interface Citation {
     start_ix: number
@@ -502,6 +502,7 @@ const ModelMapping: { [key in ModelSlug]: string } & { [key: string]: string } =
     'text-davinci-002-browse': 'GPT-3.5',
     'gpt-4': 'GPT-4',
     'gpt-4-browsing': 'GPT-4 (Browser)',
+    'gpt-4o': 'GPT-4o',
 
     // fuzzy matching
     'text-davinci-002': 'GPT-3.5',
