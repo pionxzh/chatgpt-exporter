@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.24.0
+// @version            2.24.1
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -19,7 +19,6 @@
 // @match              https://chat.openai.com/share/*
 // @match              https://chat.openai.com/share/*/continue
 // @match              https://chatgpt.com/
-// @match              https://chatgpt.com/?oai-dm=1
 // @match              https://chatgpt.com/?model=*
 // @match              https://chatgpt.com/c/*
 // @match              https://chatgpt.com/g/*
@@ -1380,6 +1379,7 @@ html {
     "text-davinci-002-browse": "GPT-3.5",
     "gpt-4": "GPT-4",
     "gpt-4-browsing": "GPT-4 (Browser)",
+    "gpt-4o": "GPT-4o",
     // fuzzy matching
     "text-davinci-002": "GPT-3.5"
   };
