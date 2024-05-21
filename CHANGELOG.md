@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.24.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.24.0...userscript-v2.24.1) (2024-05-21)
+
+
+### Bug Fixes
+
+* add [@match](https://github.com/match) for new ChatGPT domain with query parameter ([e48c902](https://github.com/pionxzh/chatgpt-exporter/commit/e48c9020214e6f573959c5bbedceed62c7b37840))
+* support model name mapping for gpt-4o ([346e08f](https://github.com/pionxzh/chatgpt-exporter/commit/346e08fbfe09cf87ccf5f0d56719c59954621294))
+
 ## [2.24.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.23.0...userscript-v2.24.0) (2024-05-18)
 
 
