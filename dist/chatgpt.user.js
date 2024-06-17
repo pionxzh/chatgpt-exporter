@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.24.1
+// @version            2.24.3
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -21154,24 +21154,30 @@ ${content2.text}
     const threadEl = thread;
     effect.run();
     await sleep(100);
-    const passLimit = 5;
+    const passLimit = 10;
     const takeScreenshot = async (width, height, additionalScale = 1, currentPass = 1) => {
       const ratio = window.devicePixelRatio || 1;
-      const canvas = await html2canvas(threadEl, {
-        scale: ratio * 2 * additionalScale,
-        // scale up to 2x to avoid blurry images
-        useCORS: true,
-        scrollX: -window.scrollX,
-        scrollY: -window.scrollY,
-        windowWidth: width,
-        windowHeight: height,
-        ignoreElements: fnIgnoreElements
-      });
-      const context = canvas.getContext("2d");
+      const scale = ratio * 2 * additionalScale;
+      let canvas = null;
+      try {
+        canvas = await html2canvas(threadEl, {
+          scale,
+          useCORS: true,
+          scrollX: -window.scrollX,
+          scrollY: -window.scrollY,
+          windowWidth: width,
+          windowHeight: height,
+          ignoreElements: fnIgnoreElements
+        });
+      } catch (error2) {
+        console.log(`ChatGPT Exporter:takeScreenshot with height=${height} width=${width} scale=${scale}`);
+        console.error("Failed to take screenshot", error2);
+      }
+      const context = canvas == null ? void 0 : canvas.getContext("2d");
       if (context)
         context.imageSmoothingEnabled = false;
-      const dataUrl2 = canvas.toDataURL("image/png", 1).replace(/^data:image\/[^;]/, "data:application/octet-stream");
-      if (dataUrl2 === "data:,") {
+      const dataUrl2 = canvas == null ? void 0 : canvas.toDataURL("image/png", 1).replace(/^data:image\/[^;]/, "data:application/octet-stream");
+      if (!canvas || !dataUrl2 || dataUrl2 === "data:,") {
         if (currentPass > passLimit)
           return null;
         return takeScreenshot(width, height, additionalScale / 1.4, currentPass + 1);
