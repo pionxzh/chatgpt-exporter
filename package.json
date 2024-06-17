@@ -1,7 +1,7 @@
 {
   "name": "@pionxzh/chatgpt-exporter",
   "type": "module",
-  "version": "2.24.2",
+  "version": "2.24.3",
   "private": true,
   "packageManager": "pnpm@8.14.1",
   "title": "ChatGPT Exporter",
