@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.24.3](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.24.2...userscript-v2.24.3) (2024-06-17)
+
+
+### Bug Fixes
+
+* handle empty dataUrl ([6c89be9](https://github.com/pionxzh/chatgpt-exporter/commit/6c89be9c1b97da0179f4595689fddfa587bc2509))
+* lint ([6cafb3c](https://github.com/pionxzh/chatgpt-exporter/commit/6cafb3ccd5d95cb849093f8a20292a691c876ea3))
+* lint ([722c752](https://github.com/pionxzh/chatgpt-exporter/commit/722c752bb9e52a59fde012ed90967b7df927b2ad))
+
 ## [2.24.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.24.1...userscript-v2.24.2) (2024-06-17)
 
 
