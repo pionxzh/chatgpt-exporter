@@ -144,7 +144,7 @@ export async function exportToPng(fileNameFormat: string) {
          * Chromium will not throw,  we can only get an empty canvas
          * Firefox will throw "DOMException: CanvasRenderingContext2D.scale: Canvas exceeds max size."
          */
-        if (!canvas || dataUrl === 'data:,') {
+        if (!canvas || !dataUrl || dataUrl === 'data:,') {
             if (currentPass > passLimit) return null
 
             // 1.4 ^ 5 ~= 5.37, should be enough for most cases
