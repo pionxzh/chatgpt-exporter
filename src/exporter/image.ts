@@ -113,7 +113,7 @@ export async function exportToPng(fileNameFormat: string) {
         const ratio = window.devicePixelRatio || 1
         const scale = ratio * 2 * additionalScale // scale up to 2x to avoid blurry images
 
-        let canvas: HTMLCanvasElement | null = null;
+        let canvas: HTMLCanvasElement | null = null
         try {
             canvas = await html2canvas(threadEl, {
                 scale,
@@ -124,7 +124,9 @@ export async function exportToPng(fileNameFormat: string) {
                 windowHeight: height,
                 ignoreElements: fnIgnoreElements,
             })
-        } catch (error) {
+        }
+        catch (error) {
+            // eslint-disable-next-line no-console
             console.log(`ChatGPT Exporter:takeScreenshot with height=${height} weight=${weight} scale=${scale}`)
             console.error('Failed to take screenshot', error)
         }
