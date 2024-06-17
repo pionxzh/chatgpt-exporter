@@ -108,29 +108,41 @@ export async function exportToPng(fileNameFormat: string) {
 
     await sleep(100)
 
-    const passLimit = 5
+    const passLimit = 10
     const takeScreenshot = async (width: number, height: number, additionalScale = 1, currentPass = 1): Promise<string | null> => {
         const ratio = window.devicePixelRatio || 1
-        const canvas = await html2canvas(threadEl, {
-            scale: ratio * 2 * additionalScale, // scale up to 2x to avoid blurry images
-            useCORS: true,
-            scrollX: -window.scrollX,
-            scrollY: -window.scrollY,
-            windowWidth: width,
-            windowHeight: height,
-            ignoreElements: fnIgnoreElements,
-        })
+        const scale = ratio * 2 * additionalScale // scale up to 2x to avoid blurry images
 
-        const context = canvas.getContext('2d')
+        let canvas: HTMLCanvasElement | null = null;
+        try {
+            canvas = await html2canvas(threadEl, {
+                scale,
+                useCORS: true,
+                scrollX: -window.scrollX,
+                scrollY: -window.scrollY,
+                windowWidth: width,
+                windowHeight: height,
+                ignoreElements: fnIgnoreElements,
+            })
+        } catch (error) {
+            console.log(`ChatGPT Exporter:takeScreenshot with height=${height} weight=${weight} scale=${scale}`)
+            console.error('Failed to take screenshot', error)
+        }
+
+        const context = canvas?.getContext('2d')
         if (context) context.imageSmoothingEnabled = false
 
-        const dataUrl = canvas.toDataURL('image/png', 1)
+        const dataUrl = canvas?.toDataURL('image/png', 1)
             .replace(/^data:image\/[^;]/, 'data:application/octet-stream')
 
-        // corrupted image
-        // meaning we might hit on the canvas size limit
-        // See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas#maximum_canvas_size
-        if (dataUrl === 'data:,') {
+        /**
+         * corrupted image
+         * meaning we might hit on the canvas size limit
+         * See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas#maximum_canvas_size
+         * Chromium will not throw,  we can only get an empty canvas
+         * Firefox will throw "DOMException: CanvasRenderingContext2D.scale: Canvas exceeds max size."
+         */
+        if (!canvas || dataUrl === 'data:,') {
             if (currentPass > passLimit) return null
 
             // 1.4 ^ 5 ~= 5.37, should be enough for most cases
