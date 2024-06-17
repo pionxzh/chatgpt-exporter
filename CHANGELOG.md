@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.24.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.24.1...userscript-v2.24.2) (2024-06-17)
+
+
+### Bug Fixes
+
+* handle oversized screenshot on firefox ([ce2356e](https://github.com/pionxzh/chatgpt-exporter/commit/ce2356e17f280b5217ca5277ee1bbf07e8148638))
+
 ## [2.24.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.24.0...userscript-v2.24.1) (2024-05-21)
 
 
