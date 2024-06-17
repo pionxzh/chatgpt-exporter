@@ -67,7 +67,7 @@ dependencies:
     version: 2.0.4
   vite-plugin-monkey:
     specifier: ^3.5.1
-    version: 3.5.1(vite@5.1.4)
+    version: 3.5.1(vite@5.1.7)
 
 devDependencies:
   '@commitlint/cli':
@@ -81,7 +81,7 @@ devDependencies:
     version: 1.0.1(eslint@8.57.0)(typescript@5.3.3)
   '@preact/preset-vite':
     specifier: ^2.8.1
-    version: 2.8.1(@babel/core@7.23.2)(preact@10.17.1)(vite@5.1.4)
+    version: 2.8.1(@babel/core@7.23.2)(preact@10.17.1)(vite@5.1.7)
   '@types/mdast':
     specifier: ^3.0.15
     version: 3.0.15
@@ -104,8 +104,8 @@ devDependencies:
     specifier: ^5.3.3
     version: 5.3.3
   vite:
-    specifier: ^5.1.4
-    version: 5.1.4(@types/node@20.11.20)
+    specifier: ^5.1.7
+    version: 5.1.7(@types/node@20.11.20)
 
 packages:
 
@@ -931,7 +931,7 @@ packages:
       - vitest
     dev: true
 
-  /@preact/preset-vite@2.8.1(@babel/core@7.23.2)(preact@10.17.1)(vite@5.1.4):
+  /@preact/preset-vite@2.8.1(@babel/core@7.23.2)(preact@10.17.1)(vite@5.1.7):
     resolution: {integrity: sha512-a9KV4opdj17X2gOFuGup0aE+sXYABX/tJi/QDptOrleX4FlnoZgDWvz45tHOdVfrZX+3uvVsIYPHxRsTerkDNA==}
     peerDependencies:
       '@babel/core': 7.x
@@ -940,7 +940,7 @@ packages:
       '@babel/core': 7.23.2
       '@babel/plugin-transform-react-jsx': 7.22.15(@babel/core@7.23.2)
       '@babel/plugin-transform-react-jsx-development': 7.22.5(@babel/core@7.23.2)
-      '@prefresh/vite': 2.4.3(preact@10.17.1)(vite@5.1.4)
+      '@prefresh/vite': 2.4.3(preact@10.17.1)(vite@5.1.7)
       '@rollup/pluginutils': 4.2.1
       babel-plugin-transform-hook-names: 1.0.2(@babel/core@7.23.2)
       debug: 4.3.4
@@ -948,7 +948,7 @@ packages:
       magic-string: 0.30.5
       node-html-parser: 6.1.12
       resolve: 1.22.8
-      vite: 5.1.4(@types/node@20.11.20)
+      vite: 5.1.7(@types/node@20.11.20)
     transitivePeerDependencies:
       - preact
       - supports-color
@@ -970,7 +970,7 @@ packages:
     resolution: {integrity: sha512-KtC/fZw+oqtwOLUFM9UtiitB0JsVX0zLKNyRTA332sqREqSALIIQQxdUCS1P3xR/jT1e2e8/5rwH6gdcMLEmsQ==}
     dev: true
 
-  /@prefresh/vite@2.4.3(preact@10.17.1)(vite@5.1.4):
+  /@prefresh/vite@2.4.3(preact@10.17.1)(vite@5.1.7):
     resolution: {integrity: sha512-diQ8AW+Y2i1QEhO64t2hhV8WFP9X0/NAxuSd9eRlVyS3LOs3RgGOwjOmLoJqwCmIbdq5Szq983gO+xdW/l0G6A==}
     peerDependencies:
       preact: ^10.4.0
@@ -982,7 +982,7 @@ packages:
       '@prefresh/utils': 1.2.0
       '@rollup/pluginutils': 4.2.1
       preact: 10.17.1
-      vite: 5.1.4(@types/node@20.11.20)
+      vite: 5.1.7(@types/node@20.11.20)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -5761,7 +5761,7 @@ packages:
       vfile-message: 3.1.4
     dev: false
 
-  /vite-plugin-monkey@3.5.1(vite@5.1.4):
+  /vite-plugin-monkey@3.5.1(vite@5.1.7):
     resolution: {integrity: sha512-sLbWbhvhXbm1d4SFY9eVx3KFqDP1gbjqUJlbpf/KRKLAFcjO3VIMOJb0oqxH77zlmSZhITrqLcsB3AyH+92i/w==}
     engines: {node: ^14.18 || >= 16, pnpm: '>=6'}
     peerDependencies:
@@ -5778,11 +5778,11 @@ packages:
       open: 9.1.0
       picocolors: 1.0.0
       systemjs: 6.14.2
-      vite: 5.1.4(@types/node@20.11.20)
+      vite: 5.1.7(@types/node@20.11.20)
     dev: false
 
-  /vite@5.1.4(@types/node@20.11.20):
-    resolution: {integrity: sha512-n+MPqzq+d9nMVTKyewqw6kSt+R3CkvF9QAKY8obiQn8g1fwTscKxyfaYnC632HtBXAQGc1Yjomphwn1dtwGAHg==}
+  /vite@5.1.7(@types/node@20.11.20):
+    resolution: {integrity: sha512-sgnEEFTZYMui/sTlH1/XEnVNHMujOahPLGMxn1+5sIT45Xjng1Ec1K78jRP15dSmVgg5WBin9yO81j3o9OxofA==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
     peerDependencies:
