@@ -127,7 +127,7 @@ export async function exportToPng(fileNameFormat: string) {
         }
         catch (error) {
             // eslint-disable-next-line no-console
-            console.log(`ChatGPT Exporter:takeScreenshot with height=${height} weight=${weight} scale=${scale}`)
+            console.log(`ChatGPT Exporter:takeScreenshot with height=${height} width=${width} scale=${scale}`)
             console.error('Failed to take screenshot', error)
         }
 
