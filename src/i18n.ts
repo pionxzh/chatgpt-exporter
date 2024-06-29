@@ -1,6 +1,6 @@
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
-import { KEY_LANGUAGE } from './constants'
+import { KEY_LANGUAGE, KEY_OAI_LOCALE } from './constants'
 import en_US from './locales/en.json'
 import es from './locales/es.json'
 import id_ID from './locales/id.json'
@@ -113,13 +113,15 @@ const resources = LOCALES.reduce<Record<string, { translation: Record<string, st
     return acc
 }, {})
 
-function standardizeLanguage(language: string) {
+function standardizeLanguage(language: string | null) {
+    if (!language) return null
+
     if (language in LanguageMapping) return LanguageMapping[language]
 
     const shortLang = language.split('-')[0]
     if (shortLang in LanguageMapping) return LanguageMapping[shortLang]
 
-    return language
+    return null
 }
 
 function getNavigatorLanguage() {
@@ -133,14 +135,20 @@ function getNavigatorLanguage() {
     return null
 }
 
+function getOaiLanguage() {
+    const storedLanguage = window?.localStorage?.getItem(KEY_OAI_LOCALE)
+    return storedLanguage?.replace(/^"(.*)"$/, '$1') ?? null
+}
+
 function getDefaultLanguage() {
     const storedLanguage = ScriptStorage.get<string>(KEY_LANGUAGE)
-    if (storedLanguage) return standardizeLanguage(storedLanguage)
-
+    const oaiLanguage = getOaiLanguage()
     const browserLanguage = getNavigatorLanguage()
-    if (browserLanguage) return standardizeLanguage(browserLanguage)
 
-    return EN_US.code
+    return standardizeLanguage(storedLanguage)
+        ?? standardizeLanguage(oaiLanguage)
+        ?? standardizeLanguage(browserLanguage)
+        ?? EN_US.code
 }
 
 i18n
