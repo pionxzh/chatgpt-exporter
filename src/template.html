@@ -342,8 +342,25 @@
 
         .conversation {
             margin: 0 auto;
-            max-width: 800px;
             padding: 1rem;
+        }
+
+        @media (min-width: 1280px) {
+            .conversation {
+                max-width: 48rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .conversation {
+                max-width: 40rem;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .conversation {
+                max-width: 48rem;
+            }
         }
 
         .conversation-header {
