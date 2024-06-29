@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.24.4](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.24.3...userscript-v2.24.4) (2024-06-29)
+
+
+### Bug Fixes
+
+* fix missing toggle style ([69d0deb](https://github.com/pionxzh/chatgpt-exporter/commit/69d0debbd1316f6219fc2b863649aaab0269b4fe))
+* improve language detection by respecting oai language setting ([6189cc0](https://github.com/pionxzh/chatgpt-exporter/commit/6189cc065c4242c40af6dab5d431de1361744f3b))
+* let html export's max width adapt to the screen size intead of the fixed 800px ([9249279](https://github.com/pionxzh/chatgpt-exporter/commit/92492792513b7a47e880c521e13ae9161f9528c3)), closes [#247](https://github.com/pionxzh/chatgpt-exporter/issues/247)
+
 ## [2.24.3](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.24.2...userscript-v2.24.3) (2024-06-17)
 
 
