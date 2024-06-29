@@ -16,11 +16,11 @@ export function Toggle({ label, checked = true, onCheckedUpdate }: ToggleProps) 
                 checked={checked}
                 onChange={onCheckedUpdate}
                 data-state={checked ? 'checked' : 'unchecked'}
-                className="bg-gray-200 radix-state-checked:bg-green-600 relative h-[20px] w-[32px] cursor-pointer rounded-full shrink-0"
+                className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-token-text-secondary focus-visible:ring-offset-2 focus-visible:radix-state-checked:ring-black focus-visible:dark:ring-token-main-surface-primary focus-visible:dark:radix-state-checked:ring-green-600 cursor-pointer bg-gray-200 radix-state-checked:bg-black dark:border dark:border-token-border-medium dark:bg-transparent relative shrink-0 rounded-full dark:radix-state-checked:border-green-600 dark:radix-state-checked:bg-green-600 h-[20px] w-[32px]"
             >
                 <span
                     data-state={checked ? 'checked' : 'unchecked'}
-                    className="block h-[16px] w-[16px] rounded-full translate-x-0.5 transition-transform duration-100 will-change-transform radix-state-checked:translate-x-[14px] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.45)]"
+                    className="flex items-center justify-center rounded-full transition-transform duration-100 will-change-transform ltr:translate-x-0.5 rtl:-translate-x-0.5 bg-white h-[16px] w-[16px] ltr:radix-state-checked:translate-x-[14px] rtl:radix-state-checked:translate-x-[-14px]"
                 >
                 </span>
             </Switch>
