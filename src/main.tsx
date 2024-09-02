@@ -32,10 +32,9 @@ function main() {
             const menuExists = profileButtonDiv.contains(container);
 
             if (profileButtonDiv && !menuExists) {
-                profileButtonDiv.appendChild(container);
+                profileButtonDiv.insertBefore(container, profileButtonDiv.firstChild);
 
                 if (menuInjectionInterval) {
-                    // Stop the periodic check once the menu is injected
                     clearInterval(menuInjectionInterval);
                     menuInjectionInterval = null;
                 }
