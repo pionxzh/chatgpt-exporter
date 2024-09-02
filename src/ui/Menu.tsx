@@ -9,7 +9,6 @@ import { exportToMarkdown } from '../exporter/markdown'
 import { exportToText } from '../exporter/text'
 import { useWindowResize } from '../hooks/useWindowResize'
 import { getHistoryDisabled } from '../page'
-import { Divider } from './Divider'
 import { ExportDialog } from './ExportDialog'
 import { FileCode, IconArrowRightFromBracket, IconCamera, IconCopy, IconJSON, IconMarkdown, IconSetting, IconZip } from './Icons'
 import { MenuItem } from './MenuItem'
@@ -222,7 +221,6 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                     </HoverCard.Content>
                 </Portal>
             </HoverCard.Root>
-            <Divider />
         </>
     )
 }
