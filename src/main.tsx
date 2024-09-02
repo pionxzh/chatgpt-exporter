@@ -12,26 +12,51 @@ main()
 
 function main() {
     onloadSafe(() => {
-        const container = document.createElement('div')
-        // to overlap on the list section
-        container.style.zIndex = '20'
-        render(<Menu container={container} />, container)
+        const container = document.createElement("div");
+        container.style.zIndex = "20";
+        D$4(/* @__PURE__ */ o$8(Menu, { container }), container);
 
-        const styleEl = document.createElement('style')
-        styleEl.id = 'sentinel-css'
-        document.head.append(styleEl)
+        const styleEl = document.createElement("style");
+        styleEl.id = "sentinel-css";
+        document.head.append(styleEl);
 
-        sentinel.on('nav', (nav) => {
-            const chatList = document.querySelector('nav > div.overflow-y-auto, nav > div.overflow-y-hidden')
-            if (chatList) {
-                chatList.after(container)
+        // Variable to store the interval ID
+        let menuInjectionInterval = null;
+
+        
+        /** Inject menu to the right of the profile button */
+        function injectMenu() {
+            const headerDiv = document.querySelector('div[class^="sticky top-0 p-3 mb-1.5 flex items-center justify-between"]');
+            if (!headerDiv) return;
+
+            const profileButtonDiv = headerDiv.querySelector('div[class^="flex items-center gap-2 pr-1 leading-[0]"]');
+            const menuExists = profileButtonDiv.contains(container);
+
+            if (profileButtonDiv && !menuExists) {
+                profileButtonDiv.appendChild(container);
+
+                if (menuInjectionInterval) {
+                    // Stop the periodic check once the menu is injected
+                    clearInterval(menuInjectionInterval);
+                    menuInjectionInterval = null;
+                }
             }
-            else {
-                // fallback to the bottom of the nav
-                nav.append(container)
-            }
-        })
+        }
 
+        // Initial injection
+        injectMenu();
+
+        // Watch for changes using sentinel
+        sentinel.on('div[class^="sticky top-0 p-3 mb-1.5 flex items-center justify-between"]', () => {
+            injectMenu();
+        });
+
+        // Start the periodic check using setInterval
+        menuInjectionInterval = setInterval(() => {
+            injectMenu();
+        }, 500);
+          
+          
         // Support for share page
         if (isSharePage()) {
             const continueUrl = `${location.href}/continue`
