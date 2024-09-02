@@ -14,7 +14,7 @@ function main() {
     onloadSafe(() => {
         const container = document.createElement("div");
         container.style.zIndex = "20";
-        D$4(/* @__PURE__ */ o$8(Menu, { container }), container);
+        (Menu, { container }), container);
 
         const styleEl = document.createElement("style");
         styleEl.id = "sentinel-css";
@@ -23,7 +23,6 @@ function main() {
         // Variable to store the interval ID
         let menuInjectionInterval = null;
 
-        
         /** Inject menu to the right of the profile button */
         function injectMenu() {
             const headerDiv = document.querySelector('div[class^="sticky top-0 p-3 mb-1.5 flex items-center justify-between"]');
@@ -55,8 +54,7 @@ function main() {
         menuInjectionInterval = setInterval(() => {
             injectMenu();
         }, 500);
-          
-          
+
         // Support for share page
         if (isSharePage()) {
             const continueUrl = `${location.href}/continue`
