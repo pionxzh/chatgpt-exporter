@@ -1,6 +1,6 @@
 import urlcat from 'urlcat'
 import { apiUrl, baseUrl } from './constants'
-import { getChatIdFromUrl, getConversationFromSharePage, isSharePage } from './page'
+import { getChatIdFromUrl, getConversationFromSharePage, getPageAccessToken, isSharePage } from './page'
 import { blobToDataURL } from './utils/dom'
 import { memorize } from './utils/memorize'
 
@@ -450,6 +450,9 @@ async function _fetchSession(): Promise<ApiSession> {
 const fetchSession = memorize(_fetchSession)
 
 async function getAccessToken(): Promise<string> {
+    const pageAccessToken = getPageAccessToken()
+    if (pageAccessToken) return pageAccessToken
+
     const session = await fetchSession()
     return session.accessToken
 }

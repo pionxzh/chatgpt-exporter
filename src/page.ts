@@ -39,6 +39,34 @@ declare global {
                 }
             }
         }
+        __remixContext: {
+            basename: string
+            future: {}
+            state: {
+                loaderData: {
+                    root: {
+                        clientBootstrap: {
+                            accountStatus: null
+                            session: {
+                                accessToken: string
+                                authProvider: string
+                                expires: string
+                                user: {
+                                    email: string
+                                    group: unknown[]
+                                    id: string
+                                    image: string
+                                    intercom_hash: string
+                                    mfa: boolean
+                                    name: string
+                                    picture: string
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -46,8 +74,12 @@ export function getHistoryDisabled(): boolean {
     return localStorage.getItem(KEY_OAI_HISTORY_DISABLED) === '"true"'
 }
 
+export function getPageAccessToken(): string | null {
+    return unsafeWindow?.__remixContext?.state?.loaderData?.root?.clientBootstrap?.session?.accessToken ?? null
+}
+
 function getUserProfile() {
-    const user = unsafeWindow?.__NEXT_DATA__?.props?.pageProps?.user
+    const user = unsafeWindow?.__NEXT_DATA__?.props?.pageProps?.user ?? unsafeWindow?.__remixContext?.state?.loaderData?.root?.clientBootstrap?.session?.user
     if (!user) throw new Error('No user found.')
     return user
 }
