@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.24.4
+// @version            2.24.5
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -1050,9 +1050,13 @@ html {
   function getHistoryDisabled() {
     return localStorage.getItem(KEY_OAI_HISTORY_DISABLED) === '"true"';
   }
+  function getPageAccessToken() {
+    var _a, _b, _c, _d, _e, _f;
+    return ((_f = (_e = (_d = (_c = (_b = (_a = _unsafeWindow == null ? void 0 : _unsafeWindow.__remixContext) == null ? void 0 : _a.state) == null ? void 0 : _b.loaderData) == null ? void 0 : _c.root) == null ? void 0 : _d.clientBootstrap) == null ? void 0 : _e.session) == null ? void 0 : _f.accessToken) ?? null;
+  }
   function getUserProfile() {
-    var _a, _b, _c;
-    const user = (_c = (_b = (_a = _unsafeWindow == null ? void 0 : _unsafeWindow.__NEXT_DATA__) == null ? void 0 : _a.props) == null ? void 0 : _b.pageProps) == null ? void 0 : _c.user;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i;
+    const user = ((_c = (_b = (_a = _unsafeWindow == null ? void 0 : _unsafeWindow.__NEXT_DATA__) == null ? void 0 : _a.props) == null ? void 0 : _b.pageProps) == null ? void 0 : _c.user) ?? ((_i = (_h = (_g = (_f = (_e = (_d = _unsafeWindow == null ? void 0 : _unsafeWindow.__remixContext) == null ? void 0 : _d.state) == null ? void 0 : _e.loaderData) == null ? void 0 : _f.root) == null ? void 0 : _g.clientBootstrap) == null ? void 0 : _h.session) == null ? void 0 : _i.user);
     if (!user) throw new Error("No user found.");
     return user;
   }
@@ -1065,9 +1069,12 @@ html {
     return location.pathname.startsWith("/share") && !location.pathname.endsWith("/continue");
   }
   function getConversationFromSharePage() {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i;
     if ((_d = (_c = (_b = (_a = window.__NEXT_DATA__) == null ? void 0 : _a.props) == null ? void 0 : _b.pageProps) == null ? void 0 : _c.serverResponse) == null ? void 0 : _d.data) {
       return JSON.parse(JSON.stringify(window.__NEXT_DATA__.props.pageProps.serverResponse.data));
+    }
+    if ((_i = (_h = (_g = (_f = (_e = window.__remixContext) == null ? void 0 : _e.state) == null ? void 0 : _f.loaderData) == null ? void 0 : _g["routes/share.$shareId.($action)"]) == null ? void 0 : _h.serverResponse) == null ? void 0 : _i.data) {
+      return JSON.parse(JSON.stringify(window.__remixContext.state.loaderData["routes/share.$shareId.($action)"].serverResponse.data));
     }
     return null;
   }
@@ -1249,6 +1256,8 @@ html {
   }
   const fetchSession = memorize(_fetchSession);
   async function getAccessToken() {
+    const pageAccessToken = getPageAccessToken();
+    if (pageAccessToken) return pageAccessToken;
     const session = await fetchSession();
     return session.accessToken;
   }
@@ -22719,14 +22728,15 @@ ${content2}`;
   main();
   function main() {
     onloadSafe(() => {
-      const container = document.createElement("div");
-      container.style.zIndex = "20";
-      D$4(/* @__PURE__ */ o$8(Menu, { container }), container);
       const styleEl = document.createElement("style");
       styleEl.id = "sentinel-css";
       document.head.append(styleEl);
+      const injectionWeakMap = /* @__PURE__ */ new WeakMap();
       sentinel.on("nav", (nav) => {
-        const chatList = document.querySelector("nav > div.overflow-y-auto, nav > div.overflow-y-hidden");
+        if (injectionWeakMap.has(nav)) return;
+        injectionWeakMap.set(nav, true);
+        const container = getMenuContainer();
+        const chatList = nav.querySelector(":scope > div.overflow-y-auto, :scope > div.overflow-y-hidden");
         if (chatList) {
           chatList.after(container);
         } else {
@@ -22734,9 +22744,8 @@ ${content2}`;
         }
       });
       if (isSharePage()) {
-        const continueUrl = `${location.href}/continue`;
-        sentinel.on(`a[href="${continueUrl}"]`, (link2) => {
-          link2.after(container);
+        sentinel.on(`div[role="presentation"] > .w-full > div >.flex.w-full`, (target) => {
+          target.prepend(getMenuContainer());
         });
       }
       let chatId = "";
@@ -22768,6 +22777,12 @@ ${content2}`;
         });
       });
     });
+  }
+  function getMenuContainer() {
+    const container = document.createElement("div");
+    container.style.zIndex = "20";
+    D$4(/* @__PURE__ */ o$8(Menu, { container }), container);
+    return container;
   }
 
 })(JSZip, html2canvas);
