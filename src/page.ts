@@ -64,6 +64,12 @@ declare global {
                             }
                         }
                     }
+                    'routes/share.$shareId.($action)': {
+                        serverResponse: {
+                            type: 'data'
+                            data: any // Basically ApiConversation
+                        }
+                    }
                 }
             }
         }
@@ -103,6 +109,9 @@ export function getConversationFromSharePage() {
         // Next.js or OpenAI started to freeze some objects, so we do a
         // deep copy here to avoid polluting the original object
         return JSON.parse(JSON.stringify(window.__NEXT_DATA__.props.pageProps.serverResponse.data))
+    }
+    if (window.__remixContext?.state?.loaderData?.['routes/share.$shareId.($action)']?.serverResponse?.data) {
+        return JSON.parse(JSON.stringify(window.__remixContext.state.loaderData['routes/share.$shareId.($action)'].serverResponse.data))
     }
     return null
 }
