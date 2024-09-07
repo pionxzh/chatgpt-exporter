@@ -12,17 +12,18 @@ main()
 
 function main() {
     onloadSafe(() => {
-        const container = document.createElement('div')
-        // to overlap on the list section
-        container.style.zIndex = '20'
-        render(<Menu container={container} />, container)
-
         const styleEl = document.createElement('style')
         styleEl.id = 'sentinel-css'
         document.head.append(styleEl)
 
+        const injectionWeakMap = new WeakMap()
+
         sentinel.on('nav', (nav) => {
-            const chatList = document.querySelector('nav > div.overflow-y-auto, nav > div.overflow-y-hidden')
+            if (injectionWeakMap.has(nav)) return
+            injectionWeakMap.set(nav, true)
+
+            const container = getMenuContainer()
+            const chatList = nav.querySelector(':scope > div.overflow-y-auto, :scope > div.overflow-y-hidden')
             if (chatList) {
                 chatList.after(container)
             }
@@ -34,9 +35,8 @@ function main() {
 
         // Support for share page
         if (isSharePage()) {
-            const continueUrl = `${location.href}/continue`
-            sentinel.on(`a[href="${continueUrl}"]`, (link) => {
-                link.after(container)
+            sentinel.on(`div[role="presentation"] > .w-full > div >.flex.w-full`, (target) => {
+                target.prepend(getMenuContainer())
             })
         }
 
@@ -75,4 +75,12 @@ function main() {
             })
         })
     })
+}
+
+function getMenuContainer() {
+    const container = document.createElement('div')
+    // to overlap on the list section
+    container.style.zIndex = '20'
+    render(<Menu container={container} />, container)
+    return container
 }
