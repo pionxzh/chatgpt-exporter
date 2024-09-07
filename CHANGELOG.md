@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.24.5](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.24.4...userscript-v2.24.5) (2024-09-07)
+
+
+### Bug Fixes
+
+* adapt remix version and try to reduce call to session api ([950c8fc](https://github.com/pionxzh/chatgpt-exporter/commit/950c8fc7cf8c9c626ace90bee4a82b482c42a40c))
+* fix the script not working on share page ([64849a6](https://github.com/pionxzh/chatgpt-exporter/commit/64849a63161571316e54a3eb3034130b9a3ab736))
+* improve menu injection ([542c23d](https://github.com/pionxzh/chatgpt-exporter/commit/542c23da68672af507d8b17b8a5c452b33690cee))
+
 ## [2.24.4](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.24.3...userscript-v2.24.4) (2024-06-29)
 
 
