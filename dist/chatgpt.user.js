@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.24.5
+// @version            2.24.6
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -20903,6 +20903,7 @@ ${content2.text}
     downloadFile("chatgpt-export.zip", "application/zip", blob);
     return true;
   }
+  const LatexRegex$1 = /(\s\$\$.+\$\$\s|\s\$.+\$\s|\\\[.+\\\]|\\\(.+\\\))|(^\$$[\S\s]+^\$$)|(^\$\$[\S\s]+^\$\$$)/gm;
   function conversationToMarkdown(conversation, metaList) {
     const { id, title: title2, model, modelSlug, createTime, updateTime, conversationNodes } = conversation;
     const source = `${baseUrl}/c/${id}`;
@@ -20942,17 +20943,29 @@ ${_metaList.join("\n")}
 `;
       }
       const author = transformAuthor$1(message.author);
-      let postSteps = [];
+      const postSteps = [];
       if (message.author.role === "assistant") {
-        postSteps = [...postSteps, (input) => transformFootNotes$1(input, message.metadata)];
+        postSteps.push((input) => transformFootNotes$1(input, message.metadata));
       }
       if (message.author.role === "assistant") {
-        postSteps = [...postSteps, (input) => {
-          if (!/```/.test(input)) {
-            input = input.replace(/^\\\[(.+)\\\]$/gm, "$$$$$1$$$$").replace(/\\\[/g, "$").replace(/\\\]/g, "$").replace(/\\\(/g, "$").replace(/\\\)/g, "$");
+        postSteps.push((input) => {
+          input = input.replace(/^\\\[(.+)\\\]$/gm, "$$$$$1$$$$").replace(/\\\[/g, "$").replace(/\\\]/g, "$").replace(/\\\(/g, "$").replace(/\\\)/g, "$");
+          const matches = input.match(LatexRegex$1);
+          const isCodeBlock = /```/.test(input);
+          if (!isCodeBlock && matches) {
+            let index2 = 0;
+            input = input.replace(LatexRegex$1, () => {
+              return `╬${index2++}╬`;
+            });
           }
-          return toMarkdown(fromMarkdown(input));
-        }];
+          let transformed = toMarkdown(fromMarkdown(input));
+          if (!isCodeBlock && matches) {
+            transformed = transformed.replace(/╬(\d+)╬/g, (_24, index2) => {
+              return matches[+index2];
+            });
+          }
+          return transformed;
+        });
       }
       const postProcess = (input) => postSteps.reduce((acc, fn2) => fn2(acc), input);
       const content22 = transformContent$1(message.content, message.metadata, postProcess);
@@ -21065,6 +21078,7 @@ ${content2.text}
     copyToClipboard(standardizeLineBreaks(text2));
     return true;
   }
+  const LatexRegex = /(\s\$\$.+\$\$\s|\s\$.+\$\s|\\\[.+\\\]|\\\(.+\\\))|(^\$$[\S\s]+^\$$)|(^\$\$[\S\s]+^\$\$$)/gm;
   function transformMessage(message) {
     var _a, _b, _c;
     if (!message || !message.content) return null;
@@ -21080,11 +21094,23 @@ ${content2.text}
     }
     const author = transformAuthor(message.author);
     let content2 = transformContent(message.content, message.metadata);
+    const matches = content2.match(LatexRegex);
+    if (matches) {
+      let index2 = 0;
+      content2 = content2.replace(LatexRegex, () => {
+        return `╬${index2++}╬`;
+      });
+    }
     if (message.author.role === "assistant") {
       content2 = transformFootNotes(content2, message.metadata);
     }
     if (message.author.role === "assistant" && content2) {
       content2 = reformatContent(content2);
+    }
+    if (matches) {
+      content2 = content2.replace(/╬(\d+)╬/g, (_24, index2) => {
+        return matches[+index2];
+      });
     }
     return `${author}:
 ${content2}`;
