@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.24.6](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.24.5...userscript-v2.24.6) (2024-09-08)
+
+
+### Bug Fixes
+
+* fix unexpected latex formula escape ([30f0b62](https://github.com/pionxzh/chatgpt-exporter/commit/30f0b623b306aff6ec5a2278207cf2481a609b85))
+
 ## [2.24.5](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.24.4...userscript-v2.24.5) (2024-09-07)
 
 
