@@ -1,7 +1,7 @@
 {
   "title": "ChatGPT Exporter",
   "ExportHelper": "Export",
-  "Setting": "Setting",
+  "Setting": "Параметры",
   "Language": "Язык",
   "Copy Text": "Копировать текст",
   "Copied!": "Скопировано!",
@@ -29,7 +29,7 @@
   "Conversation Timestamp Description": "Будет отображаться на странице.",
   "Enable on HTML": "Включить для HTML-файлов",
   "Enable on Markdown": "Включить для файлов Markdown",
-  "Use 24-hour format": "Используйте 24-часовой формат (например, 23:59)",
+  "Use 24-hour format": "Использовать 24-часовой формат (например, 23:59)",
   "Export Format": "Формат экспорта",
   "Export Metadata": "Экспорт метаданных",
   "Export Metadata Description": "Добавляйте метаданные в экспортированные файлы Markdown и HTML.",
