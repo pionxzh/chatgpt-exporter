@@ -5,6 +5,7 @@ import en_US from './locales/en.json'
 import es from './locales/es.json'
 import id_ID from './locales/id.json'
 import ja_JP from './locales/jp.json'
+import ru from './locales/ru.json'
 import tr_TR from './locales/tr.json'
 import zh_Hans from './locales/zh-Hans.json'
 import zh_Hant from './locales/zh-Hant.json'
@@ -48,6 +49,12 @@ const JA_JP = {
     resource: ja_JP,
 }
 
+const RU = {
+    name: 'Русский',
+    code: 'ru',
+    resource: ru,
+}
+
 const TR_TR = {
     name: 'Türkçe',
     code: 'tr-TR',
@@ -71,6 +78,7 @@ export const LOCALES: Locale[] = [
     ES,
     ID_ID,
     JA_JP,
+    RU,
     TR_TR,
     ZH_Hans,
     ZH_Hant,
@@ -93,6 +101,9 @@ const LanguageMapping: Record<string, string> = {
 
     'ja': JA_JP.code,
     'ja-JP': JA_JP.code,
+
+    'ru': RU.code,
+    'ru-RU': RU.code,
 
     'tr': TR_TR.code,
     'tr-TR': TR_TR.code,
