@@ -16,13 +16,14 @@ function main() {
         styleEl.id = 'sentinel-css'
         document.head.append(styleEl)
 
-        const injectionWeakMap = new WeakMap()
+        const injectionMap = new Map<HTMLElement, HTMLElement>()
 
-        sentinel.on('nav', (nav) => {
-            if (injectionWeakMap.has(nav)) return
-            injectionWeakMap.set(nav, true)
+        const injectNavMenu = (nav: HTMLElement) => {
+            if (injectionMap.has(nav)) return
 
             const container = getMenuContainer()
+            injectionMap.set(nav, container)
+
             const chatList = nav.querySelector(':scope > div.overflow-y-auto, :scope > div.overflow-y-hidden')
             if (chatList) {
                 chatList.after(container)
@@ -31,7 +32,21 @@ function main() {
                 // fallback to the bottom of the nav
                 nav.append(container)
             }
-        })
+        }
+
+        sentinel.on('nav', injectNavMenu)
+
+        setInterval(() => {
+            injectionMap.forEach((container, nav) => {
+                if (!nav.isConnected) {
+                    container.remove()
+                    injectionMap.delete(nav)
+                }
+            })
+
+            const navList = Array.from(document.querySelectorAll('nav')).filter(nav => !injectionMap.has(nav))
+            navList.forEach(injectNavMenu)
+        }, 300)
 
         // Support for share page
         if (isSharePage()) {
