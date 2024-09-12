@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.25.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.24.6...userscript-v2.25.0) (2024-09-12)
+
+
+### Features
+
+* add russian lang support ([#255](https://github.com/pionxzh/chatgpt-exporter/issues/255)) ([2562d4a](https://github.com/pionxzh/chatgpt-exporter/commit/2562d4a36042d025f3d7fc1190618461fa0127ae))
+
+
+### Bug Fixes
+
+* handle hydration missing menu and style ([bf687da](https://github.com/pionxzh/chatgpt-exporter/commit/bf687da24ca62cb4146aac4aa7e4482c51ca5aa4))
+
 ## [2.24.6](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.24.5...userscript-v2.24.6) (2024-09-08)
 
 
