@@ -315,15 +315,19 @@ async function fetchImageFromPointer(uri: string) {
 }
 
 /** replaces `file-service://` pointers with data uris containing the image */
+/** avoid errors in parsing multimodal parts we don't understand */
 async function replaceImageAssets(conversation: ApiConversation): Promise<void> {
-    const isMultiModalInputImage = (part: string | MultiModalInputImage): part is MultiModalInputImage => {
-        return typeof part !== 'string' && part.asset_pointer.startsWith('file-service://')
+    const isMultiModalInputImage = (part: any): part is MultiModalInputImage => {
+        return typeof part === 'object' && part !== null && 'asset_pointer' in part &&
+               typeof part.asset_pointer === 'string' && part.asset_pointer.startsWith('file-service://')
     }
+
     const imageAssets = Object.values(conversation.mapping).flatMap((node) => {
         if (!node.message) return []
         if (node.message.content.content_type !== 'multimodal_text') return []
 
-        return node.message.content.parts.filter(isMultiModalInputImage)
+        return (Array.isArray(node.message.content.parts) ? node.message.content.parts : [])
+            .filter(isMultiModalInputImage)
     })
 
     const executionOutputs = Object.values(conversation.mapping).flatMap((node) => {
