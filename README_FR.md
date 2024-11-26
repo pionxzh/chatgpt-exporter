@@ -2,7 +2,7 @@
 
 <div align="center">
 
-## A GreasyFork script to export the chat history of [ChatGPT](https://chatgpt.com/)
+## Un script GreasyFork pour exporter l'historique de chat de [ChatGPT](https://chatgpt.com/)
 
 [![license][license-image]][license-url]
 [![release][release-image]][release-url]
@@ -15,69 +15,71 @@
 [GreasyFork-image]: https://img.shields.io/static/v1?label=%20&message=GreasyFork&style=flat-square&labelColor=7B0000&color=960000&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3ggEBCQHM3fXsAAAAVdJREFUOMudkz2qwkAUhc/goBaGJBgUtBCZyj0ILkpwAW7Bws4yO3AHLiCtEFD8KVREkoiFxZzX5A2KGfN4F04zMN+ce+5c4LMUgDmANYBnrnV+plBSi+FwyHq9TgA2LQpvCiEiABwMBtzv95RSfoNEHy8DYBzHrNVqVEr9BWKcqNFoxF6vx3a7zc1mYyC73a4MogBg7vs+z+czO50OW60Wt9stK5UKp9Mpj8cjq9WqDTBHnjAdxzGQZrPJw+HA31oulzbAWgLoA0CWZVBKIY5jzGYzdLtdE9DlcrFNrY98zobqOA6TJKHW2jg4nU5sNBpFDp6mhVe5rsvVasUwDHm9Xqm15u12o+/7Hy0gD8KatOd5vN/v1FozTVN6nkchxFuI6hsAAIMg4OPxMJCXdtTbR7JJCMEgCJhlGUlyPB4XfumozInrupxMJpRSRtZlKoNYl+m/6/wDuWAjtPfsQuwAAAAASUVORK5CYII=
 [GreasyFork-url]: https://greasyfork.org/scripts/456055-chatgpt-exporter
 
-English &nbsp;&nbsp;|&nbsp;&nbsp; [Français](./README_FR.md) &nbsp;&nbsp;|&nbsp;&nbsp; [Indonesia](./README_ID.md) &nbsp;&nbsp;|&nbsp;&nbsp; [한국어](./README_KR.md) &nbsp;&nbsp;|&nbsp;&nbsp; [Türkçe](./README_TR.md)
+[English](./README.md) &nbsp;&nbsp;|&nbsp;&nbsp; Français &nbsp;&nbsp;|&nbsp;&nbsp; [Indonesia](./README_ID.md) &nbsp;&nbsp;|&nbsp;&nbsp; [한국어](./README_KR.md) &nbsp;&nbsp;|&nbsp;&nbsp; [Türkçe](./README_TR.md)
 
 ![image](https://github.com/pionxzh/chatgpt-exporter/assets/9910706/1c864670-7912-4484-b4be-bdf5dde51557)
 
-## Install
+## Installation
 
-### Prerequisites
+### Prérequis
 
-<align>Install <b>`Tampermonkey`</b></align>
+<align>Installez <b>`Tampermonkey`</b></align>
 
-[<img src="https://user-images.githubusercontent.com/3750161/214147732-c75e96a4-48a4-4b64-b407-c2402e899a75.PNG" height="60" alt="Chrome" valign="middle">][link-chrome] &nbsp;&nbsp; [<img src="https://user-images.githubusercontent.com/3750161/214148610-acdef778-753e-470e-8765-6cc97bca85ed.png" height="60" alt="Firefox" valign="middle">][link-firefox] &nbsp;&nbsp; [<img src="https://user-images.githubusercontent.com/3750161/233201810-d1026855-0482-44c8-b1ec-c7247134473e.png" height="60" alt="Chrome" valign="middle">][link-edge]
+[<img src="https://user-images.githubusercontent.com/3750161/214147732-c75e96a4-48a4-4b64-b407-c2402e899a75.PNG" height="60" alt="Chrome" valign="middle">][link-chrome] &nbsp;&nbsp; [<img src="https://user-images.githubusercontent.com/3750161/214148610-acdef778-753e-470e-8765-6cc97bca85ed.png" height="60" alt="Firefox" valign="middle">][link-firefox] &nbsp;&nbsp; [<img src="https://user-images.githubusercontent.com/3750161/233201810-d1026855-0482-44c8-b1ec-c7247134473e.png" height="60" alt="Edge" valign="middle">][link-edge]
 
 [link-chrome]: https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo 'Chrome Web Store'
-[link-firefox]: https://addons.mozilla.org/firefox/addon/tampermonkey 'Firefox Add-ons'
-[link-edge]: https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd 'Edge Add-ons'
+[link-firefox]: https://addons.mozilla.org/firefox/addon/tampermonkey 'Modules Firefox'
+[link-edge]: https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd 'Modules Edge'
 
-### UserScript
+### Script Utilisateur
 
-| Greasyfork                                                                        | GitHub                                                                                       |
+| Greasyfork | GitHub |
 | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| [![Install][Install-1-image]][install-1-url] | [![Install][Install-2-image]][install-2-url] |
+| [![Installer][Install-1-image]][install-1-url] | [![Installer][Install-2-image]][install-2-url] |
 
-[Install-1-image]: https://img.shields.io/badge/-Install-blue
+[Install-1-image]: https://img.shields.io/badge/-Installer-blue
 [Install-1-url]: https://greasyfork.org/scripts/456055-chatgpt-exporter
-[Install-2-image]: https://img.shields.io/badge/-Install-blue
+[Install-2-image]: https://img.shields.io/badge/-Installer-blue
 [Install-2-url]: https://raw.githubusercontent.com/pionxzh/chatgpt-exporter/master/dist/chatgpt.user.js
 
 #
 
-[📚 Supported Formats](#-supported-formats) &nbsp;&nbsp;|&nbsp;&nbsp; [💡 Example](#-example) &nbsp;&nbsp;|&nbsp;&nbsp; [📤 Export Multiple Conversations](#-export-multiple-conversations) &nbsp;&nbsp;|&nbsp;&nbsp; [🤝 Contribution](#-contribution) &nbsp;&nbsp;|&nbsp;&nbsp; [⭐ Star History](#-star-history)
+[📚 Formats Supportés](#-formats-supportés) &nbsp;&nbsp;|&nbsp;&nbsp; [💡 Exemple](#-exemple) &nbsp;&nbsp;|&nbsp;&nbsp; [📤 Exporter Plusieurs Conversations](#-exporter-plusieurs-conversations) &nbsp;&nbsp;|&nbsp;&nbsp; [🤝 Contribution](#-contribution) &nbsp;&nbsp;|&nbsp;&nbsp; [⭐ Historique des Étoiles](#-historique-des-étoiles)
 
 </div>
 
 #
 
-## 📚 Supported Formats
+## 📚 Formats Supportés
 
-- [Text](#text)
+- [Texte](#texte)
 - [HTML](#html)
 - [Markdown](#markdown)
-- [PNG](#screenshot)
+- [PNG](#capture-décran)
 - [JSON](#json)
 
-## 💡 Example
+## 💡 Exemple
 
-### Text
+### Texte
 
 ```
-You:
-I'm creating a ChatGPT Exporter. What do you think?
+Vous :
+Je crée un ChatGPT Exporter. Qu'en pensez-vous ?
 
-ChatGPT:
-It sounds like you're planning on creating a tool that uses the ChatGPT model
-to export text. ChatGPT is a large language model trained by OpenAI that is
-designed to generate human-like text responses based on a given input. It can
-be used for a variety of applications, such as chatbots, automated responses
-to customer inquiries, and more.
+ChatGPT :
+On dirait que vous prévoyez de créer un outil qui utilise le modèle ChatGPT
+pour exporter du texte. ChatGPT est un grand modèle de langage entraîné par
+OpenAI qui est conçu pour générer des réponses textuelles semblables à des
+réponses humaines à partir d'une entrée donnée. Il peut être utilisé pour
+diverses applications, telles que des chatbots, des réponses automatisées
+aux demandes des clients, et plus encore.
 
-However, please keep in mind that as a large language model, ChatGPT has not
-been specifically trained for any specific task, so the quality of the
-generated text will depend on how it is used and the context in which it is
-applied. It's important to use ChatGPT responsibly and consider the potential
-consequences of using it in any given situation.
+Cependant, gardez à l'esprit qu'en tant que grand modèle de langage, ChatGPT
+n'a pas été spécifiquement entraîné pour une tâche précise, la qualité du
+texte généré dépendra donc de son utilisation et du contexte dans lequel
+il est appliqué. Il est important d'utiliser ChatGPT de manière responsable
+et de considérer les conséquences potentielles de son utilisation dans
+n'importe quelle situation.
 ```
 
 ### HTML
@@ -92,21 +94,21 @@ consequences of using it in any given situation.
 
 ```
 ---
-title: ChatGPT Exporter Creation
-source: https://chat.openai.com/c/cf3f8850-1d69-43c8-b99b-affd0de4e76f
-author: ChatGPT
+titre : Création de ChatGPT Exporter
+source : https://chat.openai.com/c/cf3f8850-1d69-43c8-b99b-affd0de4e76f
+auteur : ChatGPT
 ---
 
-# ChatGPT Exporter Creation
+# Création de ChatGPT Exporter
 
-#### You:
-I'm creating a ChatGPT Exporter. What do you think?
+#### Vous :
+Je crée un ChatGPT Exporter. Qu'en pensez-vous ?
 
-#### ChatGPT:
-It sounds like you're planning on creating a tool that uses the ChatGPT model to export text. ChatGPT is a large language model trained by OpenAI that is designed to generate human-like text responses based on a given input. It can be used for a variety of applications, such as chatbots, automated responses to customer inquiries, and more.
+#### ChatGPT :
+On dirait que vous prévoyez de créer un outil qui utilise le modèle ChatGPT pour exporter du texte. ChatGPT est un grand modèle de langage entraîné par OpenAI qui est conçu pour générer des réponses textuelles semblables à des réponses humaines à partir d'une entrée donnée.
 ```
 
-### Screenshot
+### Capture d'écran
 
 <div align="center">
 <img width="480" src="https://user-images.githubusercontent.com/9910706/205663680-6ac97fac-39b0-495c-bee4-8ef37713a9ae.png" />
@@ -115,10 +117,10 @@ It sounds like you're planning on creating a tool that uses the ChatGPT model to
 
 ### JSON
 
-the raw content from API `https://chat.openai.com/backend-api/conversation/[id]`
+Le contenu brut de l'API `https://chat.openai.com/backend-api/conversation/[id]`
 
 <details>
-<summary>Click to see</summary>
+<summary>Cliquez pour voir</summary>
 
 ```json
 {
@@ -219,39 +221,39 @@ the raw content from API `https://chat.openai.com/backend-api/conversation/[id]`
 ```
 </details>
 
-## 📤 Export Multiple Conversations
+## 📤 Exporter Plusieurs Conversations
 
-When you click the "Export All" button, the **Export Conversations** dialog pops up. Here are the functions you can access.
+Lorsque vous cliquez sur le bouton "Tout Exporter", la boîte de dialogue **Exporter les Conversations** s'ouvre. Voici les fonctions accessibles.
 
-**Export from official export file (conversations.json)**
+**Exporter depuis un fichier d'export officiel (conversations.json)**
 
-Click the upload icon button to upload a JSON file of conversations, such as one downloaded from OpenAI.
+Cliquez sur le bouton d'icône de téléchargement pour télécharger un fichier JSON de conversations, tel que celui téléchargé depuis OpenAI.
 
-**Export from API**
+**Exporter depuis l'API**
 
-In the list of all your conversations, select which conversations you want to export. Check the "Select All" checkbox to export all your conversations.
+Dans la liste de toutes vos conversations, sélectionnez celles que vous souhaitez exporter. Cochez la case "Tout Sélectionner" pour exporter toutes vos conversations.
 
-Select your export format from the dropdown on the bottom left. You can choose from the following formats.
+Sélectionnez votre format d'exportation dans le menu déroulant en bas à gauche. Vous pouvez choisir parmi les formats suivants :
 
 - **Markdown**
 - **HTML**
 - **JSON**
 - **JSON (ZIP)**
 
-Click the button to perform the action you want.
+Cliquez sur le bouton pour effectuer l'action souhaitée.
 
-- **Archive** -  Archived chat sessions will disappear from the sidebar and can be managed in ChatGPT settings. See [#199](https://github.com/pionxzh/chatgpt-exporter/issues/199) for more details.
-- **Delete** - Deletes the selected conversations.
-- **Export** - Exports the selected conversations in the format chosen using the format selector.
+- **Archiver** - Les sessions de chat archivées disparaîtront de la barre latérale et pourront être gérées dans les paramètres de ChatGPT. Voir [#199](https://github.com/pionxzh/chatgpt-exporter/issues/199) pour plus de détails.
+- **Supprimer** - Supprime les conversations sélectionnées.
+- **Exporter** - Exporte les conversations sélectionnées dans le format choisi à l'aide du sélecteur de format.
 
 ## 🤝 Contribution
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md)
+Voir [CONTRIBUTING.md](./CONTRIBUTING.md)
 
-## ⭐ Star History
+## ⭐ Historique des Étoiles
 
 <div align="center">
 
-<img src="https://api.star-history.com/svg?repos=pionxzh/chatgpt-exporter&type=Date" width="600" height="400" alt="Star History Chart" valign="middle">
+<img src="https://api.star-history.com/svg?repos=pionxzh/chatgpt-exporter&type=Date" width="600" height="400" alt="Graphique de l'historique des étoiles" valign="middle">
 
 </div>
