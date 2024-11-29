@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.25.0
+// @version            2.26.0
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -1142,12 +1142,12 @@ html {
   }
   async function replaceImageAssets(conversation) {
     const isMultiModalInputImage = (part) => {
-      return typeof part !== "string" && part.asset_pointer.startsWith("file-service://");
+      return typeof part === "object" && part !== null && "asset_pointer" in part && typeof part.asset_pointer === "string" && part.asset_pointer.startsWith("file-service://");
     };
     const imageAssets = Object.values(conversation.mapping).flatMap((node2) => {
       if (!node2.message) return [];
       if (node2.message.content.content_type !== "multimodal_text") return [];
-      return node2.message.content.parts.filter(isMultiModalInputImage);
+      return (Array.isArray(node2.message.content.parts) ? node2.message.content.parts : []).filter(isMultiModalInputImage);
     });
     const executionOutputs = Object.values(conversation.mapping).flatMap((node2) => {
       var _a, _b;
@@ -7993,38 +7993,38 @@ html {
   instance.hasLoadedNamespace;
   instance.loadNamespaces;
   instance.loadLanguages;
-  const title$7 = "ChatGPT Exporter";
-  const ExportHelper$7 = "Export";
-  const Setting$7 = "Setting";
-  const Language$7 = "Language";
-  const Screenshot$7 = "Screenshot";
-  const Markdown$7 = "Markdown";
-  const HTML$7 = "HTML";
-  const Archive$7 = "Archive";
-  const Save$7 = "Save";
-  const Delete$7 = "Delete";
-  const Export$7 = "Export";
-  const Loading$7 = "Loading";
-  const Preview$7 = "Preview";
+  const title$8 = "ChatGPT Exporter";
+  const ExportHelper$8 = "Export";
+  const Setting$8 = "Setting";
+  const Language$8 = "Language";
+  const Screenshot$8 = "Screenshot";
+  const Markdown$8 = "Markdown";
+  const HTML$8 = "HTML";
+  const Archive$8 = "Archive";
+  const Save$8 = "Save";
+  const Delete$8 = "Delete";
+  const Export$8 = "Export";
+  const Loading$8 = "Loading";
+  const Preview$8 = "Preview";
   const en_US = {
-    title: title$7,
-    ExportHelper: ExportHelper$7,
-    Setting: Setting$7,
-    Language: Language$7,
+    title: title$8,
+    ExportHelper: ExportHelper$8,
+    Setting: Setting$8,
+    Language: Language$8,
     "Copy Text": "Copy Text",
     "Copied!": "Copied!",
-    Screenshot: Screenshot$7,
-    Markdown: Markdown$7,
-    HTML: HTML$7,
+    Screenshot: Screenshot$8,
+    Markdown: Markdown$8,
+    HTML: HTML$8,
     "JSON": "JSON",
-    Archive: Archive$7,
-    Save: Save$7,
-    Delete: Delete$7,
+    Archive: Archive$8,
+    Save: Save$8,
+    Delete: Delete$8,
     "Select All": "Select All",
-    Export: Export$7,
+    Export: Export$8,
     "Error": "Error",
-    Loading: Loading$7,
-    Preview: Preview$7,
+    Loading: Loading$8,
+    Preview: Preview$8,
     "File Name": "File Name",
     "Export All": "Export All",
     "Exporter Settings": "Exporter Settings",
@@ -8048,38 +8048,38 @@ html {
     "Conversation Deleted Message": "All selected conversations have been deleted. Please refresh the page to see the changes.",
     "Please start a conversation first": "Please start a conversation first."
   };
-  const title$6 = "ChatGPT Exporter";
-  const ExportHelper$6 = "Exportar";
-  const Setting$6 = "Ajustes";
-  const Language$6 = "Idioma";
-  const Screenshot$6 = "Captura De Pantalla";
-  const Markdown$6 = "Markdown";
-  const HTML$6 = "HTML";
-  const Archive$6 = "Archivo";
-  const Save$6 = "Guardar";
-  const Delete$6 = "Borrar";
-  const Export$6 = "Exportar";
-  const Loading$6 = "Cargando";
-  const Preview$6 = "Previsualizar";
+  const title$7 = "ChatGPT Exporter";
+  const ExportHelper$7 = "Exportar";
+  const Setting$7 = "Ajustes";
+  const Language$7 = "Idioma";
+  const Screenshot$7 = "Captura De Pantalla";
+  const Markdown$7 = "Markdown";
+  const HTML$7 = "HTML";
+  const Archive$7 = "Archivo";
+  const Save$7 = "Guardar";
+  const Delete$7 = "Borrar";
+  const Export$7 = "Exportar";
+  const Loading$7 = "Cargando";
+  const Preview$7 = "Previsualizar";
   const es = {
-    title: title$6,
-    ExportHelper: ExportHelper$6,
-    Setting: Setting$6,
-    Language: Language$6,
+    title: title$7,
+    ExportHelper: ExportHelper$7,
+    Setting: Setting$7,
+    Language: Language$7,
     "Copy Text": "Copiar Texto",
     "Copied!": "¡Copiado!",
-    Screenshot: Screenshot$6,
-    Markdown: Markdown$6,
-    HTML: HTML$6,
+    Screenshot: Screenshot$7,
+    Markdown: Markdown$7,
+    HTML: HTML$7,
     "JSON": "JSON",
-    Archive: Archive$6,
-    Save: Save$6,
-    Delete: Delete$6,
+    Archive: Archive$7,
+    Save: Save$7,
+    Delete: Delete$7,
     "Select All": "Seleccionar Todos",
-    Export: Export$6,
+    Export: Export$7,
     "Error": "Error",
-    Loading: Loading$6,
-    Preview: Preview$6,
+    Loading: Loading$7,
+    Preview: Preview$7,
     "File Name": "Nombre del Archivo",
     "Export All": "Exportar Todos",
     "Exporter Settings": "Ajustes De Exportación",
@@ -8102,6 +8102,61 @@ html {
     "Conversation Delete Alert": "¿Estás seguro que quieres borrar todas las conversaciones seleccionadas?",
     "Conversation Deleted Message": "Todos las conversaciones seleccionadas se han borrado. Por favor refresca la página para ver los cambios.",
     "Please start a conversation first": "Por favor empieza una conversación antes."
+  };
+  const title$6 = "Exportateur ChatGPT";
+  const ExportHelper$6 = "Exporter";
+  const Setting$6 = "Paramètre";
+  const Language$6 = "Langue";
+  const Screenshot$6 = "Capture d'écran";
+  const Markdown$6 = "Markdown";
+  const HTML$6 = "HTML";
+  const Archive$6 = "Archiver";
+  const Save$6 = "Enregistrer";
+  const Delete$6 = "Supprimer";
+  const Export$6 = "Exporter";
+  const Loading$6 = "Chargement";
+  const Preview$6 = "Aperçu";
+  const fr = {
+    title: title$6,
+    ExportHelper: ExportHelper$6,
+    Setting: Setting$6,
+    Language: Language$6,
+    "Copy Text": "Copier le texte",
+    "Copied!": "Copié !",
+    Screenshot: Screenshot$6,
+    Markdown: Markdown$6,
+    HTML: HTML$6,
+    "JSON": "JSON",
+    Archive: Archive$6,
+    Save: Save$6,
+    Delete: Delete$6,
+    "Select All": "Tout sélectionner",
+    Export: Export$6,
+    "Error": "Erreur",
+    Loading: Loading$6,
+    Preview: Preview$6,
+    "File Name": "Nom du fichier",
+    "Export All": "Tout exporter",
+    "Exporter Settings": "Paramètres de l'exportateur",
+    "Export Dialog Title": "Exporter les conversations",
+    "Invalid File Format": "Format de fichier invalide",
+    "Export from official export file": "Exporter depuis un fichier officiel",
+    "Export from API": "Exporter depuis l'API",
+    "Available variables": "Variables disponibles",
+    "Conversation Timestamp": "Horodatage de la conversation",
+    "Conversation Timestamp Description": "S'affichera sur la page.",
+    "Enable on HTML": "Activer sur les fichiers HTML",
+    "Enable on Markdown": "Activer sur les fichiers Markdown",
+    "Use 24-hour format": "Utiliser le format 24 heures (ex. 23:59)",
+    "Export Format": "Format d'exportation",
+    "Export Metadata": "Exporter les métadonnées",
+    "Export Metadata Description": "Ajouter des métadonnées aux fichiers Markdown et HTML exportés.",
+    "OpenAI Official Format": "Format officiel OpenAI",
+    "Conversation Archive Alert": "Êtes-vous sûr de vouloir archiver toutes les conversations sélectionnées ?",
+    "Conversation Archived Message": "Toutes les conversations sélectionnées ont été archivées. Veuillez actualiser la page pour voir les changements.",
+    "Conversation Delete Alert": "Êtes-vous sûr de vouloir supprimer toutes les conversations sélectionnées ?",
+    "Conversation Deleted Message": "Toutes les conversations sélectionnées ont été supprimées. Veuillez actualiser la page pour voir les changements.",
+    "Please start a conversation first": "Veuillez commencer une conversation d'abord."
   };
   const title$5 = "ChatGPT Exporter";
   const ExportHelper$5 = "Ekspor";
@@ -8547,6 +8602,11 @@ html {
     code: "es",
     resource: es
   };
+  const FR = {
+    name: "Français",
+    code: "fr",
+    resource: fr
+  };
   const ID_ID = {
     name: "Indonesia",
     code: "id-ID",
@@ -8580,6 +8640,7 @@ html {
   const LOCALES = [
     EN_US,
     ES,
+    FR,
     ID_ID,
     JA_JP,
     RU,
@@ -8597,6 +8658,8 @@ html {
     "es-CO": ES.code,
     "es-MX": ES.code,
     "es-US": ES.code,
+    "fr": FR.code,
+    "fr-FR": FR.code,
     "id": ID_ID.code,
     "id-ID": ID_ID.code,
     "ja": JA_JP.code,
