@@ -44,7 +44,7 @@
 
 #
 
-[📚 Desteklenen Formatlar](#-desteklenen-formatlar) &nbsp;&nbsp;|&nbsp;&nbsp; [💡 Örnek](#-örnek) &nbsp;&nbsp;|&nbsp;&nbsp; [🤝 Katılım](#-katılım) &nbsp;&nbsp;|&nbsp;&nbsp; [⭐ Yıldız Geçmişi](#-y%C4%B1ld%C4%B1z-ge%C3%A7mi%C5%9Fi)
+[📚 Desteklenen Formatlar](#-desteklenen-formatlar) &nbsp;&nbsp;|&nbsp;&nbsp; [💡 Örnek](#-örnek) &nbsp;&nbsp;|&nbsp;&nbsp; [📤 Birden Fazla Sohbeti Dışa Aktar](#-birden-fazla-sohbeti-dışa-aktar) &nbsp;&nbsp;|&nbsp;&nbsp; [🤝 Katılım](#-katılım) &nbsp;&nbsp;|&nbsp;&nbsp; [⭐ Yıldız Geçmişi](#-y%C4%B1ld%C4%B1z-ge%C3%A7mi%C5%9Fi)
 
 </div>
 
@@ -221,6 +221,31 @@ API `https://chat.openai.com/backend-api/conversation/[id]` üzerinden alınan h
 }
 ```
 </details>
+
+## 📤 Birden Fazla Sohbeti Dışa Aktar
+
+"Export All" butonuna tıkladığınızda, **Sohbetleri Dışa Aktar** diyalog penceresi açılır. Burada erişebileceğiniz işlevler şunlardır:
+
+**Resmi dışa aktarma dosyasından dışa aktar (conversations.json)**
+
+Bir JSON sohbet dosyasını yüklemek için yükleme simgesi düğmesine tıklayın. Bu dosya, OpenAI'den indirilen bir dosya olabilir.
+
+**API'den dışa aktar**
+
+Tüm sohbetlerinizin listesinden dışa aktarmak istediğiniz sohbetleri seçin. Tüm sohbetleri dışa aktarmak için "Tümünü Seç" onay kutusunu işaretleyin.
+
+Sol alt köşedeki açılır menüden dışa aktarma formatınızı seçin. Aşağıdaki formatlardan birini seçebilirsiniz:
+
+- **Markdown**
+- **HTML**
+- **JSON**
+- **JSON (ZIP)**
+
+İstediğiniz işlemi gerçekleştirmek için düğmeye tıklayın.
+
+- **Arşivle** - Arşivlenen sohbet oturumları kenar çubuğundan kaybolur ve ChatGPT ayarlarında yönetilebilir. Daha fazla bilgi için [#199](https://github.com/pionxzh/chatgpt-exporter/issues/199) sayfasına bakın.
+- **Sil** - Seçilen sohbetleri siler.
+- **Dışa Aktar** - Seçilen sohbetleri, format seçicisinden seçilen formatta dışa aktarır.
 
 ## 🤝 Katılım
 
