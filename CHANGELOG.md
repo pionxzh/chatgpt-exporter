@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.26.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.25.0...userscript-v2.26.0) (2024-11-29)
+
+
+### Features
+
+* **i18n:** add french translation ([#266](https://github.com/pionxzh/chatgpt-exporter/issues/266)) ([a71cad4](https://github.com/pionxzh/chatgpt-exporter/commit/a71cad4cb0b1fdbb2fea193f225c3c57cca9318b))
+
+
+### Bug Fixes
+
+* avoid hang when exporting voice chat ([#262](https://github.com/pionxzh/chatgpt-exporter/issues/262)) ([9924c09](https://github.com/pionxzh/chatgpt-exporter/commit/9924c0986945233cbf5d1b2b32d90c97a49ec516))
+
 ## [2.25.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.24.6...userscript-v2.25.0) (2024-09-12)
 
 
