@@ -44,7 +44,7 @@
 
 #
 
-[📚 Format yang Didukung](#-format-yang-didukung) &nbsp;&nbsp;|&nbsp;&nbsp; [💡 Contoh](#-contoh) &nbsp;&nbsp;|&nbsp;&nbsp; [🤝 Kontribusi](#-kontribusi) &nbsp;&nbsp;|&nbsp;&nbsp; [⭐ Sejarah Bintang](#-sejarah-bintang)
+[📚 Format yang Didukung](#-format-yang-didukung) &nbsp;&nbsp;|&nbsp;&nbsp; [💡 Contoh](#-contoh) &nbsp;&nbsp;|&nbsp;&nbsp; [📤 Ekspor Beberapa Percakapan](#-ekspor-beberapa-percakapan) &nbsp;&nbsp;|&nbsp;&nbsp; [🤝 Kontribusi](#-kontribusi) &nbsp;&nbsp;|&nbsp;&nbsp; [⭐ Sejarah Bintang](#-sejarah-bintang)
 
 </div>
 
@@ -229,6 +229,31 @@ Konten mentah dari API `https://chat.openai.com/backend-api/conversation/[id]`
 }
 ```
 </details>
+
+## 📤 Ekspor Beberapa Percakapan
+
+Ketika Anda mengklik tombol "Ekspor Semua", dialog **Ekspor Percakapan** akan muncul. Berikut adalah fungsi-fungsi yang dapat Anda akses.
+
+**Ekspor dari file ekspor resmi (conversations.json)**
+
+Klik tombol ikon unggah untuk mengunggah file JSON percakapan, seperti yang diunduh dari OpenAI.
+
+**Ekspor dari API**
+
+Dalam daftar semua percakapan Anda, pilih percakapan mana yang ingin Anda ekspor. Centang kotak "Pilih Semua" untuk mengekspor semua percakapan Anda.
+
+Pilih format ekspor Anda dari menu dropdown di kiri bawah. Anda dapat memilih dari format berikut:
+
+- **Markdown**
+- **HTML**
+- **JSON**
+- **JSON (ZIP)**
+
+Klik tombol untuk melakukan tindakan yang diinginkan.
+
+- **Arsipkan** - Sesi obrolan yang diarsipkan akan menghilang dari bilah sisi dan dapat dikelola di pengaturan ChatGPT. Lihat [#199](https://github.com/pionxzh/chatgpt-exporter/issues/199) untuk detail lebih lanjut.
+- **Hapus** - Menghapus percakapan yang dipilih.
+- **Ekspor** - Mengekspor percakapan yang dipilih dalam format yang dipilih menggunakan pemilih format.
 
 ## 🤝 Kontribusi
 
