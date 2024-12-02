@@ -130,6 +130,10 @@ export interface ConversationNodeMessage {
         content_type: 'execution_output'
         text: string
     } | {
+        content_type: 'user_editable_context'
+        user_profile: string
+        user_instructions: string
+    } | {
         content_type: 'tether_quote'
         domain?: string
         text: string
@@ -580,6 +584,8 @@ function extractConversationResult(conversationMapping: Record<string, Conversat
             node.message?.author.role !== 'system'
             // Skip model memory context
             && node.message?.content.content_type !== 'model_editable_context'
+            // Skip user custom instructions
+            && node.message?.content.content_type !== 'user_editable_context'
         ) {
             result.unshift(node)
         }
