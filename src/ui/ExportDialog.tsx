@@ -67,7 +67,7 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
     )
 }
 
-type ExportSource = 'API' | 'Local'
+type ExportSource = 'API' | 'Local' | 'Refer'
 
 interface DialogContentProps {
     format: string
@@ -121,10 +121,11 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
             }
             setSelected([])
             setExportSource('Local')
+            setLoading(false)
             setLocalConversations(data)
         }
         fileReader.readAsText(file)
-    }, [t, setExportSource, setLocalConversations])
+    }, [t, setExportSource, setLoading, setLocalConversations])
 
     useEffect(() => {
         const off = requestQueue.on('progress', (progress) => {
@@ -206,7 +207,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
     }, [disabled, selected, localConversations, exportAllOptions, exportType, format, metaList])
 
     const exportAll = useMemo(() => {
-        return exportSource === 'API' ? exportAllFromApi : exportAllFromLocal
+        return exportSource !== 'Local' ? exportAllFromApi : exportAllFromLocal
     }, [exportSource, exportAllFromApi, exportAllFromLocal])
 
     const deleteAll = useCallback(() => {
@@ -263,6 +264,13 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                         <IconUpload className="w-4 h-4" />
                     </button>
                 )}
+                {exportSource !== 'API' && (
+                    <CheckBox
+                        label={t('Refer')}
+                        checked={exportSource === 'Refer'}
+                        onCheckedChange={checked => setExportSource(checked ? 'Refer' : 'Local')}
+                    />
+                )}
             </div>
             <input
                 type="file"
@@ -271,7 +279,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                 ref={fileInputRef}
                 onChange={onUpload}
             />
-            {exportSource === 'API' && (
+            {exportSource !== 'Local' && (
                 <div className="flex items-center text-gray-600 dark:text-gray-300 flex justify-between mb-3">
                     {t('Export from API')}
                 </div>
