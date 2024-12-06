@@ -120,6 +120,31 @@
             border: 1px solid #e2e8f0;
         }
 
+        [data-width="narrow"] .width-toggle .expand {
+            display: block;
+        }
+
+        [data-width="wide"] .width-toggle .narrow {
+            display: block;
+        }
+
+        .width-toggle {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            background-color: #fff;
+            border: 1px solid #e2e8f0;
+            margin-left: 8px;
+            cursor: pointer;
+        }
+
+        .width-toggle svg {
+            display: none;
+        }
+
         .metadata_container {
             display: flex;
             flex-direction: column;
@@ -343,6 +368,15 @@
         .conversation {
             margin: 0 auto;
             padding: 1rem;
+            max-width: 64rem;
+        }
+
+        [data-width="narrow"] .conversation {
+            max-width: 64rem;
+        }
+
+        [data-width="wide"] .conversation {
+            max-width: 90%;
         }
 
         @media (min-width: 1280px) {
@@ -480,6 +514,14 @@
                     <svg class="sun" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
                     <svg class="moon" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </button>
+                <button class="toggle width-toggle">
+                    <svg class="expand" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg" style="display: block;">
+                        <path d="M3 12h18M6 8l-4 4 4 4M18 8l4 4-4 4"></path>
+                    </svg>
+                    <svg class="narrow" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                        <path d="M3 12h7M14 12h7M6 16l4-4-4-4M18 16l-4-4 4-4"></path>
+                    </svg>
+                </button>
             </h1>
             <div class="conversation-export">
                 <p>Exported by
@@ -495,23 +537,50 @@
 
     <script>
         function toggleDarkMode(mode) {
-            const html = document.querySelector('html')
-            const isDarkMode = html.getAttribute('data-theme') === 'dark'
-            const newMode = mode || (isDarkMode ? 'light' : 'dark')
-            if (newMode !== 'dark' && newMode !== 'light') return
-            html.setAttribute('data-theme', newMode)
+            const html = document.querySelector('html');
+            const isDarkMode = html.getAttribute('data-theme') === 'dark';
+            const newMode = mode || (isDarkMode ? 'light' : 'dark');
+            if (newMode !== 'dark' && newMode !== 'light') return;
+            html.setAttribute('data-theme', newMode);
 
-            const url = new URL(window.location)
-            url.searchParams.set('theme', newMode)
-            window.history.replaceState({}, '', url)
+            const url = new URL(window.location);
+            url.searchParams.set('theme', newMode);
+            window.history.replaceState({}, '', url);
+        }
+        function toggleWidthMode(mode) {
+            const body = document.querySelector('body');
+            const widthToggleButton = document.querySelector('.width-toggle');
+            const isWide = body.getAttribute('data-width') === 'wide';
+            const newWidthMode = mode || (isWide ? 'narrow' : 'wide');
+            if (newWidthMode !== 'narrow' && newWidthMode !== 'wide') return;
+            body.setAttribute('data-width', newWidthMode);
+
+            const url = new URL(window.location);
+            url.searchParams.set('width', newWidthMode);
+            window.history.replaceState({}, '', url);
+
+            // Update the icon based on the current mode
+            const narrowIcon = widthToggleButton.querySelector('.narrow');
+            const expandIcon = widthToggleButton.querySelector('.expand');
+
+            if (newWidthMode === 'wide') {
+                expandIcon.style.display = "none";
+                narrowIcon.style.display = "block";
+            } else {
+                expandIcon.style.display = "block";
+                narrowIcon.style.display = "none";
+            }
         }
 
-        // Support for ?theme=dark
-        const urlParams = new URLSearchParams(window.location.search)
-        const theme = urlParams.get('theme')
-        if (theme) toggleDarkMode(theme)
+        const urlParams = new URLSearchParams(window.location.search);
+        const theme = urlParams.get('theme');
+        const width = urlParams.get('width');
 
-        document.querySelector('.toggle').addEventListener('click', () => toggleDarkMode())
+        if (theme) toggleDarkMode(theme);
+        if (width) toggleWidthMode(width);
+
+        document.querySelector('.toggle').addEventListener('click', () => toggleDarkMode());
+        document.querySelector('.width-toggle').addEventListener('click', () => toggleWidthMode());
     </script>
 </body>
 
