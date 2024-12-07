@@ -100,7 +100,7 @@ export async function exportAllToJson(fileNameFormat: string, apiConversations: 
             level: 9,
         },
     })
-    downloadFile('chatgpt-export.zip', 'application/zip', blob)
+    downloadFile('chatgpt-export-json.zip', 'application/zip', blob)
 
     return true
 }

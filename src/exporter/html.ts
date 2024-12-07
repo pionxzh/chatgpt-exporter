@@ -63,7 +63,7 @@ export async function exportAllToHtml(fileNameFormat: string, apiConversations: 
             level: 9,
         },
     })
-    downloadFile('chatgpt-export.zip', 'application/zip', blob)
+    downloadFile('chatgpt-export-html.zip', 'application/zip', blob)
 
     return true
 }
@@ -74,6 +74,8 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
     const enableTimestamp = ScriptStorage.get<boolean>(KEY_TIMESTAMP_ENABLED) ?? false
     const timeStampHtml = ScriptStorage.get<boolean>(KEY_TIMESTAMP_HTML) ?? false
     const timeStamp24H = ScriptStorage.get<boolean>(KEY_TIMESTAMP_24H) ?? false
+
+    const LatexRegex = /(\s\$\$.+?\$\$\s|\s\$.+?\$\s|\\\[.+?\\\]|\\\(.+?\\\))|(^\$$[\S\s]+?^\$$)|(^\$\$[\S\s]+?^\$\$\$)/gm
 
     const conversationHtml = conversationNodes.map(({ message }) => {
         if (!message || !message.content) return null
@@ -107,12 +109,39 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
         let postSteps: Array<(input: string) => string> = []
         if (message.author.role === 'assistant') {
             postSteps = [...postSteps, input => transformFootNotes(input, message.metadata)]
+            postSteps.push((input) => {
+                const matches = input.match(LatexRegex)
+
+                // Skip code block as the following steps can potentially break the code
+                const isCodeBlock = /```/.test(input)
+                if (!isCodeBlock && matches) {
+                    let index = 0
+                    input = input.replace(LatexRegex, () => {
+                        // Replace it with `╬${index}╬` to avoid processing from ruining the formula
+                        return `╬${index++}╬`
+                    })
+                    input = input
+                        .replace(/^\\\[(.+)\\\]$/gm, '$$$$$1$$$$')
+                        .replace(/\\\[/g, '$$')
+                        .replace(/\\\]/g, '$$')
+                        .replace(/\\\(/g, '$')
+                        .replace(/\\\)/g, '$')
+                }
+
+                let transformed = toHtml(fromMarkdown(input))
+
+                if (!isCodeBlock && matches) {
+                    // Replace `╬${index}╬` back to the original latex
+                    transformed = transformed.replace(/╬(\d+)╬/g, (_, index) => {
+                        return matches[+index]
+                    })
+                }
+
+                return transformed
+            })
         }
         if (message.author.role === 'user') {
-            postSteps = [...postSteps, input => `<p>${escapeHtml(input)}</p>`]
-        }
-        else {
-            postSteps = [...postSteps, input => toHtml(fromMarkdown(input))]
+            postSteps = [...postSteps, input => `<p class="no-katex">${escapeHtml(input)}</p>`]
         }
         const postProcess = (input: string) => postSteps.reduce((acc, fn) => fn(acc), input)
         const content = transformContent(message.content, message.metadata, postProcess)
@@ -260,7 +289,7 @@ function transformContent(
             }).join('\n') || ''
         }
         default:
-            return postProcess('[Unsupported Content]')
+            return postProcess(`[Unsupported Content: ${content.content_type} ]`)
     }
 }
 
