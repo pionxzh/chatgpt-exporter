@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.27.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.26.0...userscript-v2.27.0) (2024-12-07)
+
+
+### Features
+
+* add width toggle ([3cfe3e2](https://github.com/pionxzh/chatgpt-exporter/commit/3cfe3e249b2c5f209ae8425e4f8cfdb2b9b8c4db))
+
+
+### Bug Fixes
+
+* skip user custom instructions to avoid showing unsupported content ([b0b9916](https://github.com/pionxzh/chatgpt-exporter/commit/b0b99165bdb4373237a6e8d2716271db81c4ad5a)), closes [#269](https://github.com/pionxzh/chatgpt-exporter/issues/269)
+
 ## [2.26.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.25.0...userscript-v2.26.0) (2024-11-29)
 
 
