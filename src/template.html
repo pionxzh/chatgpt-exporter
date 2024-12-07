@@ -10,6 +10,55 @@
     <script>
         hljs.highlightAll()
     </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.3/katex.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.3/katex.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.3/contrib/auto-render.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    { left: "$$", right: "$$", display: true },
+                    { left: "$", right: "$", display: false },
+                    { left: "\\[", right: "\\]", display: true },
+                    { left: "\\(", right: "\\)", display: false }
+                ],
+                throwOnError: false,
+                ignoredClasses: ["no-katex"],
+                preProcess: function(math) {
+                    return `\\displaystyle \\Large ${math}`;
+                }
+            });
+            document.querySelectorAll('.katex').forEach(function(el) {
+                const parent = el.parentNode;
+                const grandparent = parent.parentNode;
+                if (grandparent.tagName === 'P' && isOnlyContent(grandparent, parent)) {
+                    el.style.width = '100%';
+                    el.style.display = 'block';
+                    el.style.textAlign = 'center';
+                    parent.style.textAlign = 'center';
+                } else {
+                    el.style.display = 'inline-block';
+                    el.style.width = 'fit-content';
+                }
+            });
+            function isOnlyContent(parent, element) {
+                let onlyKaTeX = true;
+                parent.childNodes.forEach(function(child) {
+                    console.log(child.textContent);
+                    if (child !== element) {
+                        if (child.nodeType === Node.TEXT_NODE) {
+                            if (child.textContent.trim().length > 0) {
+                                onlyKaTeX = false;
+                            }
+                        } else if (child.nodeType === Node.ELEMENT_NODE) {
+                            onlyKaTeX = false;
+                        }
+                    }
+                });
+                return onlyKaTeX;
+            }
+        });
+    </script>
 
     <style>
         :root {
@@ -497,6 +546,7 @@
             font-size: 0.8rem;
             color: #acacbe
         }
+
     </style>
 </head>
 
@@ -525,7 +575,7 @@
             </h1>
             <div class="conversation-export">
                 <p>Exported by
-                <a href="https://github.com/pionxzh/chatgpt-exporter">ChatGPT Exporter</a>
+                <a href="https://github.com/pionxzh/chatgpt-exporter.git">ChatGPT Exporter</a>
                 at {{time}}</p>
             </div>
             {{details}}
