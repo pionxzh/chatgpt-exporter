@@ -58,7 +58,7 @@ export async function exportAllToMarkdown(fileNameFormat: string, apiConversatio
             level: 9,
         },
     })
-    downloadFile('chatgpt-export.zip', 'application/zip', blob)
+    downloadFile('chatgpt-export-markdown.zip', 'application/zip', blob)
 
     return true
 }
@@ -141,9 +141,7 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
                     .replace(/\\\]/g, '$')
                     .replace(/\\\(/g, '$')
                     .replace(/\\\)/g, '$')
-
                 const matches = input.match(LatexRegex)
-
                 // Skip code block as the following steps can potentially break the code
                 const isCodeBlock = /```/.test(input)
                 if (!isCodeBlock && matches) {
