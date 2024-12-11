@@ -108,7 +108,6 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
 
         let postSteps: Array<(input: string) => string> = []
         if (message.author.role === 'assistant') {
-            postSteps = [...postSteps, input => transformFootNotes(input, message.metadata)]
             postSteps.push((input) => {
                 const matches = input.match(LatexRegex)
 
@@ -139,6 +138,7 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
 
                 return transformed
             })
+            postSteps = [...postSteps, input => transformFootNotes(input, message.metadata)]
         }
         if (message.author.role === 'user') {
             postSteps = [...postSteps, input => `<p class="no-katex">${escapeHtml(input)}</p>`]
@@ -238,13 +238,23 @@ function transformFootNotes(
 ) {
     // 【11†(PrintWiki)】
     const footNoteMarkRegex = /【(\d+)†\((.+?)\)】/g
-    return input.replace(footNoteMarkRegex, (match, citeIndex, _evidenceText) => {
+    input = input.replace(footNoteMarkRegex, (match, citeIndex) => {
         const citation = metadata?.citations?.find(cite => cite.metadata?.extra?.cited_message_idx === +citeIndex)
-        // We simply remove the foot note mark in html output
-        if (citation) return ''
-
-        return match
+        return citation ? '' : match
     })
+
+    metadata?.content_references?.forEach((ref) => {
+        if (ref.type === 'webpage' && ref.matched_text) {
+            const tooltip = ref.snippet ?? ''
+            const linkText = (ref.attribution ?? ref.url?.match(/\/\/([^/]+)/)?.[1]) || 'Link'
+            const linkHtml = `<a href="${ref.url}" title="${tooltip}" target="_blank" rel="noopener noreferrer">${linkText}</a>`
+            const referenceRegex = new RegExp(ref.matched_text.replace(/([.*+?^${}()|\[\]\/\\])/g, '\\$&'), 'g')
+            input = input.replace(referenceRegex, linkHtml)
+        }
+    })
+    input = input.replace(/[\uE203\uE204]/g, '')
+
+    return input
 }
 
 /**

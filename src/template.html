@@ -223,10 +223,30 @@
         }
 
         a {
-            color: var(--tw-prose-links);
-            font-size: 0.8rem;
-            text-decoration-line: underline;
-            text-underline-offset: 2px;
+            display: inline-block;
+            padding: 6px 6px;
+            border-radius: 12px;
+            background-color: var(--link-bg, #f1f1f1);
+            color: var(--link-color, #0d0d0d);
+            font-size: 0.9rem;
+            text-decoration: none;
+            text-align: center;
+            line-height: 1;
+            box-shadow: none;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        a:hover {
+            background-color: var(--link-hover-bg, #e0e0e0);
+        }
+
+        [data-theme="dark"] a {
+            background-color: var(--link-bg-dark, #333333);
+            color: var(--link-color-dark, #ececec);
+        }
+
+        [data-theme="dark"] a:hover {
+            background-color: var(--link-hover-bg-dark, #444444);
         }
 
         .conversation-content > p:first-child,
@@ -234,17 +254,26 @@
             margin-top: 0;
         }
 
-        p>code, li>code {
+        p > code, li > code {
             color: var(--tw-prose-code);
             font-weight: 600;
             font-size: .875em;
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            background-color: var(--inline-code-bg, #f4f4f4);
+            font-family: "Fira Code", monospace;
+        }
+
+        [data-theme="dark"] p > code, [data-theme="dark"] li > code {
+            background-color: var(--inline-code-bg-dark, #2d2d2d);
+            color: var(--inline-code-color-dark, #e6e6e6);
         }
 
         p>code::before,
         p>code::after,
         li>code::before,
         li>code::after {
-            content: "`";
+            content: none;
         }
 
         hr {
@@ -260,11 +289,12 @@
             background-color: #000000;
             overflow-x: auto;
             margin: 0 0 1rem 0;
+            padding: 1rem;
             border-radius: 0.375rem;
         }
 
         pre>code {
-            font-family: Söhne Mono, Monaco, Andale Mono, Ubuntu Mono, monospace !important;
+            font-family: "Fira Code", Monaco, Andale Mono, Ubuntu Mono, monospace !important;
             font-weight: 400;
             font-size: .875em;
             line-height: 1.7142857;
@@ -575,7 +605,7 @@
             </h1>
             <div class="conversation-export">
                 <p>Exported by
-                <a href="https://github.com/pionxzh/chatgpt-exporter.git">ChatGPT Exporter</a>
+                <a href="https://github.com/pionxzh/chatgpt-exporter">ChatGPT Exporter</a>
                 at {{time}}</p>
             </div>
             {{details}}

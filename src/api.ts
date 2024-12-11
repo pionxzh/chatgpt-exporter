@@ -27,6 +27,23 @@ interface ApiSession {
 
 type ModelSlug = 'text-davinci-002-render-sha' | 'text-davinci-002-render-paid' | 'text-davinci-002-browse' | 'gpt-4' | 'gpt-4-browsing' | 'gpt-4o'
 
+export interface Reference {
+    matched_text: string
+    start_idx: number
+    end_idx: number
+    alt: string | null
+    prompt_text: string | null
+    type: 'webpage' | 'hidden' | 'sources_footnote'
+    invalid: boolean
+    title?: string
+    url?: string
+    snippet?: string
+    attributions?: string
+    attributions_debug?: string
+    pub_date?: number
+    attribution?: string
+}
+
 export interface Citation {
     start_ix: number
     end_ix: number
@@ -84,6 +101,7 @@ interface MessageMeta {
     model_slug?: ModelSlug & (string & {})
     parent_id?: string
     timestamp_?: 'absolute' & (string & {})
+    content_references?: Reference[]
     citations?: Citation[]
     _cite_metadata?: CiteMetadata
 }

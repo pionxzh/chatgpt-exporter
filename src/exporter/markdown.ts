@@ -122,7 +122,7 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
             const date = new Date(timestamp * 1000)
             // format: 20:12 / 08:12 PM
             const conversationTime = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: !timeStamp24H })
-            timestampHtml = `<time datetime="${date.toISOString()}" title="${date.toLocaleString()}">${conversationTime}</time>\n\n`
+            timestampHtml = `*(<time datetime="${date.toISOString()}" title="${date.toLocaleString()}">${conversationTime}</time>)*`
         }
 
         const author = transformAuthor(message.author)
@@ -167,7 +167,7 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
         const postProcess = (input: string) => postSteps.reduce((acc, fn) => fn(acc), input)
         const content = transformContent(message.content, message.metadata, postProcess)
 
-        return `#### ${author}:\n${timestampHtml}${content}`
+        return `#### ${author}: ${timestampHtml}\n\n${content}`
     }).filter(Boolean).join('\n\n')
 
     const markdown = `${frontMatter}# ${title}\n\n${content}`
@@ -209,14 +209,26 @@ function transformFootNotes(
 
         return match
     })
+
+    // Process references (replacing matched_text with markdown links or placeholders)
+    const processedOutput = (metadata?.content_references ?? []).reduce((text, ref) => {
+        if (ref.type === 'webpage' && ref.matched_text) {
+            const linkText = ref.alt ?? `[(${ref.attribution ?? 'Link'})](${ref.url})`
+            const referenceRegex = new RegExp(ref.matched_text.replace(/([.*+?^${}()|\[\]\/\\])/g, '\\$&'), 'g')
+            return text.replace(referenceRegex, linkText)
+        }
+        return text
+    }, output.replace(/[\uE203\uE204]/g, ''))
+
     const citationText = citationList.map((citation) => {
         const citeIndex = citation.metadata?.extra?.cited_message_idx ?? 1
         const citeTitle = citation.metadata?.title ?? 'No title'
-        return `[^${citeIndex}]: ${citeTitle}`
+        const citeUrl = citation.metadata?.url ?? ''
+        return citeUrl ? `[^${citeIndex}]: [${citeTitle}](${citeUrl})` : `[^${citeIndex}]: ${citeTitle}`
     }).join('\n')
 
-    // Foot notes are placed at the end of the conversation node, not the end of the whole document
-    return `${output}\n\n${citationText}`
+    // Footnotes are placed at the end of the conversation node, not the whole document
+    return `${processedOutput}\n\n${citationText}\n---`
 }
 
 /**
