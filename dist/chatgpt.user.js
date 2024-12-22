@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.26.0
+// @version            2.27.0
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -1201,12 +1201,13 @@ html {
   }
   async function fetchAllConversations() {
     const conversations = [];
-    const limit = 20;
+    const limit = 100;
     let offset = 0;
     while (true) {
       const result = await fetchConversations(offset, limit);
       conversations.push(...result.items);
       if (offset + limit >= result.total) break;
+      if (offset + limit >= 1e3) break;
       offset += limit;
     }
     return conversations;
@@ -1346,7 +1347,7 @@ html {
     };
   }
   function extractConversationResult(conversationMapping, startNodeId) {
-    var _a, _b;
+    var _a, _b, _c;
     const result = [];
     let currentNodeId = startNodeId;
     while (currentNodeId) {
@@ -1359,7 +1360,7 @@ html {
       }
       if (
         // Skip system messages
-        ((_a = node2.message) == null ? void 0 : _a.author.role) !== "system" && ((_b = node2.message) == null ? void 0 : _b.content.content_type) !== "model_editable_context"
+        ((_a = node2.message) == null ? void 0 : _a.author.role) !== "system" && ((_b = node2.message) == null ? void 0 : _b.content.content_type) !== "model_editable_context" && ((_c = node2.message) == null ? void 0 : _c.content.content_type) !== "user_editable_context"
       ) {
         result.unshift(node2);
       }
@@ -8732,6 +8733,55 @@ html {
     <script>
         hljs.highlightAll()
     <\/script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.3/katex.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.3/katex.min.js"><\/script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.3/contrib/auto-render.min.js"><\/script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    { left: "$$", right: "$$", display: true },
+                    { left: "$", right: "$", display: false },
+                    { left: "\\\\[", right: "\\\\]", display: true },
+                    { left: "\\\\(", right: "\\\\)", display: false }
+                ],
+                throwOnError: false,
+                ignoredClasses: ["no-katex"],
+                preProcess: function(math) {
+                    return \`\\\\displaystyle \\\\Large \${math}\`;
+                }
+            });
+            document.querySelectorAll('.katex').forEach(function(el) {
+                const parent = el.parentNode;
+                const grandparent = parent.parentNode;
+                if (grandparent.tagName === 'P' && isOnlyContent(grandparent, parent)) {
+                    el.style.width = '100%';
+                    el.style.display = 'block';
+                    el.style.textAlign = 'center';
+                    parent.style.textAlign = 'center';
+                } else {
+                    el.style.display = 'inline-block';
+                    el.style.width = 'fit-content';
+                }
+            });
+            function isOnlyContent(parent, element) {
+                let onlyKaTeX = true;
+                parent.childNodes.forEach(function(child) {
+                    console.log(child.textContent);
+                    if (child !== element) {
+                        if (child.nodeType === Node.TEXT_NODE) {
+                            if (child.textContent.trim().length > 0) {
+                                onlyKaTeX = false;
+                            }
+                        } else if (child.nodeType === Node.ELEMENT_NODE) {
+                            onlyKaTeX = false;
+                        }
+                    }
+                });
+                return onlyKaTeX;
+            }
+        });
+    <\/script>
 
     <style>
         :root {
@@ -8840,6 +8890,31 @@ html {
             border-radius: 4px;
             background-color: #fff;
             border: 1px solid #e2e8f0;
+        }
+
+        [data-width="narrow"] .width-toggle .expand {
+            display: block;
+        }
+
+        [data-width="wide"] .width-toggle .narrow {
+            display: block;
+        }
+
+        .width-toggle {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            background-color: #fff;
+            border: 1px solid #e2e8f0;
+            margin-left: 8px;
+            cursor: pointer;
+        }
+
+        .width-toggle svg {
+            display: none;
         }
 
         .metadata_container {
@@ -9065,6 +9140,15 @@ html {
         .conversation {
             margin: 0 auto;
             padding: 1rem;
+            max-width: 64rem;
+        }
+
+        [data-width="narrow"] .conversation {
+            max-width: 64rem;
+        }
+
+        [data-width="wide"] .conversation {
+            max-width: 90%;
         }
 
         @media (min-width: 1280px) {
@@ -9185,6 +9269,7 @@ html {
             font-size: 0.8rem;
             color: #acacbe
         }
+
     </style>
 </head>
 
@@ -9202,10 +9287,18 @@ html {
                     <svg class="sun" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
                     <svg class="moon" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </button>
+                <button class="toggle width-toggle">
+                    <svg class="expand" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg" style="display: block;">
+                        <path d="M3 12h18M6 8l-4 4 4 4M18 8l4 4-4 4"></path>
+                    </svg>
+                    <svg class="narrow" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                        <path d="M3 12h7M14 12h7M6 16l4-4-4-4M18 16l-4-4 4-4"></path>
+                    </svg>
+                </button>
             </h1>
             <div class="conversation-export">
                 <p>Exported by
-                <a href="https://github.com/pionxzh/chatgpt-exporter">ChatGPT Exporter</a>
+                <a href="https://github.com/pionxzh/chatgpt-exporter.git">ChatGPT Exporter</a>
                 at {{time}}</p>
             </div>
             {{details}}
@@ -9217,23 +9310,50 @@ html {
 
     <script>
         function toggleDarkMode(mode) {
-            const html = document.querySelector('html')
-            const isDarkMode = html.getAttribute('data-theme') === 'dark'
-            const newMode = mode || (isDarkMode ? 'light' : 'dark')
-            if (newMode !== 'dark' && newMode !== 'light') return
-            html.setAttribute('data-theme', newMode)
+            const html = document.querySelector('html');
+            const isDarkMode = html.getAttribute('data-theme') === 'dark';
+            const newMode = mode || (isDarkMode ? 'light' : 'dark');
+            if (newMode !== 'dark' && newMode !== 'light') return;
+            html.setAttribute('data-theme', newMode);
 
-            const url = new URL(window.location)
-            url.searchParams.set('theme', newMode)
-            window.history.replaceState({}, '', url)
+            const url = new URL(window.location);
+            url.searchParams.set('theme', newMode);
+            window.history.replaceState({}, '', url);
+        }
+        function toggleWidthMode(mode) {
+            const body = document.querySelector('body');
+            const widthToggleButton = document.querySelector('.width-toggle');
+            const isWide = body.getAttribute('data-width') === 'wide';
+            const newWidthMode = mode || (isWide ? 'narrow' : 'wide');
+            if (newWidthMode !== 'narrow' && newWidthMode !== 'wide') return;
+            body.setAttribute('data-width', newWidthMode);
+
+            const url = new URL(window.location);
+            url.searchParams.set('width', newWidthMode);
+            window.history.replaceState({}, '', url);
+
+            // Update the icon based on the current mode
+            const narrowIcon = widthToggleButton.querySelector('.narrow');
+            const expandIcon = widthToggleButton.querySelector('.expand');
+
+            if (newWidthMode === 'wide') {
+                expandIcon.style.display = "none";
+                narrowIcon.style.display = "block";
+            } else {
+                expandIcon.style.display = "block";
+                narrowIcon.style.display = "none";
+            }
         }
 
-        // Support for ?theme=dark
-        const urlParams = new URLSearchParams(window.location.search)
-        const theme = urlParams.get('theme')
-        if (theme) toggleDarkMode(theme)
+        const urlParams = new URLSearchParams(window.location.search);
+        const theme = urlParams.get('theme');
+        const width = urlParams.get('width');
 
-        document.querySelector('.toggle').addEventListener('click', () => toggleDarkMode())
+        if (theme) toggleDarkMode(theme);
+        if (width) toggleWidthMode(width);
+
+        document.querySelector('.toggle').addEventListener('click', () => toggleDarkMode());
+        document.querySelector('.width-toggle').addEventListener('click', () => toggleWidthMode());
     <\/script>
 </body>
 
@@ -20522,7 +20642,7 @@ html {
         level: 9
       }
     });
-    downloadFile("chatgpt-export.zip", "application/zip", blob);
+    downloadFile("chatgpt-export-html.zip", "application/zip", blob);
     return true;
   }
   function conversationToHtml(conversation, avatar, metaList) {
@@ -20530,6 +20650,7 @@ html {
     const enableTimestamp = ScriptStorage.get(KEY_TIMESTAMP_ENABLED) ?? false;
     const timeStampHtml = ScriptStorage.get(KEY_TIMESTAMP_HTML) ?? false;
     const timeStamp24H = ScriptStorage.get(KEY_TIMESTAMP_24H) ?? false;
+    const LatexRegex2 = /(\s\$\$.+?\$\$\s|\s\$.+?\$\s|\\\[.+?\\\]|\\\(.+?\\\))|(^\$$[\S\s]+?^\$$)|(^\$\$[\S\s]+?^\$\$\$)/gm;
     const conversationHtml = conversationNodes.map(({ message }) => {
       var _a, _b, _c, _d;
       if (!message || !message.content) return null;
@@ -20550,11 +20671,27 @@ html {
       let postSteps = [];
       if (message.author.role === "assistant") {
         postSteps = [...postSteps, (input) => transformFootNotes$2(input, message.metadata)];
+        postSteps.push((input) => {
+          const matches = input.match(LatexRegex2);
+          const isCodeBlock = /```/.test(input);
+          if (!isCodeBlock && matches) {
+            let index2 = 0;
+            input = input.replace(LatexRegex2, () => {
+              return `╬${index2++}╬`;
+            });
+            input = input.replace(/^\\\[(.+)\\\]$/gm, "$$$$$1$$$$").replace(/\\\[/g, "$$").replace(/\\\]/g, "$$").replace(/\\\(/g, "$").replace(/\\\)/g, "$");
+          }
+          let transformed = toHtml(fromMarkdown(input));
+          if (!isCodeBlock && matches) {
+            transformed = transformed.replace(/╬(\d+)╬/g, (_24, index2) => {
+              return matches[+index2];
+            });
+          }
+          return transformed;
+        });
       }
       if (message.author.role === "user") {
-        postSteps = [...postSteps, (input) => `<p>${escapeHtml(input)}</p>`];
-      } else {
-        postSteps = [...postSteps, (input) => toHtml(fromMarkdown(input))];
+        postSteps = [...postSteps, (input) => `<p class="no-katex">${escapeHtml(input)}</p>`];
       }
       const postProcess = (input) => postSteps.reduce((acc, fn2) => fn2(acc), input);
       const content2 = transformContent$2(message.content, message.metadata, postProcess);
@@ -20661,7 +20798,7 @@ ${content2.text}
         }).join("\n")) || "";
       }
       default:
-        return postProcess("[Unsupported Content]");
+        return postProcess(`[Unsupported Content: ${content2.content_type} ]`);
     }
   }
   function escapeHtml(html2) {
@@ -20978,7 +21115,7 @@ ${content2.text}
         level: 9
       }
     });
-    downloadFile("chatgpt-export.zip", "application/zip", blob);
+    downloadFile("chatgpt-export-json.zip", "application/zip", blob);
     return true;
   }
   function conversationToJson(conversation) {
@@ -21025,7 +21162,7 @@ ${content2.text}
         level: 9
       }
     });
-    downloadFile("chatgpt-export.zip", "application/zip", blob);
+    downloadFile("chatgpt-export-markdown.zip", "application/zip", blob);
     return true;
   }
   const LatexRegex$1 = /(\s\$\$.+\$\$\s|\s\$.+\$\s|\\\[.+\\\]|\\\(.+\\\))|(^\$$[\S\s]+^\$$)|(^\$\$[\S\s]+^\$\$$)/gm;
