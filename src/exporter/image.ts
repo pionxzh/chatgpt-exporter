@@ -71,18 +71,21 @@ export async function exportToPng(fileNameFormat: string) {
         })
     }
 
-    // hide buttons
-    const buttonWrappers = document.querySelectorAll<HTMLDivElement>('main .flex.empty\\:hidden')
-    buttonWrappers.forEach((wrapper) => {
-        if (!wrapper.querySelector('button')) return
-        // ignore codeblock
-        if (wrapper.closest('pre')) return
-
+    // hide switch context button
+    const switchContextBuuton1 = thread.querySelectorAll('div.mb-2.flex.gap-3.empty\\:hidden.mr-1.flex-row-reverse')
+    if (switchContextBuuton1) {
         effect.add(() => {
-            wrapper.style.display = 'none'
-            return () => wrapper.style.display = ''
+            switchContextBuuton1.forEach(a => a.classList.add('hidden'))
+            return () => switchContextBuuton1.forEach(a => a.classList.remove('hidden'))
         })
-    })
+    }
+    const switchContextBuuton2 = thread.querySelectorAll('div.mb-2.flex.gap-3.empty\\:hidden.-ml-2')
+    if (switchContextBuuton2) {
+        effect.add(() => {
+            switchContextBuuton2.forEach(a => a.classList.add('hidden'))
+            return () => switchContextBuuton2.forEach(a => a.classList.remove('hidden'))
+        })
+    }
 
     // hide code block copy button
     const copyButtons = thread.querySelectorAll('pre button')
