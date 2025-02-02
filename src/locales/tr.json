@@ -40,5 +40,7 @@
   "Conversation Deleted Message": "Seçilen tüm konuşmalar silindi. Değişiklikleri görmek için sayfayı yenileyin.",
   "Please start a conversation first": "Lütfen önce bir konuşma başlatın.",
   "Select Project": "Proje Seç",
-  "(no project)": "(proje yok)"
+  "(no project)": "(proje yok)",
+  "Export All Limit": "Tümünü Dışa Aktarma Limiti",
+  "Export All Limit Description": "'Tümünü Dışa Aktar' iletişim kutusunda yüklenecek maksimum konuşma sayısını ayarlayın."
 }

@@ -108,7 +108,7 @@ interface DialogContentProps {
 
 const DialogContent: FC<DialogContentProps> = ({ format }) => {
     const { t } = useTranslation()
-    const { enableMeta, exportMetaList } = useSettingContext()
+    const { enableMeta, exportMetaList, exportAllLimit } = useSettingContext()
     const metaList = useMemo(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList])
 
     const exportAllOptions = useMemo(() => [
@@ -238,7 +238,15 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
         const results = localConversations.filter(c => selected.some(s => s.id === c.id))
         const callback = exportAllOptions.find(o => o.label === exportType)?.callback
         if (callback) callback(format, results, metaList)
-    }, [disabled, selected, localConversations, exportAllOptions, exportType, format, metaList])
+    }, [
+        disabled,
+        selected,
+        localConversations,
+        exportAllOptions,
+        exportType,
+        format,
+        metaList,
+    ])
 
     const exportAll = useMemo(() => {
         return exportSource === 'API' ? exportAllFromApi : exportAllFromLocal
@@ -288,11 +296,14 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
 
     useEffect(() => {
         setLoading(true)
-        fetchAllConversations(selectedProject?.id)
+        fetchAllConversations(selectedProject?.id, exportAllLimit)
             .then(setApiConversations)
-            .catch(err => setError(err.toString()))
+            .catch((err) => {
+                console.error('Error fetching conversations:', err)
+                setError(err.message || 'Failed to load conversations')
+            })
             .finally(() => setLoading(false))
-    }, [selectedProject])
+    }, [selectedProject, exportAllLimit])
 
     return (
         <>
@@ -350,7 +361,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                         <span>{`${progress.completed}/${progress.total}`}</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
-                        <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${progress.completed / progress.total * 100}%` }} />
+                        <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${(progress.completed / progress.total) * 100}%` }} />
                     </div>
                 </>
             )}

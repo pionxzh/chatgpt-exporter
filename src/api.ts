@@ -25,7 +25,13 @@ interface ApiSession {
     }
 }
 
-type ModelSlug = 'text-davinci-002-render-sha' | 'text-davinci-002-render-paid' | 'text-davinci-002-browse' | 'gpt-4' | 'gpt-4-browsing' | 'gpt-4o'
+type ModelSlug =
+    | 'text-davinci-002-render-sha'
+    | 'text-davinci-002-render-paid'
+    | 'text-davinci-002-browse'
+    | 'gpt-4'
+    | 'gpt-4-browsing'
+    | 'gpt-4o'
 
 export interface Citation {
     start_ix: number
@@ -432,19 +438,31 @@ async function fetchProjectConversations(project: string, offset = 0, limit = 20
     }
 }
 
-export async function fetchAllConversations(project: string | null = null): Promise<ApiConversationItem[]> {
+export async function fetchAllConversations(project: string | null = null, maxConversations = 1000): Promise<ApiConversationItem[]> {
     const conversations: ApiConversationItem[] = []
     const limit = project === null ? 100 : 50 // gizmos api uses a smaller limit
     let offset = 0
     while (true) {
-        const result = await fetchConversations(offset, limit, project)
-        conversations.push(...result.items)
-        if (result.total !== null && offset + limit >= result.total) break
-        if (result.items.length === 0) break
-        if (offset + limit >= 1000) break
-        offset += limit
+        try {
+            const result = await fetchConversations(offset, limit, project)
+            if (!result.items) {
+                // Handle potential API errors or empty responses
+                console.warn('fetchAllConversations received no items at offset:', offset)
+                break
+            }
+            conversations.push(...result.items)
+            // Stop if we've reached the total reported by the API OR the user-defined limit
+            if (result.total !== null && offset + limit >= result.total) break
+            if (conversations.length >= maxConversations) break
+            offset += limit
+        }
+        catch (error) {
+            console.error('Error fetching conversations batch:', error)
+            break
+        }
     }
-    return conversations
+    // Ensure we don't return more than the requested limit if the last batch pushed us over
+    return conversations.slice(0, maxConversations)
 }
 
 export async function archiveConversation(chatId: string): Promise<boolean> {

@@ -40,5 +40,7 @@
   "Conversation Deleted Message": "選択したすべての会話が削除されました。変更を表示するには、ページを更新してください。",
   "Please start a conversation first": "まず会話を開始してください。",
   "Select Project": "プロジェクトを選択",
-  "(no project)": "（プロジェクトなし）"
+  "(no project)": "（プロジェクトなし）",
+  "Export All Limit": "すべてエクスポートの上限",
+  "Export All Limit Description": "「すべてエクスポート」ダイアログで読み込む会話の最大数を設定します。"
 }

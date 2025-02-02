@@ -40,5 +40,7 @@
   "Conversation Deleted Message": "Todos las conversaciones seleccionadas se han borrado. Por favor refresca la página para ver los cambios.",
   "Please start a conversation first": "Por favor empieza una conversación antes.",
   "Select Project": "Seleccionar proyecto",
-  "(no project)": "(sin proyecto)"
+  "(no project)": "(sin proyecto)",
+  "Export All Limit": "Límite de Exportar Todos",
+  "Export All Limit Description": "Establece el número máximo de conversaciones a cargar en el diálogo 'Exportar Todos'."
 }
