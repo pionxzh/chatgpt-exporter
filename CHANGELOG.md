@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.27.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.27.0...userscript-v2.27.1) (2025-02-02)
+
+
+### Bug Fixes
+
+* fixed user conversations disappearing when exporting screenshots ([eaf7c76](https://github.com/pionxzh/chatgpt-exporter/commit/eaf7c76af99fb78516732ab3f68f62a9f67d588c))
+
 ## [2.27.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.26.0...userscript-v2.27.0) (2024-12-08)
 
 
