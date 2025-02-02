@@ -1,6 +1,11 @@
 import urlcat from 'urlcat'
 import { apiUrl, baseUrl } from './constants'
-import { getChatIdFromUrl, getConversationFromSharePage, getPageAccessToken, isSharePage } from './page'
+import {
+    getChatIdFromUrl,
+    getConversationFromSharePage,
+    getPageAccessToken,
+    isSharePage,
+} from './page'
 import { blobToDataURL } from './utils/dom'
 import { memorize } from './utils/memorize'
 
@@ -25,7 +30,13 @@ interface ApiSession {
     }
 }
 
-type ModelSlug = 'text-davinci-002-render-sha' | 'text-davinci-002-render-paid' | 'text-davinci-002-browse' | 'gpt-4' | 'gpt-4-browsing' | 'gpt-4o'
+type ModelSlug =
+    | 'text-davinci-002-render-sha'
+    | 'text-davinci-002-render-paid'
+    | 'text-davinci-002-browse'
+    | 'gpt-4'
+    | 'gpt-4-browsing'
+    | 'gpt-4o'
 
 export interface Citation {
     start_ix: number
@@ -70,15 +81,20 @@ interface MessageMeta {
         }>
         run_id: string
         start_time: number
-        status: 'success' | 'error' & (string & {})
+        status: 'success' | ('error' & (string & {}))
         update_time: number
     }
     args?: unknown
-    command?: 'click' | 'search' | 'quote' | 'quote_lines' | 'scroll' & (string & {})
+    command?:
+    | 'click'
+    | 'search'
+    | 'quote'
+    | 'quote_lines'
+    | ('scroll' & (string & {}))
     finish_details?: {
         // stop: string
         stop_tokens?: number[]
-        type: 'stop' | 'interrupted' & (string & {})
+        type: 'stop' | ('interrupted' & (string & {}))
     }
     is_complete?: boolean
     model_slug?: ModelSlug & (string & {})
@@ -114,43 +130,52 @@ interface MultiModalInputImage {
 export interface ConversationNodeMessage {
     author: {
         role: AuthorRole
-        name?: 'browser' | 'python' & (string & {})
+        name?: 'browser' | ('python' & (string & {}))
         metadata: unknown
     }
-    content: {
+    content:
+    | {
         // chat response
         content_type: 'text'
         parts: string[]
-    } | {
+    }
+    | {
         // plugin response
         content_type: 'code'
         language: 'unknown' & (string & {})
         text: string
-    } | {
+    }
+    | {
         content_type: 'execution_output'
         text: string
-    } | {
+    }
+    | {
         content_type: 'user_editable_context'
         user_profile: string
         user_instructions: string
-    } | {
+    }
+    | {
         content_type: 'tether_quote'
         domain?: string
         text: string
         title: string
         url?: string
-    } | {
+    }
+    | {
         content_type: 'tether_browsing_code'
         // unknown
-    } | {
+    }
+    | {
         content_type: 'tether_browsing_display'
         result: string
         summary?: string
-    } | {
+    }
+    | {
         // multi-modal input
         content_type: 'multimodal_text'
         parts: Array<MultiModalInputImage | string>
-    } | {
+    }
+    | {
         content_type: 'model_editable_context'
         model_set_context: string
     }
@@ -159,7 +184,7 @@ export interface ConversationNodeMessage {
     // end_turn: boolean
     id: string
     metadata?: MessageMeta
-    recipient: 'all' | 'browser' | 'python' | 'dalle.text2im' & (string & {})
+    recipient: 'all' | 'browser' | 'python' | ('dalle.text2im' & (string & {}))
     status: string
     end_turn?: boolean
     weight: number
@@ -245,19 +270,21 @@ interface ApiAccountsCheck {
     account_ordering: string[]
 }
 
-type ApiFileDownload = {
-    status: 'success'
-    /** signed download url */
-    download_url: string
-    metadata: {}
-    file_name: string
-    /** iso8601 datetime string */
-    creation_time: string
-} | {
-    status: 'error'
-    error_code: string
-    error_message: string | null
-}
+type ApiFileDownload =
+    | {
+        status: 'success'
+        /** signed download url */
+        download_url: string
+        metadata: {}
+        file_name: string
+        /** iso8601 datetime string */
+        creation_time: string
+    }
+    | {
+        status: 'error'
+        error_code: string
+        error_message: string | null
+    }
 
 // eslint-disable-next-line no-restricted-syntax
 const enum ChatGPTCookie {
@@ -283,9 +310,15 @@ const enum ChatGPTCookie {
 }
 
 const sessionApi = urlcat(baseUrl, '/api/auth/session')
-const conversationApi = (id: string) => urlcat(apiUrl, '/conversation/:id', { id })
-const conversationsApi = (offset: number, limit: number) => urlcat(apiUrl, '/conversations', { offset, limit })
-const fileDownloadApi = (id: string) => urlcat(apiUrl, '/files/:id/download', { id })
+function conversationApi(id: string) {
+    return urlcat(apiUrl, '/conversation/:id', { id })
+}
+function conversationsApi(offset: number, limit: number) {
+    return urlcat(apiUrl, '/conversations', { offset, limit })
+}
+function fileDownloadApi(id: string) {
+    return urlcat(apiUrl, '/files/:id/download', { id })
+}
 const accountsCheckApi = urlcat(apiUrl, '/accounts/check/v4-2023-04-27')
 
 export async function getCurrentChatId(): Promise<string> {
@@ -306,47 +339,75 @@ export async function getCurrentChatId(): Promise<string> {
 
 async function fetchImageFromPointer(uri: string) {
     const pointer = uri.replace('file-service://', '')
-    const imageDetails = await fetchApi<ApiFileDownload>(fileDownloadApi(pointer))
+    const imageDetails = await fetchApi<ApiFileDownload>(
+        fileDownloadApi(pointer),
+    )
     if (imageDetails.status === 'error') {
-        console.error('Failed to fetch image asset', imageDetails.error_code, imageDetails.error_message)
+        console.error(
+            'Failed to fetch image asset',
+            imageDetails.error_code,
+            imageDetails.error_message,
+        )
         return null
     }
 
     const image = await fetch(imageDetails.download_url)
     const blob = await image.blob()
     const base64 = await blobToDataURL(blob)
-    return base64.replace(/^data:.*?;/, `data:${image.headers.get('content-type')};`)
+    return base64.replace(
+        /^data:.*?;/,
+        `data:${image.headers.get('content-type')};`,
+    )
 }
 
 /** replaces `file-service://` pointers with data uris containing the image */
 /** avoid errors in parsing multimodal parts we don't understand */
-async function replaceImageAssets(conversation: ApiConversation): Promise<void> {
-    const isMultiModalInputImage = (part: any): part is MultiModalInputImage => {
-        return typeof part === 'object' && part !== null && 'asset_pointer' in part
-               && typeof part.asset_pointer === 'string' && part.asset_pointer.startsWith('file-service://')
+async function replaceImageAssets(
+    conversation: ApiConversation,
+): Promise<void> {
+    const isMultiModalInputImage = (
+        part: any,
+    ): part is MultiModalInputImage => {
+        return (
+            typeof part === 'object'
+            && part !== null
+            && 'asset_pointer' in part
+            && typeof part.asset_pointer === 'string'
+            && part.asset_pointer.startsWith('file-service://')
+        )
     }
 
     const imageAssets = Object.values(conversation.mapping).flatMap((node) => {
         if (!node.message) return []
         if (node.message.content.content_type !== 'multimodal_text') return []
 
-        return (Array.isArray(node.message.content.parts) ? node.message.content.parts : [])
-            .filter(isMultiModalInputImage)
+        return (
+            Array.isArray(node.message.content.parts)
+                ? node.message.content.parts
+                : []
+        ).filter(isMultiModalInputImage)
     })
 
-    const executionOutputs = Object.values(conversation.mapping).flatMap((node) => {
-        if (!node.message) return []
-        if (node.message.content.content_type !== 'execution_output') return []
-        if (!node.message.metadata?.aggregate_result?.messages) return []
+    const executionOutputs = Object.values(conversation.mapping).flatMap(
+        (node) => {
+            if (!node.message) return []
+            if (node.message.content.content_type !== 'execution_output') {
+                return []
+            }
+            if (!node.message.metadata?.aggregate_result?.messages) return []
 
-        return node.message.metadata.aggregate_result.messages
-            .filter(msg => msg.message_type === 'image')
-    })
+            return node.message.metadata.aggregate_result.messages.filter(
+                msg => msg.message_type === 'image',
+            )
+        },
+    )
 
     await Promise.all([
         ...imageAssets.map(async (asset) => {
             try {
-                const newAssetPointer = await fetchImageFromPointer(asset.asset_pointer)
+                const newAssetPointer = await fetchImageFromPointer(
+                    asset.asset_pointer,
+                )
                 if (newAssetPointer) asset.asset_pointer = newAssetPointer
             }
             catch (error) {
@@ -365,10 +426,14 @@ async function replaceImageAssets(conversation: ApiConversation): Promise<void> 
     ])
 }
 
-export async function fetchConversation(chatId: string, shouldReplaceAssets: boolean): Promise<ApiConversationWithId> {
+export async function fetchConversation(
+    chatId: string,
+    shouldReplaceAssets: boolean,
+): Promise<ApiConversationWithId> {
     if (chatId.startsWith('__share__')) {
         const id = chatId.replace('__share__', '')
-        const shareConversation = getConversationFromSharePage() as ApiConversation
+        const shareConversation
+            = getConversationFromSharePage() as ApiConversation
         await replaceImageAssets(shareConversation)
 
         return {
@@ -390,23 +455,51 @@ export async function fetchConversation(chatId: string, shouldReplaceAssets: boo
     }
 }
 
-async function fetchConversations(offset = 0, limit = 20): Promise<ApiConversations> {
+async function fetchConversations(
+    offset = 0,
+    limit = 20,
+): Promise<ApiConversations> {
     const url = conversationsApi(offset, limit)
     return fetchApi(url)
 }
 
-export async function fetchAllConversations(): Promise<ApiConversationItem[]> {
+export async function fetchAllConversations(
+    maxConversations = 1000,
+): Promise<ApiConversationItem[]> {
     const conversations: ApiConversationItem[] = []
-    const limit = 100
+    const limit = 100 // Keep batch size
     let offset = 0
     while (true) {
-        const result = await fetchConversations(offset, limit)
-        conversations.push(...result.items)
-        if (offset + limit >= result.total) break
-        if (offset + limit >= 1000) break
-        offset += limit
+        try {
+            const result = await fetchConversations(offset, limit)
+            if (!result.items) {
+                // Handle potential API errors or empty responses
+                console.warn(
+                    'fetchAllConversations received no items at offset:',
+                    offset,
+                )
+                break
+            }
+            conversations.push(...result.items)
+            // Stop if we've reached the total reported by the API OR the user-defined limit
+            if (
+                offset + limit >= result.total
+                || conversations.length >= maxConversations
+            ) {
+                break
+            }
+            // Safety break moved inside the condition above
+            // if (offset + limit >= 1000) break; // Remove or adjust this if maxConversations can be higher
+            offset += limit
+        }
+        catch (error) {
+            console.error('Error fetching conversations batch:', error)
+            // Decide if you want to stop or retry on error. Stopping for now.
+            break
+        }
     }
-    return conversations
+    // Ensure we don't return more than the requested limit if the last batch pushed us over
+    return conversations.slice(0, maxConversations)
 }
 
 export async function archiveConversation(chatId: string): Promise<boolean> {
@@ -483,7 +576,11 @@ async function _fetchAccountsCheck(): Promise<ApiAccountsCheck> {
 
 const fetchAccountsCheck = memorize(_fetchAccountsCheck)
 
-const getCookie = (key: string) => document.cookie.match(`(^|;)\\s*${key}\\s*=\\s*([^;]+)`)?.pop() || ''
+function getCookie(key: string) {
+    return (
+        document.cookie.match(`(^|;)\\s*${key}\\s*=\\s*([^;]+)`)?.pop() || ''
+    )
+}
 
 export async function getTeamAccountId(): Promise<string | null> {
     const accountsCheck = await fetchAccountsCheck()
@@ -508,29 +605,38 @@ export interface ConversationResult {
     conversationNodes: ConversationNode[]
 }
 
-const ModelMapping: { [key in ModelSlug]: string } & { [key: string]: string } = {
-    'text-davinci-002-render-sha': 'GPT-3.5',
-    'text-davinci-002-render-paid': 'GPT-3.5',
-    'text-davinci-002-browse': 'GPT-3.5',
-    'gpt-4': 'GPT-4',
-    'gpt-4-browsing': 'GPT-4 (Browser)',
-    'gpt-4o': 'GPT-4o',
+const ModelMapping: { [key in ModelSlug]: string } & { [key: string]: string }
+    = {
+        'text-davinci-002-render-sha': 'GPT-3.5',
+        'text-davinci-002-render-paid': 'GPT-3.5',
+        'text-davinci-002-browse': 'GPT-3.5',
+        'gpt-4': 'GPT-4',
+        'gpt-4-browsing': 'GPT-4 (Browser)',
+        'gpt-4o': 'GPT-4o',
 
-    // fuzzy matching
-    'text-davinci-002': 'GPT-3.5',
-}
+        // fuzzy matching
+        'text-davinci-002': 'GPT-3.5',
+    }
 
-export function processConversation(conversation: ApiConversationWithId): ConversationResult {
+export function processConversation(
+    conversation: ApiConversationWithId,
+): ConversationResult {
     const title = conversation.title || 'ChatGPT Conversation'
     const createTime = conversation.create_time
     const updateTime = conversation.update_time
     const { model, modelSlug } = extractModel(conversation.mapping)
 
-    const startNodeId = conversation.current_node
-        || Object.values(conversation.mapping).find(node => !node.children || node.children.length === 0)?.id
+    const startNodeId
+        = conversation.current_node
+        || Object.values(conversation.mapping).find(
+            node => !node.children || node.children.length === 0,
+        )?.id
     if (!startNodeId) throw new Error('Failed to find start node.')
 
-    const conversationNodes = extractConversationResult(conversation.mapping, startNodeId)
+    const conversationNodes = extractConversationResult(
+        conversation.mapping,
+        startNodeId,
+    )
     const mergedConversationNodes = mergeContinuationNodes(conversationNodes)
 
     return {
@@ -546,7 +652,10 @@ export function processConversation(conversation: ApiConversationWithId): Conver
 
 function extractModel(conversationMapping: Record<string, ConversationNode>) {
     let model = ''
-    const modelSlug = Object.values(conversationMapping).find(node => node.message?.metadata?.model_slug)?.message?.metadata?.model_slug || ''
+    const modelSlug
+        = Object.values(conversationMapping).find(
+            node => node.message?.metadata?.model_slug,
+        )?.message?.metadata?.model_slug || ''
     if (modelSlug) {
         if (ModelMapping[modelSlug]) {
             model = ModelMapping[modelSlug]
@@ -566,7 +675,10 @@ function extractModel(conversationMapping: Record<string, ConversationNode>) {
     }
 }
 
-function extractConversationResult(conversationMapping: Record<string, ConversationNode>, startNodeId: string): ConversationNode[] {
+function extractConversationResult(
+    conversationMapping: Record<string, ConversationNode>,
+    startNodeId: string,
+): ConversationNode[] {
     const result: ConversationNode[] = []
     let currentNodeId: string | undefined = startNodeId
 
@@ -606,13 +718,20 @@ function mergeContinuationNodes(nodes: ConversationNode[]): ConversationNode[] {
     for (const node of nodes) {
         const prevNode = result[result.length - 1]
         if (
-            prevNode?.message?.author.role === 'assistant' && node.message?.author.role === 'assistant'
-         && prevNode.message.recipient === 'all' && node.message.recipient === 'all'
-         && prevNode.message.content.content_type === 'text' && node.message.content.content_type === 'text'
+            prevNode?.message?.author.role === 'assistant'
+            && node.message?.author.role === 'assistant'
+            && prevNode.message.recipient === 'all'
+            && node.message.recipient === 'all'
+            && prevNode.message.content.content_type === 'text'
+            && node.message.content.content_type === 'text'
         ) {
             // the last part of the previous node should directly concat to the first part of the current node
-            prevNode.message.content.parts[prevNode.message.content.parts.length - 1] += node.message.content.parts[0]
-            prevNode.message.content.parts.push(...node.message.content.parts.slice(1))
+            prevNode.message.content.parts[
+                prevNode.message.content.parts.length - 1
+            ] += node.message.content.parts[0]
+            prevNode.message.content.parts.push(
+                ...node.message.content.parts.slice(1),
+            )
         }
         else {
             result.push(node)

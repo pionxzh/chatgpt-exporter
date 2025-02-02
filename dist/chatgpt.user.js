@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.27.0
+// @version            2.27.1
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -1012,6 +1012,7 @@ html {
   const KEY_META_LIST = "exporter:meta_list";
   const KEY_OAI_LOCALE = "oai/apps/locale";
   const KEY_OAI_HISTORY_DISABLED = "oai/apps/historyDisabled";
+  const KEY_EXPORT_ALL_LIMIT = "exporter:export_all_limit";
   var _GM_deleteValue = /* @__PURE__ */ (() => typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0)();
   var _GM_getValue = /* @__PURE__ */ (() => typeof GM_getValue != "undefined" ? GM_getValue : void 0)();
   var _GM_setValue = /* @__PURE__ */ (() => typeof GM_setValue != "undefined" ? GM_setValue : void 0)();
@@ -1130,15 +1131,24 @@ html {
   }
   async function fetchImageFromPointer(uri) {
     const pointer = uri.replace("file-service://", "");
-    const imageDetails = await fetchApi(fileDownloadApi(pointer));
+    const imageDetails = await fetchApi(
+      fileDownloadApi(pointer)
+    );
     if (imageDetails.status === "error") {
-      console.error("Failed to fetch image asset", imageDetails.error_code, imageDetails.error_message);
+      console.error(
+        "Failed to fetch image asset",
+        imageDetails.error_code,
+        imageDetails.error_message
+      );
       return null;
     }
     const image2 = await fetch(imageDetails.download_url);
     const blob = await image2.blob();
     const base64 = await blobToDataURL(blob);
-    return base64.replace(/^data:.*?;/, `data:${image2.headers.get("content-type")};`);
+    return base64.replace(
+      /^data:.*?;/,
+      `data:${image2.headers.get("content-type")};`
+    );
   }
   async function replaceImageAssets(conversation) {
     const isMultiModalInputImage = (part) => {
@@ -1149,17 +1159,24 @@ html {
       if (node2.message.content.content_type !== "multimodal_text") return [];
       return (Array.isArray(node2.message.content.parts) ? node2.message.content.parts : []).filter(isMultiModalInputImage);
     });
-    const executionOutputs = Object.values(conversation.mapping).flatMap((node2) => {
-      var _a, _b;
-      if (!node2.message) return [];
-      if (node2.message.content.content_type !== "execution_output") return [];
-      if (!((_b = (_a = node2.message.metadata) == null ? void 0 : _a.aggregate_result) == null ? void 0 : _b.messages)) return [];
-      return node2.message.metadata.aggregate_result.messages.filter((msg) => msg.message_type === "image");
-    });
+    const executionOutputs = Object.values(conversation.mapping).flatMap(
+      (node2) => {
+        var _a, _b;
+        if (!node2.message) return [];
+        if (node2.message.content.content_type !== "execution_output")
+          return [];
+        if (!((_b = (_a = node2.message.metadata) == null ? void 0 : _a.aggregate_result) == null ? void 0 : _b.messages)) return [];
+        return node2.message.metadata.aggregate_result.messages.filter(
+          (msg) => msg.message_type === "image"
+        );
+      }
+    );
     await Promise.all([
       ...imageAssets.map(async (asset) => {
         try {
-          const newAssetPointer = await fetchImageFromPointer(asset.asset_pointer);
+          const newAssetPointer = await fetchImageFromPointer(
+            asset.asset_pointer
+          );
           if (newAssetPointer) asset.asset_pointer = newAssetPointer;
         } catch (error2) {
           console.error("Failed to fetch image asset", error2);
@@ -1199,18 +1216,31 @@ html {
     const url = conversationsApi(offset, limit);
     return fetchApi(url);
   }
-  async function fetchAllConversations() {
+  async function fetchAllConversations(maxConversations = 1e3) {
     const conversations = [];
     const limit = 100;
     let offset = 0;
     while (true) {
-      const result = await fetchConversations(offset, limit);
-      conversations.push(...result.items);
-      if (offset + limit >= result.total) break;
-      if (offset + limit >= 1e3) break;
-      offset += limit;
+      try {
+        const result = await fetchConversations(offset, limit);
+        if (!result.items) {
+          console.warn(
+            "fetchAllConversations received no items at offset:",
+            offset
+          );
+          break;
+        }
+        conversations.push(...result.items);
+        if (offset + limit >= result.total || conversations.length >= maxConversations) {
+          break;
+        }
+        offset += limit;
+      } catch (error2) {
+        console.error("Error fetching conversations batch:", error2);
+        break;
+      }
     }
-    return conversations;
+    return conversations.slice(0, maxConversations);
   }
   async function archiveConversation(chatId) {
     const url = conversationApi(chatId);
@@ -1236,7 +1266,7 @@ html {
     const response = await fetch(url, {
       ...options,
       headers: {
-        "Authorization": `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
         "X-Authorization": `Bearer ${accessToken}`,
         ...accountId ? { "Chatgpt-Account-Id": accountId } : {},
         ...options == null ? void 0 : options.headers
@@ -1265,7 +1295,7 @@ html {
     const accessToken = await getAccessToken();
     const response = await fetch(accountsCheckApi, {
       headers: {
-        "Authorization": `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
         "X-Authorization": `Bearer ${accessToken}`
       }
     });
@@ -1309,9 +1339,14 @@ html {
     const createTime = conversation.create_time;
     const updateTime = conversation.update_time;
     const { model, modelSlug } = extractModel(conversation.mapping);
-    const startNodeId = conversation.current_node || ((_a = Object.values(conversation.mapping).find((node2) => !node2.children || node2.children.length === 0)) == null ? void 0 : _a.id);
+    const startNodeId = conversation.current_node || ((_a = Object.values(conversation.mapping).find(
+      (node2) => !node2.children || node2.children.length === 0
+    )) == null ? void 0 : _a.id);
     if (!startNodeId) throw new Error("Failed to find start node.");
-    const conversationNodes = extractConversationResult(conversation.mapping, startNodeId);
+    const conversationNodes = extractConversationResult(
+      conversation.mapping,
+      startNodeId
+    );
     const mergedConversationNodes = mergeContinuationNodes(conversationNodes);
     return {
       id: conversation.id,
@@ -1326,10 +1361,12 @@ html {
   function extractModel(conversationMapping) {
     var _a, _b, _c;
     let model = "";
-    const modelSlug = ((_c = (_b = (_a = Object.values(conversationMapping).find((node2) => {
-      var _a2, _b2;
-      return (_b2 = (_a2 = node2.message) == null ? void 0 : _a2.metadata) == null ? void 0 : _b2.model_slug;
-    })) == null ? void 0 : _a.message) == null ? void 0 : _b.metadata) == null ? void 0 : _c.model_slug) || "";
+    const modelSlug = ((_c = (_b = (_a = Object.values(conversationMapping).find(
+      (node2) => {
+        var _a2, _b2;
+        return (_b2 = (_a2 = node2.message) == null ? void 0 : _a2.metadata) == null ? void 0 : _b2.model_slug;
+      }
+    )) == null ? void 0 : _a.message) == null ? void 0 : _b.metadata) == null ? void 0 : _c.model_slug) || "";
     if (modelSlug) {
       if (ModelMapping[modelSlug]) {
         model = ModelMapping[modelSlug];
@@ -1360,7 +1397,9 @@ html {
       }
       if (
         // Skip system messages
-        ((_a = node2.message) == null ? void 0 : _a.author.role) !== "system" && ((_b = node2.message) == null ? void 0 : _b.content.content_type) !== "model_editable_context" && ((_c = node2.message) == null ? void 0 : _c.content.content_type) !== "user_editable_context"
+        ((_a = node2.message) == null ? void 0 : _a.author.role) !== "system" && // Skip model memory context
+        ((_b = node2.message) == null ? void 0 : _b.content.content_type) !== "model_editable_context" && // Skip user custom instructions
+        ((_c = node2.message) == null ? void 0 : _c.content.content_type) !== "user_editable_context"
       ) {
         result.unshift(node2);
       }
@@ -1375,7 +1414,9 @@ html {
       const prevNode = result[result.length - 1];
       if (((_a = prevNode == null ? void 0 : prevNode.message) == null ? void 0 : _a.author.role) === "assistant" && ((_b = node2.message) == null ? void 0 : _b.author.role) === "assistant" && prevNode.message.recipient === "all" && node2.message.recipient === "all" && prevNode.message.content.content_type === "text" && node2.message.content.content_type === "text") {
         prevNode.message.content.parts[prevNode.message.content.parts.length - 1] += node2.message.content.parts[0];
-        prevNode.message.content.parts.push(...node2.message.content.parts.slice(1));
+        prevNode.message.content.parts.push(
+          ...node2.message.content.parts.slice(1)
+        );
       } else {
         result.push(node2);
       }
@@ -8047,7 +8088,9 @@ html {
     "Conversation Archived Message": "All selected conversations have been archived. Please refresh the page to see the changes.",
     "Conversation Delete Alert": "Are you sure you want to delete all selected conversations?",
     "Conversation Deleted Message": "All selected conversations have been deleted. Please refresh the page to see the changes.",
-    "Please start a conversation first": "Please start a conversation first."
+    "Please start a conversation first": "Please start a conversation first.",
+    "Export All Limit": "Export All Limit",
+    "Export All Limit Description": "Set the maximum number of conversations to load in the 'Export All' dialog."
   };
   const title$7 = "ChatGPT Exporter";
   const ExportHelper$7 = "Exportar";
@@ -8102,6 +8145,8 @@ html {
     "Conversation Archived Message": "Todos las conversaciones seleccionadas se han archivado. Por favor refresca la página para ver los cambios.",
     "Conversation Delete Alert": "¿Estás seguro que quieres borrar todas las conversaciones seleccionadas?",
     "Conversation Deleted Message": "Todos las conversaciones seleccionadas se han borrado. Por favor refresca la página para ver los cambios.",
+    "Export All Limit": "Límite de Exportar Todos",
+    "Export All Limit Description": "Establece el número máximo de conversaciones a cargar en el diálogo 'Exportar Todos'.",
     "Please start a conversation first": "Por favor empieza una conversación antes."
   };
   const title$6 = "Exportateur ChatGPT";
@@ -8157,6 +8202,8 @@ html {
     "Conversation Archived Message": "Toutes les conversations sélectionnées ont été archivées. Veuillez actualiser la page pour voir les changements.",
     "Conversation Delete Alert": "Êtes-vous sûr de vouloir supprimer toutes les conversations sélectionnées ?",
     "Conversation Deleted Message": "Toutes les conversations sélectionnées ont été supprimées. Veuillez actualiser la page pour voir les changements.",
+    "Export All Limit": "Limite d'Exportation Multiple",
+    "Export All Limit Description": "Définit le nombre maximal de conversations à charger dans la boîte de dialogue 'Tout exporter'.",
     "Please start a conversation first": "Veuillez commencer une conversation d'abord."
   };
   const title$5 = "ChatGPT Exporter";
@@ -8212,6 +8259,8 @@ html {
     "Conversation Archived Message": "Semua percakapan yang dipilih telah diarsipkan. Harap segarkan halaman untuk melihat perubahan.",
     "Conversation Delete Alert": "Apakah Anda yakin ingin menghapus semua percakapan yang dipilih?",
     "Conversation Deleted Message": "Semua percakapan yang dipilih telah dihapus. Harap segarkan halaman untuk melihat perubahan.",
+    "Export All Limit": "Batas Ekspor Semua",
+    "Export All Limit Description": "Atur jumlah maksimum percakapan yang akan dimuat dalam dialog 'Ekspor Semua'.",
     "Please start a conversation first": "Harap mulai percakapan terlebih dahulu."
   };
   const title$4 = "ChatGPTエクスポーター";
@@ -8267,6 +8316,8 @@ html {
     "Conversation Archived Message": "選択したすべての会話がアーカイブされました。変更を表示するには、ページを更新してください。",
     "Conversation Delete Alert": "選択したすべての会話を削除してもよろしいですか？",
     "Conversation Deleted Message": "選択したすべての会話が削除されました。変更を表示するには、ページを更新してください。",
+    "Export All Limit": "すべてエクスポートの上限",
+    "Export All Limit Description": "「すべてエクスポート」ダイアログで読み込む会話の最大数を設定します。",
     "Please start a conversation first": "まず会話を開始してください。"
   };
   const title$3 = "ChatGPT Exporter";
@@ -8322,6 +8373,8 @@ html {
     "Conversation Archived Message": "Все выбранные разговоры были заархивированы. Пожалуйста, обновите страницу, чтобы увидеть изменения.",
     "Conversation Delete Alert": "Вы уверены, что хотите удалить все выбранные разговоры?",
     "Conversation Deleted Message": "Все выбранные разговоры были удалены. Пожалуйста, обновите страницу, чтобы увидеть изменения.",
+    "Export All Limit": "Лимит экспорта всех",
+    "Export All Limit Description": "Установите максимальное количество бесед для загрузки в диалоге 'Экспортировать все'.",
     "Please start a conversation first": "Пожалуйста, начните разговор первым."
   };
   const title$2 = "ChatGPT Exporter";
@@ -8377,6 +8430,8 @@ html {
     "Conversation Archived Message": "Seçilen tüm konuşmalar arşivlendi. Değişiklikleri görmek için sayfayı yenileyin.",
     "Conversation Delete Alert": "Seçilen tüm konuşmaları silmek istediğinizden emin misiniz?",
     "Conversation Deleted Message": "Seçilen tüm konuşmalar silindi. Değişiklikleri görmek için sayfayı yenileyin.",
+    "Export All Limit": "Tümünü Dışa Aktarma Limiti",
+    "Export All Limit Description": "'Tümünü Dışa Aktar' iletişim kutusunda yüklenecek maksimum konuşma sayısını ayarlayın.",
     "Please start a conversation first": "Lütfen önce bir konuşma başlatın."
   };
   const title$1 = "ChatGPT Exporter";
@@ -8432,6 +8487,8 @@ html {
     "Conversation Archived Message": "所有所选的对话已归档。请刷新页面。",
     "Conversation Delete Alert": "确定要删除所有选取的对话？",
     "Conversation Deleted Message": "所有所选的对话已删除。请刷新页面。",
+    "Export All Limit": "批量导出上限",
+    "Export All Limit Description": "设置“批量导出”对话框中加载的最大对话数量。",
     "Please start a conversation first": "请先开始对话。"
   };
   const title = "ChatGPT Exporter";
@@ -8487,6 +8544,8 @@ html {
     "Conversation Archived Message": "所有選取的對話已封存。請重新整理頁面。",
     "Conversation Delete Alert": "確定要刪除所有選取的對話？",
     "Conversation Deleted Message": "所有選取的對話已刪除。請重新整理頁面。",
+    "Export All Limit": "批量匯出上限",
+    "Export All Limit Description": "設定「批量匯出」對話方塊中載入的最大對話數量。",
     "Please start a conversation first": "請先開始對話。"
   };
   class GMStorage {
@@ -20896,15 +20955,20 @@ ${content2.text}
         return () => feedbackBar.classList.remove("hidden");
       });
     }
-    const buttonWrappers = document.querySelectorAll("main .flex.empty\\:hidden");
-    buttonWrappers.forEach((wrapper) => {
-      if (!wrapper.querySelector("button")) return;
-      if (wrapper.closest("pre")) return;
+    const switchContextBuuton1 = thread.querySelectorAll("div.mb-2.flex.gap-3.empty\\:hidden.mr-1.flex-row-reverse");
+    if (switchContextBuuton1) {
       effect.add(() => {
-        wrapper.style.display = "none";
-        return () => wrapper.style.display = "";
+        switchContextBuuton1.forEach((a2) => a2.classList.add("hidden"));
+        return () => switchContextBuuton1.forEach((a2) => a2.classList.remove("hidden"));
       });
-    });
+    }
+    const switchContextBuuton2 = thread.querySelectorAll("div.mb-2.flex.gap-3.empty\\:hidden.-ml-2");
+    if (switchContextBuuton2) {
+      effect.add(() => {
+        switchContextBuuton2.forEach((a2) => a2.classList.add("hidden"));
+        return () => switchContextBuuton2.forEach((a2) => a2.classList.remove("hidden"));
+      });
+    }
     const copyButtons = thread.querySelectorAll("pre button");
     copyButtons.forEach((button) => {
       effect.add(() => {
@@ -21820,6 +21884,7 @@ ${content2}`;
     return [storedValue, setValue];
   }
   const defaultFormat = "ChatGPT-{title}";
+  const defaultExportAllLimit = 1e3;
   const defaultExportMetaList = [
     { name: "title", value: "{title}" },
     { name: "source", value: "{source}" }
@@ -21846,22 +21911,55 @@ ${content2}`;
     exportMetaList: defaultExportMetaList,
     setExportMetaList: (_24) => {
     },
+    exportAllLimit: defaultExportAllLimit,
+    setExportAllLimit: (_24) => {
+    },
     resetDefault: () => {
     }
   });
   const SettingProvider = ({ children }) => {
-    const [format, setFormat] = useGMStorage(KEY_FILENAME_FORMAT, defaultFormat);
-    const [enableTimestamp, setEnableTimestamp] = useGMStorage(KEY_TIMESTAMP_ENABLED, false);
-    const [timeStamp24H, setTimeStamp24H] = useGMStorage(KEY_TIMESTAMP_24H, false);
-    const [enableTimestampHTML, setEnableTimestampHTML] = useGMStorage(KEY_TIMESTAMP_HTML, false);
-    const [enableTimestampMarkdown, setEnableTimestampMarkdown] = useGMStorage(KEY_TIMESTAMP_MARKDOWN, false);
+    const [format, setFormat] = useGMStorage(
+      KEY_FILENAME_FORMAT,
+      defaultFormat
+    );
+    const [enableTimestamp, setEnableTimestamp] = useGMStorage(
+      KEY_TIMESTAMP_ENABLED,
+      false
+    );
+    const [timeStamp24H, setTimeStamp24H] = useGMStorage(
+      KEY_TIMESTAMP_24H,
+      false
+    );
+    const [enableTimestampHTML, setEnableTimestampHTML] = useGMStorage(
+      KEY_TIMESTAMP_HTML,
+      false
+    );
+    const [enableTimestampMarkdown, setEnableTimestampMarkdown] = useGMStorage(
+      KEY_TIMESTAMP_MARKDOWN,
+      false
+    );
     const [enableMeta, setEnableMeta] = useGMStorage(KEY_META_ENABLED, false);
-    const [exportMetaList, setExportMetaList] = useGMStorage(KEY_META_LIST, defaultExportMetaList);
+    const [exportMetaList, setExportMetaList] = useGMStorage(
+      KEY_META_LIST,
+      defaultExportMetaList
+    );
+    const [exportAllLimit, setExportAllLimit] = useGMStorage(
+      KEY_EXPORT_ALL_LIMIT,
+      defaultExportAllLimit
+    );
     const resetDefault = T$4(() => {
       setFormat(defaultFormat);
+      setEnableTimestamp(false);
       setEnableMeta(false);
       setExportMetaList(defaultExportMetaList);
-    }, [setFormat, setEnableMeta, setExportMetaList]);
+      setExportAllLimit(defaultExportAllLimit);
+    }, [
+      setFormat,
+      setEnableTimestamp,
+      setEnableMeta,
+      setExportMetaList,
+      setExportAllLimit
+    ]);
     return /* @__PURE__ */ o$8(
       SettingContext.Provider,
       {
@@ -21880,6 +21978,10 @@ ${content2}`;
           setEnableMeta,
           exportMetaList,
           setExportMetaList,
+          exportAllLimit,
+          // Provide state
+          setExportAllLimit,
+          // Provide setter
           resetDefault
         },
         children
@@ -21936,14 +22038,20 @@ ${content2}`;
   };
   const DialogContent = ({ format }) => {
     const { t: t2 } = useTranslation();
-    const { enableMeta, exportMetaList } = useSettingContext();
-    const metaList = F$1(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList]);
-    const exportAllOptions = F$1(() => [
-      { label: "Markdown", callback: exportAllToMarkdown },
-      { label: "HTML", callback: exportAllToHtml },
-      { label: "JSON", callback: exportAllToOfficialJson },
-      { label: "JSON (ZIP)", callback: exportAllToJson }
-    ], []);
+    const { enableMeta, exportMetaList, exportAllLimit } = useSettingContext();
+    const metaList = F$1(
+      () => enableMeta ? exportMetaList : [],
+      [enableMeta, exportMetaList]
+    );
+    const exportAllOptions = F$1(
+      () => [
+        { label: "Markdown", callback: exportAllToMarkdown },
+        { label: "HTML", callback: exportAllToHtml },
+        { label: "JSON", callback: exportAllToOfficialJson },
+        { label: "JSON (ZIP)", callback: exportAllToJson }
+      ],
+      []
+    );
     const fileInputRef = _(null);
     const [exportSource, setExportSource] = h$4("API");
     const [apiConversations, setApiConversations] = h$4([]);
@@ -21955,8 +22063,14 @@ ${content2}`;
     const [selected, setSelected] = h$4([]);
     const [exportType, setExportType] = h$4(exportAllOptions[0].label);
     const disabled = loading || processing || !!error2 || selected.length === 0;
-    const requestQueue = F$1(() => new RequestQueue(200, 1600), []);
-    const archiveQueue = F$1(() => new RequestQueue(200, 1600), []);
+    const requestQueue = F$1(
+      () => new RequestQueue(200, 1600),
+      []
+    );
+    const archiveQueue = F$1(
+      () => new RequestQueue(200, 1600),
+      []
+    );
     const deleteQueue = F$1(() => new RequestQueue(200, 1600), []);
     const [progress, setProgress] = h$4({
       total: 0,
@@ -21964,23 +22078,26 @@ ${content2}`;
       currentName: "",
       currentStatus: ""
     });
-    const onUpload = T$4((e2) => {
-      var _a, _b;
-      const file = (_b = (_a = e2.target) == null ? void 0 : _a.files) == null ? void 0 : _b[0];
-      if (!file) return;
-      const fileReader = new FileReader();
-      fileReader.onload = () => {
-        const data = JSON.parse(fileReader.result);
-        if (!Array.isArray(data)) {
-          alert(t2("Invalid File Format"));
-          return;
-        }
-        setSelected([]);
-        setExportSource("Local");
-        setLocalConversations(data);
-      };
-      fileReader.readAsText(file);
-    }, [t2, setExportSource, setLocalConversations]);
+    const onUpload = T$4(
+      (e2) => {
+        var _a, _b;
+        const file = (_b = (_a = e2.target) == null ? void 0 : _a.files) == null ? void 0 : _b[0];
+        if (!file) return;
+        const fileReader = new FileReader();
+        fileReader.onload = () => {
+          const data = JSON.parse(fileReader.result);
+          if (!Array.isArray(data)) {
+            alert(t2("Invalid File Format"));
+            return;
+          }
+          setSelected([]);
+          setExportSource("Local");
+          setLocalConversations(data);
+        };
+        fileReader.readAsText(file);
+      },
+      [t2, setExportSource, setLocalConversations]
+    );
     p$6(() => {
       const off = requestQueue.on("progress", (progress2) => {
         setProcessing(true);
@@ -22006,7 +22123,9 @@ ${content2}`;
       const off = requestQueue.on("done", (results) => {
         var _a;
         setProcessing(false);
-        const callback = (_a = exportAllOptions.find((o3) => o3.label === exportType)) == null ? void 0 : _a.callback;
+        const callback = (_a = exportAllOptions.find(
+          (o3) => o3.label === exportType
+        )) == null ? void 0 : _a.callback;
         if (callback) callback(format, results, metaList);
       });
       return () => off();
@@ -22014,7 +22133,11 @@ ${content2}`;
     p$6(() => {
       const off = archiveQueue.on("done", () => {
         setProcessing(false);
-        setApiConversations(apiConversations.filter((c2) => !selected.some((s2) => s2.id === c2.id)));
+        setApiConversations(
+          apiConversations.filter(
+            (c2) => !selected.some((s2) => s2.id === c2.id)
+          )
+        );
         setSelected([]);
         alert(t2("Conversation Archived Message"));
       });
@@ -22023,7 +22146,11 @@ ${content2}`;
     p$6(() => {
       const off = deleteQueue.on("done", () => {
         setProcessing(false);
-        setApiConversations(apiConversations.filter((c2) => !selected.some((s2) => s2.id === c2.id)));
+        setApiConversations(
+          apiConversations.filter(
+            (c2) => !selected.some((s2) => s2.id === c2.id)
+          )
+        );
         setSelected([]);
         alert(t2("Conversation Deleted Message"));
       });
@@ -22043,10 +22170,22 @@ ${content2}`;
     const exportAllFromLocal = T$4(() => {
       var _a;
       if (disabled) return;
-      const results = localConversations.filter((c2) => selected.some((s2) => s2.id === c2.id));
-      const callback = (_a = exportAllOptions.find((o3) => o3.label === exportType)) == null ? void 0 : _a.callback;
+      const results = localConversations.filter(
+        (c2) => selected.some((s2) => s2.id === c2.id)
+      );
+      const callback = (_a = exportAllOptions.find(
+        (o3) => o3.label === exportType
+      )) == null ? void 0 : _a.callback;
       if (callback) callback(format, results, metaList);
-    }, [disabled, selected, localConversations, exportAllOptions, exportType, format, metaList]);
+    }, [
+      disabled,
+      selected,
+      localConversations,
+      exportAllOptions,
+      exportType,
+      format,
+      metaList
+    ]);
     const exportAll = F$1(() => {
       return exportSource === "API" ? exportAllFromApi : exportAllFromLocal;
     }, [exportSource, exportAllFromApi, exportAllFromLocal]);
@@ -22078,17 +22217,28 @@ ${content2}`;
     }, [disabled, selected, archiveQueue, t2]);
     p$6(() => {
       setLoading(true);
-      fetchAllConversations().then(setApiConversations).catch(setError).finally(() => setLoading(false));
-    }, []);
+      fetchAllConversations(exportAllLimit).then(setApiConversations).catch((err) => {
+        console.error("Error fetching conversations:", err);
+        setError(err.message || "Failed to load conversations");
+      }).finally(() => setLoading(false));
+    }, [exportAllLimit]);
     return /* @__PURE__ */ o$8(k$3, { children: [
       /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$f99233281efd08a0, { className: "DialogTitle", children: t2("Export Dialog Title") }),
       /* @__PURE__ */ o$8("div", { className: "flex items-center text-gray-600 dark:text-gray-300 flex justify-between border-b-[1px] pb-3 mb-3 dark:border-gray-700", children: [
         t2("Export from official export file"),
-        " (conversations.json) ",
-        exportSource === "API" && /* @__PURE__ */ o$8("button", { className: "btn relative btn-neutral", onClick: () => {
-          var _a;
-          return (_a = fileInputRef.current) == null ? void 0 : _a.click();
-        }, children: /* @__PURE__ */ o$8(IconUpload, { className: "w-4 h-4" }) })
+        " ",
+        "(conversations.json) ",
+        exportSource === "API" && /* @__PURE__ */ o$8(
+          "button",
+          {
+            className: "btn relative btn-neutral",
+            onClick: () => {
+              var _a;
+              return (_a = fileInputRef.current) == null ? void 0 : _a.click();
+            },
+            children: /* @__PURE__ */ o$8(IconUpload, { className: "w-4 h-4" })
+          }
+        )
       ] }),
       /* @__PURE__ */ o$8(
         "input",
@@ -22112,38 +22262,84 @@ ${content2}`;
           error: error2
         }
       ),
-      /* @__PURE__ */ o$8("div", { className: "flex mt-6", style: { justifyContent: "space-between" }, children: [
-        /* @__PURE__ */ o$8("select", { className: "Select", disabled: processing, value: exportType, onChange: (e2) => setExportType(e2.currentTarget.value), children: exportAllOptions.map(({ label }) => /* @__PURE__ */ o$8("option", { value: label, children: label }, t2(label))) }),
-        /* @__PURE__ */ o$8("div", { className: "flex flex-grow" }),
-        /* @__PURE__ */ o$8("button", { className: "Button red", disabled: disabled || exportSource === "Local", onClick: archiveAll, children: t2("Archive") }),
-        /* @__PURE__ */ o$8("button", { className: "Button red ml-4", disabled: disabled || exportSource === "Local", onClick: deleteAll, children: t2("Delete") }),
-        /* @__PURE__ */ o$8("button", { className: "Button green ml-4", disabled, onClick: exportAll, children: t2("Export") })
-      ] }),
+      /* @__PURE__ */ o$8(
+        "div",
+        {
+          className: "flex mt-6",
+          style: { justifyContent: "space-between" },
+          children: [
+            /* @__PURE__ */ o$8(
+              "select",
+              {
+                className: "Select",
+                disabled: processing,
+                value: exportType,
+                onChange: (e2) => setExportType(e2.currentTarget.value),
+                children: exportAllOptions.map(({ label }) => /* @__PURE__ */ o$8("option", { value: label, children: label }, t2(label)))
+              }
+            ),
+            /* @__PURE__ */ o$8("div", { className: "flex flex-grow" }),
+            /* @__PURE__ */ o$8(
+              "button",
+              {
+                className: "Button red",
+                disabled: disabled || exportSource === "Local",
+                onClick: archiveAll,
+                children: t2("Archive")
+              }
+            ),
+            /* @__PURE__ */ o$8(
+              "button",
+              {
+                className: "Button red ml-4",
+                disabled: disabled || exportSource === "Local",
+                onClick: deleteAll,
+                children: t2("Delete")
+              }
+            ),
+            /* @__PURE__ */ o$8(
+              "button",
+              {
+                className: "Button green ml-4",
+                disabled,
+                onClick: exportAll,
+                children: t2("Export")
+              }
+            )
+          ]
+        }
+      ),
       processing && /* @__PURE__ */ o$8(k$3, { children: [
         /* @__PURE__ */ o$8("div", { className: "mt-2 mb-1 justify-between flex", children: [
           /* @__PURE__ */ o$8("span", { className: "truncate mr-8", children: progress.currentName }),
           /* @__PURE__ */ o$8("span", { children: `${progress.completed}/${progress.total}` })
         ] }),
-        /* @__PURE__ */ o$8("div", { className: "w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700", children: /* @__PURE__ */ o$8("div", { className: "bg-blue-600 h-2.5 rounded-full", style: { width: `${progress.completed / progress.total * 100}%` } }) })
+        /* @__PURE__ */ o$8("div", { className: "w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700", children: /* @__PURE__ */ o$8(
+          "div",
+          {
+            className: "bg-blue-600 h-2.5 rounded-full",
+            style: {
+              width: `${progress.completed / progress.total * 100}%`
+            }
+          }
+        ) })
       ] }),
       /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$f39c2d165cd861fe, { asChild: true, children: /* @__PURE__ */ o$8("button", { className: "IconButton CloseButton", "aria-label": "Close", children: /* @__PURE__ */ o$8(IconCross, {}) }) })
     ] });
   };
-  const ExportDialog = ({ format, open, onOpenChange, children }) => {
-    return /* @__PURE__ */ o$8(
-      $5d3850c4d0b4e6c7$export$be92b6f5f03c0fe9,
-      {
-        open,
-        onOpenChange,
-        children: [
-          /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$41fb9f06171c75f4, { asChild: true, children }),
-          /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$602eac185826482c, { children: [
-            /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$c6fdb837b070b4ff, { className: "DialogOverlay" }),
-            /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$7c6e2c02157bb7d2, { className: "DialogContent", children: open && /* @__PURE__ */ o$8(DialogContent, { format }) })
-          ] })
-        ]
-      }
-    );
+  const ExportDialog = ({
+    format,
+    open,
+    onOpenChange,
+    children
+  }) => {
+    return /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$be92b6f5f03c0fe9, { open, onOpenChange, children: [
+      /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$41fb9f06171c75f4, { asChild: true, children }),
+      /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$602eac185826482c, { children: [
+        /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$c6fdb837b070b4ff, { className: "DialogOverlay" }),
+        /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$7c6e2c02157bb7d2, { className: "DialogContent", children: open && /* @__PURE__ */ o$8(DialogContent, { format }) })
+      ] })
+    ] });
   };
   const TIMEOUT = 2500;
   const MenuItem = ({ text: text2, successText, disabled = false, title: title2, icon: Icon, onClick, className }) => {
@@ -22556,7 +22752,14 @@ ${content2}`;
     ] });
   }
   function Variable({ name, title: title2 }) {
-    return /* @__PURE__ */ o$8("strong", { className: "cursor-help select-all whitespace-nowrap", title: title2, children: name });
+    return /* @__PURE__ */ o$8(
+      "strong",
+      {
+        className: "cursor-help select-all whitespace-nowrap",
+        title: title2,
+        children: name
+      }
+    );
   }
   const SettingDialog = ({
     open,
@@ -22578,7 +22781,9 @@ ${content2}`;
       enableMeta,
       setEnableMeta,
       exportMetaList,
-      setExportMetaList
+      setExportMetaList,
+      exportAllLimit,
+      setExportAllLimit
       /* eslint-enable pionxzh/consistent-list-newline */
     } = useSettingContext();
     const { t: t2, i18n } = useTranslation();
@@ -22590,143 +22795,298 @@ ${content2}`;
     const now = Date.now() / 1e3;
     const createTime = now;
     const updateTime = now;
-    const preview = getFileNameWithFormat(format, "{ext}", { title: title2, chatId, createTime, updateTime });
+    const preview = getFileNameWithFormat(format, "{ext}", {
+      title: title2,
+      chatId,
+      createTime,
+      updateTime
+    });
     const source = `${baseUrl}/${chatId}`;
-    return /* @__PURE__ */ o$8(
-      $5d3850c4d0b4e6c7$export$be92b6f5f03c0fe9,
-      {
-        open,
-        onOpenChange,
-        children: [
-          /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$41fb9f06171c75f4, { asChild: true, children }),
-          /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$602eac185826482c, { children: [
-            /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$c6fdb837b070b4ff, { className: "DialogOverlay" }),
-            /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$7c6e2c02157bb7d2, { className: "DialogContent", children: [
-              /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$f99233281efd08a0, { className: "DialogTitle", children: t2("Exporter Settings") }),
-              /* @__PURE__ */ o$8("dl", { className: "space-y-6", children: [
-                /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: /* @__PURE__ */ o$8("div", { children: [
-                  /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: `${t2("Language")} 🌐` }),
-                  /* @__PURE__ */ o$8("dd", { children: /* @__PURE__ */ o$8(
-                    "select",
+    return /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$be92b6f5f03c0fe9, { open, onOpenChange, children: [
+      /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$41fb9f06171c75f4, { asChild: true, children }),
+      /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$602eac185826482c, { children: [
+        /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$c6fdb837b070b4ff, { className: "DialogOverlay" }),
+        /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$7c6e2c02157bb7d2, { className: "DialogContent", children: [
+          /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$f99233281efd08a0, { className: "DialogTitle", children: t2("Exporter Settings") }),
+          /* @__PURE__ */ o$8("dl", { className: "space-y-6", children: [
+            /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: /* @__PURE__ */ o$8("div", { children: [
+              /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: `${t2("Language")} 🌐` }),
+              /* @__PURE__ */ o$8("dd", { children: /* @__PURE__ */ o$8(
+                "select",
+                {
+                  className: "Select mt-3",
+                  value: i18n.language,
+                  onChange: (e2) => i18n.changeLanguage(
+                    e2.currentTarget.value
+                  ),
+                  children: LOCALES.map(({ name, code: code2 }) => /* @__PURE__ */ o$8("option", { value: code2, children: name }, code2))
+                }
+              ) })
+            ] }) }),
+            /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: /* @__PURE__ */ o$8("div", { children: [
+              /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: t2("File Name") }),
+              /* @__PURE__ */ o$8("dd", { children: [
+                /* @__PURE__ */ o$8("p", { className: "text-sm text-gray-700 dark:text-gray-300", children: [
+                  t2("Available variables"),
+                  ":",
+                  " ",
+                  /* @__PURE__ */ o$8(
+                    Variable,
                     {
-                      className: "Select mt-3",
-                      value: i18n.language,
-                      onChange: (e2) => i18n.changeLanguage(e2.currentTarget.value),
-                      children: LOCALES.map(({ name, code: code2 }) => /* @__PURE__ */ o$8("option", { value: code2, children: name }, code2))
+                      name: "{title}",
+                      title: title2
                     }
-                  ) })
-                ] }) }),
-                /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: /* @__PURE__ */ o$8("div", { children: [
-                  /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: t2("File Name") }),
-                  /* @__PURE__ */ o$8("dd", { children: [
-                    /* @__PURE__ */ o$8("p", { className: "text-sm text-gray-700 dark:text-gray-300", children: [
+                  ),
+                  ",",
+                  " ",
+                  /* @__PURE__ */ o$8(Variable, { name: "{date}", title: date }),
+                  ",",
+                  " ",
+                  /* @__PURE__ */ o$8(
+                    Variable,
+                    {
+                      name: "{timestamp}",
+                      title: timestamp$1
+                    }
+                  ),
+                  ",",
+                  " ",
+                  /* @__PURE__ */ o$8(
+                    Variable,
+                    {
+                      name: "{chat_id}",
+                      title: chatId
+                    }
+                  ),
+                  ",",
+                  " ",
+                  /* @__PURE__ */ o$8(
+                    Variable,
+                    {
+                      name: "{create_time}",
+                      title: unixTimestampToISOString(
+                        createTime
+                      )
+                    }
+                  ),
+                  ",",
+                  " ",
+                  /* @__PURE__ */ o$8(
+                    Variable,
+                    {
+                      name: "{update_time}",
+                      title: unixTimestampToISOString(
+                        updateTime
+                      )
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ o$8(
+                  "input",
+                  {
+                    className: "Input mt-4",
+                    id: "filename",
+                    value: format,
+                    onChange: (e2) => setFormat(e2.currentTarget.value)
+                  }
+                ),
+                /* @__PURE__ */ o$8("p", { className: "mt-1 text-sm text-gray-700 dark:text-gray-300", children: [
+                  t2("Preview"),
+                  ":",
+                  " ",
+                  /* @__PURE__ */ o$8(
+                    "span",
+                    {
+                      className: "select-all",
+                      style: {
+                        "text-decoration": "underline",
+                        "text-underline-offset": 4
+                      },
+                      children: preview
+                    }
+                  )
+                ] })
+              ] })
+            ] }) }),
+            /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: /* @__PURE__ */ o$8("div", { children: [
+              /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: [
+                t2("Export All Limit"),
+                " "
+              ] }),
+              /* @__PURE__ */ o$8("dd", { className: "text-sm text-gray-700 dark:text-gray-300 mt-2", children: [
+                t2("Export All Limit Description"),
+                " ",
+                /* @__PURE__ */ o$8("div", { className: "flex items-center gap-4 mt-3", children: [
+                  /* @__PURE__ */ o$8(
+                    "input",
+                    {
+                      type: "range",
+                      min: "100",
+                      max: "20000",
+                      step: "100",
+                      value: exportAllLimit,
+                      onChange: (e2) => setExportAllLimit(
+                        parseInt(
+                          e2.currentTarget.value,
+                          10
+                        )
+                      ),
+                      className: "flex-grow h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700",
+                      id: "exportAllLimitSlider"
+                    }
+                  ),
+                  /* @__PURE__ */ o$8("span", { className: "font-medium text-gray-900 dark:text-gray-300 w-12 text-right", children: exportAllLimit })
+                ] })
+              ] })
+            ] }) }),
+            /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: [
+              /* @__PURE__ */ o$8("div", { children: [
+                /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: t2("Conversation Timestamp") }),
+                /* @__PURE__ */ o$8("dd", { className: "text-sm text-gray-700 dark:text-gray-300", children: [
+                  t2("Conversation Timestamp Description"),
+                  enableTimestamp && /* @__PURE__ */ o$8(k$3, { children: [
+                    /* @__PURE__ */ o$8("div", { className: "mt-2", children: /* @__PURE__ */ o$8(
+                      Toggle,
+                      {
+                        label: t2(
+                          "Use 24-hour format"
+                        ),
+                        checked: timeStamp24H,
+                        onCheckedUpdate: setTimeStamp24H
+                      }
+                    ) }),
+                    /* @__PURE__ */ o$8("div", { className: "mt-2", children: /* @__PURE__ */ o$8(
+                      Toggle,
+                      {
+                        label: t2("Enable on HTML"),
+                        checked: enableTimestampHTML,
+                        onCheckedUpdate: setEnableTimestampHTML
+                      }
+                    ) }),
+                    /* @__PURE__ */ o$8("div", { className: "mt-2", children: /* @__PURE__ */ o$8(
+                      Toggle,
+                      {
+                        label: t2(
+                          "Enable on Markdown"
+                        ),
+                        checked: enableTimestampMarkdown,
+                        onCheckedUpdate: setEnableTimestampMarkdown
+                      }
+                    ) })
+                  ] })
+                ] })
+              ] }),
+              /* @__PURE__ */ o$8("div", { className: "absolute right-4", children: /* @__PURE__ */ o$8(
+                Toggle,
+                {
+                  label: "",
+                  checked: enableTimestamp,
+                  onCheckedUpdate: setEnableTimestamp
+                }
+              ) })
+            ] }),
+            /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: [
+              /* @__PURE__ */ o$8("div", { children: [
+                /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: t2("Export Metadata") }),
+                /* @__PURE__ */ o$8("dd", { className: "text-sm text-gray-700 dark:text-gray-300", children: [
+                  t2("Export Metadata Description"),
+                  enableMeta && /* @__PURE__ */ o$8(k$3, { children: [
+                    /* @__PURE__ */ o$8("p", { className: "mt-2 text-sm text-gray-700 dark:text-gray-300", children: [
                       t2("Available variables"),
                       ":",
                       " ",
-                      /* @__PURE__ */ o$8(Variable, { name: "{title}", title: title2 }),
+                      /* @__PURE__ */ o$8(
+                        Variable,
+                        {
+                          name: "{title}",
+                          title: title2
+                        }
+                      ),
                       ",",
                       " ",
-                      /* @__PURE__ */ o$8(Variable, { name: "{date}", title: date }),
+                      /* @__PURE__ */ o$8(
+                        Variable,
+                        {
+                          name: "{date}",
+                          title: date
+                        }
+                      ),
                       ",",
                       " ",
-                      /* @__PURE__ */ o$8(Variable, { name: "{timestamp}", title: timestamp$1 }),
+                      /* @__PURE__ */ o$8(
+                        Variable,
+                        {
+                          name: "{timestamp}",
+                          title: timestamp$1
+                        }
+                      ),
                       ",",
                       " ",
-                      /* @__PURE__ */ o$8(Variable, { name: "{chat_id}", title: chatId }),
+                      /* @__PURE__ */ o$8(
+                        Variable,
+                        {
+                          name: "{source}",
+                          title: source
+                        }
+                      ),
                       ",",
                       " ",
-                      /* @__PURE__ */ o$8(Variable, { name: "{create_time}", title: unixTimestampToISOString(createTime) }),
+                      /* @__PURE__ */ o$8(
+                        Variable,
+                        {
+                          name: "{model}",
+                          title: "ChatGPT-3.5"
+                        }
+                      ),
                       ",",
                       " ",
-                      /* @__PURE__ */ o$8(Variable, { name: "{update_time}", title: unixTimestampToISOString(updateTime) })
+                      /* @__PURE__ */ o$8(
+                        Variable,
+                        {
+                          name: "{model_name}",
+                          title: "text-davinci-002-render-sha"
+                        }
+                      ),
+                      ",",
+                      " ",
+                      /* @__PURE__ */ o$8(
+                        Variable,
+                        {
+                          name: "{create_time}",
+                          title: "2023-04-10T21:45:35.027Z"
+                        }
+                      ),
+                      ",",
+                      " ",
+                      /* @__PURE__ */ o$8(
+                        Variable,
+                        {
+                          name: "{update_time}",
+                          title: "2023-04-10T21:45:35.027Z"
+                        }
+                      )
                     ] }),
-                    /* @__PURE__ */ o$8("input", { className: "Input mt-4", id: "filename", value: format, onChange: (e2) => setFormat(e2.currentTarget.value) }),
-                    /* @__PURE__ */ o$8("p", { className: "mt-1 text-sm text-gray-700 dark:text-gray-300", children: [
-                      t2("Preview"),
-                      ":",
-                      " ",
-                      /* @__PURE__ */ o$8("span", { className: "select-all", style: { "text-decoration": "underline", "text-underline-offset": 4 }, children: preview })
-                    ] })
-                  ] })
-                ] }) }),
-                /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: [
-                  /* @__PURE__ */ o$8("div", { children: [
-                    /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: t2("Conversation Timestamp") }),
-                    /* @__PURE__ */ o$8("dd", { className: "text-sm text-gray-700 dark:text-gray-300", children: [
-                      t2("Conversation Timestamp Description"),
-                      enableTimestamp && /* @__PURE__ */ o$8(k$3, { children: [
-                        /* @__PURE__ */ o$8("div", { className: "mt-2", children: /* @__PURE__ */ o$8(
-                          Toggle,
-                          {
-                            label: t2("Use 24-hour format"),
-                            checked: timeStamp24H,
-                            onCheckedUpdate: setTimeStamp24H
-                          }
-                        ) }),
-                        /* @__PURE__ */ o$8("div", { className: "mt-2", children: /* @__PURE__ */ o$8(
-                          Toggle,
-                          {
-                            label: t2("Enable on HTML"),
-                            checked: enableTimestampHTML,
-                            onCheckedUpdate: setEnableTimestampHTML
-                          }
-                        ) }),
-                        /* @__PURE__ */ o$8("div", { className: "mt-2", children: /* @__PURE__ */ o$8(
-                          Toggle,
-                          {
-                            label: t2("Enable on Markdown"),
-                            checked: enableTimestampMarkdown,
-                            onCheckedUpdate: setEnableTimestampMarkdown
-                          }
-                        ) })
-                      ] })
-                    ] })
-                  ] }),
-                  /* @__PURE__ */ o$8("div", { className: "absolute right-4", children: /* @__PURE__ */ o$8(Toggle, { label: "", checked: enableTimestamp, onCheckedUpdate: setEnableTimestamp }) })
-                ] }),
-                /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: [
-                  /* @__PURE__ */ o$8("div", { children: [
-                    /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: t2("Export Metadata") }),
-                    /* @__PURE__ */ o$8("dd", { className: "text-sm text-gray-700 dark:text-gray-300", children: [
-                      t2("Export Metadata Description"),
-                      enableMeta && /* @__PURE__ */ o$8(k$3, { children: [
-                        /* @__PURE__ */ o$8("p", { className: "mt-2 text-sm text-gray-700 dark:text-gray-300", children: [
-                          t2("Available variables"),
-                          ":",
-                          " ",
-                          /* @__PURE__ */ o$8(Variable, { name: "{title}", title: title2 }),
-                          ",",
-                          " ",
-                          /* @__PURE__ */ o$8(Variable, { name: "{date}", title: date }),
-                          ",",
-                          " ",
-                          /* @__PURE__ */ o$8(Variable, { name: "{timestamp}", title: timestamp$1 }),
-                          ",",
-                          " ",
-                          /* @__PURE__ */ o$8(Variable, { name: "{source}", title: source }),
-                          ",",
-                          " ",
-                          /* @__PURE__ */ o$8(Variable, { name: "{model}", title: "ChatGPT-3.5" }),
-                          ",",
-                          " ",
-                          /* @__PURE__ */ o$8(Variable, { name: "{model_name}", title: "text-davinci-002-render-sha" }),
-                          ",",
-                          " ",
-                          /* @__PURE__ */ o$8(Variable, { name: "{create_time}", title: "2023-04-10T21:45:35.027Z" }),
-                          ",",
-                          " ",
-                          /* @__PURE__ */ o$8(Variable, { name: "{update_time}", title: "2023-04-10T21:45:35.027Z" })
-                        ] }),
-                        exportMetaList.map((meta, i2) => /* @__PURE__ */ o$8("div", { className: "flex items-center mt-2", children: [
+                    exportMetaList.map((meta, i2) => /* @__PURE__ */ o$8(
+                      "div",
+                      {
+                        className: "flex items-center mt-2",
+                        children: [
                           /* @__PURE__ */ o$8(
                             "input",
                             {
                               className: "Input",
                               value: meta.name,
                               onChange: (e2) => {
-                                const list2 = [...exportMetaList];
-                                list2[i2] = { ...list2[i2], name: e2.currentTarget.value };
-                                setExportMetaList(list2);
+                                const list2 = [
+                                  ...exportMetaList
+                                ];
+                                list2[i2] = {
+                                  ...list2[i2],
+                                  name: e2.currentTarget.value
+                                };
+                                setExportMetaList(
+                                  list2
+                                );
                               }
                             }
                           ),
@@ -22737,9 +23097,16 @@ ${content2}`;
                               className: "Input",
                               value: meta.value,
                               onChange: (e2) => {
-                                const list2 = [...exportMetaList];
-                                list2[i2] = { ...list2[i2], value: e2.currentTarget.value };
-                                setExportMetaList(list2);
+                                const list2 = [
+                                  ...exportMetaList
+                                ];
+                                list2[i2] = {
+                                  ...list2[i2],
+                                  value: e2.currentTarget.value
+                                };
+                                setExportMetaList(
+                                  list2
+                                );
                               }
                             }
                           ),
@@ -22748,33 +23115,65 @@ ${content2}`;
                             {
                               className: "ml-2 rounded-full p-1 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition ease-in-out duration-150",
                               "aria-label": "Remove",
-                              onClick: () => setExportMetaList(exportMetaList.filter((_24, j2) => j2 !== i2)),
+                              onClick: () => setExportMetaList(
+                                exportMetaList.filter(
+                                  (_24, j2) => j2 !== i2
+                                )
+                              ),
                               children: /* @__PURE__ */ o$8(IconTrash, { className: "w-4 h-4" })
                             }
                           )
-                        ] }, i2)),
-                        /* @__PURE__ */ o$8("div", { className: "flex justify-center items-center mt-2 pr-8", children: /* @__PURE__ */ o$8(
-                          "button",
+                        ]
+                      },
+                      i2
+                    )),
+                    /* @__PURE__ */ o$8("div", { className: "flex justify-center items-center mt-2 pr-8", children: /* @__PURE__ */ o$8(
+                      "button",
+                      {
+                        className: "w-full border border-[#6f6e77] dark:border-gray-[#86858d] rounded-md py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition ease-in-out duration-150",
+                        "aria-label": "Add",
+                        onClick: () => setExportMetaList([
+                          ...exportMetaList,
                           {
-                            className: "w-full border border-[#6f6e77] dark:border-gray-[#86858d] rounded-md py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition ease-in-out duration-150",
-                            "aria-label": "Add",
-                            onClick: () => setExportMetaList([...exportMetaList, { name: "", value: "" }]),
-                            children: "+"
+                            name: "",
+                            value: ""
                           }
-                        ) })
-                      ] })
-                    ] })
-                  ] }),
-                  /* @__PURE__ */ o$8("div", { className: "absolute right-4", children: /* @__PURE__ */ o$8(Toggle, { label: "", checked: enableMeta, onCheckedUpdate: setEnableMeta }) })
+                        ]),
+                        children: "+"
+                      }
+                    ) })
+                  ] })
                 ] })
               ] }),
-              /* @__PURE__ */ o$8("div", { className: "flex mt-6", style: { justifyContent: "flex-end" }, children: /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$f39c2d165cd861fe, { asChild: true, children: /* @__PURE__ */ o$8("button", { className: "Button green font-bold", children: t2("Save") }) }) }),
-              /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$f39c2d165cd861fe, { asChild: true, children: /* @__PURE__ */ o$8("button", { className: "IconButton CloseButton", "aria-label": "Close", children: /* @__PURE__ */ o$8(IconCross, {}) }) })
+              /* @__PURE__ */ o$8("div", { className: "absolute right-4", children: /* @__PURE__ */ o$8(
+                Toggle,
+                {
+                  label: "",
+                  checked: enableMeta,
+                  onCheckedUpdate: setEnableMeta
+                }
+              ) })
             ] })
-          ] })
-        ]
-      }
-    );
+          ] }),
+          /* @__PURE__ */ o$8(
+            "div",
+            {
+              className: "flex mt-6",
+              style: { justifyContent: "flex-end" },
+              children: /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$f39c2d165cd861fe, { asChild: true, children: /* @__PURE__ */ o$8("button", { className: "Button green font-bold", children: t2("Save") }) })
+            }
+          ),
+          /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$f39c2d165cd861fe, { asChild: true, children: /* @__PURE__ */ o$8(
+            "button",
+            {
+              className: "IconButton CloseButton",
+              "aria-label": "Close",
+              children: /* @__PURE__ */ o$8(IconCross, {})
+            }
+          ) })
+        ] })
+      ] })
+    ] });
   };
   function MenuInner({ container }) {
     const { t: t2 } = useTranslation();
