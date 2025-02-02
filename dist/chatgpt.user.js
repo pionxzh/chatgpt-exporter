@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.27.0
+// @version            2.27.1
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -20896,15 +20896,20 @@ ${content2.text}
         return () => feedbackBar.classList.remove("hidden");
       });
     }
-    const buttonWrappers = document.querySelectorAll("main .flex.empty\\:hidden");
-    buttonWrappers.forEach((wrapper) => {
-      if (!wrapper.querySelector("button")) return;
-      if (wrapper.closest("pre")) return;
+    const switchContextBuuton1 = thread.querySelectorAll("div.mb-2.flex.gap-3.empty\\:hidden.mr-1.flex-row-reverse");
+    if (switchContextBuuton1) {
       effect.add(() => {
-        wrapper.style.display = "none";
-        return () => wrapper.style.display = "";
+        switchContextBuuton1.forEach((a2) => a2.classList.add("hidden"));
+        return () => switchContextBuuton1.forEach((a2) => a2.classList.remove("hidden"));
       });
-    });
+    }
+    const switchContextBuuton2 = thread.querySelectorAll("div.mb-2.flex.gap-3.empty\\:hidden.-ml-2");
+    if (switchContextBuuton2) {
+      effect.add(() => {
+        switchContextBuuton2.forEach((a2) => a2.classList.add("hidden"));
+        return () => switchContextBuuton2.forEach((a2) => a2.classList.remove("hidden"));
+      });
+    }
     const copyButtons = thread.querySelectorAll("pre button");
     copyButtons.forEach((button) => {
       effect.add(() => {
