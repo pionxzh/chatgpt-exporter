@@ -40,5 +40,7 @@
   "Conversation Deleted Message": "所有所选的对话已删除。请刷新页面。",
   "Please start a conversation first": "请先开始对话。",
   "Select Project": "选择项目",
-  "(no project)": "（无项目）"
+  "(no project)": "（无项目）",
+  "Export All Limit": "批量导出上限",
+  "Export All Limit Description": "设置“批量导出”对话框中加载的最大对话数量。"
 }

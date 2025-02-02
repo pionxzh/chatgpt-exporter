@@ -35,6 +35,7 @@ export const SettingDialog: FC<SettingDialogProps> = ({
         enableTimestampMarkdown, setEnableTimestampMarkdown,
         enableMeta, setEnableMeta,
         exportMetaList, setExportMetaList,
+        exportAllLimit, setExportAllLimit,
         /* eslint-enable pionxzh/consistent-list-newline */
     } = useSettingContext()
     const { t, i18n } = useTranslation()
@@ -107,6 +108,39 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                                         {t('Preview')}:{' '}
                                         <span className="select-all" style={{ 'text-decoration': 'underline', 'text-underline-offset': 4 }}>{preview}</span>
                                     </p>
+                                </dd>
+                            </div>
+                        </div>
+                        <div className="relative flex bg-white dark:bg-white/5 rounded p-4">
+                            <div>
+                                <dt className="text-md font-medium text-gray-800 dark:text-white">
+                                    {t('Export All Limit')}{' '}
+                                    {/* Add translation key */}
+                                </dt>
+                                <dd className="text-sm text-gray-700 dark:text-gray-300 mt-2">
+                                    {t('Export All Limit Description')}{' '}
+                                    {/* Add translation key */}
+                                    <div className="flex items-center gap-4 mt-3">
+                                        <input
+                                            type="range"
+                                            min="100" // Set min value
+                                            max="20000" // Set max value (adjust as needed)
+                                            step="100" // Set step value
+                                            value={exportAllLimit}
+                                            onChange={e =>
+                                                setExportAllLimit(
+                                                    Number.parseInt(
+                                                        e.currentTarget.value,
+                                                        10,
+                                                    ),
+                                                )}
+                                            className="flex-grow h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                                            id="exportAllLimitSlider"
+                                        />
+                                        <span className="font-medium text-gray-900 dark:text-gray-300 w-12 text-right">
+                                            {exportAllLimit}
+                                        </span>
+                                    </div>
                                 </dd>
                             </div>
                         </div>

@@ -40,5 +40,7 @@
   "Conversation Deleted Message": "Semua percakapan yang dipilih telah dihapus. Harap segarkan halaman untuk melihat perubahan.",
   "Please start a conversation first": "Harap mulai percakapan terlebih dahulu.",
   "Select Project": "Pilih Proyek",
-  "(no project)": "(tidak ada proyek)"
+  "(no project)": "(tidak ada proyek)",
+  "Export All Limit": "Batas Ekspor Semua",
+  "Export All Limit Description": "Atur jumlah maksimum percakapan yang akan dimuat dalam dialog 'Ekspor Semua'."
 }

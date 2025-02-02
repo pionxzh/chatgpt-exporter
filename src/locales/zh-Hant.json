@@ -40,5 +40,7 @@
   "Conversation Deleted Message": "所有選取的對話已刪除。請重新整理頁面。",
   "Please start a conversation first": "請先開始對話。",
   "Select Project": "選擇專案",
-  "(no project)": "（無專案）"
+  "(no project)": "（無專案）",
+  "Export All Limit": "批量匯出上限",
+  "Export All Limit Description": "設定「批量匯出」對話方塊中載入的最大對話數量。"
 }
