@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'preact/compat'
 import { useCallback } from 'preact/hooks'
 import {
+    KEY_EXPORT_ALL_LIMIT,
     KEY_FILENAME_FORMAT,
     KEY_META_ENABLED,
     KEY_META_LIST,
@@ -13,6 +14,7 @@ import { useGMStorage } from '../hooks/useGMStorage'
 import type { FC } from 'preact/compat'
 
 const defaultFormat = 'ChatGPT-{title}'
+const defaultExportAllLimit = 1000
 
 export interface ExportMeta {
     name: string
@@ -41,27 +43,57 @@ const SettingContext = createContext({
     setEnableMeta: (_: boolean) => {},
     exportMetaList: defaultExportMetaList,
     setExportMetaList: (_: ExportMeta[]) => {},
-
+    exportAllLimit: defaultExportAllLimit,
+    setExportAllLimit: (_: number) => {},
     resetDefault: () => {},
 })
 
 export const SettingProvider: FC = ({ children }) => {
-    const [format, setFormat] = useGMStorage(KEY_FILENAME_FORMAT, defaultFormat)
+    const [format, setFormat] = useGMStorage(
+        KEY_FILENAME_FORMAT,
+        defaultFormat,
+    )
 
-    const [enableTimestamp, setEnableTimestamp] = useGMStorage(KEY_TIMESTAMP_ENABLED, false)
-    const [timeStamp24H, setTimeStamp24H] = useGMStorage(KEY_TIMESTAMP_24H, false)
-    const [enableTimestampHTML, setEnableTimestampHTML] = useGMStorage(KEY_TIMESTAMP_HTML, false)
-    const [enableTimestampMarkdown, setEnableTimestampMarkdown] = useGMStorage(KEY_TIMESTAMP_MARKDOWN, false)
+    const [enableTimestamp, setEnableTimestamp] = useGMStorage(
+        KEY_TIMESTAMP_ENABLED,
+        false,
+    )
+    const [timeStamp24H, setTimeStamp24H] = useGMStorage(
+        KEY_TIMESTAMP_24H,
+        false,
+    )
+    const [enableTimestampHTML, setEnableTimestampHTML] = useGMStorage(
+        KEY_TIMESTAMP_HTML,
+        false,
+    )
+    const [enableTimestampMarkdown, setEnableTimestampMarkdown] = useGMStorage(
+        KEY_TIMESTAMP_MARKDOWN,
+        false,
+    )
 
     const [enableMeta, setEnableMeta] = useGMStorage(KEY_META_ENABLED, false)
 
-    const [exportMetaList, setExportMetaList] = useGMStorage(KEY_META_LIST, defaultExportMetaList)
-
+    const [exportMetaList, setExportMetaList] = useGMStorage(
+        KEY_META_LIST,
+        defaultExportMetaList,
+    )
+    const [exportAllLimit, setExportAllLimit] = useGMStorage(
+        KEY_EXPORT_ALL_LIMIT,
+        defaultExportAllLimit,
+    )
     const resetDefault = useCallback(() => {
         setFormat(defaultFormat)
+        setEnableTimestamp(false)
         setEnableMeta(false)
         setExportMetaList(defaultExportMetaList)
-    }, [setFormat, setEnableMeta, setExportMetaList])
+        setExportAllLimit(defaultExportAllLimit)
+    }, [
+        setFormat,
+        setEnableTimestamp,
+        setEnableMeta,
+        setExportMetaList,
+        setExportAllLimit,
+    ])
 
     return (
         <SettingContext.Provider
@@ -82,6 +114,9 @@ export const SettingProvider: FC = ({ children }) => {
                 setEnableMeta,
                 exportMetaList,
                 setExportMetaList,
+
+                exportAllLimit, // Provide state
+                setExportAllLimit, // Provide setter
 
                 resetDefault,
             }}

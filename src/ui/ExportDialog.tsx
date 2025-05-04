@@ -1,7 +1,18 @@
 import * as Dialog from '@radix-ui/react-dialog'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks'
+import {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'preact/hooks'
 import { useTranslation } from 'react-i18next'
-import { archiveConversation, deleteConversation, fetchAllConversations, fetchConversation } from '../api'
+import {
+    archiveConversation,
+    deleteConversation,
+    fetchAllConversations,
+    fetchConversation,
+} from '../api'
 import { exportAllToHtml } from '../exporter/html'
 import { exportAllToJson, exportAllToOfficialJson } from '../exporter/json'
 import { exportAllToMarkdown } from '../exporter/markdown'
@@ -46,7 +57,11 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
             </div>
             <ul className="SelectList">
                 {loading && <li className="SelectItem">{t('Loading')}...</li>}
-                {error && <li className="SelectItem">{t('Error')}: {error}</li>}
+                {error && (
+                    <li className="SelectItem">
+                        {t('Error')}: {error}
+                    </li>
+                )}
                 {conversations.map(c => (
                     <li className="SelectItem" key={c.id}>
                         <CheckBox
@@ -54,9 +69,10 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
                             disabled={disabled}
                             checked={selected.some(x => x.id === c.id)}
                             onCheckedChange={(checked) => {
-                                setSelected(checked
-                                    ? [...selected, c]
-                                    : selected.filter(x => x.id !== c.id),
+                                setSelected(
+                                    checked
+                                        ? [...selected, c]
+                                        : selected.filter(x => x.id !== c.id),
                                 )
                             }}
                         />
@@ -75,21 +91,34 @@ interface DialogContentProps {
 
 const DialogContent: FC<DialogContentProps> = ({ format }) => {
     const { t } = useTranslation()
-    const { enableMeta, exportMetaList } = useSettingContext()
-    const metaList = useMemo(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList])
+    const { enableMeta, exportMetaList, exportAllLimit } = useSettingContext()
+    const metaList = useMemo(
+        () => (enableMeta ? exportMetaList : []),
+        [enableMeta, exportMetaList],
+    )
 
-    const exportAllOptions = useMemo(() => [
-        { label: 'Markdown', callback: exportAllToMarkdown },
-        { label: 'HTML', callback: exportAllToHtml },
-        { label: 'JSON', callback: exportAllToOfficialJson },
-        { label: 'JSON (ZIP)', callback: exportAllToJson },
-    ], [])
+    const exportAllOptions = useMemo(
+        () => [
+            { label: 'Markdown', callback: exportAllToMarkdown },
+            { label: 'HTML', callback: exportAllToHtml },
+            { label: 'JSON', callback: exportAllToOfficialJson },
+            { label: 'JSON (ZIP)', callback: exportAllToJson },
+        ],
+        [],
+    )
 
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [exportSource, setExportSource] = useState<ExportSource>('API')
-    const [apiConversations, setApiConversations] = useState<ApiConversationItem[]>([])
-    const [localConversations, setLocalConversations] = useState<ApiConversationWithId[]>([])
-    const conversations = exportSource === 'API' ? apiConversations : localConversations
+    const [apiConversations, setApiConversations] = useState<
+    ApiConversationItem[]
+    >([],
+    )
+    const [localConversations, setLocalConversations] = useState<
+    ApiConversationWithId[]
+    >([],
+    )
+    const conversations
+        = exportSource === 'API' ? apiConversations : localConversations
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
     const [processing, setProcessing] = useState(false)
@@ -98,8 +127,14 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
     const [exportType, setExportType] = useState(exportAllOptions[0].label)
     const disabled = loading || processing || !!error || selected.length === 0
 
-    const requestQueue = useMemo(() => new RequestQueue<ApiConversationWithId>(200, 1600), [])
-    const archiveQueue = useMemo(() => new RequestQueue<boolean>(200, 1600), [])
+    const requestQueue = useMemo(
+        () => new RequestQueue<ApiConversationWithId>(200, 1600),
+        [],
+    )
+    const archiveQueue = useMemo(
+        () => new RequestQueue<boolean>(200, 1600),
+        [],
+    )
     const deleteQueue = useMemo(() => new RequestQueue<boolean>(200, 1600), [])
     const [progress, setProgress] = useState({
         total: 0,
@@ -108,23 +143,26 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
         currentStatus: '',
     })
 
-    const onUpload = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        const file = (e.target as HTMLInputElement)?.files?.[0]
-        if (!file) return
+    const onUpload = useCallback(
+        (e: ChangeEvent<HTMLInputElement>) => {
+            const file = (e.target as HTMLInputElement)?.files?.[0]
+            if (!file) return
 
-        const fileReader = new FileReader()
-        fileReader.onload = () => {
-            const data = JSON.parse(fileReader.result as string)
-            if (!Array.isArray(data)) {
-                alert(t('Invalid File Format'))
-                return
+            const fileReader = new FileReader()
+            fileReader.onload = () => {
+                const data = JSON.parse(fileReader.result as string)
+                if (!Array.isArray(data)) {
+                    alert(t('Invalid File Format'))
+                    return
+                }
+                setSelected([])
+                setExportSource('Local')
+                setLocalConversations(data)
             }
-            setSelected([])
-            setExportSource('Local')
-            setLocalConversations(data)
-        }
-        fileReader.readAsText(file)
-    }, [t, setExportSource, setLocalConversations])
+            fileReader.readAsText(file)
+        },
+        [t, setExportSource, setLocalConversations],
+    )
 
     useEffect(() => {
         const off = requestQueue.on('progress', (progress) => {
@@ -156,7 +194,9 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
     useEffect(() => {
         const off = requestQueue.on('done', (results) => {
             setProcessing(false)
-            const callback = exportAllOptions.find(o => o.label === exportType)?.callback
+            const callback = exportAllOptions.find(
+                o => o.label === exportType,
+            )?.callback
             if (callback) callback(format, results, metaList)
         })
         return () => off()
@@ -165,7 +205,11 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
     useEffect(() => {
         const off = archiveQueue.on('done', () => {
             setProcessing(false)
-            setApiConversations(apiConversations.filter(c => !selected.some(s => s.id === c.id)))
+            setApiConversations(
+                apiConversations.filter(
+                    c => !selected.some(s => s.id === c.id),
+                ),
+            )
             setSelected([])
             alert(t('Conversation Archived Message'))
         })
@@ -175,7 +219,11 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
     useEffect(() => {
         const off = deleteQueue.on('done', () => {
             setProcessing(false)
-            setApiConversations(apiConversations.filter(c => !selected.some(s => s.id === c.id)))
+            setApiConversations(
+                apiConversations.filter(
+                    c => !selected.some(s => s.id === c.id),
+                ),
+            )
             setSelected([])
             alert(t('Conversation Deleted Message'))
         })
@@ -200,10 +248,22 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
     const exportAllFromLocal = useCallback(() => {
         if (disabled) return
 
-        const results = localConversations.filter(c => selected.some(s => s.id === c.id))
-        const callback = exportAllOptions.find(o => o.label === exportType)?.callback
+        const results = localConversations.filter(c =>
+            selected.some(s => s.id === c.id),
+        )
+        const callback = exportAllOptions.find(
+            o => o.label === exportType,
+        )?.callback
         if (callback) callback(format, results, metaList)
-    }, [disabled, selected, localConversations, exportAllOptions, exportType, format, metaList])
+    }, [
+        disabled,
+        selected,
+        localConversations,
+        exportAllOptions,
+        exportType,
+        format,
+        metaList,
+    ])
 
     const exportAll = useMemo(() => {
         return exportSource === 'API' ? exportAllFromApi : exportAllFromLocal
@@ -247,19 +307,29 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
 
     useEffect(() => {
         setLoading(true)
-        fetchAllConversations()
+        // Pass exportAllLimit to fetchAllConversations
+        fetchAllConversations(exportAllLimit)
             .then(setApiConversations)
-            .catch(setError)
+            .catch((err) => {
+                console.error('Error fetching conversations:', err)
+                setError(err.message || 'Failed to load conversations')
+            })
             .finally(() => setLoading(false))
-    }, [])
+    }, [exportAllLimit])
 
     return (
         <>
-            <Dialog.Title className="DialogTitle">{t('Export Dialog Title')}</Dialog.Title>
+            <Dialog.Title className="DialogTitle">
+                {t('Export Dialog Title')}
+            </Dialog.Title>
             <div className="flex items-center text-gray-600 dark:text-gray-300 flex justify-between border-b-[1px] pb-3 mb-3 dark:border-gray-700">
-                {t('Export from official export file')} (conversations.json)&nbsp;
+                {t('Export from official export file')}{' '}
+                (conversations.json)&nbsp;
                 {exportSource === 'API' && (
-                    <button className="btn relative btn-neutral" onClick={() => fileInputRef.current?.click()}>
+                    <button
+                        className="btn relative btn-neutral"
+                        onClick={() => fileInputRef.current?.click()}
+                    >
                         <IconUpload className="w-4 h-4" />
                     </button>
                 )}
@@ -284,31 +354,60 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                 loading={loading}
                 error={error}
             />
-            <div className="flex mt-6" style={{ justifyContent: 'space-between' }}>
-                <select className="Select" disabled={processing} value={exportType} onChange={e => setExportType(e.currentTarget.value)}>
+            <div
+                className="flex mt-6"
+                style={{ justifyContent: 'space-between' }}
+            >
+                <select
+                    className="Select"
+                    disabled={processing}
+                    value={exportType}
+                    onChange={e => setExportType(e.currentTarget.value)}
+                >
                     {exportAllOptions.map(({ label }) => (
-                        <option key={t(label)} value={label}>{label}</option>
+                        <option key={t(label)} value={label}>
+                            {label}
+                        </option>
                     ))}
                 </select>
                 <div className="flex flex-grow"></div>
-                <button className="Button red" disabled={disabled || exportSource === 'Local'} onClick={archiveAll}>
+                <button
+                    className="Button red"
+                    disabled={disabled || exportSource === 'Local'}
+                    onClick={archiveAll}
+                >
                     {t('Archive')}
                 </button>
-                <button className="Button red ml-4" disabled={disabled || exportSource === 'Local'} onClick={deleteAll}>
+                <button
+                    className="Button red ml-4"
+                    disabled={disabled || exportSource === 'Local'}
+                    onClick={deleteAll}
+                >
                     {t('Delete')}
                 </button>
-                <button className="Button green ml-4" disabled={disabled} onClick={exportAll}>
+                <button
+                    className="Button green ml-4"
+                    disabled={disabled}
+                    onClick={exportAll}
+                >
                     {t('Export')}
                 </button>
             </div>
             {processing && (
                 <>
                     <div className="mt-2 mb-1 justify-between flex">
-                        <span className="truncate mr-8">{progress.currentName}</span>
+                        <span className="truncate mr-8">
+                            {progress.currentName}
+                        </span>
                         <span>{`${progress.completed}/${progress.total}`}</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
-                        <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${progress.completed / progress.total * 100}%` }} />
+                        <div
+                            className="bg-blue-600 h-2.5 rounded-full"
+                            style={{
+                                width: `${(progress.completed / progress.total) * 100}%`,
+                            }}
+                        />
                     </div>
                 </>
             )}
@@ -327,15 +426,15 @@ interface ExportDialogProps {
     onOpenChange: (value: boolean) => void
 }
 
-export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange, children }) => {
+export const ExportDialog: FC<ExportDialogProps> = ({
+    format,
+    open,
+    onOpenChange,
+    children,
+}) => {
     return (
-        <Dialog.Root
-            open={open}
-            onOpenChange={onOpenChange}
-        >
-            <Dialog.Trigger asChild>
-                {children}
-            </Dialog.Trigger>
+        <Dialog.Root open={open} onOpenChange={onOpenChange}>
+            <Dialog.Trigger asChild>{children}</Dialog.Trigger>
             <Dialog.Portal>
                 <Dialog.Overlay className="DialogOverlay" />
                 <Dialog.Content className="DialogContent">
