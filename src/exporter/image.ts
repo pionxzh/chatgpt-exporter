@@ -18,7 +18,7 @@ export async function exportToPng(fileNameFormat: string) {
 
     const effect = new Effect()
 
-    const thread = document.querySelector('main [class^=\'react-scroll-to-bottom\'] > div > div')
+    const thread = document.querySelector('#thread div:has(> [data-testid="conversation-turn-1"]')
     if (!thread || thread.children.length === 0 || thread.scrollHeight < 50) {
         alert(i18n.t('Failed to export to PNG. Failed to find the element node.'))
         return false
@@ -29,8 +29,8 @@ export async function exportToPng(fileNameFormat: string) {
     effect.add(() => {
         const style = document.createElement('style')
         style.textContent = `
-        main [class^=\'react-scroll-to-bottom\'] > div > div,
-        [data-testid^="conversation-turn-"] {
+            #thread div:has(> [data-testid="conversation-turn-1"]),
+            #thread [data-testid^="conversation-turn-"] {
                 color: ${isDarkMode ? '#ececec' : '#0d0d0d'};
                 background-color: ${isDarkMode ? '#212121' : '#fff'};
             }
@@ -48,61 +48,27 @@ export async function exportToPng(fileNameFormat: string) {
                 margin-top: -12px;
                 padding-bottom: 2px;
             }
+
+            #page-header,
+            #thread-bottom-container,
+            /* any other elements that are not conversation turns */
+            #thread div:has(> [data-testid="conversation-turn-1"]) > :not([data-testid^="conversation-turn-"]),
+            /* hide back to top button */
+            button.absolute,
+            /* question button */
+            .group.absolute > button {
+                display: none;
+            }
+
+            /* conversation action bar */
+            .group\\/conversation-turn > div > div.absolute,
+            /* code block buttons */
+            #thread pre button {
+                visibility: hidden;
+            }
             `
         thread!.appendChild(style)
         return () => style.remove()
-    })
-
-    // hide top header
-    const topHeader = thread.querySelector('.sticky.top-0')
-    if (topHeader) {
-        effect.add(() => {
-            topHeader.classList.add('hidden')
-            return () => topHeader.classList.remove('hidden')
-        })
-    }
-
-    // hide feedback bar
-    const feedbackBar = thread.querySelector('[data-testid^="conversation-turn-"] + .mx-auto')
-    if (feedbackBar) {
-        effect.add(() => {
-            feedbackBar.classList.add('hidden')
-            return () => feedbackBar.classList.remove('hidden')
-        })
-    }
-
-    // hide switch context button
-    const switchContextBuuton1 = thread.querySelectorAll('div.mb-2.flex.gap-3.empty\\:hidden.mr-1.flex-row-reverse')
-    if (switchContextBuuton1) {
-        effect.add(() => {
-            switchContextBuuton1.forEach(a => a.classList.add('hidden'))
-            return () => switchContextBuuton1.forEach(a => a.classList.remove('hidden'))
-        })
-    }
-    const switchContextBuuton2 = thread.querySelectorAll('div.mb-2.flex.gap-3.empty\\:hidden.-ml-2')
-    if (switchContextBuuton2) {
-        effect.add(() => {
-            switchContextBuuton2.forEach(a => a.classList.add('hidden'))
-            return () => switchContextBuuton2.forEach(a => a.classList.remove('hidden'))
-        })
-    }
-
-    // hide code block copy button
-    const copyButtons = thread.querySelectorAll('pre button')
-    copyButtons.forEach((button) => {
-        effect.add(() => {
-            button.classList.add('hidden')
-            return () => button.classList.remove('hidden')
-        })
-    })
-
-    // hide back to top button
-    const backToTop = thread.querySelectorAll('button.absolute')
-    backToTop.forEach((button) => {
-        effect.add(() => {
-            button.classList.add('hidden')
-            return () => button.classList.remove('hidden')
-        })
     })
 
     const threadEl = thread as HTMLElement
@@ -144,7 +110,7 @@ export async function exportToPng(fileNameFormat: string) {
          * corrupted image
          * meaning we might hit on the canvas size limit
          * See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas#maximum_canvas_size
-         * Chromium will not throw,  we can only get an empty canvas
+         * Chromium will not throw, we can only get an empty canvas
          * Firefox will throw "DOMException: CanvasRenderingContext2D.scale: Canvas exceeds max size."
          */
         if (!canvas || !dataUrl || dataUrl === 'data:,') {
