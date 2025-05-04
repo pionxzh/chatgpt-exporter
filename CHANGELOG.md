@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.27.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.27.1...userscript-v2.27.2) (2025-05-04)
+
+
+### Bug Fixes
+
+* fix screenshot not work in latest layout ([f62bbbd](https://github.com/pionxzh/chatgpt-exporter/commit/f62bbbd5e6e6a18c49bc1c233685fc18608ea7dd)), closes [#287](https://github.com/pionxzh/chatgpt-exporter/issues/287)
+
 ## [2.27.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.27.0...userscript-v2.27.1) (2025-02-02)
 
 
