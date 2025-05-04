@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.27.1
+// @version            2.27.2
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -20850,7 +20850,7 @@ ${content2.text}
       return false;
     }
     const effect = new Effect();
-    const thread = document.querySelector("main [class^='react-scroll-to-bottom'] > div > div");
+    const thread = document.querySelector('#thread div:has(> [data-testid="conversation-turn-1"]');
     if (!thread || thread.children.length === 0 || thread.scrollHeight < 50) {
       alert(instance.t("Failed to export to PNG. Failed to find the element node."));
       return false;
@@ -20859,8 +20859,8 @@ ${content2.text}
     effect.add(() => {
       const style = document.createElement("style");
       style.textContent = `
-        main [class^='react-scroll-to-bottom'] > div > div,
-        [data-testid^="conversation-turn-"] {
+            #thread div:has(> [data-testid="conversation-turn-1"]),
+            #thread [data-testid^="conversation-turn-"] {
                 color: ${isDarkMode ? "#ececec" : "#0d0d0d"};
                 background-color: ${isDarkMode ? "#212121" : "#fff"};
             }
@@ -20878,51 +20878,27 @@ ${content2.text}
                 margin-top: -12px;
                 padding-bottom: 2px;
             }
+
+            #page-header,
+            #thread-bottom-container,
+            /* any other elements that are not conversation turns */
+            #thread div:has(> [data-testid="conversation-turn-1"]) > :not([data-testid^="conversation-turn-"]),
+            /* hide back to top button */
+            button.absolute,
+            /* question button */
+            .group.absolute > button {
+                display: none;
+            }
+
+            /* conversation action bar */
+            .group\\/conversation-turn > div > div.absolute,
+            /* code block buttons */
+            #thread pre button {
+                visibility: hidden;
+            }
             `;
       thread.appendChild(style);
       return () => style.remove();
-    });
-    const topHeader = thread.querySelector(".sticky.top-0");
-    if (topHeader) {
-      effect.add(() => {
-        topHeader.classList.add("hidden");
-        return () => topHeader.classList.remove("hidden");
-      });
-    }
-    const feedbackBar = thread.querySelector('[data-testid^="conversation-turn-"] + .mx-auto');
-    if (feedbackBar) {
-      effect.add(() => {
-        feedbackBar.classList.add("hidden");
-        return () => feedbackBar.classList.remove("hidden");
-      });
-    }
-    const switchContextBuuton1 = thread.querySelectorAll("div.mb-2.flex.gap-3.empty\\:hidden.mr-1.flex-row-reverse");
-    if (switchContextBuuton1) {
-      effect.add(() => {
-        switchContextBuuton1.forEach((a2) => a2.classList.add("hidden"));
-        return () => switchContextBuuton1.forEach((a2) => a2.classList.remove("hidden"));
-      });
-    }
-    const switchContextBuuton2 = thread.querySelectorAll("div.mb-2.flex.gap-3.empty\\:hidden.-ml-2");
-    if (switchContextBuuton2) {
-      effect.add(() => {
-        switchContextBuuton2.forEach((a2) => a2.classList.add("hidden"));
-        return () => switchContextBuuton2.forEach((a2) => a2.classList.remove("hidden"));
-      });
-    }
-    const copyButtons = thread.querySelectorAll("pre button");
-    copyButtons.forEach((button) => {
-      effect.add(() => {
-        button.classList.add("hidden");
-        return () => button.classList.remove("hidden");
-      });
-    });
-    const backToTop = thread.querySelectorAll("button.absolute");
-    backToTop.forEach((button) => {
-      effect.add(() => {
-        button.classList.add("hidden");
-        return () => button.classList.remove("hidden");
-      });
     });
     const threadEl = thread;
     effect.run();
