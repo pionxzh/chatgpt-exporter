@@ -1,7 +1,7 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import { useTranslation } from 'react-i18next'
-import { archiveConversation, deleteConversation, fetchAllConversations, fetchConversation } from '../api'
+import { archiveConversation, deleteConversation, fetchAllConversations, fetchConversation, fetchProjects } from '../api'
 import { exportAllToHtml } from '../exporter/html'
 import { exportAllToJson, exportAllToOfficialJson } from '../exporter/json'
 import { exportAllToMarkdown } from '../exporter/markdown'
@@ -9,9 +9,41 @@ import { RequestQueue } from '../utils/queue'
 import { CheckBox } from './CheckBox'
 import { IconCross, IconUpload } from './Icons'
 import { useSettingContext } from './SettingContext'
-import type { ApiConversationItem, ApiConversationWithId } from '../api'
+import type { ApiConversationItem, ApiConversationWithId, ApiProjectInfo } from '../api'
 import type { FC } from '../type'
 import type { ChangeEvent } from 'preact/compat'
+
+interface ProjectSelectProps {
+    projects: ApiProjectInfo[]
+    selected: ApiProjectInfo | null
+    setSelected: (selected: ApiProjectInfo | null) => void
+    disabled: boolean
+}
+
+const ProjectSelect: FC<ProjectSelectProps> = ({ projects, selected, setSelected, disabled }) => {
+    const { t } = useTranslation()
+
+    return (
+        <div className="flex items-center text-gray-600 dark:text-gray-300 flex justify-between mb-3">
+            {t('Select Project')}
+            <select
+                disabled={disabled}
+                className="Select"
+                value={selected?.id || ''}
+                onChange={(e) => {
+                    const projectId = e.currentTarget.value
+                    const project = projects.find(p => p.id === projectId)
+                    setSelected(project || null)
+                }}
+            >
+                <option value="">{t('(no project)')}</option>
+                {projects.map(project => (
+                    <option key={project.id} value={project.id}>{project.display.name}</option>
+                ))}
+            </select>
+        </div>
+    )
+}
 
 interface ConversationSelectProps {
     conversations: ApiConversationItem[]
@@ -47,7 +79,8 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
             <ul className="SelectList">
                 {loading && <li className="SelectItem">{t('Loading')}...</li>}
                 {error && <li className="SelectItem">{t('Error')}: {error}</li>}
-                {conversations.map(c => (
+                {!loading && !error
+                && conversations.map(c => (
                     <li className="SelectItem" key={c.id}>
                         <CheckBox
                             label={c.title}
@@ -90,9 +123,11 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
     const [apiConversations, setApiConversations] = useState<ApiConversationItem[]>([])
     const [localConversations, setLocalConversations] = useState<ApiConversationWithId[]>([])
     const conversations = exportSource === 'API' ? apiConversations : localConversations
+    const [projects, setProjects] = useState<ApiProjectInfo[]>([])
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
     const [processing, setProcessing] = useState(false)
+    const [selectedProject, setSelectedProject] = useState<ApiProjectInfo | null>(null)
 
     const [selected, setSelected] = useState<ApiConversationItem[]>([])
     const [exportType, setExportType] = useState(exportAllOptions[0].label)
@@ -246,12 +281,18 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
     }, [disabled, selected, archiveQueue, t])
 
     useEffect(() => {
-        setLoading(true)
-        fetchAllConversations()
-            .then(setApiConversations)
-            .catch(setError)
-            .finally(() => setLoading(false))
+        fetchProjects()
+            .then(setProjects)
+            .catch(err => setError(err.toString()))
     }, [])
+
+    useEffect(() => {
+        setLoading(true)
+        fetchAllConversations(selectedProject?.id)
+            .then(setApiConversations)
+            .catch(err => setError(err.toString()))
+            .finally(() => setLoading(false))
+    }, [selectedProject])
 
     return (
         <>
@@ -276,6 +317,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                     {t('Export from API')}
                 </div>
             )}
+            <ProjectSelect projects={projects} selected={selectedProject} setSelected={setSelectedProject} disabled={processing || loading} />
             <ConversationSelect
                 conversations={conversations}
                 selected={selected}
