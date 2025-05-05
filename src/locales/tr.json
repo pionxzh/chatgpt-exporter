@@ -38,5 +38,7 @@
   "Conversation Archived Message": "Seçilen tüm konuşmalar arşivlendi. Değişiklikleri görmek için sayfayı yenileyin.",
   "Conversation Delete Alert": "Seçilen tüm konuşmaları silmek istediğinizden emin misiniz?",
   "Conversation Deleted Message": "Seçilen tüm konuşmalar silindi. Değişiklikleri görmek için sayfayı yenileyin.",
-  "Please start a conversation first": "Lütfen önce bir konuşma başlatın."
+  "Please start a conversation first": "Lütfen önce bir konuşma başlatın.",
+  "Select Project": "Proje Seç",
+  "(no project)": "(proje yok)"
 }
