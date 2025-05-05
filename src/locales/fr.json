@@ -38,5 +38,7 @@
   "Conversation Archived Message": "Toutes les conversations sélectionnées ont été archivées. Veuillez actualiser la page pour voir les changements.",
   "Conversation Delete Alert": "Êtes-vous sûr de vouloir supprimer toutes les conversations sélectionnées ?",
   "Conversation Deleted Message": "Toutes les conversations sélectionnées ont été supprimées. Veuillez actualiser la page pour voir les changements.",
-  "Please start a conversation first": "Veuillez commencer une conversation d'abord."
+  "Please start a conversation first": "Veuillez commencer une conversation d'abord.",
+  "Select Project": "Sélectionner un projet",
+  "(no project)": "(aucun projet)"
 }

@@ -38,5 +38,7 @@
   "Conversation Archived Message": "Semua percakapan yang dipilih telah diarsipkan. Harap segarkan halaman untuk melihat perubahan.",
   "Conversation Delete Alert": "Apakah Anda yakin ingin menghapus semua percakapan yang dipilih?",
   "Conversation Deleted Message": "Semua percakapan yang dipilih telah dihapus. Harap segarkan halaman untuk melihat perubahan.",
-  "Please start a conversation first": "Harap mulai percakapan terlebih dahulu."
+  "Please start a conversation first": "Harap mulai percakapan terlebih dahulu.",
+  "Select Project": "Pilih Proyek",
+  "(no project)": "(tidak ada proyek)"
 }

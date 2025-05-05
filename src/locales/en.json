@@ -38,5 +38,7 @@
   "Conversation Archived Message": "All selected conversations have been archived. Please refresh the page to see the changes.",
   "Conversation Delete Alert": "Are you sure you want to delete all selected conversations?",
   "Conversation Deleted Message": "All selected conversations have been deleted. Please refresh the page to see the changes.",
-  "Please start a conversation first": "Please start a conversation first."
+  "Please start a conversation first": "Please start a conversation first.",
+  "Select Project": "Select Project",
+  "(no project)": "(no project)"
 }
