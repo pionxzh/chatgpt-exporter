@@ -202,7 +202,21 @@ export interface ApiConversations {
     items: ApiConversationItem[]
     limit: number
     offset: number
-    total: number
+    total: number | null
+}
+
+/// "Gizmos" are what OpenAI calls "projects" or other GPTs in the UI
+export interface ApiGizmo {
+    // weird nesting but ok
+    gizmo: { gizmo: ApiProjectInfo }
+    conversations: { itmes: ApiConversationItem[] }
+}
+
+export interface ApiProjectInfo {
+    id: string
+    organization_id: string
+    display: { name: string; description: string }
+    // todo: support exporting project context
 }
 
 interface ApiAccountsCheckAccountDetail {
@@ -286,6 +300,8 @@ const sessionApi = urlcat(baseUrl, '/api/auth/session')
 const conversationApi = (id: string) => urlcat(apiUrl, '/conversation/:id', { id })
 const conversationsApi = (offset: number, limit: number) => urlcat(apiUrl, '/conversations', { offset, limit })
 const fileDownloadApi = (id: string) => urlcat(apiUrl, '/files/:id/download', { id })
+const projectsApi = () => urlcat(apiUrl, '/gizmos/snorlax/sidebar', { conversations_per_gizmo: 0 })
+const projectConversationsApi = (gizmo: string, offset: number, limit: number) => urlcat(apiUrl, '/gizmos/:gizmo/conversations', { gizmo, cursor: offset, limit })
 const accountsCheckApi = urlcat(apiUrl, '/accounts/check/v4-2023-04-27')
 
 export async function getCurrentChatId(): Promise<string> {
@@ -390,19 +406,41 @@ export async function fetchConversation(chatId: string, shouldReplaceAssets: boo
     }
 }
 
-async function fetchConversations(offset = 0, limit = 20): Promise<ApiConversations> {
+export async function fetchProjects(): Promise<ApiProjectInfo[]> {
+    const url = projectsApi()
+    const { items } = await fetchApi<{ items: ApiGizmo[] }>(url)
+    return items.map(gizmo => (gizmo.gizmo.gizmo))
+}
+
+async function fetchConversations(offset = 0, limit = 20, project: string | null = null): Promise<ApiConversations> {
+    if (project) {
+        return fetchProjectConversations(project, offset, limit)
+    }
     const url = conversationsApi(offset, limit)
     return fetchApi(url)
 }
 
-export async function fetchAllConversations(): Promise<ApiConversationItem[]> {
+async function fetchProjectConversations(project: string, offset = 0, limit = 20): Promise<ApiConversations> {
+    const url = projectConversationsApi(project, offset, limit)
+    const { items } = await fetchApi< { items: ApiConversationItem[]; cursor: number | null }>(url)
+    return {
+        has_missing_conversations: false,
+        items,
+        limit,
+        offset,
+        total: null,
+    }
+}
+
+export async function fetchAllConversations(project: string | null = null): Promise<ApiConversationItem[]> {
     const conversations: ApiConversationItem[] = []
-    const limit = 100
+    const limit = project === null ? 100 : 50 // gizmos api uses a smaller limit
     let offset = 0
     while (true) {
-        const result = await fetchConversations(offset, limit)
+        const result = await fetchConversations(offset, limit, project)
         conversations.push(...result.items)
-        if (offset + limit >= result.total) break
+        if (result.total !== null && offset + limit >= result.total) break
+        if (result.items.length === 0) break
         if (offset + limit >= 1000) break
         offset += limit
     }
@@ -506,6 +544,8 @@ export interface ConversationResult {
     createTime: number
     updateTime: number
     conversationNodes: ConversationNode[]
+    projectName?: string
+    projectId?: string
 }
 
 const ModelMapping: { [key in ModelSlug]: string } & { [key: string]: string } = {
