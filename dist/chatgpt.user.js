@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.27.2
+// @version            2.28.0
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -1115,6 +1115,8 @@ html {
   const conversationApi = (id) => _default(apiUrl, "/conversation/:id", { id });
   const conversationsApi = (offset, limit) => _default(apiUrl, "/conversations", { offset, limit });
   const fileDownloadApi = (id) => _default(apiUrl, "/files/:id/download", { id });
+  const projectsApi = () => _default(apiUrl, "/gizmos/snorlax/sidebar", { conversations_per_gizmo: 0 });
+  const projectConversationsApi = (gizmo, offset, limit) => _default(apiUrl, "/gizmos/:gizmo/conversations", { gizmo, cursor: offset, limit });
   const accountsCheckApi = _default(apiUrl, "/accounts/check/v4-2023-04-27");
   async function getCurrentChatId() {
     if (isSharePage()) {
@@ -1195,18 +1197,38 @@ html {
       ...conversation
     };
   }
-  async function fetchConversations(offset = 0, limit = 20) {
+  async function fetchProjects() {
+    const url = projectsApi();
+    const { items } = await fetchApi(url);
+    return items.map((gizmo) => gizmo.gizmo.gizmo);
+  }
+  async function fetchConversations(offset = 0, limit = 20, project = null) {
+    if (project) {
+      return fetchProjectConversations(project, offset, limit);
+    }
     const url = conversationsApi(offset, limit);
     return fetchApi(url);
   }
-  async function fetchAllConversations() {
+  async function fetchProjectConversations(project, offset = 0, limit = 20) {
+    const url = projectConversationsApi(project, offset, limit);
+    const { items } = await fetchApi(url);
+    return {
+      has_missing_conversations: false,
+      items,
+      limit,
+      offset,
+      total: null
+    };
+  }
+  async function fetchAllConversations(project = null) {
     const conversations = [];
-    const limit = 100;
+    const limit = project === null ? 100 : 50;
     let offset = 0;
     while (true) {
-      const result = await fetchConversations(offset, limit);
+      const result = await fetchConversations(offset, limit, project);
       conversations.push(...result.items);
-      if (offset + limit >= result.total) break;
+      if (result.total !== null && offset + limit >= result.total) break;
+      if (result.items.length === 0) break;
       if (offset + limit >= 1e3) break;
       offset += limit;
     }
@@ -8047,7 +8069,9 @@ html {
     "Conversation Archived Message": "All selected conversations have been archived. Please refresh the page to see the changes.",
     "Conversation Delete Alert": "Are you sure you want to delete all selected conversations?",
     "Conversation Deleted Message": "All selected conversations have been deleted. Please refresh the page to see the changes.",
-    "Please start a conversation first": "Please start a conversation first."
+    "Please start a conversation first": "Please start a conversation first.",
+    "Select Project": "Select Project",
+    "(no project)": "(no project)"
   };
   const title$7 = "ChatGPT Exporter";
   const ExportHelper$7 = "Exportar";
@@ -8102,7 +8126,9 @@ html {
     "Conversation Archived Message": "Todos las conversaciones seleccionadas se han archivado. Por favor refresca la página para ver los cambios.",
     "Conversation Delete Alert": "¿Estás seguro que quieres borrar todas las conversaciones seleccionadas?",
     "Conversation Deleted Message": "Todos las conversaciones seleccionadas se han borrado. Por favor refresca la página para ver los cambios.",
-    "Please start a conversation first": "Por favor empieza una conversación antes."
+    "Please start a conversation first": "Por favor empieza una conversación antes.",
+    "Select Project": "Seleccionar proyecto",
+    "(no project)": "(sin proyecto)"
   };
   const title$6 = "Exportateur ChatGPT";
   const ExportHelper$6 = "Exporter";
@@ -8157,7 +8183,9 @@ html {
     "Conversation Archived Message": "Toutes les conversations sélectionnées ont été archivées. Veuillez actualiser la page pour voir les changements.",
     "Conversation Delete Alert": "Êtes-vous sûr de vouloir supprimer toutes les conversations sélectionnées ?",
     "Conversation Deleted Message": "Toutes les conversations sélectionnées ont été supprimées. Veuillez actualiser la page pour voir les changements.",
-    "Please start a conversation first": "Veuillez commencer une conversation d'abord."
+    "Please start a conversation first": "Veuillez commencer une conversation d'abord.",
+    "Select Project": "Sélectionner un projet",
+    "(no project)": "(aucun projet)"
   };
   const title$5 = "ChatGPT Exporter";
   const ExportHelper$5 = "Ekspor";
@@ -8212,7 +8240,9 @@ html {
     "Conversation Archived Message": "Semua percakapan yang dipilih telah diarsipkan. Harap segarkan halaman untuk melihat perubahan.",
     "Conversation Delete Alert": "Apakah Anda yakin ingin menghapus semua percakapan yang dipilih?",
     "Conversation Deleted Message": "Semua percakapan yang dipilih telah dihapus. Harap segarkan halaman untuk melihat perubahan.",
-    "Please start a conversation first": "Harap mulai percakapan terlebih dahulu."
+    "Please start a conversation first": "Harap mulai percakapan terlebih dahulu.",
+    "Select Project": "Pilih Proyek",
+    "(no project)": "(tidak ada proyek)"
   };
   const title$4 = "ChatGPTエクスポーター";
   const ExportHelper$4 = "エクスポート";
@@ -8267,7 +8297,9 @@ html {
     "Conversation Archived Message": "選択したすべての会話がアーカイブされました。変更を表示するには、ページを更新してください。",
     "Conversation Delete Alert": "選択したすべての会話を削除してもよろしいですか？",
     "Conversation Deleted Message": "選択したすべての会話が削除されました。変更を表示するには、ページを更新してください。",
-    "Please start a conversation first": "まず会話を開始してください。"
+    "Please start a conversation first": "まず会話を開始してください。",
+    "Select Project": "プロジェクトを選択",
+    "(no project)": "（プロジェクトなし）"
   };
   const title$3 = "ChatGPT Exporter";
   const ExportHelper$3 = "Export";
@@ -8322,7 +8354,9 @@ html {
     "Conversation Archived Message": "Все выбранные разговоры были заархивированы. Пожалуйста, обновите страницу, чтобы увидеть изменения.",
     "Conversation Delete Alert": "Вы уверены, что хотите удалить все выбранные разговоры?",
     "Conversation Deleted Message": "Все выбранные разговоры были удалены. Пожалуйста, обновите страницу, чтобы увидеть изменения.",
-    "Please start a conversation first": "Пожалуйста, начните разговор первым."
+    "Please start a conversation first": "Пожалуйста, начните разговор первым.",
+    "Select Project": "Выберите проект",
+    "(no project)": "(нет проекта)"
   };
   const title$2 = "ChatGPT Exporter";
   const ExportHelper$2 = "Dışa Aktar";
@@ -8377,7 +8411,9 @@ html {
     "Conversation Archived Message": "Seçilen tüm konuşmalar arşivlendi. Değişiklikleri görmek için sayfayı yenileyin.",
     "Conversation Delete Alert": "Seçilen tüm konuşmaları silmek istediğinizden emin misiniz?",
     "Conversation Deleted Message": "Seçilen tüm konuşmalar silindi. Değişiklikleri görmek için sayfayı yenileyin.",
-    "Please start a conversation first": "Lütfen önce bir konuşma başlatın."
+    "Please start a conversation first": "Lütfen önce bir konuşma başlatın.",
+    "Select Project": "Proje Seç",
+    "(no project)": "(proje yok)"
   };
   const title$1 = "ChatGPT Exporter";
   const ExportHelper$1 = "导出助手";
@@ -8432,7 +8468,9 @@ html {
     "Conversation Archived Message": "所有所选的对话已归档。请刷新页面。",
     "Conversation Delete Alert": "确定要删除所有选取的对话？",
     "Conversation Deleted Message": "所有所选的对话已删除。请刷新页面。",
-    "Please start a conversation first": "请先开始对话。"
+    "Please start a conversation first": "请先开始对话。",
+    "Select Project": "选择项目",
+    "(no project)": "（无项目）"
   };
   const title = "ChatGPT Exporter";
   const ExportHelper = "Export";
@@ -8487,7 +8525,9 @@ html {
     "Conversation Archived Message": "所有選取的對話已封存。請重新整理頁面。",
     "Conversation Delete Alert": "確定要刪除所有選取的對話？",
     "Conversation Deleted Message": "所有選取的對話已刪除。請重新整理頁面。",
-    "Please start a conversation first": "請先開始對話。"
+    "Please start a conversation first": "請先開始對話。",
+    "Select Project": "選擇專案",
+    "(no project)": "（無專案）"
   };
   class GMStorage {
     static get(key2) {
@@ -21868,6 +21908,29 @@ ${content2}`;
     );
   };
   const useSettingContext = () => q$1(SettingContext);
+  const ProjectSelect = ({ projects, selected, setSelected, disabled }) => {
+    const { t: t2 } = useTranslation();
+    return /* @__PURE__ */ o$8("div", { className: "flex items-center text-gray-600 dark:text-gray-300 flex justify-between mb-3", children: [
+      t2("Select Project"),
+      /* @__PURE__ */ o$8(
+        "select",
+        {
+          disabled,
+          className: "Select",
+          value: (selected == null ? void 0 : selected.id) || "",
+          onChange: (e2) => {
+            const projectId = e2.currentTarget.value;
+            const project = projects.find((p2) => p2.id === projectId);
+            setSelected(project || null);
+          },
+          children: [
+            /* @__PURE__ */ o$8("option", { value: "", children: t2("(no project)") }),
+            projects.map((project) => /* @__PURE__ */ o$8("option", { value: project.id, children: project.display.name }, project.id))
+          ]
+        }
+      )
+    ] });
+  };
   const ConversationSelect = ({
     conversations,
     selected,
@@ -21899,7 +21962,7 @@ ${content2}`;
           ": ",
           error2
         ] }),
-        conversations.map((c2) => /* @__PURE__ */ o$8("li", { className: "SelectItem", children: /* @__PURE__ */ o$8(
+        !loading && !error2 && conversations.map((c2) => /* @__PURE__ */ o$8("li", { className: "SelectItem", children: /* @__PURE__ */ o$8(
           CheckBox,
           {
             label: c2.title,
@@ -21930,9 +21993,11 @@ ${content2}`;
     const [apiConversations, setApiConversations] = h$4([]);
     const [localConversations, setLocalConversations] = h$4([]);
     const conversations = exportSource === "API" ? apiConversations : localConversations;
+    const [projects, setProjects] = h$4([]);
     const [loading, setLoading] = h$4(false);
     const [error2, setError] = h$4("");
     const [processing, setProcessing] = h$4(false);
+    const [selectedProject, setSelectedProject] = h$4(null);
     const [selected, setSelected] = h$4([]);
     const [exportType, setExportType] = h$4(exportAllOptions[0].label);
     const disabled = loading || processing || !!error2 || selected.length === 0;
@@ -22058,9 +22123,12 @@ ${content2}`;
       archiveQueue.start();
     }, [disabled, selected, archiveQueue, t2]);
     p$6(() => {
-      setLoading(true);
-      fetchAllConversations().then(setApiConversations).catch(setError).finally(() => setLoading(false));
+      fetchProjects().then(setProjects).catch((err) => setError(err.toString()));
     }, []);
+    p$6(() => {
+      setLoading(true);
+      fetchAllConversations(selectedProject == null ? void 0 : selectedProject.id).then(setApiConversations).catch((err) => setError(err.toString())).finally(() => setLoading(false));
+    }, [selectedProject]);
     return /* @__PURE__ */ o$8(k$3, { children: [
       /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$f99233281efd08a0, { className: "DialogTitle", children: t2("Export Dialog Title") }),
       /* @__PURE__ */ o$8("div", { className: "flex items-center text-gray-600 dark:text-gray-300 flex justify-between border-b-[1px] pb-3 mb-3 dark:border-gray-700", children: [
@@ -22082,6 +22150,7 @@ ${content2}`;
         }
       ),
       exportSource === "API" && /* @__PURE__ */ o$8("div", { className: "flex items-center text-gray-600 dark:text-gray-300 flex justify-between mb-3", children: t2("Export from API") }),
+      /* @__PURE__ */ o$8(ProjectSelect, { projects, selected: selectedProject, setSelected: setSelectedProject, disabled: processing || loading }),
       /* @__PURE__ */ o$8(
         ConversationSelect,
         {
@@ -23005,10 +23074,13 @@ ${content2}`;
         if (injectionMap.has(nav)) return;
         const container = getMenuContainer();
         injectionMap.set(nav, container);
-        const chatList = nav.querySelector(":scope > div.overflow-y-auto, :scope > div.overflow-y-hidden");
+        const chatList = nav.querySelector(":scope > div.sticky.bottom-0");
         if (chatList) {
-          chatList.after(container);
+          chatList.prepend(container);
         } else {
+          container.style.backgroundColor = "#171717";
+          container.style.position = "sticky";
+          container.style.bottom = "72px";
           nav.append(container);
         }
       };
@@ -23060,7 +23132,7 @@ ${content2}`;
   }
   function getMenuContainer() {
     const container = document.createElement("div");
-    container.style.zIndex = "20";
+    container.style.zIndex = "99";
     D$4(/* @__PURE__ */ o$8(Menu, { container }), container);
     return container;
   }
