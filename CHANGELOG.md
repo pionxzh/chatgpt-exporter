@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.28.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.27.2...userscript-v2.28.0) (2025-05-11)
+
+
+### Features
+
+* add project support ([9ddd11f](https://github.com/pionxzh/chatgpt-exporter/commit/9ddd11f715b267ecd10f8b1a641287e0ae7bb0b2))
+
+
+### Bug Fixes
+
+* fix button position disappeared on new sidebar layout ([d3b73cb](https://github.com/pionxzh/chatgpt-exporter/commit/d3b73cb4dd4727788d9dd4697b358562c99a293b)), closes [#290](https://github.com/pionxzh/chatgpt-exporter/issues/290)
+
 ## [2.27.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.27.1...userscript-v2.27.2) (2025-05-04)
 
 
