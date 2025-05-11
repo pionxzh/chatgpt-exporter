@@ -24,12 +24,15 @@ function main() {
             const container = getMenuContainer()
             injectionMap.set(nav, container)
 
-            const chatList = nav.querySelector(':scope > div.overflow-y-auto, :scope > div.overflow-y-hidden')
+            const chatList = nav.querySelector(':scope > div.sticky.bottom-0')
             if (chatList) {
-                chatList.after(container)
+                chatList.prepend(container)
             }
             else {
                 // fallback to the bottom of the nav
+                container.style.backgroundColor = '#171717'
+                container.style.position = 'sticky'
+                container.style.bottom = '72px'
                 nav.append(container)
             }
         }
@@ -95,7 +98,7 @@ function main() {
 function getMenuContainer() {
     const container = document.createElement('div')
     // to overlap on the list section
-    container.style.zIndex = '20'
+    container.style.zIndex = '99'
     render(<Menu container={container} />, container)
     return container
 }
