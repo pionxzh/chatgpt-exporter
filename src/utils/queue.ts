@@ -1,4 +1,4 @@
-import EventEmitter from 'eventemitter3'
+import EventEmitter from 'mitt'
 import { sleep } from './utils'
 
 type RequestFn<T> = () => Promise<T>
@@ -14,7 +14,11 @@ interface ProgressEvent {
 }
 
 export class RequestQueue<T> {
-    private eventEmitter = new EventEmitter()
+    private eventEmitter = EventEmitter<{
+        done: T[]
+        progress: ProgressEvent
+    } & Record<string, any[]>>()
+
     private queue: Array<RequestObject<T>> = []
     private results: T[] = []
 

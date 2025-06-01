@@ -14,9 +14,6 @@ dependencies:
   '@radix-ui/react-hover-card':
     specifier: ^1.0.5
     version: 1.0.5(react-dom@18.3.1)(react@18.3.1)
-  eventemitter3:
-    specifier: ^5.0.1
-    version: 5.0.1
   hast-util-to-html:
     specifier: ^8.0.4
     version: 8.0.4
@@ -50,6 +47,9 @@ dependencies:
   micromark-extension-gfm:
     specifier: ^2.0.3
     version: 2.0.3
+  mitt:
+    specifier: ^3.0.1
+    version: 3.0.1
   preact:
     specifier: ^10.17.1
     version: 10.17.1
@@ -2874,6 +2874,7 @@ packages:
 
   /eventemitter3@5.0.1:
     resolution: {integrity: sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==}
+    dev: true
 
   /execa@5.1.1:
     resolution: {integrity: sha512-8uSpZZocAZRBAPIEINJj3Lo9HyGitllczc27Eh5YYojjMFMn8yHMDMaUHE2Jqfq05D/wucwI4JGURyXt1vchyg==}
@@ -4505,6 +4506,10 @@ packages:
   /minimist@1.2.8:
     resolution: {integrity: sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==}
     dev: true
+
+  /mitt@3.0.1:
+    resolution: {integrity: sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==}
+    dev: false
 
   /mlly@1.4.2:
     resolution: {integrity: sha512-i/Ykufi2t1EZ6NaPLdfnZk2AX8cs0d+mTzVKuPfqPKPatxLApaBoxJQ9x1/uckXtrS/U5oisPMDkNs0yQTaBRg==}
