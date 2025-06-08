@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.28.0
+// @version            2.28.1
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -488,6 +488,14 @@ html {
     height: 1rem;
 }
 
+.inline-flex {
+    display: inline-flex;
+}
+
+.items-center {
+    align-items: center;
+}
+
 .ml-3 {
     margin-left: 0.75rem;
 }
@@ -506,6 +514,10 @@ html {
 
 .pr-8 {
     padding-right: 2rem;
+}
+
+.right-4 {
+    right: 1rem;
 }
 
 .rounded-full {
@@ -544,6 +556,63 @@ html {
     .lg\\:top-8 {
         top: 2rem;
     }
+}
+
+
+.toggle-switch {
+    position: relative;
+    outline: none;
+    background-color: rgb(229 231 235);
+    border: 1px solid rgb(107 114 128);
+    border-radius: 9999px;
+    cursor: pointer;
+    height: 20px;
+    width: 32px;
+}
+
+.dark .toggle-switch {
+    background-color: rgb(255 255 255 / 5%);
+    border-color: rgb(255 255 255 / 1);
+}
+
+.toggle-switch[data-state="checked"] {
+    background-color: rgb(0 0 0);
+    border-color: rgb(0 0 0);
+}
+
+.dark .toggle-switch[data-state="checked"] {
+    background-color: rgb(22 163 74);
+    border-color: rgb(22 163 74);
+}
+
+.toggle-switch-handle {
+    display: block;
+    background-color: rgb(255 255 255);
+    border-radius: 9999px;
+    height: 16px;
+    width: 16px;
+    transition: transform 0.1s;
+    will-change: transform;
+    transform: translateX(1px);
+}
+
+.toggle-switch-handle[data-state="checked"] {
+    transform: translateX(14px);
+}
+
+.toggle-switch-handle:hover {
+    background-color: rgb(243 244 246);
+}
+
+.toggle-switch-label {
+    color: rgb(107 114 128);
+    margin-left: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.toggle-switch-label:hover {
+    color: rgb(71 85 105);
 } `);
 
 (function (JSZip, html2canvas) {
@@ -21200,7 +21269,7 @@ ${_metaList.join("\n")}
 
 ` : "";
     const enableTimestamp = ScriptStorage.get(KEY_TIMESTAMP_ENABLED) ?? false;
-    const timeStampHtml = ScriptStorage.get(KEY_TIMESTAMP_HTML) ?? false;
+    const timeStampMarkdown = ScriptStorage.get(KEY_TIMESTAMP_MARKDOWN) ?? false;
     const timeStamp24H = ScriptStorage.get(KEY_TIMESTAMP_24H) ?? false;
     const content2 = conversationNodes.map(({ message }) => {
       var _a, _b, _c;
@@ -21216,7 +21285,7 @@ ${_metaList.join("\n")}
         }
       }
       const timestamp2 = (message == null ? void 0 : message.create_time) ?? "";
-      const showTimestamp = enableTimestamp && timeStampHtml && timestamp2;
+      const showTimestamp = enableTimestamp && timeStampMarkdown && timestamp2;
       let timestampHtml = "";
       if (showTimestamp) {
         const date = new Date(timestamp2 * 1e3);
@@ -21473,168 +21542,25 @@ ${content2}`;
     return () => window.removeEventListener("resize", callback);
   }
   const Divider = () => /* @__PURE__ */ o$8("div", { className: "h-px bg-token-border-light" });
-  var eventemitter3 = { exports: {} };
-  (function(module) {
-    var has = Object.prototype.hasOwnProperty, prefix = "~";
-    function Events() {
-    }
-    if (Object.create) {
-      Events.prototype = /* @__PURE__ */ Object.create(null);
-      if (!new Events().__proto__) prefix = false;
-    }
-    function EE(fn2, context, once) {
-      this.fn = fn2;
-      this.context = context;
-      this.once = once || false;
-    }
-    function addListener(emitter, event, fn2, context, once) {
-      if (typeof fn2 !== "function") {
-        throw new TypeError("The listener must be a function");
-      }
-      var listener = new EE(fn2, context || emitter, once), evt = prefix ? prefix + event : event;
-      if (!emitter._events[evt]) emitter._events[evt] = listener, emitter._eventsCount++;
-      else if (!emitter._events[evt].fn) emitter._events[evt].push(listener);
-      else emitter._events[evt] = [emitter._events[evt], listener];
-      return emitter;
-    }
-    function clearEvent(emitter, evt) {
-      if (--emitter._eventsCount === 0) emitter._events = new Events();
-      else delete emitter._events[evt];
-    }
-    function EventEmitter2() {
-      this._events = new Events();
-      this._eventsCount = 0;
-    }
-    EventEmitter2.prototype.eventNames = function eventNames() {
-      var names = [], events, name;
-      if (this._eventsCount === 0) return names;
-      for (name in events = this._events) {
-        if (has.call(events, name)) names.push(prefix ? name.slice(1) : name);
-      }
-      if (Object.getOwnPropertySymbols) {
-        return names.concat(Object.getOwnPropertySymbols(events));
-      }
-      return names;
-    };
-    EventEmitter2.prototype.listeners = function listeners(event) {
-      var evt = prefix ? prefix + event : event, handlers2 = this._events[evt];
-      if (!handlers2) return [];
-      if (handlers2.fn) return [handlers2.fn];
-      for (var i2 = 0, l2 = handlers2.length, ee2 = new Array(l2); i2 < l2; i2++) {
-        ee2[i2] = handlers2[i2].fn;
-      }
-      return ee2;
-    };
-    EventEmitter2.prototype.listenerCount = function listenerCount(event) {
-      var evt = prefix ? prefix + event : event, listeners = this._events[evt];
-      if (!listeners) return 0;
-      if (listeners.fn) return 1;
-      return listeners.length;
-    };
-    EventEmitter2.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
-      var evt = prefix ? prefix + event : event;
-      if (!this._events[evt]) return false;
-      var listeners = this._events[evt], len = arguments.length, args, i2;
-      if (listeners.fn) {
-        if (listeners.once) this.removeListener(event, listeners.fn, void 0, true);
-        switch (len) {
-          case 1:
-            return listeners.fn.call(listeners.context), true;
-          case 2:
-            return listeners.fn.call(listeners.context, a1), true;
-          case 3:
-            return listeners.fn.call(listeners.context, a1, a2), true;
-          case 4:
-            return listeners.fn.call(listeners.context, a1, a2, a3), true;
-          case 5:
-            return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
-          case 6:
-            return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
-        }
-        for (i2 = 1, args = new Array(len - 1); i2 < len; i2++) {
-          args[i2 - 1] = arguments[i2];
-        }
-        listeners.fn.apply(listeners.context, args);
-      } else {
-        var length = listeners.length, j2;
-        for (i2 = 0; i2 < length; i2++) {
-          if (listeners[i2].once) this.removeListener(event, listeners[i2].fn, void 0, true);
-          switch (len) {
-            case 1:
-              listeners[i2].fn.call(listeners[i2].context);
-              break;
-            case 2:
-              listeners[i2].fn.call(listeners[i2].context, a1);
-              break;
-            case 3:
-              listeners[i2].fn.call(listeners[i2].context, a1, a2);
-              break;
-            case 4:
-              listeners[i2].fn.call(listeners[i2].context, a1, a2, a3);
-              break;
-            default:
-              if (!args) for (j2 = 1, args = new Array(len - 1); j2 < len; j2++) {
-                args[j2 - 1] = arguments[j2];
-              }
-              listeners[i2].fn.apply(listeners[i2].context, args);
-          }
-        }
-      }
-      return true;
-    };
-    EventEmitter2.prototype.on = function on2(event, fn2, context) {
-      return addListener(this, event, fn2, context, false);
-    };
-    EventEmitter2.prototype.once = function once(event, fn2, context) {
-      return addListener(this, event, fn2, context, true);
-    };
-    EventEmitter2.prototype.removeListener = function removeListener(event, fn2, context, once) {
-      var evt = prefix ? prefix + event : event;
-      if (!this._events[evt]) return this;
-      if (!fn2) {
-        clearEvent(this, evt);
-        return this;
-      }
-      var listeners = this._events[evt];
-      if (listeners.fn) {
-        if (listeners.fn === fn2 && (!once || listeners.once) && (!context || listeners.context === context)) {
-          clearEvent(this, evt);
-        }
-      } else {
-        for (var i2 = 0, events = [], length = listeners.length; i2 < length; i2++) {
-          if (listeners[i2].fn !== fn2 || once && !listeners[i2].once || context && listeners[i2].context !== context) {
-            events.push(listeners[i2]);
-          }
-        }
-        if (events.length) this._events[evt] = events.length === 1 ? events[0] : events;
-        else clearEvent(this, evt);
-      }
-      return this;
-    };
-    EventEmitter2.prototype.removeAllListeners = function removeAllListeners(event) {
-      var evt;
-      if (event) {
-        evt = prefix ? prefix + event : event;
-        if (this._events[evt]) clearEvent(this, evt);
-      } else {
-        this._events = new Events();
-        this._eventsCount = 0;
-      }
-      return this;
-    };
-    EventEmitter2.prototype.off = EventEmitter2.prototype.removeListener;
-    EventEmitter2.prototype.addListener = EventEmitter2.prototype.on;
-    EventEmitter2.prefixed = prefix;
-    EventEmitter2.EventEmitter = EventEmitter2;
-    {
-      module.exports = EventEmitter2;
-    }
-  })(eventemitter3);
-  var eventemitter3Exports = eventemitter3.exports;
-  const EventEmitter = /* @__PURE__ */ getDefaultExportFromCjs(eventemitter3Exports);
+  function EventEmitter(n2) {
+    return { all: n2 = n2 || /* @__PURE__ */ new Map(), on: function(t2, e2) {
+      var i2 = n2.get(t2);
+      i2 ? i2.push(e2) : n2.set(t2, [e2]);
+    }, off: function(t2, e2) {
+      var i2 = n2.get(t2);
+      i2 && (e2 ? i2.splice(i2.indexOf(e2) >>> 0, 1) : n2.set(t2, []));
+    }, emit: function(t2, e2) {
+      var i2 = n2.get(t2);
+      i2 && i2.slice().map(function(n3) {
+        n3(e2);
+      }), (i2 = n2.get("*")) && i2.slice().map(function(n3) {
+        n3(t2, e2);
+      });
+    } };
+  }
   class RequestQueue {
     constructor(minBackoff, maxBackoff) {
-      __publicField(this, "eventEmitter", new EventEmitter());
+      __publicField(this, "eventEmitter", EventEmitter());
       __publicField(this, "queue", []);
       __publicField(this, "results", []);
       __publicField(this, "status", "IDLE");
@@ -22592,17 +22518,17 @@ ${content2}`;
           checked,
           onChange: onCheckedUpdate,
           "data-state": checked ? "checked" : "unchecked",
-          className: "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-token-text-secondary focus-visible:ring-offset-2 focus-visible:radix-state-checked:ring-black focus-visible:dark:ring-token-main-surface-primary focus-visible:dark:radix-state-checked:ring-green-600 cursor-pointer bg-gray-200 radix-state-checked:bg-black dark:border dark:border-token-border-medium dark:bg-transparent relative shrink-0 rounded-full dark:radix-state-checked:border-green-600 dark:radix-state-checked:bg-green-600 h-[20px] w-[32px]",
+          className: "toggle-switch",
           children: /* @__PURE__ */ o$8(
             "span",
             {
               "data-state": checked ? "checked" : "unchecked",
-              className: "flex items-center justify-center rounded-full transition-transform duration-100 will-change-transform ltr:translate-x-0.5 rtl:-translate-x-0.5 bg-white h-[16px] w-[16px] ltr:radix-state-checked:translate-x-[14px] rtl:radix-state-checked:translate-x-[-14px]"
+              className: "toggle-switch-handle"
             }
           )
         }
       ),
-      label && /* @__PURE__ */ o$8("span", { className: "ml-3 text-sm font-medium text-gray-900 dark:text-gray-300", children: label })
+      label && /* @__PURE__ */ o$8("span", { className: "toggle-switch-label", children: label })
     ] });
   }
   function Variable({ name, title: title2 }) {
