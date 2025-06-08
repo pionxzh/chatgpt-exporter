@@ -1,6 +1,6 @@
 import JSZip from 'jszip'
 import { fetchConversation, getCurrentChatId, processConversation } from '../api'
-import { KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_HTML, baseUrl } from '../constants'
+import { KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_MARKDOWN, baseUrl } from '../constants'
 import i18n from '../i18n'
 import { checkIfConversationStarted } from '../page'
 import { downloadFile, getFileNameWithFormat } from '../utils/download'
@@ -90,7 +90,7 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
         : ''
 
     const enableTimestamp = ScriptStorage.get<boolean>(KEY_TIMESTAMP_ENABLED) ?? false
-    const timeStampHtml = ScriptStorage.get<boolean>(KEY_TIMESTAMP_HTML) ?? false
+    const timeStampMarkdown = ScriptStorage.get<boolean>(KEY_TIMESTAMP_MARKDOWN) ?? false
     const timeStamp24H = ScriptStorage.get<boolean>(KEY_TIMESTAMP_24H) ?? false
 
     const content = conversationNodes.map(({ message }) => {
@@ -116,7 +116,7 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
         }
 
         const timestamp = message?.create_time ?? ''
-        const showTimestamp = enableTimestamp && timeStampHtml && timestamp
+        const showTimestamp = enableTimestamp && timeStampMarkdown && timestamp
         let timestampHtml = ''
         if (showTimestamp) {
             const date = new Date(timestamp * 1000)
