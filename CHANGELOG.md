@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.28.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.28.0...userscript-v2.28.1) (2025-06-08)
+
+
+### Bug Fixes
+
+* fix exporting markdown with timestamp ([87c2cb7](https://github.com/pionxzh/chatgpt-exporter/commit/87c2cb74bafc3594f7bb7272cf3f0f57795a9ab8)), closes [#296](https://github.com/pionxzh/chatgpt-exporter/issues/296)
+* fix toggle style ([103b617](https://github.com/pionxzh/chatgpt-exporter/commit/103b6170ff3feaac87cb94e94bfb7c19c688964c))
+
 ## [2.28.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.27.2...userscript-v2.28.0) (2025-05-11)
 
 
