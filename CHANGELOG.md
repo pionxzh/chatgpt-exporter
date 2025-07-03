@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.29.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.28.1...userscript-v2.29.0) (2025-07-03)
+
+
+### Features
+
+* **export:** make max-message-export configurable ([832732b](https://github.com/pionxzh/chatgpt-exporter/commit/832732b90c65e9c4bb57d4276a66323ab39ad540))
+* support audio chat ([e1d1a2f](https://github.com/pionxzh/chatgpt-exporter/commit/e1d1a2f6457a881c5ba88aa89c33e5983ca74f05)), closes [#298](https://github.com/pionxzh/chatgpt-exporter/issues/298)
+
+
+### Bug Fixes
+
+* correct timestamp default ([0b1109b](https://github.com/pionxzh/chatgpt-exporter/commit/0b1109b0d18470e4d1a8f188b63467d80e82f3a4))
+
 ## [2.28.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.28.0...userscript-v2.28.1) (2025-06-08)
 
 
