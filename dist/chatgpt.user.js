@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.28.1
+// @version            2.29.0
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -1079,6 +1079,7 @@ html {
   const KEY_TIMESTAMP_HTML = "exporter:timestamp_html";
   const KEY_META_ENABLED = "exporter:enable_meta";
   const KEY_META_LIST = "exporter:meta_list";
+  const KEY_EXPORT_ALL_LIMIT = "exporter:export_all_limit";
   const KEY_OAI_LOCALE = "oai/apps/locale";
   const KEY_OAI_HISTORY_DISABLED = "oai/apps/historyDisabled";
   var _GM_deleteValue = /* @__PURE__ */ (() => typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0)();
@@ -1213,7 +1214,7 @@ html {
   }
   async function replaceImageAssets(conversation) {
     const isMultiModalInputImage = (part) => {
-      return typeof part === "object" && part !== null && "asset_pointer" in part && typeof part.asset_pointer === "string" && part.asset_pointer.startsWith("file-service://");
+      return typeof part === "object" && part !== null && "content_type" in part && part.content_type === "image_asset_pointer" && "asset_pointer" in part && typeof part.asset_pointer === "string" && part.asset_pointer.startsWith("file-service://");
     };
     const imageAssets = Object.values(conversation.mapping).flatMap((node2) => {
       if (!node2.message) return [];
@@ -1289,19 +1290,27 @@ html {
       total: null
     };
   }
-  async function fetchAllConversations(project = null) {
+  async function fetchAllConversations(project = null, maxConversations = 1e3) {
     const conversations = [];
     const limit = project === null ? 100 : 50;
     let offset = 0;
     while (true) {
-      const result = await fetchConversations(offset, limit, project);
-      conversations.push(...result.items);
-      if (result.total !== null && offset + limit >= result.total) break;
-      if (result.items.length === 0) break;
-      if (offset + limit >= 1e3) break;
-      offset += limit;
+      try {
+        const result = await fetchConversations(offset, limit, project);
+        if (!result.items) {
+          console.warn("fetchAllConversations received no items at offset:", offset);
+          break;
+        }
+        conversations.push(...result.items);
+        if (result.total !== null && offset + limit >= result.total) break;
+        if (conversations.length >= maxConversations) break;
+        offset += limit;
+      } catch (error2) {
+        console.error("Error fetching conversations batch:", error2);
+        break;
+      }
     }
-    return conversations;
+    return conversations.slice(0, maxConversations);
   }
   async function archiveConversation(chatId) {
     const url = conversationApi(chatId);
@@ -8140,7 +8149,9 @@ html {
     "Conversation Deleted Message": "All selected conversations have been deleted. Please refresh the page to see the changes.",
     "Please start a conversation first": "Please start a conversation first.",
     "Select Project": "Select Project",
-    "(no project)": "(no project)"
+    "(no project)": "(no project)",
+    "Export All Limit": "Export All Limit",
+    "Export All Limit Description": "Set the maximum number of conversations to load in the 'Export All' dialog."
   };
   const title$7 = "ChatGPT Exporter";
   const ExportHelper$7 = "Exportar";
@@ -8197,7 +8208,9 @@ html {
     "Conversation Deleted Message": "Todos las conversaciones seleccionadas se han borrado. Por favor refresca la página para ver los cambios.",
     "Please start a conversation first": "Por favor empieza una conversación antes.",
     "Select Project": "Seleccionar proyecto",
-    "(no project)": "(sin proyecto)"
+    "(no project)": "(sin proyecto)",
+    "Export All Limit": "Límite de Exportar Todos",
+    "Export All Limit Description": "Establece el número máximo de conversaciones a cargar en el diálogo 'Exportar Todos'."
   };
   const title$6 = "Exportateur ChatGPT";
   const ExportHelper$6 = "Exporter";
@@ -8254,7 +8267,9 @@ html {
     "Conversation Deleted Message": "Toutes les conversations sélectionnées ont été supprimées. Veuillez actualiser la page pour voir les changements.",
     "Please start a conversation first": "Veuillez commencer une conversation d'abord.",
     "Select Project": "Sélectionner un projet",
-    "(no project)": "(aucun projet)"
+    "(no project)": "(aucun projet)",
+    "Export All Limit": "Limite d'Exportation Multiple",
+    "Export All Limit Description": "Définit le nombre maximal de conversations à charger dans la boîte de dialogue 'Tout exporter'."
   };
   const title$5 = "ChatGPT Exporter";
   const ExportHelper$5 = "Ekspor";
@@ -8311,7 +8326,9 @@ html {
     "Conversation Deleted Message": "Semua percakapan yang dipilih telah dihapus. Harap segarkan halaman untuk melihat perubahan.",
     "Please start a conversation first": "Harap mulai percakapan terlebih dahulu.",
     "Select Project": "Pilih Proyek",
-    "(no project)": "(tidak ada proyek)"
+    "(no project)": "(tidak ada proyek)",
+    "Export All Limit": "Batas Ekspor Semua",
+    "Export All Limit Description": "Atur jumlah maksimum percakapan yang akan dimuat dalam dialog 'Ekspor Semua'."
   };
   const title$4 = "ChatGPTエクスポーター";
   const ExportHelper$4 = "エクスポート";
@@ -8368,7 +8385,9 @@ html {
     "Conversation Deleted Message": "選択したすべての会話が削除されました。変更を表示するには、ページを更新してください。",
     "Please start a conversation first": "まず会話を開始してください。",
     "Select Project": "プロジェクトを選択",
-    "(no project)": "（プロジェクトなし）"
+    "(no project)": "（プロジェクトなし）",
+    "Export All Limit": "すべてエクスポートの上限",
+    "Export All Limit Description": "「すべてエクスポート」ダイアログで読み込む会話の最大数を設定します。"
   };
   const title$3 = "ChatGPT Exporter";
   const ExportHelper$3 = "Export";
@@ -8425,7 +8444,9 @@ html {
     "Conversation Deleted Message": "Все выбранные разговоры были удалены. Пожалуйста, обновите страницу, чтобы увидеть изменения.",
     "Please start a conversation first": "Пожалуйста, начните разговор первым.",
     "Select Project": "Выберите проект",
-    "(no project)": "(нет проекта)"
+    "(no project)": "(нет проекта)",
+    "Export All Limit": "Лимит экспорта всех",
+    "Export All Limit Description": "Установите максимальное количество бесед для загрузки в диалоге 'Экспортировать все'."
   };
   const title$2 = "ChatGPT Exporter";
   const ExportHelper$2 = "Dışa Aktar";
@@ -8482,7 +8503,9 @@ html {
     "Conversation Deleted Message": "Seçilen tüm konuşmalar silindi. Değişiklikleri görmek için sayfayı yenileyin.",
     "Please start a conversation first": "Lütfen önce bir konuşma başlatın.",
     "Select Project": "Proje Seç",
-    "(no project)": "(proje yok)"
+    "(no project)": "(proje yok)",
+    "Export All Limit": "Tümünü Dışa Aktarma Limiti",
+    "Export All Limit Description": "'Tümünü Dışa Aktar' iletişim kutusunda yüklenecek maksimum konuşma sayısını ayarlayın."
   };
   const title$1 = "ChatGPT Exporter";
   const ExportHelper$1 = "导出助手";
@@ -8539,7 +8562,9 @@ html {
     "Conversation Deleted Message": "所有所选的对话已删除。请刷新页面。",
     "Please start a conversation first": "请先开始对话。",
     "Select Project": "选择项目",
-    "(no project)": "（无项目）"
+    "(no project)": "（无项目）",
+    "Export All Limit": "批量导出上限",
+    "Export All Limit Description": "设置“批量导出”对话框中加载的最大对话数量。"
   };
   const title = "ChatGPT Exporter";
   const ExportHelper = "Export";
@@ -8596,7 +8621,9 @@ html {
     "Conversation Deleted Message": "所有選取的對話已刪除。請重新整理頁面。",
     "Please start a conversation first": "請先開始對話。",
     "Select Project": "選擇專案",
-    "(no project)": "（無專案）"
+    "(no project)": "（無專案）",
+    "Export All Limit": "批量匯出上限",
+    "Export All Limit Description": "設定「批量匯出」對話方塊中載入的最大對話數量。"
   };
   class GMStorage {
     static get(key2) {
@@ -9612,8 +9639,11 @@ html {
     title: title2 = document.title,
     // chatId will be empty when exporting all conversations
     chatId = "",
-    createTime = Date.now(),
-    updateTime = Date.now()
+    // convert to seconds for unixTimestampToISOString which expects a unix
+    // timestamp (in seconds). using Date.now() directly would pass
+    // milliseconds which results in an invalid far future date.
+    createTime = Math.floor(Date.now() / 1e3),
+    updateTime = Math.floor(Date.now() / 1e3)
   } = {}) {
     const _title = sanitize$1(title2).replace(/\s+/g, "_");
     const _createTime = unixTimestampToISOString(createTime);
@@ -20902,7 +20932,10 @@ ${content2.text}
       case "multimodal_text": {
         return ((_d = content2.parts) == null ? void 0 : _d.map((part) => {
           if (typeof part === "string") return postProcess(part);
-          if (part.asset_pointer) return `<img src="${part.asset_pointer}" height="${part.height}" width="${part.width}" />`;
+          if (part.content_type === "image_asset_pointer") return `<img src="${part.asset_pointer}" height="${part.height}" width="${part.width}" />`;
+          if (part.content_type === "audio_transcription") return `<div style="font-style: italic; opacity: 0.65;">“${part.text}”</div>`;
+          if (part.content_type === "audio_asset_pointer") return null;
+          if (part.content_type === "real_time_user_audio_video_asset_pointer") return null;
           return postProcess("[Unsupported multimodal content]");
         }).join("\n")) || "";
       }
@@ -21398,7 +21431,10 @@ ${content2.text}
       case "multimodal_text": {
         return ((_d = content2.parts) == null ? void 0 : _d.map((part) => {
           if (typeof part === "string") return postProcess(part);
-          if (part.asset_pointer) return `![image](${part.asset_pointer})`;
+          if (part.content_type === "image_asset_pointer") return `![image](${part.asset_pointer})`;
+          if (part.content_type === "audio_transcription") return `[audio] ${part.text}`;
+          if (part.content_type === "audio_asset_pointer") return null;
+          if (part.content_type === "real_time_user_audio_video_asset_pointer") return null;
           return postProcess("[Unsupported multimodal content]");
         }).join("\n")) || "";
       }
@@ -21493,7 +21529,10 @@ ${content2}`;
       case "multimodal_text": {
         return ((_d = content2.parts) == null ? void 0 : _d.map((part) => {
           if (typeof part === "string") return part;
-          if (part.asset_pointer) return "[image]";
+          if (part.content_type === "image_asset_pointer") return "[image]";
+          if (part.content_type === "audio_transcription") return `[audio] ${part.text}`;
+          if (part.content_type === "audio_asset_pointer") return null;
+          if (part.content_type === "real_time_user_audio_video_asset_pointer") return null;
           return "[Unsupported multimodal content]";
         }).join("\n")) || "";
       }
@@ -21508,7 +21547,11 @@ ${content2}`;
       if (item.type === "emphasis") return item.children;
       return [item];
     });
-    return toMarkdown(root2);
+    const result = toMarkdown(root2);
+    if (result.startsWith("\\[") && input.startsWith("[")) {
+      return result.slice(1);
+    }
+    return result;
   }
   function transformAuthor(author) {
     switch (author.role) {
@@ -21767,6 +21810,7 @@ ${content2}`;
     return [storedValue, setValue];
   }
   const defaultFormat = "ChatGPT-{title}";
+  const defaultExportAllLimit = 1e3;
   const defaultExportMetaList = [
     { name: "title", value: "{title}" },
     { name: "source", value: "{source}" }
@@ -21793,6 +21837,9 @@ ${content2}`;
     exportMetaList: defaultExportMetaList,
     setExportMetaList: (_24) => {
     },
+    exportAllLimit: defaultExportAllLimit,
+    setExportAllLimit: (_24) => {
+    },
     resetDefault: () => {
     }
   });
@@ -21804,11 +21851,20 @@ ${content2}`;
     const [enableTimestampMarkdown, setEnableTimestampMarkdown] = useGMStorage(KEY_TIMESTAMP_MARKDOWN, false);
     const [enableMeta, setEnableMeta] = useGMStorage(KEY_META_ENABLED, false);
     const [exportMetaList, setExportMetaList] = useGMStorage(KEY_META_LIST, defaultExportMetaList);
+    const [exportAllLimit, setExportAllLimit] = useGMStorage(KEY_EXPORT_ALL_LIMIT, defaultExportAllLimit);
     const resetDefault = T$4(() => {
       setFormat(defaultFormat);
+      setEnableTimestamp(false);
       setEnableMeta(false);
       setExportMetaList(defaultExportMetaList);
-    }, [setFormat, setEnableMeta, setExportMetaList]);
+      setExportAllLimit(defaultExportAllLimit);
+    }, [
+      setFormat,
+      setEnableTimestamp,
+      setEnableMeta,
+      setExportMetaList,
+      setExportAllLimit
+    ]);
     return /* @__PURE__ */ o$8(
       SettingContext.Provider,
       {
@@ -21827,6 +21883,8 @@ ${content2}`;
           setEnableMeta,
           exportMetaList,
           setExportMetaList,
+          exportAllLimit,
+          setExportAllLimit,
           resetDefault
         },
         children
@@ -21906,7 +21964,7 @@ ${content2}`;
   };
   const DialogContent = ({ format }) => {
     const { t: t2 } = useTranslation();
-    const { enableMeta, exportMetaList } = useSettingContext();
+    const { enableMeta, exportMetaList, exportAllLimit } = useSettingContext();
     const metaList = F$1(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList]);
     const exportAllOptions = F$1(() => [
       { label: "Markdown", callback: exportAllToMarkdown },
@@ -22018,7 +22076,15 @@ ${content2}`;
       const results = localConversations.filter((c2) => selected.some((s2) => s2.id === c2.id));
       const callback = (_a = exportAllOptions.find((o3) => o3.label === exportType)) == null ? void 0 : _a.callback;
       if (callback) callback(format, results, metaList);
-    }, [disabled, selected, localConversations, exportAllOptions, exportType, format, metaList]);
+    }, [
+      disabled,
+      selected,
+      localConversations,
+      exportAllOptions,
+      exportType,
+      format,
+      metaList
+    ]);
     const exportAll = F$1(() => {
       return exportSource === "API" ? exportAllFromApi : exportAllFromLocal;
     }, [exportSource, exportAllFromApi, exportAllFromLocal]);
@@ -22053,8 +22119,11 @@ ${content2}`;
     }, []);
     p$6(() => {
       setLoading(true);
-      fetchAllConversations(selectedProject == null ? void 0 : selectedProject.id).then(setApiConversations).catch((err) => setError(err.toString())).finally(() => setLoading(false));
-    }, [selectedProject]);
+      fetchAllConversations(selectedProject == null ? void 0 : selectedProject.id, exportAllLimit).then(setApiConversations).catch((err) => {
+        console.error("Error fetching conversations:", err);
+        setError(err.message || "Failed to load conversations");
+      }).finally(() => setLoading(false));
+    }, [selectedProject, exportAllLimit]);
     return /* @__PURE__ */ o$8(k$3, { children: [
       /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$f99233281efd08a0, { className: "DialogTitle", children: t2("Export Dialog Title") }),
       /* @__PURE__ */ o$8("div", { className: "flex items-center text-gray-600 dark:text-gray-300 flex justify-between border-b-[1px] pb-3 mb-3 dark:border-gray-700", children: [
@@ -22554,7 +22623,9 @@ ${content2}`;
       enableMeta,
       setEnableMeta,
       exportMetaList,
-      setExportMetaList
+      setExportMetaList,
+      exportAllLimit,
+      setExportAllLimit
       /* eslint-enable pionxzh/consistent-list-newline */
     } = useSettingContext();
     const { t: t2, i18n } = useTranslation();
@@ -22622,6 +22693,37 @@ ${content2}`;
                       ":",
                       " ",
                       /* @__PURE__ */ o$8("span", { className: "select-all", style: { "text-decoration": "underline", "text-underline-offset": 4 }, children: preview })
+                    ] })
+                  ] })
+                ] }) }),
+                /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: /* @__PURE__ */ o$8("div", { children: [
+                  /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: [
+                    t2("Export All Limit"),
+                    " "
+                  ] }),
+                  /* @__PURE__ */ o$8("dd", { className: "text-sm text-gray-700 dark:text-gray-300 mt-2", children: [
+                    t2("Export All Limit Description"),
+                    " ",
+                    /* @__PURE__ */ o$8("div", { className: "flex items-center gap-4 mt-3", children: [
+                      /* @__PURE__ */ o$8(
+                        "input",
+                        {
+                          type: "range",
+                          min: "100",
+                          max: "20000",
+                          step: "100",
+                          value: exportAllLimit,
+                          onChange: (e2) => setExportAllLimit(
+                            Number.parseInt(
+                              e2.currentTarget.value,
+                              10
+                            )
+                          ),
+                          className: "flex-grow h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700",
+                          id: "exportAllLimitSlider"
+                        }
+                      ),
+                      /* @__PURE__ */ o$8("span", { className: "font-medium text-gray-900 dark:text-gray-300 w-12 text-right", children: exportAllLimit })
                     ] })
                   ] })
                 ] }) }),
