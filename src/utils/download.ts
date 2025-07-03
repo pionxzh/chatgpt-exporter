@@ -25,8 +25,11 @@ export function getFileNameWithFormat(format: string, ext: string, {
     title = document.title,
     // chatId will be empty when exporting all conversations
     chatId = '',
-    createTime = Date.now(),
-    updateTime = Date.now(),
+    // convert to seconds for unixTimestampToISOString which expects a unix
+    // timestamp (in seconds). using Date.now() directly would pass
+    // milliseconds which results in an invalid far future date.
+    createTime = Math.floor(Date.now() / 1000),
+    updateTime = Math.floor(Date.now() / 1000),
 } = {}) {
     const _title = sanitize(title).replace(/\s+/g, '_')
     const _createTime = unixTimestampToISOString(createTime)
