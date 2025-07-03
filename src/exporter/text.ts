@@ -119,7 +119,10 @@ function transformContent(
             return content.parts?.map((part) => {
                 if (typeof part === 'string') return part
                 // We show `[image]` for multimodal as the base64 string is too long. This is bad for sharing pure text.
-                if (part.asset_pointer) return '[image]'
+                if (part.content_type === 'image_asset_pointer') return '[image]'
+                if (part.content_type === 'audio_transcription') return `[audio] ${part.text}`
+                if (part.content_type === 'audio_asset_pointer') return null
+                if (part.content_type === 'real_time_user_audio_video_asset_pointer') return null
                 return '[Unsupported multimodal content]'
             }).join('\n') || ''
         }
@@ -141,7 +144,12 @@ function reformatContent(input: string) {
 
         return [item]
     })
-    return toMarkdown(root)
+    const result = toMarkdown(root)
+    // HACK: render to markdown will let [ be escaped, so we need to remove the first character
+    if (result.startsWith('\\[') && input.startsWith('[')) {
+        return result.slice(1)
+    }
+    return result
 }
 
 function transformAuthor(author: ConversationNodeMessage['author']): string {

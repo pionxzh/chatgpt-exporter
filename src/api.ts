@@ -117,6 +117,52 @@ interface MultiModalInputImage {
     }
 }
 
+interface MultiModalInputAudio {
+    content_type: 'audio_asset_pointer'
+    audio_asset_pointer: string
+    expiry_datetime: string
+    format: string
+    metadata: {
+        start_timestamp: number
+        end_timestamp: number
+        pretokenized_vq: null
+    }
+    size_bytes: number
+}
+
+interface MultiModalAudioVideoAssetPointer {
+    content_type: 'real_time_user_audio_video_asset_pointer'
+    expiry_datetime: string
+    frames_asset_pointers: unknown[]
+    video_container_asset_pointer: null
+    audio_asset_pointer: {
+        expiry_datetime: string
+        content_type: 'audio_asset_pointer'
+        asset_pointer: string
+        size_bytes: number
+        format: string
+        metadata: {
+            start_timestamp: null
+            end_timestamp: null
+            pretokenized_vq: null
+            interruptions: null
+            original_audio_source: null
+            transcription: null
+            word_transcription: null
+            start: number
+            end: number
+        }
+    }
+    audio_start_timestamp: number
+}
+
+interface MultiModalAudioTranscription {
+    content_type: 'audio_transcription'
+    decoding_id: null
+    direction: 'in' | 'out'
+    text: string
+}
+
 export interface ConversationNodeMessage {
     author: {
         role: AuthorRole
@@ -155,7 +201,7 @@ export interface ConversationNodeMessage {
     } | {
         // multi-modal input
         content_type: 'multimodal_text'
-        parts: Array<MultiModalInputImage | string>
+        parts: Array<MultiModalAudioVideoAssetPointer | MultiModalAudioTranscription | MultiModalInputImage | MultiModalInputAudio | string>
     } | {
         content_type: 'model_editable_context'
         model_set_context: string
@@ -344,8 +390,13 @@ async function fetchImageFromPointer(uri: string) {
 /** avoid errors in parsing multimodal parts we don't understand */
 async function replaceImageAssets(conversation: ApiConversation): Promise<void> {
     const isMultiModalInputImage = (part: any): part is MultiModalInputImage => {
-        return typeof part === 'object' && part !== null && 'asset_pointer' in part
-               && typeof part.asset_pointer === 'string' && part.asset_pointer.startsWith('file-service://')
+        return typeof part === 'object'
+        && part !== null
+        && 'content_type' in part
+        && part.content_type === 'image_asset_pointer'
+        && 'asset_pointer' in part
+        && typeof part.asset_pointer === 'string'
+        && part.asset_pointer.startsWith('file-service://')
     }
 
     const imageAssets = Object.values(conversation.mapping).flatMap((node) => {

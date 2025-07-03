@@ -254,7 +254,10 @@ function transformContent(
         case 'multimodal_text': {
             return content.parts?.map((part) => {
                 if (typeof part === 'string') return postProcess(part)
-                if (part.asset_pointer) return `![image](${part.asset_pointer})`
+                if (part.content_type === 'image_asset_pointer') return `![image](${part.asset_pointer})`
+                if (part.content_type === 'audio_transcription') return `[audio] ${part.text}`
+                if (part.content_type === 'audio_asset_pointer') return null
+                if (part.content_type === 'real_time_user_audio_video_asset_pointer') return null
                 return postProcess('[Unsupported multimodal content]')
             }).join('\n') || ''
         }
