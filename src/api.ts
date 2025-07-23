@@ -495,13 +495,16 @@ export async function fetchAllConversations(project: string | null = null, maxCo
     let offset = 0
     while (true) {
         try {
-            const result = await fetchConversations(offset, limit, project)
+            const result = project === null
+                ? await fetchConversations(offset, limit)
+                : await fetchProjectConversations(project, offset, limit)
             if (!result.items) {
                 // Handle potential API errors or empty responses
                 console.warn('fetchAllConversations received no items at offset:', offset)
                 break
             }
             conversations.push(...result.items)
+            if (result.items.length === 0) break
             // Stop if we've reached the total reported by the API OR the user-defined limit
             if (result.total !== null && offset + limit >= result.total) break
             if (conversations.length >= maxConversations) break
