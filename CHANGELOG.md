@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.29.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.29.0...userscript-v2.29.1) (2025-07-25)
+
+
+### Bug Fixes
+
+* **api:** fix project-level chat export stuck at "Loading" ([f4c4a7f](https://github.com/pionxzh/chatgpt-exporter/commit/f4c4a7f1324b7d3506dc6cdf1db1a69ae43e0028)), closes [#305](https://github.com/pionxzh/chatgpt-exporter/issues/305)
+
 ## [2.29.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.28.1...userscript-v2.29.0) (2025-07-03)
 
 
