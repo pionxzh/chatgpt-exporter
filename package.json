@@ -64,11 +64,11 @@
     "@types/unist": "^2.0.10",
     "eslint": "^8.57.0",
     "husky": "^9.0.11",
-    "katex": "^0.16.11",
+    "katex": "^0.16.21",
     "lint-staged": "^15.2.7",
     "react": "^18.3.1",
     "typescript": "^5.5.2",
-    "vite": "^5.3.2"
+    "vite": "^5.4.21"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "pnpm exec eslint"
