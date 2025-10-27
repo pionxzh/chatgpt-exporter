@@ -27,7 +27,7 @@ export const CheckBox: React.FC<CheckBoxProps> = ({
         setChecked(checked)
     }, [checked])
     return (
-        <label className={`CheckBoxLabel ${className ?? ''}`} disabled={disabled}>
+        <label className={`CheckBoxLabel ${className ?? ''} ${disabled ? 'disabled' : ''}`}>
             <span className="IconWrapper">
                 <input
                     type="checkbox"

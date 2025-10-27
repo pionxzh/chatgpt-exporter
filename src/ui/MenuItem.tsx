@@ -49,10 +49,10 @@ export const MenuItem: FC<MenuItemProps> = ({ text, successText, disabled = fals
             transition-colors duration-200
             text-menu text-sm
             cursor-pointer
-            border border-menu ${className}`}
+            border border-menu ${disabled ? 'opacity-50 pointer-events-none' : ''} ${className}`}
             onClick={handleClick}
             onTouchStart={handleClick}
-            disabled={disabled}
+            data-disabled={disabled}
             title={title}
         >
             {loading
