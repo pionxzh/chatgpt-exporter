@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT Insights Knowledge Base Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #38bdf8;
+        }
+
+        .upload-area {
+            border: 2px dashed #475569;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            border-color: #38bdf8;
+            background: #1e293b;
+        }
+
+        .upload-area.dragover {
+            border-color: #38bdf8;
+            background: #1e293b;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #1e293b;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #38bdf8;
+            margin-top: 5px;
+        }
+
+        .filters {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .filter-row label {
+            font-weight: 500;
+            color: #94a3b8;
+            min-width: 100px;
+        }
+
+        select, input {
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #e2e8f0;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        select {
+            min-width: 200px;
+        }
+
+        input[type="date"] {
+            min-width: 150px;
+        }
+
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: #2563eb;
+        }
+
+        button:disabled {
+            background: #475569;
+            cursor: not-allowed;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 10px 20px;
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        .content {
+            background: #1e293b;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 400px;
+        }
+
+        .entity-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .entity-card {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.2s;
+        }
+
+        .entity-card:hover {
+            border-color: #38bdf8;
+            transform: translateX(5px);
+        }
+
+        .entity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+
+        .entity-type {
+            background: #3b82f6;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .entity-subtype {
+            background: #475569;
+            color: #e2e8f0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-left: 5px;
+        }
+
+        .entity-content {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #f1f5f9;
+        }
+
+        .entity-meta {
+            font-size: 12px;
+            color: #94a3b8;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .evidence {
+            background: #1e293b;
+            border-left: 3px solid #38bdf8;
+            padding: 10px;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 30px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -25px;
+            top: 8px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #3b82f6;
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: -21px;
+            top: 18px;
+            width: 2px;
+            height: calc(100% - 8px);
+            background: #334155;
+        }
+
+        .timeline-item:last-child::after {
+            display: none;
+        }
+
+        .timeline-date {
+            font-size: 12px;
+            color: #38bdf8;
+            margin-bottom: 5px;
+        }
+
+        .tags {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .tag {
+            background: #334155;
+            color: #94a3b8;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .search-highlight {
+            background: #fbbf24;
+            color: #000;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+
+        .export-btn {
+            background: #10b981;
+        }
+
+        .export-btn:hover {
+            background: #059669;
+        }
+
+        @media (max-width: 768px) {
+            .filter-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-row label {
+                min-width: auto;
+            }
+
+            .tabs {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧠 ChatGPT Insights Knowledge Base Viewer</h1>
+            <p style="color: #94a3b8;">Explore and analyze your conversation insights</p>
+        </header>
+
+        <div class="upload-area" id="uploadArea">
+            <div style="font-size: 48px; margin-bottom: 10px;">📁</div>
+            <div style="font-size: 18px; margin-bottom: 5px;">Drop your knowledge base JSON file here</div>
+            <div style="color: #64748b; font-size: 14px;">or click to browse</div>
+            <input type="file" id="fileInput" accept=".json">
+        </div>
+
+        <div id="mainContent" style="display: none;">
+            <div class="stats" id="stats"></div>
+
+            <div class="filters">
+                <div class="filter-row">
+                    <label>Entity Type:</label>
+                    <select id="filterType">
+                        <option value="">All Types</option>
+                        <option value="event">Events</option>
+                        <option value="concept">Concepts</option>
+                        <option value="question">Questions</option>
+                        <option value="decision">Decisions</option>
+                        <option value="assumption">Assumptions</option>
+                    </select>
+
+                    <label style="margin-left: 20px;">Event Subtype:</label>
+                    <select id="filterSubtype" disabled>
+                        <option value="">All Subtypes</option>
+                        <option value="aha_moment">Aha Moments</option>
+                        <option value="question_asked">Questions Asked</option>
+                        <option value="decision_made">Decisions</option>
+                        <option value="discovery">Discoveries</option>
+                        <option value="uncertainty">Uncertainty</option>
+                    </select>
+                </div>
+
+                <div class="filter-row">
+                    <label>Date Range:</label>
+                    <input type="date" id="filterStartDate">
+                    <span style="color: #64748b;">to</span>
+                    <input type="date" id="filterEndDate">
+
+                    <label style="margin-left: 20px;">Search:</label>
+                    <input type="text" id="filterSearch" placeholder="Search content..." style="flex: 1; min-width: 200px;">
+                </div>
+
+                <div class="filter-row">
+                    <button onclick="applyFilters()">Apply Filters</button>
+                    <button onclick="resetFilters()">Reset</button>
+                    <button class="export-btn" onclick="exportFiltered()" style="margin-left: auto;">Export Filtered Data</button>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('entities')">📋 Entities</div>
+                <div class="tab" onclick="switchTab('timeline')">📅 Timeline</div>
+                <div class="tab" onclick="switchTab('concepts')">💡 Concepts</div>
+                <div class="tab" onclick="switchTab('raw')">🔍 Raw Data</div>
+            </div>
+
+            <div class="content">
+                <div id="entitiesView"></div>
+                <div id="timelineView" style="display: none;"></div>
+                <div id="conceptsView" style="display: none;"></div>
+                <div id="rawView" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let knowledgeBase = null;
+        let filteredEntities = [];
+        let currentTab = 'entities';
+
+        // File upload handling
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            loadKnowledgeBase(file);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            loadKnowledgeBase(e.target.files[0]);
+        });
+
+        function loadKnowledgeBase(file) {
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    knowledgeBase = JSON.parse(e.target.result);
+                    console.log('Loaded knowledge base:', knowledgeBase);
+                    initializeViewer();
+                } catch (error) {
+                    alert('Failed to parse JSON file: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function initializeViewer() {
+            document.getElementById('uploadArea').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+
+            renderStats();
+            applyFilters();
+        }
+
+        function renderStats() {
+            const stats = knowledgeBase.meta;
+            const entities = Object.values(knowledgeBase.entities);
+
+            const eventTypes = {};
+            entities.filter(e => e.type === 'event').forEach(e => {
+                eventTypes[e.subtype] = (eventTypes[e.subtype] || 0) + 1;
+            });
+
+            const statsHtml = `
+                <div class="stat-card">
+                    <div class="stat-label">Total Entities</div>
+                    <div class="stat-value">${stats.total_entities}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Events</div>
+                    <div class="stat-value">${stats.total_events}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Conversations</div>
+                    <div class="stat-value">${stats.conversations_analyzed}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Aha Moments</div>
+                    <div class="stat-value">${eventTypes.aha_moment || 0}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Decisions</div>
+                    <div class="stat-value">${eventTypes.decision_made || 0}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Last Updated</div>
+                    <div class="stat-value" style="font-size: 14px;">${new Date(stats.last_updated).toLocaleDateString()}</div>
+                </div>
+            `;
+
+            document.getElementById('stats').innerHTML = statsHtml;
+        }
+
+        function applyFilters() {
+            const typeFilter = document.getElementById('filterType').value;
+            const subtypeFilter = document.getElementById('filterSubtype').value;
+            const startDate = document.getElementById('filterStartDate').value;
+            const endDate = document.getElementById('filterEndDate').value;
+            const searchTerm = document.getElementById('filterSearch').value.toLowerCase();
+
+            filteredEntities = Object.values(knowledgeBase.entities).filter(entity => {
+                // Type filter
+                if (typeFilter && entity.type !== typeFilter) return false;
+
+                // Subtype filter (for events)
+                if (subtypeFilter && entity.type === 'event' && entity.subtype !== subtypeFilter) return false;
+
+                // Date filter
+                if (entity.type === 'event') {
+                    if (startDate && entity.turn_timestamp < startDate) return false;
+                    if (endDate && entity.turn_timestamp > endDate + 'T23:59:59') return false;
+                }
+
+                // Search filter
+                if (searchTerm) {
+                    const content = entity.content || entity.label || entity.question || entity.decision || '';
+                    if (!content.toLowerCase().includes(searchTerm)) return false;
+                }
+
+                return true;
+            });
+
+            renderCurrentView();
+        }
+
+        function resetFilters() {
+            document.getElementById('filterType').value = '';
+            document.getElementById('filterSubtype').value = '';
+            document.getElementById('filterStartDate').value = '';
+            document.getElementById('filterEndDate').value = '';
+            document.getElementById('filterSearch').value = '';
+            applyFilters();
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+
+            // Update tab styles
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Hide all views
+            document.getElementById('entitiesView').style.display = 'none';
+            document.getElementById('timelineView').style.display = 'none';
+            document.getElementById('conceptsView').style.display = 'none';
+            document.getElementById('rawView').style.display = 'none';
+
+            renderCurrentView();
+        }
+
+        function renderCurrentView() {
+            switch (currentTab) {
+                case 'entities':
+                    renderEntitiesView();
+                    document.getElementById('entitiesView').style.display = 'block';
+                    break;
+                case 'timeline':
+                    renderTimelineView();
+                    document.getElementById('timelineView').style.display = 'block';
+                    break;
+                case 'concepts':
+                    renderConceptsView();
+                    document.getElementById('conceptsView').style.display = 'block';
+                    break;
+                case 'raw':
+                    renderRawView();
+                    document.getElementById('rawView').style.display = 'block';
+                    break;
+            }
+        }
+
+        function renderEntitiesView() {
+            const view = document.getElementById('entitiesView');
+
+            if (filteredEntities.length === 0) {
+                view.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔍</div>
+                        <div>No entities match your filters</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = filteredEntities.map(entity => {
+                const content = entity.content || entity.label || entity.question || entity.decision || entity.assumption || '';
+                const evidence = entity.evidence && entity.evidence[0] ? entity.evidence[0].quote : '';
+                const timestamp = entity.turn_timestamp || entity.timestamp || entity.created_at || '';
+                const tags = entity.tags || [];
+
+                return `
+                    <div class="entity-card">
+                        <div class="entity-header">
+                            <div>
+                                <span class="entity-type">${entity.type}</span>
+                                ${entity.subtype ? `<span class="entity-subtype">${entity.subtype.replace(/_/g, ' ')}</span>` : ''}
+                            </div>
+                            <div style="color: #64748b; font-size: 12px;">${new Date(timestamp).toLocaleString()}</div>
+                        </div>
+                        <div class="entity-content">${content}</div>
+                        ${evidence ? `<div class="evidence">"${evidence}"</div>` : ''}
+                        <div class="entity-meta">
+                            <span>🆔 ${entity.id}</span>
+                            ${entity.conversation_title ? `<span>💬 ${entity.conversation_title}</span>` : ''}
+                            ${entity.confidence ? `<span>📊 ${(entity.confidence * 100).toFixed(0)}% confidence</span>` : ''}
+                        </div>
+                        ${tags.length > 0 ? `<div class="tags">${tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            view.innerHTML = `<div class="entity-list">${html}</div>`;
+        }
+
+        function renderTimelineView() {
+            const view = document.getElementById('timelineView');
+
+            const events = filteredEntities
+                .filter(e => e.type === 'event')
+                .sort((a, b) => new Date(a.turn_timestamp) - new Date(b.turn_timestamp));
+
+            if (events.length === 0) {
+                view.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📅</div>
+                        <div>No events to display</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = events.map(event => `
+                <div class="timeline-item">
+                    <div class="timeline-date">${new Date(event.turn_timestamp).toLocaleString()}</div>
+                    <div style="font-weight: 500; margin-bottom: 5px;">
+                        <span class="entity-subtype">${event.subtype.replace(/_/g, ' ')}</span>
+                    </div>
+                    <div style="color: #cbd5e1;">${event.content}</div>
+                    ${event.conversation_title ? `<div style="font-size: 12px; color: #64748b; margin-top: 5px;">💬 ${event.conversation_title}</div>` : ''}
+                </div>
+            `).join('');
+
+            view.innerHTML = `<div class="timeline">${html}</div>`;
+        }
+
+        function renderConceptsView() {
+            const view = document.getElementById('conceptsView');
+
+            const concepts = filteredEntities.filter(e => e.type === 'concept');
+
+            if (concepts.length === 0) {
+                view.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💡</div>
+                        <div>No concepts to display</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = concepts.map(concept => `
+                <div class="entity-card">
+                    <div class="entity-header">
+                        <div>
+                            <h3 style="color: #38bdf8; margin-bottom: 5px;">${concept.label}</h3>
+                            ${concept.alt_labels && concept.alt_labels.length > 0 ?
+                                `<div style="font-size: 12px; color: #64748b;">aka: ${concept.alt_labels.join(', ')}</div>`
+                                : ''}
+                        </div>
+                    </div>
+                    <div style="margin: 10px 0; color: #cbd5e1;">${concept.description || ''}</div>
+                    <div class="entity-meta">
+                        <span>📊 ${concept.mention_count || 0} mentions</span>
+                        <span>🗓 First: ${concept.first_mentioned ? new Date(concept.first_mentioned).toLocaleDateString() : 'N/A'}</span>
+                        <span>🗓 Last: ${concept.last_mentioned ? new Date(concept.last_mentioned).toLocaleDateString() : 'N/A'}</span>
+                    </div>
+                    ${concept.evolution ? `<div style="margin-top: 10px; padding: 10px; background: #0f172a; border-radius: 4px; font-style: italic; color: #94a3b8;">${concept.evolution}</div>` : ''}
+                </div>
+            `).join('');
+
+            view.innerHTML = `<div class="entity-list">${html}</div>`;
+        }
+
+        function renderRawView() {
+            const view = document.getElementById('rawView');
+            view.innerHTML = `<pre style="background: #0f172a; padding: 20px; border-radius: 8px; overflow-x: auto; font-size: 12px; line-height: 1.4;">${JSON.stringify(knowledgeBase, null, 2)}</pre>`;
+        }
+
+        function exportFiltered() {
+            const filtered = {
+                meta: knowledgeBase.meta,
+                entities: {},
+                relationships: knowledgeBase.relationships,
+                temporal_chains: knowledgeBase.temporal_chains,
+                indexes: knowledgeBase.indexes
+            };
+
+            filteredEntities.forEach(entity => {
+                filtered.entities[entity.id] = entity;
+            });
+
+            const json = JSON.stringify(filtered, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `chatgpt-insights-filtered-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Enable/disable subtype filter based on type selection
+        document.getElementById('filterType').addEventListener('change', (e) => {
+            const subtypeFilter = document.getElementById('filterSubtype');
+            subtypeFilter.disabled = e.target.value !== 'event';
+        });
+    </script>
+</body>
+</html>

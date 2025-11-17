@@ -23501,6 +23501,710 @@ ${content2}`;
       this.eventEmitter.emit("done", this.results);
     }
   }
+  const SYSTEM_PROMPT = `You are an expert conversation analyst specializing in extracting structured insights from human-AI dialogues.
+
+Your task is to analyze conversation chunks and extract specific types of events, insights, and patterns while ALWAYS providing evidence (exact quotes) from the source conversation.
+
+Key principles:
+1. **Evidence-based**: Every insight must be grounded in actual conversation text
+2. **Precise quotes**: Include exact quotes with turn numbers
+3. **Contextual**: Understand the flow and progression of ideas
+4. **Structured output**: Always return valid JSON matching the requested schema
+5. **Conservative**: Only extract insights you're confident about (confidence > 0.7)
+
+When analyzing:
+- Pay attention to discovery moments ("aha!", "I see", "oh!")
+- Track assumptions ("I assume", "probably", "should")
+- Identify decisions ("let's do", "we'll use", "I'll go with")
+- Note questions (especially unanswered ones)
+- Detect problem-solution pairs
+- Recognize creative prompts and ideation
+
+Remember: The conversation might be a chunk from a larger discussion. Consider context from turn numbers and timestamps.`;
+  function createEventExtractionPrompt(chunk) {
+    return `Analyze the following conversation chunk and extract ALL significant events.
+
+For each event, provide:
+- **type**: The event type (aha_moment, question_asked, decision_made, assumption_stated, problem_identified, solution_proposed, creative_prompt, uncertainty, discovery, etc.)
+- **turn_number**: Which turn it occurred in
+- **speaker**: "user" or "assistant"
+- **content**: Brief description of the insight/event
+- **quote**: EXACT quote from the conversation (2-3 sentences max)
+- **context**: Surrounding context that makes this significant
+- **confidence**: 0.0-1.0 how confident you are in this extraction
+- **tags**: Relevant tags (e.g., ["technical", "decision"], ["creative", "ideation"])
+
+Event types to look for:
+- **aha_moment**: Sudden realization, "I see!", breakthrough moments
+- **question_asked**: User asks a question (especially open/unanswered)
+- **question_answered**: A previous question gets answered
+- **decision_made**: A choice or direction is decided
+- **assumption_stated**: User or assistant states an assumption
+- **assumption_challenge**: An assumption is questioned or invalidated
+- **problem_identified**: A problem/challenge is recognized
+- **solution_proposed**: A solution is suggested
+- **creative_prompt**: Generative thinking, "what if", brainstorming
+- **uncertainty**: Expressions of uncertainty, doubt, "I'm not sure"
+- **discovery**: Learning something new, realizations
+
+Return a JSON object with this structure:
+\`\`\`json
+{
+  "events": [
+    {
+      "type": "aha_moment",
+      "turn_number": 5,
+      "speaker": "user",
+      "content": "Input/output ratio reveals conversation depth",
+      "quote": "I think the ones where i write more are more interesting",
+      "context": "User realized that conversations with higher user input are more valuable",
+      "confidence": 0.95,
+      "tags": ["discovery", "metrics", "insight"]
+    }
+  ]
+}
+\`\`\`
+
+CONVERSATION CHUNK:
+${formatChunkForPrompt(chunk)}
+
+Analyze this chunk and extract all events in the JSON format specified above.`;
+  }
+  function createConceptExtractionPrompt(chunk) {
+    return `Analyze the following conversation chunk and identify all significant CONCEPTS discussed.
+
+A concept is a recurring idea, topic, technique, or theme. Examples:
+- Technical concepts: "chunking", "rate limiting", "memory management"
+- Domain concepts: "Theory of Mind", "conversation analysis", "knowledge graphs"
+- Abstract concepts: "discovery", "optimization", "user experience"
+
+For each concept mentioned, provide:
+- **label**: The concept name (concise, 1-3 words)
+- **turn_numbers**: Which turns mention this concept
+- **context**: How it's being discussed (exploration/implementation/etc.)
+- **quotes**: 1-2 representative quotes
+- **confidence**: 0.0-1.0
+
+Return JSON:
+\`\`\`json
+{
+  "concepts": [
+    {
+      "label": "chunking",
+      "alt_labels": ["batching", "segmentation"],
+      "turn_numbers": [3, 5, 8],
+      "context": "Used to prevent memory overflow when exporting large datasets",
+      "quotes": [
+        "we need to process in chunks to avoid freezing the browser"
+      ],
+      "confidence": 0.95
+    }
+  ]
+}
+\`\`\`
+
+CONVERSATION CHUNK:
+${formatChunkForPrompt(chunk)}
+
+Extract all concepts:`;
+  }
+  function createToMPrompt(chunk) {
+    return `Analyze the following conversation chunk using Theory of Mind reasoning.
+
+Theory of Mind (ToM) is the ability to understand mental states - beliefs, desires, intentions, emotions.
+
+For this conversation chunk, reconstruct:
+1. **User's mental state evolution**: What were they thinking/feeling at key moments?
+2. **Goals and motivations**: What is the user trying to achieve?
+3. **Cognitive patterns**: How does the user approach problems?
+4. **Emotional markers**: Frustration, excitement, uncertainty, confidence
+5. **Perspective shifts**: Moments when understanding changed
+
+Return JSON:
+\`\`\`json
+{
+  "mental_states": [
+    {
+      "turn_number": 5,
+      "state_type": "realization",
+      "description": "User realized that input/output ratio is a key metric for conversation quality",
+      "evidence": "I think the ones where i write more are more interesting",
+      "confidence": 0.9
+    }
+  ],
+  "user_goals": [
+    {
+      "goal": "Build a system to discover and organize insights from past conversations",
+      "evidence_turns": [1, 3, 7],
+      "confidence": 0.95
+    }
+  ],
+  "cognitive_patterns": [
+    {
+      "pattern": "Iterative refinement - prefers building in phases",
+      "evidence": "Let's do it in phases and be sure the first parts work",
+      "confidence": 0.9
+    }
+  ]
+}
+\`\`\`
+
+CONVERSATION CHUNK:
+${formatChunkForPrompt(chunk)}
+
+Perform ToM analysis:`;
+  }
+  function createDecisionTreePrompt(chunk) {
+    return `Analyze this conversation chunk for DECISIONS and the reasoning behind them.
+
+For each decision, extract:
+- What was decided
+- What options were considered
+- The reasoning/tradeoffs
+- Evidence (exact quotes)
+
+Also identify:
+- **Overruled decisions**: Decisions that were changed later
+- **Decision chains**: How one decision led to another
+
+Return JSON:
+\`\`\`json
+{
+  "decisions": [
+    {
+      "turn_number": 20,
+      "decision": "Use JSON as primary storage format",
+      "options_considered": ["YAML", "CSV", "JSON"],
+      "reasoning": "Better for temporal tracking with timestamps",
+      "evidence": "maybe json is best and then we can export extract from it later",
+      "confidence": 0.95,
+      "supersedes": null
+    }
+  ],
+  "decision_chains": [
+    {
+      "sequence": [
+        {
+          "decision": "Need cross-conversation insights",
+          "leads_to": "Design storage format for insights"
+        },
+        {
+          "decision": "Use JSON for storage",
+          "leads_to": "Build ontology with temporal tracking"
+        }
+      ]
+    }
+  ]
+}
+\`\`\`
+
+CONVERSATION CHUNK:
+${formatChunkForPrompt(chunk)}
+
+Extract decisions and chains:`;
+  }
+  function createAssumptionTrackingPrompt(chunk) {
+    return `Analyze this conversation chunk for ASSUMPTIONS and whether they were challenged.
+
+An assumption is a belief or premise stated without full verification.
+Look for:
+- Explicit assumptions ("I assume...", "probably...", "should be...")
+- Implicit assumptions (unstated premises)
+- Challenged assumptions (when evidence contradicts)
+
+Return JSON:
+\`\`\`json
+{
+  "assumptions": [
+    {
+      "turn_number": 3,
+      "assumption": "Users have < 1000 conversations",
+      "evidence": "we can load all conversations at once",
+      "type": "explicit",
+      "challenged": true,
+      "challenged_at_turn": 5,
+      "challenge_evidence": "my ALL is a lot and it sort of freezes",
+      "outcome": "invalidated",
+      "confidence": 0.9
+    }
+  ]
+}
+\`\`\`
+
+CONVERSATION CHUNK:
+${formatChunkForPrompt(chunk)}
+
+Extract assumptions:`;
+  }
+  function createIdeaArchaeologyPrompt(chunk) {
+    return `Analyze this conversation chunk for IDEA EVOLUTION.
+
+Idea archaeology tracks how ideas develop, morph, and connect over time.
+
+Look for:
+- **Seed ideas**: Initial mentions of a concept
+- **Refinements**: How ideas get more specific
+- **Pivots**: When direction changes
+- **Connections**: How ideas link together
+- **Emergence**: New ideas arising from combinations
+
+Return JSON:
+\`\`\`json
+{
+  "idea_evolution": [
+    {
+      "concept": "conversation analysis",
+      "stages": [
+        {
+          "turn_number": 3,
+          "stage": "seed",
+          "description": "Initial thought about analyzing conversations",
+          "quote": "what would be interesting to extract"
+        },
+        {
+          "turn_number": 8,
+          "stage": "refinement",
+          "description": "Specific focus on input/output ratio",
+          "quote": "the ones where i write more are more interesting"
+        },
+        {
+          "turn_number": 12,
+          "stage": "implementation",
+          "description": "Decision to build filtering system",
+          "quote": "extract the preexport analysis and use those insights as filters"
+        }
+      ]
+    }
+  ]
+}
+\`\`\`
+
+CONVERSATION CHUNK:
+${formatChunkForPrompt(chunk)}
+
+Extract idea evolution:`;
+  }
+  function createAutoTaggingPrompt(chunk) {
+    return `Analyze this conversation chunk and generate semantic tags.
+
+Tags should capture:
+- **Topics**: What domains/subjects (e.g., "web development", "machine learning")
+- **Activity type**: What's happening (e.g., "debugging", "brainstorming", "learning")
+- **Complexity**: "beginner", "intermediate", "advanced"
+- **Outcome**: "problem_solved", "question_answered", "exploration", "stuck"
+- **Emotion**: "frustrated", "excited", "confused", "confident"
+- **Collaboration style**: "directive", "exploratory", "iterative"
+
+Return 5-10 tags.
+
+Return JSON:
+\`\`\`json
+{
+  "tags": [
+    "conversation_analysis",
+    "brainstorming",
+    "advanced",
+    "iterative",
+    "excited"
+  ],
+  "primary_topic": "knowledge management",
+  "activity_type": "design",
+  "complexity": "advanced"
+}
+\`\`\`
+
+CONVERSATION CHUNK:
+${formatChunkForPrompt(chunk)}
+
+Generate tags:`;
+  }
+  function formatChunkForPrompt(chunk) {
+    let text2 = "";
+    for (const turn of chunk.turns) {
+      const speaker = turn.speaker.toUpperCase();
+      text2 += `[Turn ${turn.turn_number}] ${speaker}: ${turn.content}
+
+`;
+    }
+    return text2;
+  }
+  const HAIKU_4_5_PRICING = {
+    input_per_million: 1,
+    // $1 per million input tokens
+    output_per_million: 5
+    // $5 per million output tokens
+  };
+  function calculateCost(inputTokens, outputTokens) {
+    const inputCost = inputTokens / 1e6 * HAIKU_4_5_PRICING.input_per_million;
+    const outputCost = outputTokens / 1e6 * HAIKU_4_5_PRICING.output_per_million;
+    return inputCost + outputCost;
+  }
+  class AnthropicClient {
+    constructor(apiKey) {
+      __publicField(this, "apiKey");
+      __publicField(this, "baseUrl", "https://api.anthropic.com/v1");
+      __publicField(this, "model", "claude-haiku-4-5-20250929");
+      __publicField(this, "apiVersion", "2023-06-01");
+      this.apiKey = apiKey;
+    }
+    /**
+     * Make a request to Claude API
+     */
+    async makeRequest(userPrompt, options = {}) {
+      const {
+        systemPrompt = SYSTEM_PROMPT,
+        maxTokens = 4096,
+        temperature = 0
+        // Low temperature for structured extraction
+      } = options;
+      const request = {
+        model: this.model,
+        max_tokens: maxTokens,
+        temperature,
+        system: systemPrompt,
+        messages: [
+          {
+            role: "user",
+            content: userPrompt
+          }
+        ]
+      };
+      const response = await fetch(`${this.baseUrl}/messages`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": this.apiKey,
+          "anthropic-version": this.apiVersion,
+          // Critical: Enable CORS for browser requests
+          "anthropic-dangerous-direct-browser-access": "true"
+        },
+        body: JSON.stringify(request)
+      });
+      if (!response.ok) {
+        const error2 = await response.json();
+        throw new Error(`Anthropic API error: ${error2.error.message}`);
+      }
+      return await response.json();
+    }
+    /**
+     * Analyze with retry logic
+     */
+    async analyzeWithRetry(prompt, parseResponse, maxRetries = 3) {
+      let lastError;
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+          const response = await this.makeRequest(prompt);
+          const text2 = response.content.filter((c2) => c2.type === "text").map((c2) => c2.text).join("\n");
+          let data;
+          try {
+            data = parseResponse(text2);
+          } catch (parseError) {
+            lastError = `Failed to parse response: ${parseError}`;
+            if (attempt < maxRetries - 1) continue;
+            throw parseError;
+          }
+          const cost = calculateCost(response.usage.input_tokens, response.usage.output_tokens);
+          return {
+            success: true,
+            data,
+            raw_response: text2,
+            usage: {
+              input_tokens: response.usage.input_tokens,
+              output_tokens: response.usage.output_tokens,
+              cost_usd: cost
+            }
+          };
+        } catch (error2) {
+          lastError = error2 instanceof Error ? error2.message : String(error2);
+          if (attempt < maxRetries - 1) {
+            await new Promise((resolve) => setTimeout(resolve, 1e3 * 2 ** attempt));
+            continue;
+          }
+        }
+      }
+      return {
+        success: false,
+        error: lastError || "Unknown error"
+      };
+    }
+    /**
+     * Extract structured JSON from response
+     */
+    async extractJSON(prompt) {
+      return this.analyzeWithRetry(prompt, (text2) => {
+        const jsonMatch = text2.match(/```json\n?([\s\S]*?)\n?```/) || text2.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          throw new Error("No JSON found in response");
+        }
+        const jsonText = jsonMatch[1] || jsonMatch[0];
+        return JSON.parse(jsonText);
+      });
+    }
+    /**
+     * Extract plain text response
+     */
+    async extractText(prompt) {
+      return this.analyzeWithRetry(prompt, (text2) => {
+        const cleaned = text2.replace(/```[\s\S]*?```/g, "").trim();
+        return cleaned;
+      });
+    }
+  }
+  function estimateAnalysisCost(estimatedInputTokens, analysisTypes = 1, tokensPerResponse = 1e3) {
+    const totalInput = estimatedInputTokens * analysisTypes;
+    const totalOutput = tokensPerResponse * analysisTypes;
+    return calculateCost(totalInput, totalOutput);
+  }
+  const DEFAULT_CONFIG = {
+    turns_per_chunk: 10,
+    overlap_turns: 2,
+    max_tokens: 8e3
+    // Conservative limit for Haiku input
+  };
+  function extractMessageText(message) {
+    if (!message || !message.content) return "";
+    const content2 = message.content;
+    if (typeof content2 === "string") {
+      return content2;
+    }
+    if (Array.isArray(content2)) {
+      return content2.filter((part) => (part == null ? void 0 : part.content_type) === "text").map((part) => {
+        var _a;
+        return ((_a = part == null ? void 0 : part.parts) == null ? void 0 : _a.join("")) || "";
+      }).join("\n");
+    }
+    if (content2.parts) {
+      return Array.isArray(content2.parts) ? content2.parts.join("") : String(content2.parts);
+    }
+    return String(content2);
+  }
+  function estimateTokens(text2) {
+    return Math.ceil(text2.length / 4);
+  }
+  function parseConversationTurns(conversation, mapping) {
+    var _a;
+    const turns = [];
+    const currentNodeId = conversation.current_node;
+    if (!currentNodeId) return turns;
+    const path2 = [];
+    let nodeId = currentNodeId;
+    while (nodeId) {
+      path2.unshift(nodeId);
+      const node2 = mapping[nodeId];
+      nodeId = (node2 == null ? void 0 : node2.parent) || null;
+    }
+    let turnNumber = 0;
+    for (const id of path2) {
+      const node2 = mapping[id];
+      if (!node2 || !node2.message) continue;
+      const message = node2.message;
+      const content2 = extractMessageText(message);
+      if (!content2.trim()) continue;
+      const role = (_a = message.author) == null ? void 0 : _a.role;
+      if (role !== "user" && role !== "assistant") continue;
+      turns.push({
+        turn_number: turnNumber,
+        timestamp: message.create_time ? new Date(message.create_time * 1e3).toISOString() : (/* @__PURE__ */ new Date()).toISOString(),
+        speaker: role,
+        content: content2,
+        message_node: node2
+      });
+      turnNumber++;
+    }
+    return turns;
+  }
+  function chunkConversation(conversationId, conversationTitle, turns, config = {}) {
+    const cfg = { ...DEFAULT_CONFIG, ...config };
+    const chunks = [];
+    if (turns.length === 0) {
+      return chunks;
+    }
+    const totalTurns = turns.length;
+    let chunkIndex = 0;
+    let startIdx = 0;
+    while (startIdx < totalTurns) {
+      const endIdx = Math.min(startIdx + cfg.turns_per_chunk, totalTurns);
+      const chunkTurns = turns.slice(startIdx, endIdx);
+      const text2 = chunkTurns.map((t2) => t2.content).join("\n");
+      const estimatedTokens = estimateTokens(text2);
+      chunks.push({
+        conversation_id: conversationId,
+        conversation_title: conversationTitle,
+        chunk_index: chunkIndex,
+        total_chunks: 0,
+        // Will be set after we know total
+        turn_range: [chunkTurns[0].turn_number, chunkTurns[chunkTurns.length - 1].turn_number],
+        turns: chunkTurns,
+        has_overlap: startIdx > 0,
+        estimated_tokens: estimatedTokens
+      });
+      startIdx += cfg.turns_per_chunk - cfg.overlap_turns;
+      chunkIndex++;
+      if (startIdx === startIdx + cfg.turns_per_chunk - cfg.overlap_turns) {
+        break;
+      }
+    }
+    const totalChunks = chunks.length;
+    chunks.forEach((chunk) => {
+      chunk.total_chunks = totalChunks;
+    });
+    return chunks;
+  }
+  class EventExtractor {
+    constructor(client) {
+      __publicField(this, "client");
+      this.client = client;
+    }
+    /**
+     * Analyze a single chunk - extract all insights
+     */
+    async analyzeChunk(chunk) {
+      var _a, _b, _c, _d, _e2, _f, _g, _h, _i, _j, _k, _l, _m, _n2, _o, _p, _q, _r, _s, _t, _u;
+      const results = {};
+      let totalTokensUsed = 0;
+      let totalCost = 0;
+      const eventsResult = await this.client.extractJSON(
+        createEventExtractionPrompt(chunk)
+      );
+      if (eventsResult.success && eventsResult.data) {
+        results.events = eventsResult.data.events;
+        totalTokensUsed += (((_a = eventsResult.usage) == null ? void 0 : _a.input_tokens) || 0) + (((_b = eventsResult.usage) == null ? void 0 : _b.output_tokens) || 0);
+        totalCost += ((_c = eventsResult.usage) == null ? void 0 : _c.cost_usd) || 0;
+      }
+      const conceptsResult = await this.client.extractJSON(
+        createConceptExtractionPrompt(chunk)
+      );
+      if (conceptsResult.success && conceptsResult.data) {
+        results.concepts = conceptsResult.data.concepts;
+        totalTokensUsed += (((_d = conceptsResult.usage) == null ? void 0 : _d.input_tokens) || 0) + (((_e2 = conceptsResult.usage) == null ? void 0 : _e2.output_tokens) || 0);
+        totalCost += ((_f = conceptsResult.usage) == null ? void 0 : _f.cost_usd) || 0;
+      }
+      const decisionsResult = await this.client.extractJSON(
+        createDecisionTreePrompt(chunk)
+      );
+      if (decisionsResult.success && decisionsResult.data) {
+        results.decisions = decisionsResult.data.decisions;
+        totalTokensUsed += (((_g = decisionsResult.usage) == null ? void 0 : _g.input_tokens) || 0) + (((_h = decisionsResult.usage) == null ? void 0 : _h.output_tokens) || 0);
+        totalCost += ((_i = decisionsResult.usage) == null ? void 0 : _i.cost_usd) || 0;
+      }
+      const assumptionsResult = await this.client.extractJSON(
+        createAssumptionTrackingPrompt(chunk)
+      );
+      if (assumptionsResult.success && assumptionsResult.data) {
+        results.assumptions = assumptionsResult.data.assumptions;
+        totalTokensUsed += (((_j = assumptionsResult.usage) == null ? void 0 : _j.input_tokens) || 0) + (((_k = assumptionsResult.usage) == null ? void 0 : _k.output_tokens) || 0);
+        totalCost += ((_l = assumptionsResult.usage) == null ? void 0 : _l.cost_usd) || 0;
+      }
+      const tomResult = await this.client.extractJSON(
+        createToMPrompt(chunk)
+      );
+      if (tomResult.success && tomResult.data) {
+        results.mental_states = tomResult.data.mental_states;
+        totalTokensUsed += (((_m = tomResult.usage) == null ? void 0 : _m.input_tokens) || 0) + (((_n2 = tomResult.usage) == null ? void 0 : _n2.output_tokens) || 0);
+        totalCost += ((_o = tomResult.usage) == null ? void 0 : _o.cost_usd) || 0;
+      }
+      const ideaEvolutionResult = await this.client.extractJSON(
+        createIdeaArchaeologyPrompt(chunk)
+      );
+      if (ideaEvolutionResult.success && ideaEvolutionResult.data) {
+        results.idea_evolution = ideaEvolutionResult.data.idea_evolution;
+        totalTokensUsed += (((_p = ideaEvolutionResult.usage) == null ? void 0 : _p.input_tokens) || 0) + (((_q = ideaEvolutionResult.usage) == null ? void 0 : _q.output_tokens) || 0);
+        totalCost += ((_r = ideaEvolutionResult.usage) == null ? void 0 : _r.cost_usd) || 0;
+      }
+      const tagsResult = await this.client.extractJSON(
+        createAutoTaggingPrompt(chunk)
+      );
+      if (tagsResult.success && tagsResult.data) {
+        results.tags = tagsResult.data;
+        totalTokensUsed += (((_s = tagsResult.usage) == null ? void 0 : _s.input_tokens) || 0) + (((_t = tagsResult.usage) == null ? void 0 : _t.output_tokens) || 0);
+        totalCost += ((_u = tagsResult.usage) == null ? void 0 : _u.cost_usd) || 0;
+      }
+      const events = (results.events || []).map((e2, idx) => {
+        var _a2, _b2;
+        const evidence = [
+          {
+            quote: e2.quote,
+            speaker: e2.speaker,
+            turn_number: e2.turn_number,
+            turn_timestamp: ((_a2 = chunk.turns[e2.turn_number]) == null ? void 0 : _a2.timestamp) || (/* @__PURE__ */ new Date()).toISOString(),
+            conversation_id: chunk.conversation_id
+          }
+        ];
+        return {
+          id: `evt_${chunk.conversation_id}_${chunk.chunk_index}_${idx}`,
+          type: "event",
+          subtype: e2.type,
+          conversation_id: chunk.conversation_id,
+          conversation_title: chunk.conversation_title,
+          turn_number: e2.turn_number,
+          turn_timestamp: ((_b2 = chunk.turns[e2.turn_number]) == null ? void 0 : _b2.timestamp) || (/* @__PURE__ */ new Date()).toISOString(),
+          content: e2.content,
+          evidence,
+          related_entities: [],
+          created_at: (/* @__PURE__ */ new Date()).toISOString(),
+          tags: e2.tags,
+          confidence: e2.confidence
+        };
+      });
+      const chunkResult = {
+        conversation_id: chunk.conversation_id,
+        chunk_index: chunk.chunk_index,
+        turn_range: chunk.turn_range,
+        events,
+        concept_mentions: (results.concepts || []).map((c2) => ({
+          concept_label: c2.label,
+          turn_number: c2.turn_numbers[0] || 0,
+          context: c2.context
+        })),
+        metadata: {
+          analyzed_at: (/* @__PURE__ */ new Date()).toISOString(),
+          model: "claude-haiku-4-5",
+          tokens_used: totalTokensUsed,
+          cost_usd: totalCost
+        }
+      };
+      return chunkResult;
+    }
+    /**
+     * Analyze a full conversation (all chunks)
+     */
+    async analyzeConversation(conversationId, conversationTitle, chunks, onProgress) {
+      const chunkResults = [];
+      for (let i2 = 0; i2 < chunks.length; i2++) {
+        if (onProgress) {
+          onProgress(i2, chunks.length);
+        }
+        const result2 = await this.analyzeChunk(chunks[i2]);
+        chunkResults.push(result2);
+      }
+      const allEvents = chunkResults.flatMap((r2) => r2.events);
+      const eventTypeCounts = {};
+      for (const event of allEvents) {
+        eventTypeCounts[event.subtype] = (eventTypeCounts[event.subtype] || 0) + 1;
+      }
+      const conceptsSet = /* @__PURE__ */ new Set();
+      for (const chunk of chunkResults) {
+        for (const mention of chunk.concept_mentions) {
+          conceptsSet.add(mention.concept_label);
+        }
+      }
+      const totalCost = chunkResults.reduce((sum, r2) => sum + r2.metadata.cost_usd, 0);
+      const result = {
+        conversation_id: conversationId,
+        conversation_title: conversationTitle,
+        chunks: chunkResults,
+        summary: {
+          total_events: allEvents.length,
+          event_types: eventTypeCounts,
+          concepts_mentioned: conceptsSet.size,
+          questions_asked: allEvents.filter((e2) => e2.subtype === "question_asked").length,
+          decisions_made: allEvents.filter((e2) => e2.subtype === "decision_made").length
+        },
+        total_cost_usd: totalCost
+      };
+      return result;
+    }
+  }
   const STORAGE_KEY = "chatgpt_insights_kb";
   const STORAGE_VERSION = "1.0.0";
   class KnowledgeBaseManager {
@@ -23886,9 +24590,11 @@ ${content2}`;
   }) => {
     const { anthropicApiKey } = useSettingContext();
     const [expanded, setExpanded] = d$3(false);
-    const [analyzing] = d$3(false);
-    const [progress] = d$3({ current: 0, total: 0 });
-    const [lastAnalysis] = d$3(null);
+    const [analyzing, setAnalyzing] = d$3(false);
+    const [progress, setProgress] = d$3({ current: 0, total: 0 });
+    const [estimatedCost, setEstimatedCost] = d$3(0);
+    const [lastAnalysis, setLastAnalysis] = d$3(null);
+    const [error2, setError] = d$3(null);
     const kb = getKnowledgeBaseManager();
     const stats = kb.getStats();
     const hasApiKey = anthropicApiKey && anthropicApiKey.trim().length > 0;
@@ -23901,20 +24607,70 @@ ${content2}`;
         alert("Please select conversations to analyze.");
         return;
       }
-      alert(
-        `Analysis ready to run on ${selectedConversations.length} conversations!
+      try {
+        setError(null);
+        setAnalyzing(true);
+        setProgress({ current: 0, total: selectedConversations.length });
+        const client = new AnthropicClient(anthropicApiKey);
+        const extractor = new EventExtractor(client);
+        let totalCost = 0;
+        for (let i2 = 0; i2 < selectedConversations.length; i2++) {
+          const conv = selectedConversations[i2];
+          setProgress({ current: i2 + 1, total: selectedConversations.length });
+          try {
+            const fullConv = await fetchConversation(conv.id);
+            const turns = parseConversationTurns(fullConv, fullConv.mapping);
+            const chunks = chunkConversation(conv.id, conv.title, turns);
+            if (chunks.length === 0) {
+              continue;
+            }
+            const result = await extractor.analyzeConversation(
+              conv.id,
+              conv.title,
+              chunks
+            );
+            kb.addConversationAnalysis(result);
+            totalCost += result.total_cost_usd;
+          } catch (convError) {
+          }
+        }
+        setLastAnalysis({
+          count: selectedConversations.length,
+          cost: totalCost,
+          timestamp: (/* @__PURE__ */ new Date()).toISOString()
+        });
+        alert(
+          `Analysis complete!
 
-This will analyze conversations using Claude Haiku 4.5 to extract:
-- Aha moments and discoveries
-- Questions and answers
-- Decisions and assumptions
-- Theory of Mind insights
-- Concept evolution
-- Auto-tags
+Analyzed: ${selectedConversations.length} conversations
+Total cost: $${totalCost.toFixed(4)}
+Total insights: ${kb.getStats().total_events}
 
-Implementation is ready - integration coming next!`
-      );
+Results saved to knowledge base.`
+        );
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : String(err);
+        setError(errorMsg);
+        alert(`Analysis failed: ${errorMsg}`);
+      } finally {
+        setAnalyzing(false);
+        setProgress({ current: 0, total: 0 });
+      }
     };
+    const updateCostEstimate = q$1(() => {
+      if (selectedConversations.length === 0) {
+        setEstimatedCost(0);
+        return;
+      }
+      const avgTurns = 10;
+      const avgCharsPerTurn = 500;
+      const avgTokens = avgTurns * avgCharsPerTurn / 4;
+      const cost = estimateAnalysisCost(avgTokens, 8) * selectedConversations.length;
+      setEstimatedCost(cost);
+    }, [selectedConversations.length]);
+    y$1(() => {
+      updateCostEstimate();
+    }, [updateCostEstimate]);
     const handleExportKB = () => {
       kb.exportToFile();
     };
@@ -23976,6 +24732,21 @@ Implementation is ready - integration coming next!`
               /* @__PURE__ */ u$5("span", { children: count2 })
             ] }, type))
           ] })
+        ] }),
+        error2 && /* @__PURE__ */ u$5("div", { className: "text-xs bg-red-50 dark:bg-red-900/20 p-2 rounded text-red-600 dark:text-red-400", children: [
+          /* @__PURE__ */ u$5("strong", { children: "Error:" }),
+          " ",
+          error2
+        ] }),
+        selectedConversations.length > 0 && estimatedCost > 0 && /* @__PURE__ */ u$5("div", { className: "text-xs bg-blue-50 dark:bg-blue-900/20 p-2 rounded", children: [
+          /* @__PURE__ */ u$5("strong", { children: "Estimated cost:" }),
+          " $",
+          estimatedCost.toFixed(4),
+          " for ",
+          selectedConversations.length,
+          " conversation",
+          selectedConversations.length > 1 ? "s" : "",
+          /* @__PURE__ */ u$5("div", { className: "text-gray-600 dark:text-gray-400 mt-1", children: "(Actual cost may vary based on conversation length)" })
         ] }),
         /* @__PURE__ */ u$5("div", { className: "space-y-2", children: [
           /* @__PURE__ */ u$5(

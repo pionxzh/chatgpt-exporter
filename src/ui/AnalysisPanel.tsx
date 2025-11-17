@@ -4,7 +4,11 @@
  * UI for triggering conversation analysis with Claude Haiku 4.5
  */
 
-import { useState } from 'preact/hooks'
+import { useCallback, useEffect, useState } from 'preact/hooks'
+import { fetchConversation } from '../api'
+import { AnthropicClient, estimateAnalysisCost } from '../ontology/anthropic-client'
+import { chunkConversation, parseConversationTurns } from '../ontology/chunker'
+import { EventExtractor } from '../ontology/extractor'
 import { getKnowledgeBaseManager } from '../ontology/storage'
 import { useSettingContext } from './SettingContext'
 import type { FC } from '../type'
@@ -20,13 +24,15 @@ export const AnalysisPanel: FC<AnalysisPanelProps> = ({
 }) => {
     const { anthropicApiKey } = useSettingContext()
     const [expanded, setExpanded] = useState(false)
-    const [analyzing] = useState(false)
-    const [progress] = useState({ current: 0, total: 0 })
-    const [lastAnalysis] = useState<{
+    const [analyzing, setAnalyzing] = useState(false)
+    const [progress, setProgress] = useState({ current: 0, total: 0 })
+    const [estimatedCost, setEstimatedCost] = useState(0)
+    const [lastAnalysis, setLastAnalysis] = useState<{
         count: number
         cost: number
         timestamp: string
     } | null>(null)
+    const [error, setError] = useState<string | null>(null)
 
     const kb = getKnowledgeBaseManager()
     const stats = kb.getStats()
@@ -44,20 +50,97 @@ export const AnalysisPanel: FC<AnalysisPanelProps> = ({
             return
         }
 
-        // For now, show a message that analysis will be implemented
-        // In a real implementation, we'd call the analyzer here
-        alert(
-            `Analysis ready to run on ${selectedConversations.length} conversations!\n\n`
-            + `This will analyze conversations using Claude Haiku 4.5 to extract:\n`
-            + `- Aha moments and discoveries\n`
-            + `- Questions and answers\n`
-            + `- Decisions and assumptions\n`
-            + `- Theory of Mind insights\n`
-            + `- Concept evolution\n`
-            + `- Auto-tags\n\n`
-            + `Implementation is ready - integration coming next!`,
-        )
+        // Estimate cost first
+        try {
+            setError(null)
+            setAnalyzing(true)
+            setProgress({ current: 0, total: selectedConversations.length })
+
+            const client = new AnthropicClient(anthropicApiKey)
+            const extractor = new EventExtractor(client)
+
+            let totalCost = 0
+
+            for (let i = 0; i < selectedConversations.length; i++) {
+                const conv = selectedConversations[i]
+                setProgress({ current: i + 1, total: selectedConversations.length })
+
+                try {
+                    // Fetch full conversation
+                    const fullConv = await fetchConversation(conv.id)
+
+                    // Parse and chunk
+                    const turns = parseConversationTurns(fullConv, fullConv.mapping)
+                    const chunks = chunkConversation(conv.id, conv.title, turns)
+
+                    if (chunks.length === 0) {
+                        // Skip conversations with no content
+                        continue
+                    }
+
+                    // Analyze conversation
+                    const result = await extractor.analyzeConversation(
+                        conv.id,
+                        conv.title,
+                        chunks,
+                    )
+
+                    // Store in knowledge base
+                    kb.addConversationAnalysis(result)
+
+                    totalCost += result.total_cost_usd
+                }
+                catch (convError) {
+                    // Continue with next conversation on error
+                    // Error is logged but doesn't stop the batch
+                }
+            }
+
+            // Update last analysis
+            setLastAnalysis({
+                count: selectedConversations.length,
+                cost: totalCost,
+                timestamp: new Date().toISOString(),
+            })
+
+            alert(
+                `Analysis complete!\n\n`
+                + `Analyzed: ${selectedConversations.length} conversations\n`
+                + `Total cost: $${totalCost.toFixed(4)}\n`
+                + `Total insights: ${kb.getStats().total_events}\n\n`
+                + `Results saved to knowledge base.`,
+            )
+        }
+        catch (err) {
+            const errorMsg = err instanceof Error ? err.message : String(err)
+            setError(errorMsg)
+            alert(`Analysis failed: ${errorMsg}`)
+        }
+        finally {
+            setAnalyzing(false)
+            setProgress({ current: 0, total: 0 })
+        }
     }
+
+    // Calculate estimated cost when selection changes
+    const updateCostEstimate = useCallback(() => {
+        if (selectedConversations.length === 0) {
+            setEstimatedCost(0)
+            return
+        }
+
+        // Rough estimate: 10 turns per conversation, 500 chars per turn
+        const avgTurns = 10
+        const avgCharsPerTurn = 500
+        const avgTokens = (avgTurns * avgCharsPerTurn) / 4
+        const cost = estimateAnalysisCost(avgTokens, 8) * selectedConversations.length
+        setEstimatedCost(cost)
+    }, [selectedConversations.length])
+
+    // Update estimate when selection changes
+    useEffect(() => {
+        updateCostEstimate()
+    }, [updateCostEstimate])
 
     const handleExportKB = () => {
         kb.exportToFile()
@@ -123,6 +206,23 @@ export const AnalysisPanel: FC<AnalysisPanelProps> = ({
                                     ))}
                                 </div>
                             )}
+                        </div>
+                    )}
+
+                    {/* Error Display */}
+                    {error && (
+                        <div className="text-xs bg-red-50 dark:bg-red-900/20 p-2 rounded text-red-600 dark:text-red-400">
+                            <strong>Error:</strong> {error}
+                        </div>
+                    )}
+
+                    {/* Cost Estimate */}
+                    {selectedConversations.length > 0 && estimatedCost > 0 && (
+                        <div className="text-xs bg-blue-50 dark:bg-blue-900/20 p-2 rounded">
+                            <strong>Estimated cost:</strong> ${estimatedCost.toFixed(4)} for {selectedConversations.length} conversation{selectedConversations.length > 1 ? 's' : ''}
+                            <div className="text-gray-600 dark:text-gray-400 mt-1">
+                                (Actual cost may vary based on conversation length)
+                            </div>
                         </div>
                     )}
 
