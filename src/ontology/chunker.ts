@@ -5,7 +5,7 @@
  * Uses sliding windows with overlap to maintain context across chunk boundaries.
  */
 
-import type { ApiConversation, ApiMapping } from '../api'
+import type { ApiConversation, ConversationNode } from '../api'
 
 export interface ConversationTurn {
     turn_number: number
@@ -89,7 +89,7 @@ function estimateTokens(text: string): number {
  */
 export function parseConversationTurns(
     conversation: ApiConversation,
-    mapping: ApiMapping,
+    mapping: Record<string, ConversationNode>,
 ): ConversationTurn[] {
     const turns: ConversationTurn[] = []
 
@@ -102,14 +102,14 @@ export function parseConversationTurns(
     let nodeId: string | null = currentNodeId
     while (nodeId) {
         path.unshift(nodeId)
-        const node = mapping[nodeId]
+        const node: ConversationNode | undefined = mapping[nodeId]
         nodeId = node?.parent || null
     }
 
     // Convert to turns
     let turnNumber = 0
     for (const id of path) {
-        const node = mapping[id]
+        const node: ConversationNode | undefined = mapping[id]
         if (!node || !node.message) continue
 
         const message = node.message
