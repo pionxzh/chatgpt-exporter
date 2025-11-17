@@ -67,7 +67,7 @@ export const AnalysisPanel: FC<AnalysisPanelProps> = ({
 
                 try {
                     // Fetch full conversation
-                    const fullConv = await fetchConversation(conv.id)
+                    const fullConv = await fetchConversation(conv.id, false)
 
                     // Parse and chunk
                     const turns = parseConversationTurns(fullConv, fullConv.mapping)
