@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'preact/compat'
 import { useCallback } from 'preact/hooks'
 import {
+    KEY_ANTHROPIC_API_KEY,
     KEY_EXPORT_ALL_LIMIT,
     KEY_EXPORT_CHUNK_SIZE,
     KEY_FILENAME_FORMAT,
@@ -49,6 +50,8 @@ const SettingContext = createContext({
     setExportAllLimit: (_: number) => {},
     exportChunkSize: defaultExportChunkSize,
     setExportChunkSize: (_: number) => {},
+    anthropicApiKey: '',
+    setAnthropicApiKey: (_: string) => {},
     resetDefault: () => {},
 })
 
@@ -65,6 +68,7 @@ export const SettingProvider: FC = ({ children }) => {
     const [exportMetaList, setExportMetaList] = useGMStorage(KEY_META_LIST, defaultExportMetaList)
     const [exportAllLimit, setExportAllLimit] = useGMStorage(KEY_EXPORT_ALL_LIMIT, defaultExportAllLimit)
     const [exportChunkSize, setExportChunkSize] = useGMStorage(KEY_EXPORT_CHUNK_SIZE, defaultExportChunkSize)
+    const [anthropicApiKey, setAnthropicApiKey] = useGMStorage(KEY_ANTHROPIC_API_KEY, '')
 
     const resetDefault = useCallback(() => {
         setFormat(defaultFormat)
@@ -73,6 +77,7 @@ export const SettingProvider: FC = ({ children }) => {
         setExportMetaList(defaultExportMetaList)
         setExportAllLimit(defaultExportAllLimit)
         setExportChunkSize(defaultExportChunkSize)
+        // Don't reset API key on reset
     }, [
         setFormat,
         setEnableTimestamp,
@@ -107,6 +112,9 @@ export const SettingProvider: FC = ({ children }) => {
 
                 exportChunkSize,
                 setExportChunkSize,
+
+                anthropicApiKey,
+                setAnthropicApiKey,
 
                 resetDefault,
             }}

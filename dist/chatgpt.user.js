@@ -1106,6 +1106,7 @@ html {
   const KEY_META_LIST = "exporter:meta_list";
   const KEY_EXPORT_ALL_LIMIT = "exporter:export_all_limit";
   const KEY_EXPORT_CHUNK_SIZE = "exporter:export_chunk_size";
+  const KEY_ANTHROPIC_API_KEY = "exporter:anthropic_api_key";
   const KEY_OAI_LOCALE = "oai/apps/locale";
   const KEY_OAI_HISTORY_DISABLED = "oai/apps/historyDisabled";
   var _GM_deleteValue = /* @__PURE__ */ (() => typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0)();
@@ -9552,22 +9553,22 @@ For more information, see https://radix-ui.com/primitives/docs/components/${titl
     var callback = arguments.length > 1 ? arguments[1] : void 0;
     return new I18n(options, callback);
   });
-  var instance = I18n.createInstance();
-  instance.createInstance = I18n.createInstance;
-  instance.createInstance;
-  instance.dir;
-  instance.init;
-  instance.loadResources;
-  instance.reloadResources;
-  instance.use;
-  instance.changeLanguage;
-  instance.getFixedT;
-  instance.t;
-  instance.exists;
-  instance.setDefaultNamespace;
-  instance.hasLoadedNamespace;
-  instance.loadNamespaces;
-  instance.loadLanguages;
+  var instance$1 = I18n.createInstance();
+  instance$1.createInstance = I18n.createInstance;
+  instance$1.createInstance;
+  instance$1.dir;
+  instance$1.init;
+  instance$1.loadResources;
+  instance$1.reloadResources;
+  instance$1.use;
+  instance$1.changeLanguage;
+  instance$1.getFixedT;
+  instance$1.t;
+  instance$1.exists;
+  instance$1.setDefaultNamespace;
+  instance$1.hasLoadedNamespace;
+  instance$1.loadNamespaces;
+  instance$1.loadLanguages;
   const title$8 = "ChatGPT Exporter";
   const ExportHelper$8 = "Export";
   const Setting$8 = "Setting";
@@ -9637,7 +9638,10 @@ For more information, see https://radix-ui.com/primitives/docs/components/${titl
     "Search in titles": "Search in titles",
     "Type to search...": "Type to search...",
     "Min Input/Output Ratio": "Min Input/Output Ratio",
-    "Min Conversation Length": "Min Conversation Length"
+    "Min Conversation Length": "Min Conversation Length",
+    "Anthropic API Key": "Anthropic API Key",
+    "Anthropic API Key Description": "Enter your Anthropic API key to enable conversation analysis with Claude Haiku 4.5. Get your API key at console.anthropic.com",
+    "API Key Security Warning": "This key is stored locally in your browser. Never share it with others."
   };
   const title$7 = "ChatGPT Exporter";
   const ExportHelper$7 = "Exportar";
@@ -10330,7 +10334,7 @@ For more information, see https://radix-ui.com/primitives/docs/components/${titl
     const browserLanguage = getNavigatorLanguage();
     return standardizeLanguage(storedLanguage) ?? standardizeLanguage(oaiLanguage) ?? standardizeLanguage(browserLanguage) ?? EN_US.code;
   }
-  instance.use(initReactI18next).init({
+  instance$1.use(initReactI18next).init({
     fallbackLng: EN_US.code,
     lng: getDefaultLanguage(),
     debug: false,
@@ -10340,7 +10344,7 @@ For more information, see https://radix-ui.com/primitives/docs/components/${titl
       // not needed for react as it escapes by default
     }
   });
-  instance.on("languageChanged", (lng) => {
+  instance$1.on("languageChanged", (lng) => {
     ScriptStorage.set(KEY_LANGUAGE, lng);
   });
   const templateHtml = `<!DOCTYPE html>
@@ -22368,7 +22372,7 @@ For more information, see https://radix-ui.com/primitives/docs/components/${titl
   }
   async function exportToHtml(fileNameFormat, metaList) {
     if (!checkIfConversationStarted()) {
-      alert(instance.t("Please start a conversation first"));
+      alert(instance$1.t("Please start a conversation first"));
       return false;
     }
     const userAvatar = await getUserAvatar();
@@ -22617,13 +22621,13 @@ ${content2.text}
   }
   async function exportToPng(fileNameFormat) {
     if (!checkIfConversationStarted()) {
-      alert(instance.t("Please start a conversation first"));
+      alert(instance$1.t("Please start a conversation first"));
       return false;
     }
     const effect = new Effect();
     const thread = document.querySelector('#thread div:has(> [data-testid="conversation-turn-1"]');
     if (!thread || thread.children.length === 0 || thread.scrollHeight < 50) {
-      alert(instance.t("Failed to export to PNG. Failed to find the element node."));
+      alert(instance$1.t("Failed to export to PNG. Failed to find the element node."));
       return false;
     }
     const isDarkMode = document.documentElement.classList.contains("dark");
@@ -22794,7 +22798,7 @@ ${content2.text}
   }
   async function exportToJson(fileNameFormat) {
     if (!checkIfConversationStarted()) {
-      alert(instance.t("Please start a conversation first"));
+      alert(instance$1.t("Please start a conversation first"));
       return false;
     }
     const chatId = await getCurrentChatId();
@@ -22807,7 +22811,7 @@ ${content2.text}
   }
   async function exportToTavern(fileNameFormat) {
     if (!checkIfConversationStarted()) {
-      alert(instance.t("Please start a conversation first"));
+      alert(instance$1.t("Please start a conversation first"));
       return false;
     }
     const chatId = await getCurrentChatId();
@@ -22820,7 +22824,7 @@ ${content2.text}
   }
   async function exportToOoba(fileNameFormat) {
     if (!checkIfConversationStarted()) {
-      alert(instance.t("Please start a conversation first"));
+      alert(instance$1.t("Please start a conversation first"));
       return false;
     }
     const chatId = await getCurrentChatId();
@@ -22877,7 +22881,7 @@ ${content2.text}
   }
   async function exportToMarkdown(fileNameFormat, metaList) {
     if (!checkIfConversationStarted()) {
-      alert(instance.t("Please start a conversation first"));
+      alert(instance$1.t("Please start a conversation first"));
       return false;
     }
     const chatId = await getCurrentChatId();
@@ -23088,7 +23092,7 @@ ${content2.text}
   }
   async function exportToText() {
     if (!checkIfConversationStarted()) {
-      alert(instance.t("Please start a conversation first"));
+      alert(instance$1.t("Please start a conversation first"));
       return false;
     }
     const chatId = await getCurrentChatId();
@@ -23497,6 +23501,539 @@ ${content2}`;
       this.eventEmitter.emit("done", this.results);
     }
   }
+  const STORAGE_KEY = "chatgpt_insights_kb";
+  const STORAGE_VERSION = "1.0.0";
+  class KnowledgeBaseManager {
+    constructor() {
+      __publicField(this, "kb");
+      this.kb = this.loadFromStorage() || this.createEmpty();
+    }
+    /**
+     * Create an empty knowledge base
+     */
+    createEmpty() {
+      return {
+        meta: {
+          version: STORAGE_VERSION,
+          namespace: "chatgpt-insights",
+          last_updated: (/* @__PURE__ */ new Date()).toISOString(),
+          conversations_analyzed: 0,
+          total_entities: 0,
+          total_events: 0
+        },
+        entities: {},
+        relationships: [],
+        temporal_chains: [],
+        indexes: {
+          by_type: {},
+          by_conversation: {},
+          by_date: {},
+          by_tag: {},
+          by_concept: {}
+        }
+      };
+    }
+    /**
+     * Load from localStorage
+     */
+    loadFromStorage() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (!stored) return null;
+        const kb = JSON.parse(stored);
+        if (kb.meta.version !== STORAGE_VERSION) {
+          console.warn("Knowledge base version mismatch, creating new");
+          return null;
+        }
+        return kb;
+      } catch (error2) {
+        console.error("Failed to load knowledge base:", error2);
+        return null;
+      }
+    }
+    /**
+     * Save to localStorage
+     */
+    save() {
+      try {
+        this.kb.meta.last_updated = (/* @__PURE__ */ new Date()).toISOString();
+        const json = JSON.stringify(this.kb);
+        localStorage.setItem(STORAGE_KEY, json);
+      } catch (error2) {
+        console.error("Failed to save knowledge base:", error2);
+        throw error2;
+      }
+    }
+    /**
+     * Get the entire knowledge base
+     */
+    getKnowledgeBase() {
+      return this.kb;
+    }
+    /**
+     * Add events from a conversation analysis
+     */
+    addConversationAnalysis(analysis) {
+      const events = [];
+      for (const chunk of analysis.chunks) {
+        events.push(...chunk.events);
+      }
+      for (const event of events) {
+        this.addEntity(event);
+      }
+      this.kb.meta.conversations_analyzed++;
+      this.buildConceptsFromEvents(events);
+      this.save();
+    }
+    /**
+     * Add an entity to the knowledge base
+     */
+    addEntity(entity) {
+      this.kb.entities[entity.id] = entity;
+      this.updateIndexes(entity);
+      this.kb.meta.total_entities = Object.keys(this.kb.entities).length;
+      if (entity.type === "event") {
+        this.kb.meta.total_events++;
+      }
+    }
+    /**
+     * Update indexes for an entity
+     */
+    updateIndexes(entity) {
+      if (!this.kb.indexes.by_type[entity.type]) {
+        this.kb.indexes.by_type[entity.type] = [];
+      }
+      if (!this.kb.indexes.by_type[entity.type].includes(entity.id)) {
+        this.kb.indexes.by_type[entity.type].push(entity.id);
+      }
+      if (entity.type === "event") {
+        const event = entity;
+        if (!this.kb.indexes.by_conversation[event.conversation_id]) {
+          this.kb.indexes.by_conversation[event.conversation_id] = [];
+        }
+        if (!this.kb.indexes.by_conversation[event.conversation_id].includes(entity.id)) {
+          this.kb.indexes.by_conversation[event.conversation_id].push(entity.id);
+        }
+        const date = event.turn_timestamp.split("T")[0];
+        if (!this.kb.indexes.by_date[date]) {
+          this.kb.indexes.by_date[date] = [];
+        }
+        if (!this.kb.indexes.by_date[date].includes(entity.id)) {
+          this.kb.indexes.by_date[date].push(entity.id);
+        }
+      }
+      for (const tag of entity.tags) {
+        if (!this.kb.indexes.by_tag[tag]) {
+          this.kb.indexes.by_tag[tag] = [];
+        }
+        if (!this.kb.indexes.by_tag[tag].includes(entity.id)) {
+          this.kb.indexes.by_tag[tag].push(entity.id);
+        }
+      }
+    }
+    /**
+     * Build concept entities from event mentions
+     */
+    buildConceptsFromEvents(_events) {
+    }
+    /**
+     * Add a relationship
+     */
+    addRelationship(relationship) {
+      this.kb.relationships.push(relationship);
+      this.save();
+    }
+    /**
+     * Add a temporal chain
+     */
+    addTemporalChain(chain) {
+      this.kb.temporal_chains.push(chain);
+      this.save();
+    }
+    /**
+     * Query entities by type
+     */
+    getEntitiesByType(type) {
+      const ids = this.kb.indexes.by_type[type] || [];
+      return ids.map((id) => this.kb.entities[id]);
+    }
+    /**
+     * Query entities by conversation
+     */
+    getEntitiesByConversation(conversationId) {
+      const ids = this.kb.indexes.by_conversation[conversationId] || [];
+      return ids.map((id) => this.kb.entities[id]);
+    }
+    /**
+     * Query entities by date range
+     */
+    getEntitiesByDateRange(startDate, endDate) {
+      const ids = [];
+      const dates = Object.keys(this.kb.indexes.by_date).filter(
+        (date) => date >= startDate && date <= endDate
+      );
+      for (const date of dates) {
+        ids.push(...this.kb.indexes.by_date[date]);
+      }
+      const uniqueIds = Array.from(new Set(ids));
+      return uniqueIds.map((id) => this.kb.entities[id]);
+    }
+    /**
+     * Query entities by tag
+     */
+    getEntitiesByTag(tag) {
+      const ids = this.kb.indexes.by_tag[tag] || [];
+      return ids.map((id) => this.kb.entities[id]);
+    }
+    /**
+     * Get all concepts
+     */
+    getConcepts() {
+      return this.getEntitiesByType("concept");
+    }
+    /**
+     * Get all events
+     */
+    getEvents() {
+      return this.getEntitiesByType("event");
+    }
+    /**
+     * Get statistics
+     */
+    getStats() {
+      const events = this.getEvents();
+      const eventTypes = {};
+      for (const event of events) {
+        eventTypes[event.subtype] = (eventTypes[event.subtype] || 0) + 1;
+      }
+      return {
+        total_entities: this.kb.meta.total_entities,
+        total_events: this.kb.meta.total_events,
+        conversations_analyzed: this.kb.meta.conversations_analyzed,
+        event_types: eventTypes,
+        concepts: this.getConcepts().length,
+        relationships: this.kb.relationships.length,
+        temporal_chains: this.kb.temporal_chains.length
+      };
+    }
+    /**
+     * Export knowledge base as JSON
+     */
+    exportJSON() {
+      return JSON.stringify(this.kb, null, 2);
+    }
+    /**
+     * Export as downloadable file
+     */
+    exportToFile() {
+      const json = this.exportJSON();
+      const blob = new Blob([json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a2 = document.createElement("a");
+      a2.href = url;
+      a2.download = `chatgpt-insights-${(/* @__PURE__ */ new Date()).toISOString().split("T")[0]}.json`;
+      document.body.appendChild(a2);
+      a2.click();
+      document.body.removeChild(a2);
+      URL.revokeObjectURL(url);
+    }
+    /**
+     * Import from JSON
+     */
+    importJSON(json) {
+      try {
+        const imported = JSON.parse(json);
+        if (!imported.meta || !imported.entities) {
+          throw new Error("Invalid knowledge base format");
+        }
+        this.kb = imported;
+        this.save();
+      } catch (error2) {
+        console.error("Failed to import knowledge base:", error2);
+        throw error2;
+      }
+    }
+    /**
+     * Clear all data
+     */
+    clear() {
+      this.kb = this.createEmpty();
+      this.save();
+    }
+    /**
+     * Get storage size (approximate)
+     */
+    getStorageSize() {
+      const json = this.exportJSON();
+      return new Blob([json]).size;
+    }
+  }
+  let instance = null;
+  function getKnowledgeBaseManager() {
+    if (!instance) {
+      instance = new KnowledgeBaseManager();
+    }
+    return instance;
+  }
+  function useGMStorage(key2, initialValue) {
+    const [storedValue, setStoredValue] = d$3(() => ScriptStorage.get(key2) ?? initialValue);
+    const setValue = (value) => {
+      setStoredValue(value);
+      ScriptStorage.set(key2, value);
+    };
+    return [storedValue, setValue];
+  }
+  const defaultFormat = "ChatGPT-{title}";
+  const defaultExportAllLimit = 1e3;
+  const defaultExportChunkSize = 100;
+  const defaultExportMetaList = [
+    { name: "title", value: "{title}" },
+    { name: "source", value: "{source}" }
+  ];
+  const SettingContext = Q$1({
+    format: defaultFormat,
+    setFormat: (_24) => {
+    },
+    enableTimestamp: false,
+    setEnableTimestamp: (_24) => {
+    },
+    timeStamp24H: false,
+    setTimeStamp24H: (_24) => {
+    },
+    enableTimestampHTML: false,
+    setEnableTimestampHTML: (_24) => {
+    },
+    enableTimestampMarkdown: false,
+    setEnableTimestampMarkdown: (_24) => {
+    },
+    enableMeta: false,
+    setEnableMeta: (_24) => {
+    },
+    exportMetaList: defaultExportMetaList,
+    setExportMetaList: (_24) => {
+    },
+    exportAllLimit: defaultExportAllLimit,
+    setExportAllLimit: (_24) => {
+    },
+    exportChunkSize: defaultExportChunkSize,
+    setExportChunkSize: (_24) => {
+    },
+    anthropicApiKey: "",
+    setAnthropicApiKey: (_24) => {
+    },
+    resetDefault: () => {
+    }
+  });
+  const SettingProvider = ({ children }) => {
+    const [format, setFormat] = useGMStorage(KEY_FILENAME_FORMAT, defaultFormat);
+    const [enableTimestamp, setEnableTimestamp] = useGMStorage(KEY_TIMESTAMP_ENABLED, false);
+    const [timeStamp24H, setTimeStamp24H] = useGMStorage(KEY_TIMESTAMP_24H, false);
+    const [enableTimestampHTML, setEnableTimestampHTML] = useGMStorage(KEY_TIMESTAMP_HTML, false);
+    const [enableTimestampMarkdown, setEnableTimestampMarkdown] = useGMStorage(KEY_TIMESTAMP_MARKDOWN, false);
+    const [enableMeta, setEnableMeta] = useGMStorage(KEY_META_ENABLED, false);
+    const [exportMetaList, setExportMetaList] = useGMStorage(KEY_META_LIST, defaultExportMetaList);
+    const [exportAllLimit, setExportAllLimit] = useGMStorage(KEY_EXPORT_ALL_LIMIT, defaultExportAllLimit);
+    const [exportChunkSize, setExportChunkSize] = useGMStorage(KEY_EXPORT_CHUNK_SIZE, defaultExportChunkSize);
+    const [anthropicApiKey, setAnthropicApiKey] = useGMStorage(KEY_ANTHROPIC_API_KEY, "");
+    const resetDefault = q$1(() => {
+      setFormat(defaultFormat);
+      setEnableTimestamp(false);
+      setEnableMeta(false);
+      setExportMetaList(defaultExportMetaList);
+      setExportAllLimit(defaultExportAllLimit);
+      setExportChunkSize(defaultExportChunkSize);
+    }, [
+      setFormat,
+      setEnableTimestamp,
+      setEnableMeta,
+      setExportMetaList,
+      setExportAllLimit,
+      setExportChunkSize
+    ]);
+    return /* @__PURE__ */ u$5(
+      SettingContext.Provider,
+      {
+        value: {
+          format,
+          setFormat,
+          enableTimestamp,
+          setEnableTimestamp,
+          timeStamp24H,
+          setTimeStamp24H,
+          enableTimestampHTML,
+          setEnableTimestampHTML,
+          enableTimestampMarkdown,
+          setEnableTimestampMarkdown,
+          enableMeta,
+          setEnableMeta,
+          exportMetaList,
+          setExportMetaList,
+          exportAllLimit,
+          setExportAllLimit,
+          exportChunkSize,
+          setExportChunkSize,
+          anthropicApiKey,
+          setAnthropicApiKey,
+          resetDefault
+        },
+        children
+      }
+    );
+  };
+  const useSettingContext = () => x$2(SettingContext);
+  const AnalysisPanel = ({
+    selectedConversations
+  }) => {
+    const { anthropicApiKey } = useSettingContext();
+    const [expanded, setExpanded] = d$3(false);
+    const [analyzing] = d$3(false);
+    const [progress] = d$3({ current: 0, total: 0 });
+    const [lastAnalysis] = d$3(null);
+    const kb = getKnowledgeBaseManager();
+    const stats = kb.getStats();
+    const hasApiKey = anthropicApiKey && anthropicApiKey.trim().length > 0;
+    const handleAnalyze = async () => {
+      if (!hasApiKey) {
+        alert("Please add your Anthropic API key in Settings first.");
+        return;
+      }
+      if (selectedConversations.length === 0) {
+        alert("Please select conversations to analyze.");
+        return;
+      }
+      alert(
+        `Analysis ready to run on ${selectedConversations.length} conversations!
+
+This will analyze conversations using Claude Haiku 4.5 to extract:
+- Aha moments and discoveries
+- Questions and answers
+- Decisions and assumptions
+- Theory of Mind insights
+- Concept evolution
+- Auto-tags
+
+Implementation is ready - integration coming next!`
+      );
+    };
+    const handleExportKB = () => {
+      kb.exportToFile();
+    };
+    const handleClearKB = () => {
+      if (confirm("Are you sure you want to clear all analysis data? This cannot be undone.")) {
+        kb.clear();
+        alert("Knowledge base cleared.");
+      }
+    };
+    return /* @__PURE__ */ u$5("div", { className: "mb-4 border rounded-lg p-3 bg-white dark:bg-white/5", children: [
+      /* @__PURE__ */ u$5(
+        "button",
+        {
+          className: "w-full flex items-center justify-between text-left",
+          onClick: () => setExpanded(!expanded),
+          children: [
+            /* @__PURE__ */ u$5("span", { className: "font-medium text-gray-800 dark:text-white", children: [
+              "🧠 AI Analysis",
+              " ",
+              stats.total_events > 0 && /* @__PURE__ */ u$5("span", { className: "text-sm text-gray-600 dark:text-gray-400", children: [
+                "(",
+                stats.total_events,
+                " insights extracted)"
+              ] })
+            ] }),
+            /* @__PURE__ */ u$5("span", { className: "text-gray-500 dark:text-gray-400", children: expanded ? "▼" : "▶" })
+          ]
+        }
+      ),
+      expanded && /* @__PURE__ */ u$5("div", { className: "mt-4 space-y-4", children: [
+        /* @__PURE__ */ u$5("div", { className: "text-sm", children: hasApiKey ? /* @__PURE__ */ u$5("span", { className: "text-green-600 dark:text-green-400", children: "✓ API key configured" }) : /* @__PURE__ */ u$5("span", { className: "text-red-600 dark:text-red-400", children: "⚠ No API key - add one in Settings" }) }),
+        stats.total_events > 0 && /* @__PURE__ */ u$5("div", { className: "text-sm bg-gray-50 dark:bg-gray-800 p-3 rounded", children: [
+          /* @__PURE__ */ u$5("div", { className: "font-medium mb-2", children: "Knowledge Base Stats:" }),
+          /* @__PURE__ */ u$5("div", { className: "grid grid-cols-2 gap-2 text-xs", children: [
+            /* @__PURE__ */ u$5("div", { children: [
+              "Total insights: ",
+              stats.total_events
+            ] }),
+            /* @__PURE__ */ u$5("div", { children: [
+              "Conversations: ",
+              stats.conversations_analyzed
+            ] }),
+            /* @__PURE__ */ u$5("div", { children: [
+              "Concepts: ",
+              stats.concepts
+            ] }),
+            /* @__PURE__ */ u$5("div", { children: [
+              "Relationships: ",
+              stats.relationships
+            ] })
+          ] }),
+          Object.keys(stats.event_types).length > 0 && /* @__PURE__ */ u$5("div", { className: "mt-2 text-xs", children: [
+            /* @__PURE__ */ u$5("div", { className: "font-medium", children: "Event types:" }),
+            Object.entries(stats.event_types).map(([type, count2]) => /* @__PURE__ */ u$5("div", { className: "flex justify-between", children: [
+              /* @__PURE__ */ u$5("span", { children: [
+                type.replace(/_/g, " "),
+                ":"
+              ] }),
+              /* @__PURE__ */ u$5("span", { children: count2 })
+            ] }, type))
+          ] })
+        ] }),
+        /* @__PURE__ */ u$5("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ u$5(
+            "button",
+            {
+              className: "w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded disabled:opacity-50 disabled:cursor-not-allowed",
+              onClick: handleAnalyze,
+              disabled: !hasApiKey || analyzing || selectedConversations.length === 0,
+              children: analyzing ? `Analyzing... ${progress.current}/${progress.total}` : `Analyze Selected (${selectedConversations.length})`
+            }
+          ),
+          stats.total_events > 0 && /* @__PURE__ */ u$5("div", { className: "flex gap-2", children: [
+            /* @__PURE__ */ u$5(
+              "button",
+              {
+                className: "flex-1 bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded text-sm",
+                onClick: handleExportKB,
+                children: "📥 Export Knowledge Base"
+              }
+            ),
+            /* @__PURE__ */ u$5(
+              "button",
+              {
+                className: "flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded text-sm",
+                onClick: handleClearKB,
+                children: "🗑 Clear All"
+              }
+            )
+          ] })
+        ] }),
+        /* @__PURE__ */ u$5("div", { className: "text-xs text-gray-600 dark:text-gray-400 space-y-1", children: [
+          /* @__PURE__ */ u$5("div", { children: [
+            /* @__PURE__ */ u$5("strong", { children: "What gets analyzed:" }),
+            " ",
+            "Aha moments, questions, decisions, assumptions, Theory of Mind, concept evolution, auto-tags"
+          ] }),
+          /* @__PURE__ */ u$5("div", { children: [
+            /* @__PURE__ */ u$5("strong", { children: "Model:" }),
+            " Claude Haiku 4.5 ($1/$5 per million tokens)"
+          ] }),
+          /* @__PURE__ */ u$5("div", { children: [
+            /* @__PURE__ */ u$5("strong", { children: "Storage:" }),
+            " Results saved locally in your browser"
+          ] })
+        ] }),
+        lastAnalysis && /* @__PURE__ */ u$5("div", { className: "text-xs bg-green-50 dark:bg-green-900/20 p-2 rounded", children: [
+          "Last analysis: ",
+          lastAnalysis.count,
+          " conversations for $",
+          lastAnalysis.cost.toFixed(4),
+          " ",
+          "(",
+          new Date(lastAnalysis.timestamp).toLocaleString(),
+          ")"
+        ] })
+      ] })
+    ] });
+  };
   function FileCode() {
     return /* @__PURE__ */ u$5("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 384 512", className: "w-4 h-4", fill: "currentColor", children: /* @__PURE__ */ u$5("path", { d: "M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zM256 0V128H384L256 0zM153 289l-31 31 31 31c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L71 337c-9.4-9.4-9.4-24.6 0-33.9l48-48c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9zM265 255l48 48c9.4 9.4 9.4 24.6 0 33.9l-48 48c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l31-31-31-31c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0z" }) });
   }
@@ -23819,106 +24356,6 @@ ${content2}`;
       ] })
     ] });
   };
-  function useGMStorage(key2, initialValue) {
-    const [storedValue, setStoredValue] = d$3(() => ScriptStorage.get(key2) ?? initialValue);
-    const setValue = (value) => {
-      setStoredValue(value);
-      ScriptStorage.set(key2, value);
-    };
-    return [storedValue, setValue];
-  }
-  const defaultFormat = "ChatGPT-{title}";
-  const defaultExportAllLimit = 1e3;
-  const defaultExportChunkSize = 100;
-  const defaultExportMetaList = [
-    { name: "title", value: "{title}" },
-    { name: "source", value: "{source}" }
-  ];
-  const SettingContext = Q$1({
-    format: defaultFormat,
-    setFormat: (_24) => {
-    },
-    enableTimestamp: false,
-    setEnableTimestamp: (_24) => {
-    },
-    timeStamp24H: false,
-    setTimeStamp24H: (_24) => {
-    },
-    enableTimestampHTML: false,
-    setEnableTimestampHTML: (_24) => {
-    },
-    enableTimestampMarkdown: false,
-    setEnableTimestampMarkdown: (_24) => {
-    },
-    enableMeta: false,
-    setEnableMeta: (_24) => {
-    },
-    exportMetaList: defaultExportMetaList,
-    setExportMetaList: (_24) => {
-    },
-    exportAllLimit: defaultExportAllLimit,
-    setExportAllLimit: (_24) => {
-    },
-    exportChunkSize: defaultExportChunkSize,
-    setExportChunkSize: (_24) => {
-    },
-    resetDefault: () => {
-    }
-  });
-  const SettingProvider = ({ children }) => {
-    const [format, setFormat] = useGMStorage(KEY_FILENAME_FORMAT, defaultFormat);
-    const [enableTimestamp, setEnableTimestamp] = useGMStorage(KEY_TIMESTAMP_ENABLED, false);
-    const [timeStamp24H, setTimeStamp24H] = useGMStorage(KEY_TIMESTAMP_24H, false);
-    const [enableTimestampHTML, setEnableTimestampHTML] = useGMStorage(KEY_TIMESTAMP_HTML, false);
-    const [enableTimestampMarkdown, setEnableTimestampMarkdown] = useGMStorage(KEY_TIMESTAMP_MARKDOWN, false);
-    const [enableMeta, setEnableMeta] = useGMStorage(KEY_META_ENABLED, false);
-    const [exportMetaList, setExportMetaList] = useGMStorage(KEY_META_LIST, defaultExportMetaList);
-    const [exportAllLimit, setExportAllLimit] = useGMStorage(KEY_EXPORT_ALL_LIMIT, defaultExportAllLimit);
-    const [exportChunkSize, setExportChunkSize] = useGMStorage(KEY_EXPORT_CHUNK_SIZE, defaultExportChunkSize);
-    const resetDefault = q$1(() => {
-      setFormat(defaultFormat);
-      setEnableTimestamp(false);
-      setEnableMeta(false);
-      setExportMetaList(defaultExportMetaList);
-      setExportAllLimit(defaultExportAllLimit);
-      setExportChunkSize(defaultExportChunkSize);
-    }, [
-      setFormat,
-      setEnableTimestamp,
-      setEnableMeta,
-      setExportMetaList,
-      setExportAllLimit,
-      setExportChunkSize
-    ]);
-    return /* @__PURE__ */ u$5(
-      SettingContext.Provider,
-      {
-        value: {
-          format,
-          setFormat,
-          enableTimestamp,
-          setEnableTimestamp,
-          timeStamp24H,
-          setTimeStamp24H,
-          enableTimestampHTML,
-          setEnableTimestampHTML,
-          enableTimestampMarkdown,
-          setEnableTimestampMarkdown,
-          enableMeta,
-          setEnableMeta,
-          exportMetaList,
-          setExportMetaList,
-          exportAllLimit,
-          setExportAllLimit,
-          exportChunkSize,
-          setExportChunkSize,
-          resetDefault
-        },
-        children
-      }
-    );
-  };
-  const useSettingContext = () => x$2(SettingContext);
   const ProjectSelect = ({ projects, selected, setSelected, disabled }) => {
     const { t: t2 } = useTranslation();
     return /* @__PURE__ */ u$5("div", { className: "flex items-center text-gray-600 dark:text-gray-300 flex justify-between mb-3", children: [
@@ -24212,6 +24649,13 @@ ${content2}`;
           onFilterChange: setFilterCriteria,
           conversationCount: conversations.length,
           filteredCount: filteredConversations.length
+        }
+      ),
+      /* @__PURE__ */ u$5(
+        AnalysisPanel,
+        {
+          conversationCount: filteredConversations.length,
+          selectedConversations: selected.map((c2) => ({ id: c2.id, title: c2.title }))
         }
       ),
       /* @__PURE__ */ u$5(
@@ -24712,7 +25156,9 @@ ${content2}`;
       exportAllLimit,
       setExportAllLimit,
       exportChunkSize,
-      setExportChunkSize
+      setExportChunkSize,
+      anthropicApiKey,
+      setAnthropicApiKey
       /* eslint-enable pionxzh/consistent-list-newline */
     } = useSettingContext();
     const { t: t2, i18n } = useTranslation();
@@ -24738,6 +25184,29 @@ ${content2}`;
             /* @__PURE__ */ u$5(Content$1, { className: "DialogContent", children: [
               /* @__PURE__ */ u$5(Title, { className: "DialogTitle", children: t2("Exporter Settings") }),
               /* @__PURE__ */ u$5("dl", { className: "space-y-6", children: [
+                /* @__PURE__ */ u$5("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: /* @__PURE__ */ u$5("div", { className: "w-full", children: [
+                  /* @__PURE__ */ u$5("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: [
+                    t2("Anthropic API Key"),
+                    " 🔑"
+                  ] }),
+                  /* @__PURE__ */ u$5("dd", { className: "text-sm text-gray-700 dark:text-gray-300 mt-2", children: [
+                    t2("Anthropic API Key Description"),
+                    /* @__PURE__ */ u$5(
+                      "input",
+                      {
+                        type: "password",
+                        className: "Input mt-3 w-full",
+                        placeholder: "sk-ant-...",
+                        value: anthropicApiKey,
+                        onChange: (e2) => setAnthropicApiKey(e2.currentTarget.value)
+                      }
+                    ),
+                    /* @__PURE__ */ u$5("p", { className: "mt-2 text-xs text-gray-600 dark:text-gray-400", children: [
+                      "⚠️ ",
+                      t2("API Key Security Warning")
+                    ] })
+                  ] })
+                ] }) }),
                 /* @__PURE__ */ u$5("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: /* @__PURE__ */ u$5("div", { children: [
                   /* @__PURE__ */ u$5("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: `${t2("Language")} 🌐` }),
                   /* @__PURE__ */ u$5("dd", { children: /* @__PURE__ */ u$5(

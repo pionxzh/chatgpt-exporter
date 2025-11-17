@@ -7,6 +7,7 @@ import { exportAllToHtml } from '../exporter/html'
 import { exportAllToJson, exportAllToOfficialJson } from '../exporter/json'
 import { exportAllToMarkdown } from '../exporter/markdown'
 import { RequestQueue } from '../utils/queue'
+import { AnalysisPanel } from './AnalysisPanel'
 import { CheckBox } from './CheckBox'
 import { FilterPanel } from './FilterPanel'
 import { IconCross, IconUpload } from './Icons'
@@ -378,6 +379,10 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                 onFilterChange={setFilterCriteria}
                 conversationCount={conversations.length}
                 filteredCount={filteredConversations.length}
+            />
+            <AnalysisPanel
+                conversationCount={filteredConversations.length}
+                selectedConversations={selected.map(c => ({ id: c.id, title: c.title }))}
             />
             <ConversationSelect
                 conversations={filteredConversations}

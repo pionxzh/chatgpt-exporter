@@ -53,5 +53,8 @@
   "Search in titles": "Search in titles",
   "Type to search...": "Type to search...",
   "Min Input/Output Ratio": "Min Input/Output Ratio",
-  "Min Conversation Length": "Min Conversation Length"
+  "Min Conversation Length": "Min Conversation Length",
+  "Anthropic API Key": "Anthropic API Key",
+  "Anthropic API Key Description": "Enter your Anthropic API key to enable conversation analysis with Claude Haiku 4.5. Get your API key at console.anthropic.com",
+  "API Key Security Warning": "This key is stored locally in your browser. Never share it with others."
 }

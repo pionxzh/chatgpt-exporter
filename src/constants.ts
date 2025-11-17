@@ -19,6 +19,7 @@ export const KEY_META_ENABLED = 'exporter:enable_meta'
 export const KEY_META_LIST = 'exporter:meta_list'
 export const KEY_EXPORT_ALL_LIMIT = 'exporter:export_all_limit'
 export const KEY_EXPORT_CHUNK_SIZE = 'exporter:export_chunk_size'
+export const KEY_ANTHROPIC_API_KEY = 'exporter:anthropic_api_key'
 
 export const KEY_OAI_LOCALE = 'oai/apps/locale'
 export const KEY_OAI_HISTORY_DISABLED = 'oai/apps/historyDisabled'

@@ -37,6 +37,7 @@ export const SettingDialog: FC<SettingDialogProps> = ({
         exportMetaList, setExportMetaList,
         exportAllLimit, setExportAllLimit,
         exportChunkSize, setExportChunkSize,
+        anthropicApiKey, setAnthropicApiKey,
         /* eslint-enable pionxzh/consistent-list-newline */
     } = useSettingContext()
     const { t, i18n } = useTranslation()
@@ -66,6 +67,26 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                     <Dialog.Title className="DialogTitle">{t('Exporter Settings')}</Dialog.Title>
 
                     <dl className="space-y-6">
+                        <div className="relative flex bg-white dark:bg-white/5 rounded p-4">
+                            <div className="w-full">
+                                <dt className="text-md font-medium text-gray-800 dark:text-white">
+                                    {t('Anthropic API Key')} 🔑
+                                </dt>
+                                <dd className="text-sm text-gray-700 dark:text-gray-300 mt-2">
+                                    {t('Anthropic API Key Description')}
+                                    <input
+                                        type="password"
+                                        className="Input mt-3 w-full"
+                                        placeholder="sk-ant-..."
+                                        value={anthropicApiKey}
+                                        onChange={e => setAnthropicApiKey(e.currentTarget.value)}
+                                    />
+                                    <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                                        ⚠️ {t('API Key Security Warning')}
+                                    </p>
+                                </dd>
+                            </div>
+                        </div>
                         <div className="relative flex bg-white dark:bg-white/5 rounded p-4">
                             <div>
                                 <dt className="text-md font-medium text-gray-800 dark:text-white">
