@@ -108,7 +108,7 @@ interface DialogContentProps {
 
 const DialogContent: FC<DialogContentProps> = ({ format }) => {
     const { t } = useTranslation()
-    const { enableMeta, exportMetaList, exportAllLimit } = useSettingContext()
+    const { enableMeta, exportMetaList, exportAllLimit, exportChunkSize } = useSettingContext()
     const metaList = useMemo(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList])
 
     const exportAllOptions = useMemo(() => [
@@ -133,7 +133,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
     const [exportType, setExportType] = useState(exportAllOptions[0].label)
     const disabled = loading || processing || !!error || selected.length === 0
 
-    const requestQueue = useMemo(() => new RequestQueue<ApiConversationWithId>(200, 1600), [])
+    const requestQueue = useMemo(() => new RequestQueue<ApiConversationWithId>(200, 1600, exportChunkSize), [exportChunkSize])
     const archiveQueue = useMemo(() => new RequestQueue<boolean>(200, 1600), [])
     const deleteQueue = useMemo(() => new RequestQueue<boolean>(200, 1600), [])
     const [progress, setProgress] = useState({
@@ -141,6 +141,10 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
         completed: 0,
         currentName: '',
         currentStatus: '',
+    })
+    const [chunkProgress, setChunkProgress] = useState({
+        currentChunk: 0,
+        totalChunks: 0,
     })
 
     const onUpload = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -171,6 +175,20 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
     }, [requestQueue])
 
     useEffect(() => {
+        const off = requestQueue.on('chunkComplete', ({ chunk, chunkIndex, totalChunks }) => {
+            setChunkProgress({
+                currentChunk: chunkIndex + 1,
+                totalChunks,
+            })
+            // Process chunk immediately
+            const callback = exportAllOptions.find(o => o.label === exportType)?.callback
+            if (callback) callback(format, chunk, metaList, chunkIndex, totalChunks)
+        })
+
+        return () => off()
+    }, [requestQueue, exportAllOptions, exportType, format, metaList])
+
+    useEffect(() => {
         const off = archiveQueue.on('progress', (progress) => {
             setProcessing(true)
             setProgress(progress)
@@ -189,13 +207,16 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
     }, [deleteQueue])
 
     useEffect(() => {
-        const off = requestQueue.on('done', (results) => {
+        const off = requestQueue.on('done', () => {
             setProcessing(false)
-            const callback = exportAllOptions.find(o => o.label === exportType)?.callback
-            if (callback) callback(format, results, metaList)
+            // Reset chunk progress
+            setChunkProgress({
+                currentChunk: 0,
+                totalChunks: 0,
+            })
         })
         return () => off()
-    }, [requestQueue, exportAllOptions, exportType, format, metaList])
+    }, [requestQueue])
 
     useEffect(() => {
         const off = archiveQueue.on('done', () => {
@@ -360,6 +381,11 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                         <span className="truncate mr-8">{progress.currentName}</span>
                         <span>{`${progress.completed}/${progress.total}`}</span>
                     </div>
+                    {chunkProgress.totalChunks > 1 && (
+                        <div className="mb-1 text-sm text-gray-600 dark:text-gray-400">
+                            {t('Processing chunk')} {chunkProgress.currentChunk} {t('of')} {chunkProgress.totalChunks}
+                        </div>
+                    )}
                     <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
                         <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${(progress.completed / progress.total) * 100}%` }} />
                     </div>

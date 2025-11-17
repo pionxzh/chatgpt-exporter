@@ -42,5 +42,9 @@
   "Select Project": "Select Project",
   "(no project)": "(no project)",
   "Export All Limit": "Export All Limit",
-  "Export All Limit Description": "Set the maximum number of conversations to load in the 'Export All' dialog."
+  "Export All Limit Description": "Set the maximum number of conversations to load in the 'Export All' dialog.",
+  "Export Chunk Size": "Export Chunk Size",
+  "Export Chunk Size Description": "Number of conversations to process per chunk. Smaller chunks use less memory but create more ZIP files.",
+  "Processing chunk": "Processing chunk",
+  "of": "of"
 }

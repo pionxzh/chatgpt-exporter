@@ -31,7 +31,13 @@ export async function exportToHtml(fileNameFormat: string, metaList: ExportMeta[
     return true
 }
 
-export async function exportAllToHtml(fileNameFormat: string, apiConversations: ApiConversationWithId[], metaList?: ExportMeta[]) {
+export async function exportAllToHtml(
+    fileNameFormat: string,
+    apiConversations: ApiConversationWithId[],
+    metaList?: ExportMeta[],
+    chunkIndex?: number,
+    totalChunks?: number,
+) {
     const userAvatar = await getUserAvatar()
 
     const zip = new JSZip()
@@ -63,7 +69,13 @@ export async function exportAllToHtml(fileNameFormat: string, apiConversations: 
             level: 9,
         },
     })
-    downloadFile('chatgpt-export-html.zip', 'application/zip', blob)
+
+    // Generate filename based on whether this is a chunked export
+    const filename = (totalChunks !== undefined && totalChunks > 1 && chunkIndex !== undefined)
+        ? `chatgpt-export-html-part${chunkIndex + 1}of${totalChunks}.zip`
+        : 'chatgpt-export-html.zip'
+
+    downloadFile(filename, 'application/zip', blob)
 
     return true
 }

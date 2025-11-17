@@ -13,10 +13,17 @@ interface ProgressEvent {
     currentStatus: 'processing' | 'retrying'
 }
 
+interface ChunkCompleteEvent<T> {
+    chunk: T[]
+    chunkIndex: number
+    totalChunks: number
+}
+
 export class RequestQueue<T> {
     private eventEmitter = EventEmitter<{
         done: T[]
         progress: ProgressEvent
+        chunkComplete: ChunkCompleteEvent<T>
     } & Record<string, any[]>>()
 
     private queue: Array<RequestObject<T>> = []
@@ -29,8 +36,9 @@ export class RequestQueue<T> {
 
     private total = 0
     private completed = 0
+    private currentChunkIndex = 0
 
-    constructor(private minBackoff: number, private maxBackoff: number) {
+    constructor(private minBackoff: number, private maxBackoff: number, private chunkSize?: number) {
         this.backoff = minBackoff
     }
 
@@ -57,10 +65,12 @@ export class RequestQueue<T> {
         this.backoff = this.minBackoff
         this.total = 0
         this.completed = 0
+        this.currentChunkIndex = 0
     }
 
     on(event: 'progress', fn: (progress: ProgressEvent) => void): () => void
     on(event: 'done', fn: (result: T[]) => void): () => void
+    on(event: 'chunkComplete', fn: (event: ChunkCompleteEvent<T>) => void): () => void
     on(event: string, fn: (...args: any[]) => void): () => void {
         this.eventEmitter.on(event, fn)
         return () => this.eventEmitter.off(event, fn)
@@ -87,6 +97,18 @@ export class RequestQueue<T> {
             this.completed++
             this.progress(name, 'processing')
             this.backoff = this.minBackoff // reset backoff on success
+
+            // Check if we should emit a chunk complete event
+            if (this.chunkSize && this.results.length >= this.chunkSize) {
+                const chunk = this.results.splice(0, this.chunkSize)
+                const totalChunks = Math.ceil(this.total / this.chunkSize)
+                this.eventEmitter.emit('chunkComplete', {
+                    chunk,
+                    chunkIndex: this.currentChunkIndex,
+                    totalChunks,
+                })
+                this.currentChunkIndex++
+            }
         }
         catch (error) {
             console.error(`Request ${name} failed:`, error)
@@ -110,6 +132,18 @@ export class RequestQueue<T> {
 
     private done() {
         this.status = 'COMPLETED'
+
+        // Emit final chunk if there are any remaining results
+        if (this.chunkSize && this.results.length > 0) {
+            const chunk = this.results.splice(0, this.results.length)
+            const totalChunks = Math.ceil(this.total / this.chunkSize)
+            this.eventEmitter.emit('chunkComplete', {
+                chunk,
+                chunkIndex: this.currentChunkIndex,
+                totalChunks,
+            })
+        }
+
         this.eventEmitter.emit('done', this.results)
     }
 }

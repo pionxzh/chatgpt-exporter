@@ -36,6 +36,7 @@ export const SettingDialog: FC<SettingDialogProps> = ({
         enableMeta, setEnableMeta,
         exportMetaList, setExportMetaList,
         exportAllLimit, setExportAllLimit,
+        exportChunkSize, setExportChunkSize,
         /* eslint-enable pionxzh/consistent-list-newline */
     } = useSettingContext()
     const { t, i18n } = useTranslation()
@@ -139,6 +140,39 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                                         />
                                         <span className="font-medium text-gray-900 dark:text-gray-300 w-12 text-right">
                                             {exportAllLimit}
+                                        </span>
+                                    </div>
+                                </dd>
+                            </div>
+                        </div>
+                        <div className="relative flex bg-white dark:bg-white/5 rounded p-4">
+                            <div>
+                                <dt className="text-md font-medium text-gray-800 dark:text-white">
+                                    {t('Export Chunk Size')}{' '}
+                                    {/* Add translation key */}
+                                </dt>
+                                <dd className="text-sm text-gray-700 dark:text-gray-300 mt-2">
+                                    {t('Export Chunk Size Description')}{' '}
+                                    {/* Add translation key */}
+                                    <div className="flex items-center gap-4 mt-3">
+                                        <input
+                                            type="range"
+                                            min="10" // Set min value
+                                            max="500" // Set max value
+                                            step="10" // Set step value
+                                            value={exportChunkSize}
+                                            onChange={e =>
+                                                setExportChunkSize(
+                                                    Number.parseInt(
+                                                        e.currentTarget.value,
+                                                        10,
+                                                    ),
+                                                )}
+                                            className="flex-grow h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                                            id="exportChunkSizeSlider"
+                                        />
+                                        <span className="font-medium text-gray-900 dark:text-gray-300 w-12 text-right">
+                                            {exportChunkSize}
                                         </span>
                                     </div>
                                 </dd>

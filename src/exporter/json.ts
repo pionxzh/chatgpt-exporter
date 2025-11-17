@@ -60,14 +60,32 @@ export async function exportToOoba(fileNameFormat: string) {
     return true
 }
 
-export async function exportAllToOfficialJson(_fileNameFormat: string, apiConversations: ApiConversationWithId[]) {
+export async function exportAllToOfficialJson(
+    _fileNameFormat: string,
+    apiConversations: ApiConversationWithId[],
+    _metaList?: any,
+    chunkIndex?: number,
+    totalChunks?: number,
+) {
     const content = conversationToJson(apiConversations)
-    downloadFile('chatgpt-export.json', 'application/json', content)
+
+    // Generate filename based on whether this is a chunked export
+    const filename = (totalChunks !== undefined && totalChunks > 1 && chunkIndex !== undefined)
+        ? `chatgpt-export-part${chunkIndex + 1}of${totalChunks}.json`
+        : 'chatgpt-export.json'
+
+    downloadFile(filename, 'application/json', content)
 
     return true
 }
 
-export async function exportAllToJson(fileNameFormat: string, apiConversations: ApiConversationWithId[]) {
+export async function exportAllToJson(
+    fileNameFormat: string,
+    apiConversations: ApiConversationWithId[],
+    _metaList?: any,
+    chunkIndex?: number,
+    totalChunks?: number,
+) {
     const zip = new JSZip()
     const filenameMap = new Map<string, number>()
     const conversations = apiConversations.map(x => ({
@@ -100,7 +118,13 @@ export async function exportAllToJson(fileNameFormat: string, apiConversations: 
             level: 9,
         },
     })
-    downloadFile('chatgpt-export-json.zip', 'application/zip', blob)
+
+    // Generate filename based on whether this is a chunked export
+    const filename = (totalChunks !== undefined && totalChunks > 1 && chunkIndex !== undefined)
+        ? `chatgpt-export-json-part${chunkIndex + 1}of${totalChunks}.zip`
+        : 'chatgpt-export-json.zip'
+
+    downloadFile(filename, 'application/zip', blob)
 
     return true
 }

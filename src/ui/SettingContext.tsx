@@ -2,6 +2,7 @@ import { createContext, useContext } from 'preact/compat'
 import { useCallback } from 'preact/hooks'
 import {
     KEY_EXPORT_ALL_LIMIT,
+    KEY_EXPORT_CHUNK_SIZE,
     KEY_FILENAME_FORMAT,
     KEY_META_ENABLED,
     KEY_META_LIST,
@@ -15,6 +16,7 @@ import type { FC } from 'preact/compat'
 
 const defaultFormat = 'ChatGPT-{title}'
 const defaultExportAllLimit = 1000
+const defaultExportChunkSize = 100
 
 export interface ExportMeta {
     name: string
@@ -45,6 +47,8 @@ const SettingContext = createContext({
     setExportMetaList: (_: ExportMeta[]) => {},
     exportAllLimit: defaultExportAllLimit,
     setExportAllLimit: (_: number) => {},
+    exportChunkSize: defaultExportChunkSize,
+    setExportChunkSize: (_: number) => {},
     resetDefault: () => {},
 })
 
@@ -60,6 +64,7 @@ export const SettingProvider: FC = ({ children }) => {
 
     const [exportMetaList, setExportMetaList] = useGMStorage(KEY_META_LIST, defaultExportMetaList)
     const [exportAllLimit, setExportAllLimit] = useGMStorage(KEY_EXPORT_ALL_LIMIT, defaultExportAllLimit)
+    const [exportChunkSize, setExportChunkSize] = useGMStorage(KEY_EXPORT_CHUNK_SIZE, defaultExportChunkSize)
 
     const resetDefault = useCallback(() => {
         setFormat(defaultFormat)
@@ -67,12 +72,14 @@ export const SettingProvider: FC = ({ children }) => {
         setEnableMeta(false)
         setExportMetaList(defaultExportMetaList)
         setExportAllLimit(defaultExportAllLimit)
+        setExportChunkSize(defaultExportChunkSize)
     }, [
         setFormat,
         setEnableTimestamp,
         setEnableMeta,
         setExportMetaList,
         setExportAllLimit,
+        setExportChunkSize,
     ])
 
     return (
@@ -97,6 +104,9 @@ export const SettingProvider: FC = ({ children }) => {
 
                 exportAllLimit,
                 setExportAllLimit,
+
+                exportChunkSize,
+                setExportChunkSize,
 
                 resetDefault,
             }}

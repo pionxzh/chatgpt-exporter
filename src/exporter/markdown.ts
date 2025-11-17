@@ -28,7 +28,13 @@ export async function exportToMarkdown(fileNameFormat: string, metaList: ExportM
     return true
 }
 
-export async function exportAllToMarkdown(fileNameFormat: string, apiConversations: ApiConversationWithId[], metaList?: ExportMeta[]) {
+export async function exportAllToMarkdown(
+    fileNameFormat: string,
+    apiConversations: ApiConversationWithId[],
+    metaList?: ExportMeta[],
+    chunkIndex?: number,
+    totalChunks?: number,
+) {
     const zip = new JSZip()
     const filenameMap = new Map<string, number>()
     const conversations = apiConversations.map(x => processConversation(x))
@@ -58,7 +64,13 @@ export async function exportAllToMarkdown(fileNameFormat: string, apiConversatio
             level: 9,
         },
     })
-    downloadFile('chatgpt-export-markdown.zip', 'application/zip', blob)
+
+    // Generate filename based on whether this is a chunked export
+    const filename = (totalChunks !== undefined && totalChunks > 1 && chunkIndex !== undefined)
+        ? `chatgpt-export-markdown-part${chunkIndex + 1}of${totalChunks}.zip`
+        : 'chatgpt-export-markdown.zip'
+
+    downloadFile(filename, 'application/zip', blob)
 
     return true
 }

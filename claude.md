@@ -283,31 +283,57 @@ export async function exportChunkToMarkdown(
 
 ---
 
-## Implementation Steps
+## Implementation Status ✅
 
-### Phase 1: Add Chunk Size Setting
-1. Add `KEY_EXPORT_CHUNK_SIZE` constant
-2. Add `exportChunkSize` to SettingContext
-3. Add UI control in SettingDialog
+All core chunked export functionality has been implemented!
 
-### Phase 2: Modify RequestQueue
-1. Add `chunkSize` parameter to constructor
-2. Implement `onChunkComplete` event
-3. Emit chunks as they complete
-4. Clear processed items from memory
+### ✅ Completed Changes
 
-### Phase 3: Update ExportDialog
-1. Listen for `chunkComplete` events
-2. Track chunk progress separately
-3. Update progress UI to show chunks
-4. Handle chunk downloads
+#### Phase 1: Add Chunk Size Setting
+- ✅ Added `KEY_EXPORT_CHUNK_SIZE` constant to `src/constants.ts`
+- ✅ Added `exportChunkSize` to SettingContext (default: 100)
+- ✅ Added UI slider control in SettingDialog (range: 10-500)
+- ✅ Added translations for chunk size settings
 
-### Phase 4: Update Exporters
-1. Create chunk-aware export functions
-2. Handle multi-part ZIP naming
-3. Test with large datasets (1000+ conversations)
+#### Phase 2: Modified RequestQueue
+- ✅ Added `chunkSize` optional parameter to constructor
+- ✅ Implemented `onChunkComplete` event with TypeScript types
+- ✅ Emit chunks as they complete (every N items)
+- ✅ Clear processed items from memory after chunk emission
+- ✅ Emit final chunk when queue completes (for remaining items)
 
-### Phase 5: Additional Improvements
+#### Phase 3: Updated ExportDialog
+- ✅ Pass `exportChunkSize` to RequestQueue constructor
+- ✅ Listen for `chunkComplete` events
+- ✅ Track chunk progress separately in state
+- ✅ Update progress UI to show "Processing chunk X of Y"
+- ✅ Process and download each chunk immediately
+- ✅ Reset chunk progress when export completes
+
+#### Phase 4: Updated All Exporters
+- ✅ Updated `exportAllToMarkdown()` with chunk parameters
+- ✅ Updated `exportAllToHtml()` with chunk parameters
+- ✅ Updated `exportAllToJson()` with chunk parameters
+- ✅ Updated `exportAllToOfficialJson()` with chunk parameters
+- ✅ Multi-part ZIP naming: `chatgpt-export-{format}-part{N}of{total}.zip`
+- ✅ Backward compatible: single file when chunk size >= total conversations
+
+### How It Works Now
+
+When you export conversations:
+
+1. **Configure chunk size**: Settings → Export Chunk Size (10-500, default 100)
+2. **Select conversations**: Export All dialog → Select conversations
+3. **Click Export**: RequestQueue fetches conversations one-by-one
+4. **Automatic chunking**: Every 100 conversations (or your chunk size):
+   - Creates ZIP file with those conversations
+   - Downloads: `chatgpt-export-markdown-part1of10.zip`
+   - Clears from memory
+   - Continues with next chunk
+5. **Progress display**: Shows both overall progress and current chunk
+6. **Memory efficient**: Only holds chunk size conversations in memory at once
+
+### Future Improvements (Optional)
 1. Add virtual scrolling to conversation list (use `react-window`)
 2. Add pause/resume functionality
 3. Add cancel button during export
