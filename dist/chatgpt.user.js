@@ -23432,7 +23432,7 @@ ${content2}`;
     y$1(() => {
       setChecked(checked);
     }, [checked]);
-    return /* @__PURE__ */ u$5("label", { className: `CheckBoxLabel ${className ?? ""}`, disabled, children: [
+    return /* @__PURE__ */ u$5("label", { className: `CheckBoxLabel ${className ?? ""} ${disabled ? "disabled" : ""}`, children: [
       /* @__PURE__ */ u$5("span", { className: "IconWrapper", children: [
         /* @__PURE__ */ u$5(
           "input",
@@ -23878,7 +23878,7 @@ ${content2}`;
     const [succeed, setSucceed] = d$3(false);
     const handleClick = typeof onClick === "function" ? async (e2) => {
       e2.preventDefault();
-      if (loading) return;
+      if (loading || disabled) return;
       try {
         setLoading(true);
         const result = await onClick();
@@ -23902,10 +23902,9 @@ ${content2}`;
             transition-colors duration-200
             text-menu text-sm
             cursor-pointer
-            border border-menu ${className}`,
+            border border-menu ${disabled ? "opacity-50 cursor-not-allowed" : ""} ${className}`,
         onClick: handleClick,
         onTouchStart: handleClick,
-        disabled,
         title: title2,
         children: loading ? /* @__PURE__ */ u$5("div", { className: "flex justify-center items-center w-full h-full", children: /* @__PURE__ */ u$5(IconLoading, { className: "w-4 h-4" }) }) : /* @__PURE__ */ u$5(k$3, { children: [
           Icon && /* @__PURE__ */ u$5(Icon, {}),
