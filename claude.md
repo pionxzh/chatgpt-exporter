@@ -1,0 +1,493 @@
+# ChatGPT Exporter - Technical Documentation
+
+## Project Overview
+
+**ChatGPT Exporter** is a Tampermonkey/Greasyfork userscript that enables users to export their ChatGPT conversations in multiple formats (Markdown, HTML, JSON, PNG). It integrates seamlessly with the ChatGPT web interface and runs entirely in the browser.
+
+- **Version**: 2.29.1
+- **Type**: Browser Userscript (Tampermonkey/Greasyfork)
+- **License**: MIT
+- **Author**: pionxzh
+- **Tech Stack**: Preact, TypeScript, Vite, Tailwind CSS
+
+---
+
+## Architecture Overview
+
+### Directory Structure
+
+```
+src/
+├── main.tsx                    # Entry point - userscript initialization
+├── page.ts                     # Page interaction utilities (URL parsing, token extraction)
+├── api.ts                      # ChatGPT API wrapper (735 lines - core data layer)
+├── constants.ts                # Configuration constants
+├── i18n.ts                     # Internationalization setup
+├── type.ts                     # TypeScript type definitions
+│
+├── exporter/                   # Export format implementations
+│   ├── text.ts                 # Plain text export
+│   ├── html.ts                 # HTML export with styling
+│   ├── markdown.ts             # Markdown export with GFM
+│   ├── json.ts                 # JSON/JSONL export (Official, Tavern, Ooba)
+│   └── image.ts                # PNG screenshot export (html2canvas)
+│
+├── ui/                         # Preact/React UI components
+│   ├── Menu.tsx                # Main menu component
+│   ├── ExportDialog.tsx        # Export All dialog (batch export) - 400 lines
+│   ├── SettingDialog.tsx       # Settings configuration
+│   ├── SettingContext.tsx      # React context for settings
+│   └── [other components]
+│
+├── hooks/                      # React hooks
+│   ├── useGMStorage.ts         # Tampermonkey storage hook
+│   └── [other hooks]
+│
+├── utils/                      # Utility functions
+│   ├── queue.ts                # RequestQueue for batch processing (116 lines)
+│   ├── download.ts             # File download utilities
+│   ├── markdown.ts             # Markdown parsing/generation
+│   └── [other utilities]
+│
+└── locales/                    # i18n translations (8+ languages)
+```
+
+---
+
+## How Export Works
+
+### Single Conversation Export
+
+**Flow:**
+1. User clicks export button in menu
+2. Fetches conversation via API: `fetchConversation(chatId, shouldReplaceAssets)`
+3. Processes raw API response: `processConversation()`
+4. Transforms to selected format (markdown/html/json/png)
+5. Downloads file directly
+
+**Key Files:**
+- `src/api.ts:441` - `fetchConversation()` - Fetches single conversation
+- `src/api.ts:635` - `processConversation()` - Transforms raw API data
+- `src/exporter/*.ts` - Format-specific transformation
+
+### Export All (Batch Export)
+
+**Current Flow (THE BOTTLENECK):**
+
+```
+User clicks "Export All"
+    ↓
+fetchAllConversations() - Fetches metadata for all conversations (up to 1000)
+    ↓
+User selects conversations (or "Select All")
+    ↓
+RequestQueue processes ALL selected conversations sequentially:
+    - Fetches each conversation one-by-one
+    - Stores ALL results in memory
+    ↓
+When queue completes, exportAll function receives ALL conversations at once
+    ↓
+Process ALL conversations into format (markdown/html/json)
+    - Line 34 (markdown.ts): apiConversations.map(x => processConversation(x))
+    - ALL conversations processed and held in memory
+    ↓
+Add ALL files to JSZip
+    - Lines 35-52 (markdown.ts): forEach conversation, add to zip
+    ↓
+Generate ZIP blob (HUGE memory spike)
+    ↓
+Download single ZIP file
+```
+
+**Key Files:**
+- `src/ui/ExportDialog.tsx:220-233` - `exportAllFromApi()` - Adds all to RequestQueue
+- `src/utils/queue.ts:69-100` - `RequestQueue.process()` - Sequential processing
+- `src/exporter/markdown.ts:31-64` - `exportAllToMarkdown()` - Processes ALL at once
+- `src/exporter/html.ts:34-69` - `exportAllToHtml()` - Processes ALL at once
+- `src/exporter/json.ts:63-106` - `exportAllToJson()` - Processes ALL at once
+
+---
+
+## The Performance Bottleneck
+
+### Problem Analysis
+
+When exporting thousands of conversations, the browser freezes due to:
+
+#### 1. **Memory Overload**
+   - All conversations fetched and stored in `RequestQueue.results[]` array
+   - All conversations processed into `ConversationResult[]` objects
+   - All conversations converted to strings (markdown/html/json)
+   - All files added to JSZip in memory
+   - Final ZIP compression happens on entire dataset at once
+
+#### 2. **DOM Bloat** (Secondary Issue)
+   - Conversation list renders ALL items (could be 1000+)
+   - No virtual scrolling implemented
+
+#### 3. **Sequential API Calls**
+   - RequestQueue processes conversations one-by-one with backoff delays
+   - Can take 10+ minutes for thousands of conversations
+   - No ability to pause/resume
+
+### Specific Code Locations
+
+**ExportDialog.tsx:**
+```typescript
+// Line 225-230: Adds ALL selected conversations to queue
+selected.forEach(({ id, title }) => {
+    requestQueue.add({
+        name: title,
+        request: () => fetchConversation(id, exportType !== 'JSON'),
+    })
+})
+```
+
+**queue.ts:**
+```typescript
+// Line 86: ALL results stored in single array
+this.results.push(result)
+
+// Line 192 (ExportDialog.tsx): Receives ALL results at once
+const off = requestQueue.on('done', (results) => {
+    const callback = exportAllOptions.find(o => o.label === exportType)?.callback
+    if (callback) callback(format, results, metaList)
+})
+```
+
+**markdown.ts (and html.ts, json.ts):**
+```typescript
+// Line 34: Processes ALL conversations at once
+const conversations = apiConversations.map(x => processConversation(x))
+
+// Lines 35-52: Adds ALL to ZIP at once
+conversations.forEach((conversation) => {
+    const content = conversationToMarkdown(conversation, metaList)
+    zip.file(fileName, content)
+})
+
+// Lines 54-60: Generates entire ZIP blob
+const blob = await zip.generateAsync({
+    type: 'blob',
+    compression: 'DEFLATE',
+    compressionOptions: { level: 9 }
+})
+```
+
+---
+
+## Proposed Solution: Chunked Export Processing
+
+### Solution Design
+
+Instead of processing ALL conversations at once, implement **chunked/batched export**:
+
+#### Option A: Multiple ZIP Files (Recommended)
+- Process conversations in chunks (e.g., 50-100 at a time)
+- Generate separate ZIP files per chunk
+- Downloads: `chatgpt-export-part1.zip`, `chatgpt-export-part2.zip`, etc.
+- **Pros**: Simple, reliable, prevents memory overflow
+- **Cons**: Multiple files to manage
+
+#### Option B: Single ZIP with Progressive Processing
+- Process in chunks, clear memory between chunks
+- Add files to ZIP progressively
+- Generate single ZIP at the end
+- **Pros**: Single output file
+- **Cons**: More complex, still risks memory issues on final compression
+
+#### Option C: Streaming ZIP Generation
+- Use streaming ZIP library (e.g., `zip-stream`)
+- Stream files directly to download without holding in memory
+- **Pros**: Best memory efficiency
+- **Cons**: Requires library change, more complex
+
+### Recommended Implementation (Option A)
+
+**Changes Required:**
+
+#### 1. Add Chunk Size Setting
+**File: `src/ui/SettingContext.tsx`**
+- Add `exportChunkSize` setting (default: 100)
+- Allow users to configure chunk size
+
+#### 2. Modify RequestQueue to Support Chunking
+**File: `src/utils/queue.ts`**
+- Add `onChunkComplete` event that fires every N items
+- Emit intermediate results instead of waiting for full completion
+- Clear processed results from memory after each chunk
+
+#### 3. Update ExportDialog to Handle Chunks
+**File: `src/ui/ExportDialog.tsx`**
+- Listen for `onChunkComplete` events
+- Process and download each chunk immediately
+- Update UI to show "Processing chunk X of Y"
+- Prevent UI freeze by using `requestIdleCallback` or Web Workers
+
+#### 4. Update Export Functions for Chunked Processing
+**Files: `src/exporter/markdown.ts`, `html.ts`, `json.ts`**
+- Add `exportChunkToMarkdown()`, `exportChunkToHtml()`, `exportChunkToJson()`
+- Generate ZIP per chunk with part number in filename
+- OR accumulate chunks and generate single ZIP (Option B)
+
+### Pseudo-code Implementation
+
+```typescript
+// RequestQueue modification
+class RequestQueue<T> {
+    private chunkSize: number = 100
+
+    on(event: 'chunkComplete', fn: (chunk: T[], chunkIndex: number) => void): void
+
+    private async process() {
+        // ... existing code ...
+
+        // After each item completes:
+        if (this.completed % this.chunkSize === 0) {
+            const chunk = this.results.splice(0, this.chunkSize)
+            this.eventEmitter.emit('chunkComplete', chunk, chunkIndex++)
+        }
+    }
+}
+
+// ExportDialog.tsx modification
+useEffect(() => {
+    let chunkIndex = 0
+    const off = requestQueue.on('chunkComplete', (chunk, index) => {
+        // Process chunk immediately
+        const callback = exportChunkOptions.find(o => o.label === exportType)?.callback
+        if (callback) callback(format, chunk, metaList, index)
+        chunkIndex++
+    })
+    return () => off()
+}, [requestQueue])
+
+// markdown.ts modification
+export async function exportChunkToMarkdown(
+    fileNameFormat: string,
+    apiConversations: ApiConversationWithId[],
+    metaList: ExportMeta[],
+    chunkIndex: number,
+    totalChunks: number
+) {
+    const zip = new JSZip()
+    // ... existing processing logic ...
+
+    const blob = await zip.generateAsync({ ... })
+    const filename = totalChunks > 1
+        ? `chatgpt-export-markdown-part${chunkIndex}.zip`
+        : 'chatgpt-export-markdown.zip'
+    downloadFile(filename, 'application/zip', blob)
+}
+```
+
+---
+
+## Implementation Steps
+
+### Phase 1: Add Chunk Size Setting
+1. Add `KEY_EXPORT_CHUNK_SIZE` constant
+2. Add `exportChunkSize` to SettingContext
+3. Add UI control in SettingDialog
+
+### Phase 2: Modify RequestQueue
+1. Add `chunkSize` parameter to constructor
+2. Implement `onChunkComplete` event
+3. Emit chunks as they complete
+4. Clear processed items from memory
+
+### Phase 3: Update ExportDialog
+1. Listen for `chunkComplete` events
+2. Track chunk progress separately
+3. Update progress UI to show chunks
+4. Handle chunk downloads
+
+### Phase 4: Update Exporters
+1. Create chunk-aware export functions
+2. Handle multi-part ZIP naming
+3. Test with large datasets (1000+ conversations)
+
+### Phase 5: Additional Improvements
+1. Add virtual scrolling to conversation list (use `react-window`)
+2. Add pause/resume functionality
+3. Add cancel button during export
+4. Show estimated time remaining
+5. Add option to combine ZIPs at the end (optional)
+
+---
+
+## Key API Endpoints
+
+```typescript
+// Fetch all conversation metadata
+GET /backend-api/conversations?offset=0&limit=100
+
+// Fetch single conversation
+GET /backend-api/conversation/{id}
+
+// Fetch projects/GPTs
+GET /backend-api/gizmos/snorlax/sidebar
+
+// Fetch project conversations
+GET /backend-api/gizmos/{gizmo}/conversations?cursor=0&limit=50
+
+// Archive conversation
+PATCH /backend-api/conversation/{id}
+Body: { is_archived: true }
+
+// Delete conversation
+PATCH /backend-api/conversation/{id}
+Body: { is_visible: false }
+
+// Download file assets
+GET /backend-api/files/{id}/download
+```
+
+---
+
+## Data Flow Diagrams
+
+### Current Export All Flow
+```
+User Action → Fetch Metadata (ALL) → User Selects →
+RequestQueue Fetches (1-by-1, stores ALL) →
+Process ALL → Add ALL to ZIP → Generate ZIP → Download
+                ↑
+         BOTTLENECK: All in memory
+```
+
+### Proposed Chunked Flow
+```
+User Action → Fetch Metadata (ALL) → User Selects →
+RequestQueue Fetches (1-by-1) →
+Every N items: Process CHUNK → Add CHUNK to ZIP → Generate ZIP → Download →
+Clear Memory → Continue...
+                ↑
+         IMPROVED: Only chunk in memory
+```
+
+---
+
+## Configuration Settings
+
+### Current Settings
+- `exportAllLimit`: Max conversations to fetch (default: 1000)
+- `fileNameFormat`: Template for filenames (default: `ChatGPT-{title}`)
+- `enableMeta`: Include metadata in exports
+- `exportMetaList`: Custom metadata fields
+- `enableTimestamp`: Show timestamps in exports
+
+### Proposed New Settings
+- `exportChunkSize`: Conversations per chunk/ZIP (default: 100)
+- `enableVirtualScroll`: Use virtual scrolling for conversation list
+- `autoMergeChunks`: Combine chunk ZIPs at the end (optional)
+
+---
+
+## Testing Recommendations
+
+### Performance Testing
+1. Test with 100 conversations
+2. Test with 500 conversations
+3. Test with 1000 conversations
+4. Monitor memory usage during export
+5. Test on different browsers (Chrome, Firefox, Edge)
+
+### Edge Cases
+1. Export with image asset replacement enabled
+2. Export with very long conversation titles
+3. Export with special characters in titles
+4. Export interrupted mid-process
+5. Network failures during fetch
+
+---
+
+## Known Issues & Limitations
+
+### Current Issues
+1. **Memory overflow** when exporting 1000+ conversations
+2. **Browser freeze** during large exports
+3. **No pause/resume** functionality
+4. **No progress estimation** (only shows count)
+5. DOM bloat with large conversation lists
+
+### API Limitations
+- Rate limiting on `/backend-api/conversations` (hence the backoff in RequestQueue)
+- Max 100 conversations per request (regular) or 50 (projects)
+- Image assets require separate API calls
+
+---
+
+## Dependencies
+
+### Runtime
+- **Preact**: 10.17 (React alternative)
+- **JSZip**: 3.9 (ZIP file generation)
+- **html2canvas**: 1.4 (PNG screenshot)
+- **i18next**: Multi-language support
+
+### Build
+- **Vite**: 5.3 (Bundler)
+- **vite-plugin-monkey**: 3.5 (Userscript generation)
+- **TypeScript**: 5.5
+
+---
+
+## File Size Estimates
+
+### Single Conversation
+- Markdown: ~5-50 KB
+- HTML: ~10-100 KB (with styling)
+- JSON: ~10-200 KB (raw API response)
+- PNG: ~100 KB - 5 MB (depends on length)
+
+### Batch Export (1000 conversations)
+- Markdown ZIP: ~5-50 MB
+- HTML ZIP: ~10-100 MB
+- JSON ZIP: ~10-200 MB
+- **Memory usage during processing: 200-500 MB** (PROBLEM!)
+
+---
+
+## Contributing Guidelines
+
+### Code Style
+- Use TypeScript strict mode
+- Follow existing naming conventions
+- Add JSDoc comments for public APIs
+- Use functional components (Preact hooks)
+
+### Adding New Export Format
+1. Create `src/exporter/newformat.ts`
+2. Implement `exportToNewFormat()` and `exportAllToNewFormat()`
+3. Add format to `exportAllOptions` in `ExportDialog.tsx`
+4. Add translations to `src/locales/*.json`
+5. Update README with examples
+
+### Debugging
+- Use browser DevTools console
+- Check Tampermonkey logs
+- Enable verbose logging in `api.ts`
+
+---
+
+## Resources
+
+- **GitHub**: https://github.com/pionxzh/chatgpt-exporter
+- **GreasyFork**: https://greasyfork.org/scripts/456055-chatgpt-exporter
+- **Issues**: https://github.com/pionxzh/chatgpt-exporter/issues
+- **ChatGPT API**: Unofficial reverse-engineered API
+
+---
+
+## Conclusion
+
+The main performance bottleneck is the **all-at-once processing** in the export functions. By implementing **chunked export processing**, we can:
+
+1. ✅ Prevent memory overflow
+2. ✅ Avoid browser freezing
+3. ✅ Provide better progress feedback
+4. ✅ Enable larger exports (5000+ conversations)
+5. ✅ Improve user experience
+
+The recommended approach is **Option A: Multiple ZIP Files** as it's the simplest and most reliable solution.
