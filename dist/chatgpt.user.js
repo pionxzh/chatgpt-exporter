@@ -9630,7 +9630,14 @@ For more information, see https://radix-ui.com/primitives/docs/components/${titl
     "Export Chunk Size": "Export Chunk Size",
     "Export Chunk Size Description": "Number of conversations to process per chunk. Smaller chunks use less memory but create more ZIP files.",
     "Processing chunk": "Processing chunk",
-    of
+    of,
+    "Smart Filters": "Smart Filters",
+    "Clear All": "Clear All",
+    "Quick Filters": "Quick Filters",
+    "Search in titles": "Search in titles",
+    "Type to search...": "Type to search...",
+    "Min Input/Output Ratio": "Min Input/Output Ratio",
+    "Min Conversation Length": "Min Conversation Length"
   };
   const title$7 = "ChatGPT Exporter";
   const ExportHelper$7 = "Exportar";
@@ -23210,6 +23217,169 @@ ${content2}`;
     return () => window.removeEventListener("resize", callback);
   }
   const Divider = () => /* @__PURE__ */ u$5("div", { className: "h-px bg-token-border-light" });
+  const CODE_BLOCK_REGEX = /```[\s\S]*?```/g;
+  const MATH_BLOCK_REGEX = /\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]/g;
+  const LINK_REGEX = /https?:\/\/[^\s]+/g;
+  const IMAGE_MARKDOWN_REGEX = /!\[.*?\]\(.*?\)/g;
+  const UNCERTAINTY_WORDS = /\b(maybe|perhaps|possibly|not sure|I think|seems like|might be|could be|uncertain)\b/gi;
+  const CERTAINTY_WORDS = /\b(definitely|clearly|obviously|exactly|certainly|surely|absolutely|precisely)\b/gi;
+  const DISCOVERY_WORDS = /\b(aha|oh!|I see|wait|interesting|got it|makes sense|eureka)\b/gi;
+  function analyzeConversation(conversation) {
+    const nodes = Object.values(conversation.mapping);
+    const messages = nodes.filter((n2) => n2.message && n2.message.author.role !== "system");
+    const userMessages = messages.filter((n2) => {
+      var _a;
+      return ((_a = n2.message) == null ? void 0 : _a.author.role) === "user";
+    });
+    const aiMessages = messages.filter((n2) => {
+      var _a;
+      return ((_a = n2.message) == null ? void 0 : _a.author.role) === "assistant";
+    });
+    const userCharCount = userMessages.reduce((sum, n2) => sum + getMessageText(n2.message).length, 0);
+    const aiCharCount = aiMessages.reduce((sum, n2) => sum + getMessageText(n2.message).length, 0);
+    const totalCharCount = userCharCount + aiCharCount;
+    const inputOutputRatio = aiCharCount > 0 ? userCharCount / aiCharCount : 0;
+    const allText = messages.map((n2) => getMessageText(n2.message)).join("\n");
+    const codeBlockCount = (allText.match(CODE_BLOCK_REGEX) || []).length;
+    const mathBlockCount = (allText.match(MATH_BLOCK_REGEX) || []).length;
+    const linkCount = (allText.match(LINK_REGEX) || []).length;
+    const imageCount = (allText.match(IMAGE_MARKDOWN_REGEX) || []).length + countMultimodalImages(messages);
+    const userText = userMessages.map((n2) => getMessageText(n2.message)).join("\n");
+    const uncertaintyMarkers = (userText.match(UNCERTAINTY_WORDS) || []).length;
+    const certaintyMarkers = (userText.match(CERTAINTY_WORDS) || []).length;
+    const discoveryMarkers = (userText.match(DISCOVERY_WORDS) || []).length;
+    const questionCount = (userText.match(/\?/g) || []).length;
+    const exclamationCount = (userText.match(/!/g) || []).length;
+    const createTime = conversation.create_time;
+    const updateTime = conversation.update_time;
+    const createDate = new Date(createTime * 1e3);
+    const hourOfDay = createDate.getHours();
+    const dayOfWeek = createDate.getDay();
+    return {
+      id: conversation.id,
+      title: conversation.title,
+      totalTurns: messages.length,
+      userMessageCount: userMessages.length,
+      aiMessageCount: aiMessages.length,
+      userCharCount,
+      aiCharCount,
+      totalCharCount,
+      inputOutputRatio,
+      avgUserMessageLength: userMessages.length > 0 ? userCharCount / userMessages.length : 0,
+      avgAiMessageLength: aiMessages.length > 0 ? aiCharCount / aiMessages.length : 0,
+      depth: calculateDepth(conversation.mapping),
+      hasCode: codeBlockCount > 0,
+      codeBlockCount,
+      hasMath: mathBlockCount > 0,
+      mathBlockCount,
+      hasImages: imageCount > 0,
+      imageCount,
+      hasLinks: linkCount > 0,
+      linkCount,
+      questionCount,
+      exclamationCount,
+      uncertaintyMarkers,
+      certaintyMarkers,
+      discoveryMarkers,
+      createTime,
+      updateTime,
+      hourOfDay,
+      dayOfWeek
+    };
+  }
+  function filterConversations(conversations, criteria) {
+    return conversations.filter((conv) => {
+      const metrics = analyzeConversation(conv);
+      if (criteria.minInputOutputRatio !== void 0 && metrics.inputOutputRatio < criteria.minInputOutputRatio) {
+        return false;
+      }
+      if (criteria.maxInputOutputRatio !== void 0 && metrics.inputOutputRatio > criteria.maxInputOutputRatio) {
+        return false;
+      }
+      if (criteria.minTurns !== void 0 && metrics.totalTurns < criteria.minTurns) {
+        return false;
+      }
+      if (criteria.maxTurns !== void 0 && metrics.totalTurns > criteria.maxTurns) {
+        return false;
+      }
+      if (criteria.hasCode !== void 0 && metrics.hasCode !== criteria.hasCode) {
+        return false;
+      }
+      if (criteria.hasMath !== void 0 && metrics.hasMath !== criteria.hasMath) {
+        return false;
+      }
+      if (criteria.hasImages !== void 0 && metrics.hasImages !== criteria.hasImages) {
+        return false;
+      }
+      if (criteria.hasDiscoveryMarkers && metrics.discoveryMarkers === 0) {
+        return false;
+      }
+      if (criteria.hasHighUncertainty && metrics.uncertaintyMarkers < 5) {
+        return false;
+      }
+      if (criteria.isQuestionHeavy && metrics.questionCount < 10) {
+        return false;
+      }
+      if (criteria.startDate !== void 0 && metrics.createTime < criteria.startDate) {
+        return false;
+      }
+      if (criteria.endDate !== void 0 && metrics.createTime > criteria.endDate) {
+        return false;
+      }
+      if (criteria.searchTerm) {
+        const searchLower = criteria.searchTerm.toLowerCase();
+        if (!metrics.title.toLowerCase().includes(searchLower)) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }
+  function getMessageText(message) {
+    var _a, _b;
+    if (!message.content) return "";
+    switch (message.content.content_type) {
+      case "text":
+        return ((_a = message.content.parts) == null ? void 0 : _a.join("\n")) || "";
+      case "code":
+        return message.content.text || "";
+      case "execution_output":
+        return message.content.text || "";
+      case "multimodal_text":
+        return ((_b = message.content.parts) == null ? void 0 : _b.filter((p2) => typeof p2 === "string").join("\n")) || "";
+      default:
+        return "";
+    }
+  }
+  function countMultimodalImages(messages) {
+    let count2 = 0;
+    messages.forEach((node2) => {
+      if (!node2.message) return;
+      const content2 = node2.message.content;
+      if (content2.content_type === "multimodal_text" && Array.isArray(content2.parts)) {
+        count2 += content2.parts.filter(
+          (p2) => typeof p2 === "object" && p2 !== null && "content_type" in p2 && p2.content_type === "image_asset_pointer"
+        ).length;
+      }
+    });
+    return count2;
+  }
+  function calculateDepth(mapping) {
+    let maxDepth = 0;
+    function traverse(nodeId, depth) {
+      maxDepth = Math.max(maxDepth, depth);
+      const node2 = mapping[nodeId];
+      if (node2 && node2.children) {
+        node2.children.forEach((childId) => traverse(childId, depth + 1));
+      }
+    }
+    Object.keys(mapping).forEach((id) => {
+      if (!mapping[id].parent) {
+        traverse(id, 0);
+      }
+    });
+    return maxDepth;
+  }
   function EventEmitter(n2) {
     return { all: n2 = n2 || /* @__PURE__ */ new Map(), on: function(t2, e2) {
       var i2 = n2.get(t2);
@@ -23448,6 +23618,207 @@ ${content2}`;
       /* @__PURE__ */ u$5("span", { className: "LabelText", children: label })
     ] });
   };
+  const PRESET_FILTERS = {
+    "deep-dives": {
+      minInputOutputRatio: 0.7,
+      minTurns: 15
+    },
+    "quick-questions": {
+      maxTurns: 5,
+      maxInputOutputRatio: 0.3
+    },
+    "code-heavy": {
+      hasCode: true
+    },
+    "discovery-moments": {
+      hasDiscoveryMarkers: true
+    },
+    "exploratory": {
+      hasHighUncertainty: true,
+      isQuestionHeavy: true
+    },
+    "marathons": {
+      minTurns: 30
+    },
+    "balanced": {
+      minInputOutputRatio: 0.4,
+      maxInputOutputRatio: 0.6
+    }
+  };
+  const PRESET_LABELS = {
+    "deep-dives": "Deep Dives (You wrote a lot)",
+    "quick-questions": "Quick Questions",
+    "code-heavy": "Code Heavy",
+    "discovery-moments": "Discovery Moments (Aha!)",
+    "exploratory": "Exploratory (Uncertain)",
+    "marathons": "Marathon Conversations (30+ turns)",
+    "balanced": "Balanced Discussions"
+  };
+  const FilterPanel = ({
+    onFilterChange,
+    conversationCount,
+    filteredCount
+  }) => {
+    const { t: t2 } = useTranslation();
+    const [expanded, setExpanded] = d$3(false);
+    const [selectedPresets, setSelectedPresets] = d$3([]);
+    const [customFilters, setCustomFilters] = d$3({});
+    const handlePresetToggle = (presetKey) => {
+      const newPresets = selectedPresets.includes(presetKey) ? selectedPresets.filter((k2) => k2 !== presetKey) : [...selectedPresets, presetKey];
+      setSelectedPresets(newPresets);
+      const mergedCriteria = {};
+      newPresets.forEach((key2) => {
+        Object.assign(mergedCriteria, PRESET_FILTERS[key2]);
+      });
+      Object.assign(mergedCriteria, customFilters);
+      onFilterChange(mergedCriteria);
+    };
+    const handleInputRatioChange = (value) => {
+      const newFilters = { ...customFilters, minInputOutputRatio: value / 100 };
+      setCustomFilters(newFilters);
+      const mergedCriteria = {};
+      selectedPresets.forEach((key2) => {
+        Object.assign(mergedCriteria, PRESET_FILTERS[key2]);
+      });
+      Object.assign(mergedCriteria, newFilters);
+      onFilterChange(mergedCriteria);
+    };
+    const handleMinTurnsChange = (value) => {
+      const newFilters = { ...customFilters, minTurns: value };
+      setCustomFilters(newFilters);
+      const mergedCriteria = {};
+      selectedPresets.forEach((key2) => {
+        Object.assign(mergedCriteria, PRESET_FILTERS[key2]);
+      });
+      Object.assign(mergedCriteria, newFilters);
+      onFilterChange(mergedCriteria);
+    };
+    const handleSearchChange = (value) => {
+      const newFilters = { ...customFilters, searchTerm: value || void 0 };
+      setCustomFilters(newFilters);
+      const mergedCriteria = {};
+      selectedPresets.forEach((key2) => {
+        Object.assign(mergedCriteria, PRESET_FILTERS[key2]);
+      });
+      Object.assign(mergedCriteria, newFilters);
+      onFilterChange(mergedCriteria);
+    };
+    const handleClearFilters = () => {
+      setSelectedPresets([]);
+      setCustomFilters({});
+      onFilterChange({});
+    };
+    const hasActiveFilters = selectedPresets.length > 0 || Object.keys(customFilters).length > 0;
+    return /* @__PURE__ */ u$5("div", { className: "mb-4 border border-gray-300 dark:border-gray-600 rounded-lg p-3", children: [
+      /* @__PURE__ */ u$5("div", { className: "flex items-center justify-between mb-2", children: [
+        /* @__PURE__ */ u$5(
+          "button",
+          {
+            className: "text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2",
+            onClick: () => setExpanded(!expanded),
+            children: [
+              "🔍 ",
+              t2("Smart Filters"),
+              /* @__PURE__ */ u$5("span", { className: "text-xs text-gray-500", children: [
+                "(",
+                filteredCount,
+                " of ",
+                conversationCount,
+                ")"
+              ] })
+            ]
+          }
+        ),
+        hasActiveFilters && /* @__PURE__ */ u$5(
+          "button",
+          {
+            className: "text-xs text-blue-600 dark:text-blue-400 hover:underline",
+            onClick: handleClearFilters,
+            children: t2("Clear All")
+          }
+        )
+      ] }),
+      expanded && /* @__PURE__ */ u$5("div", { className: "space-y-3 mt-3", children: [
+        /* @__PURE__ */ u$5("div", { children: [
+          /* @__PURE__ */ u$5("div", { className: "text-xs font-medium text-gray-600 dark:text-gray-400 mb-2", children: [
+            t2("Quick Filters"),
+            ":"
+          ] }),
+          /* @__PURE__ */ u$5("div", { className: "flex flex-wrap gap-2", children: Object.keys(PRESET_FILTERS).map((key2) => /* @__PURE__ */ u$5(
+            "button",
+            {
+              onClick: () => handlePresetToggle(key2),
+              className: `text-xs px-3 py-1 rounded-full border transition-colors ${selectedPresets.includes(key2) ? "bg-blue-100 dark:bg-blue-900 border-blue-500 text-blue-700 dark:text-blue-300" : "border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-blue-400"}`,
+              children: PRESET_LABELS[key2]
+            },
+            key2
+          )) })
+        ] }),
+        /* @__PURE__ */ u$5("div", { children: [
+          /* @__PURE__ */ u$5("label", { className: "text-xs font-medium text-gray-600 dark:text-gray-400 block mb-1", children: [
+            t2("Search in titles"),
+            ":"
+          ] }),
+          /* @__PURE__ */ u$5(
+            "input",
+            {
+              type: "text",
+              placeholder: t2("Type to search..."),
+              className: "Input w-full text-sm",
+              value: customFilters.searchTerm || "",
+              onChange: (e2) => handleSearchChange(e2.currentTarget.value)
+            }
+          )
+        ] }),
+        /* @__PURE__ */ u$5("div", { children: [
+          /* @__PURE__ */ u$5("label", { className: "text-xs font-medium text-gray-600 dark:text-gray-400 block mb-1", children: [
+            t2("Min Input/Output Ratio"),
+            ": ",
+            ((customFilters.minInputOutputRatio || 0) * 100).toFixed(0),
+            "%"
+          ] }),
+          /* @__PURE__ */ u$5(
+            "input",
+            {
+              type: "range",
+              min: "0",
+              max: "150",
+              step: "10",
+              value: (customFilters.minInputOutputRatio || 0) * 100,
+              onChange: (e2) => handleInputRatioChange(Number.parseInt(e2.currentTarget.value, 10)),
+              className: "w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+            }
+          ),
+          /* @__PURE__ */ u$5("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: [
+            (customFilters.minInputOutputRatio || 0) === 0 && "All conversations",
+            (customFilters.minInputOutputRatio || 0) > 0 && (customFilters.minInputOutputRatio || 0) < 0.5 && "Balanced or higher",
+            (customFilters.minInputOutputRatio || 0) >= 0.5 && (customFilters.minInputOutputRatio || 0) < 0.8 && "You wrote more",
+            (customFilters.minInputOutputRatio || 0) >= 0.8 && "Deep dives - you wrote a lot!"
+          ] })
+        ] }),
+        /* @__PURE__ */ u$5("div", { children: [
+          /* @__PURE__ */ u$5("label", { className: "text-xs font-medium text-gray-600 dark:text-gray-400 block mb-1", children: [
+            t2("Min Conversation Length"),
+            ": ",
+            customFilters.minTurns || 0,
+            " turns"
+          ] }),
+          /* @__PURE__ */ u$5(
+            "input",
+            {
+              type: "range",
+              min: "0",
+              max: "50",
+              step: "5",
+              value: customFilters.minTurns || 0,
+              onChange: (e2) => handleMinTurnsChange(Number.parseInt(e2.currentTarget.value, 10)),
+              className: "w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+            }
+          )
+        ] })
+      ] })
+    ] });
+  };
   function useGMStorage(key2, initialValue) {
     const [storedValue, setStoredValue] = d$3(() => ScriptStorage.get(key2) ?? initialValue);
     const setValue = (value) => {
@@ -23654,6 +24025,22 @@ ${content2}`;
       currentChunk: 0,
       totalChunks: 0
     });
+    const [filterCriteria, setFilterCriteria] = d$3({});
+    const filteredConversations = T$3(() => {
+      if (Object.keys(filterCriteria).length === 0) {
+        return conversations;
+      }
+      const conversationsWithMapping = conversations.map((c2) => ({
+        ...c2,
+        conversation_id: c2.id,
+        mapping: {},
+        current_node: "",
+        moderation_results: [],
+        is_archived: false
+      }));
+      const filtered = filterConversations(conversationsWithMapping, filterCriteria);
+      return filtered.map((c2) => ({ id: c2.id, title: c2.title, create_time: c2.create_time }));
+    }, [conversations, filterCriteria]);
     const onUpload = q$1((e2) => {
       var _a, _b;
       const file = (_b = (_a = e2.target) == null ? void 0 : _a.files) == null ? void 0 : _b[0];
@@ -23820,9 +24207,17 @@ ${content2}`;
       exportSource === "API" && /* @__PURE__ */ u$5("div", { className: "flex items-center text-gray-600 dark:text-gray-300 flex justify-between mb-3", children: t2("Export from API") }),
       /* @__PURE__ */ u$5(ProjectSelect, { projects, selected: selectedProject, setSelected: setSelectedProject, disabled: processing || loading }),
       /* @__PURE__ */ u$5(
+        FilterPanel,
+        {
+          onFilterChange: setFilterCriteria,
+          conversationCount: conversations.length,
+          filteredCount: filteredConversations.length
+        }
+      ),
+      /* @__PURE__ */ u$5(
         ConversationSelect,
         {
-          conversations,
+          conversations: filteredConversations,
           selected,
           setSelected,
           disabled: processing,

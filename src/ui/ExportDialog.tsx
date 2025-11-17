@@ -1,14 +1,17 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import { useTranslation } from 'react-i18next'
+import { filterConversations } from '../analyzer/local-analysis'
 import { archiveConversation, deleteConversation, fetchAllConversations, fetchConversation, fetchProjects } from '../api'
 import { exportAllToHtml } from '../exporter/html'
 import { exportAllToJson, exportAllToOfficialJson } from '../exporter/json'
 import { exportAllToMarkdown } from '../exporter/markdown'
 import { RequestQueue } from '../utils/queue'
 import { CheckBox } from './CheckBox'
+import { FilterPanel } from './FilterPanel'
 import { IconCross, IconUpload } from './Icons'
 import { useSettingContext } from './SettingContext'
+import type { FilterCriteria } from '../analyzer/types'
 import type { ApiConversationItem, ApiConversationWithId, ApiProjectInfo } from '../api'
 import type { FC } from '../type'
 import type { ChangeEvent } from 'preact/compat'
@@ -146,6 +149,27 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
         currentChunk: 0,
         totalChunks: 0,
     })
+
+    // Filtering state
+    const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>({})
+
+    // Apply filters to conversations
+    const filteredConversations = useMemo(() => {
+        if (Object.keys(filterCriteria).length === 0) {
+            return conversations
+        }
+        // Convert to ApiConversationWithId for filtering (add fake mapping for ApiConversationItem)
+        const conversationsWithMapping = conversations.map(c => ({
+            ...c,
+            conversation_id: c.id,
+            mapping: {},
+            current_node: '',
+            moderation_results: [],
+            is_archived: false,
+        } as any))
+        const filtered = filterConversations(conversationsWithMapping, filterCriteria)
+        return filtered.map(c => ({ id: c.id, title: c.title, create_time: c.create_time }))
+    }, [conversations, filterCriteria])
 
     const onUpload = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         const file = (e.target as HTMLInputElement)?.files?.[0]
@@ -350,8 +374,13 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                 </div>
             )}
             <ProjectSelect projects={projects} selected={selectedProject} setSelected={setSelectedProject} disabled={processing || loading} />
+            <FilterPanel
+                onFilterChange={setFilterCriteria}
+                conversationCount={conversations.length}
+                filteredCount={filteredConversations.length}
+            />
             <ConversationSelect
-                conversations={conversations}
+                conversations={filteredConversations}
                 selected={selected}
                 setSelected={setSelected}
                 disabled={processing}
