@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ Mystical Tarot Reading ✨</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="mystical-background">
+        <div class="stars"></div>
+        <div class="cosmic-dust"></div>
+    </div>
+
+    <!-- Intro Screen -->
+    <div id="intro-screen" class="screen active">
+        <div class="ornate-border">
+            <div class="intro-content">
+                <h1 class="title glowing-text">
+                    <span class="ornament">⟡</span>
+                    Mystical Tarot
+                    <span class="ornament">⟡</span>
+                </h1>
+                <p class="subtitle">Enter the realm of ancient wisdom</p>
+                <div class="divider"></div>
+                <p class="intro-text">
+                    Welcome, seeker of truth. The cards await to reveal the mysteries
+                    of your path. Clear your mind, focus your intention, and let the
+                    universe guide your reading.
+                </p>
+                <button class="mystical-button" id="begin-button">
+                    <span class="button-glow"></span>
+                    Begin Your Journey
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Question Screen -->
+    <div id="question-screen" class="screen">
+        <div class="ornate-border">
+            <div class="question-content">
+                <h2 class="screen-title glowing-text">Speak Your Question</h2>
+                <div class="divider"></div>
+                <p class="instruction-text">
+                    The cards will illuminate your path. Choose your spread and
+                    focus your intention upon the question that dwells within your heart.
+                </p>
+
+                <div class="spread-selector">
+                    <div class="spread-option" data-spread="single">
+                        <div class="spread-icon">🌟</div>
+                        <h3>Single Card</h3>
+                        <p>Quick insight for immediate guidance</p>
+                    </div>
+                    <div class="spread-option" data-spread="three">
+                        <div class="spread-icon">🔮</div>
+                        <h3>Three Card Spread</h3>
+                        <p>Past • Present • Future</p>
+                    </div>
+                    <div class="spread-option selected" data-spread="celtic">
+                        <div class="spread-icon">✨</div>
+                        <h3>Celtic Cross</h3>
+                        <p>Complete life reading with 10 cards</p>
+                    </div>
+                </div>
+
+                <div class="question-input-container">
+                    <label for="question-input">Your Question (Optional)</label>
+                    <textarea
+                        id="question-input"
+                        placeholder="What guidance do you seek from the cards today?"
+                        maxlength="200"
+                    ></textarea>
+                </div>
+
+                <button class="mystical-button" id="shuffle-button">
+                    <span class="button-glow"></span>
+                    Shuffle the Cards
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reading Screen -->
+    <div id="reading-screen" class="screen">
+        <div class="reading-container">
+            <h2 class="screen-title glowing-text" id="reading-title">Your Reading</h2>
+            <div class="divider"></div>
+
+            <!-- Card Deck Animation -->
+            <div id="deck-container" class="deck-container">
+                <div class="deck-stack">
+                    <div class="deck-card"></div>
+                    <div class="deck-card"></div>
+                    <div class="deck-card"></div>
+                </div>
+                <p class="deck-instruction">The cards are being shuffled...</p>
+            </div>
+
+            <!-- Cards Display -->
+            <div id="cards-display" class="cards-display"></div>
+
+            <!-- Card Detail Panel -->
+            <div id="card-detail" class="card-detail hidden">
+                <div class="detail-content">
+                    <button class="close-detail" id="close-detail">✕</button>
+                    <div class="detail-card-image"></div>
+                    <h3 class="detail-card-name"></h3>
+                    <p class="detail-card-position"></p>
+                    <div class="divider small"></div>
+                    <div class="detail-card-meaning"></div>
+                    <div class="detail-card-interpretation"></div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="reading-navigation hidden" id="reading-navigation">
+                <button class="mystical-button secondary" id="new-reading-button">
+                    <span class="button-glow"></span>
+                    New Reading
+                </button>
+                <button class="mystical-button secondary" id="save-reading-button">
+                    <span class="button-glow"></span>
+                    Save Reading
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="ambient-audio" loop>
+        <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" type="audio/wav">
+    </audio>
+    <audio id="card-flip-audio">
+        <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" type="audio/wav">
+    </audio>
+    <audio id="mystical-chime">
+        <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" type="audio/wav">
+    </audio>
+
+    <script src="tarot-data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
