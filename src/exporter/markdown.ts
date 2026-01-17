@@ -99,6 +99,13 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
         // ChatGPT is talking to tool
         if (message.recipient !== 'all') return null
 
+        // Skip "thinking" content (hidden reasoning steps from thinking models)
+        if (message.content.content_type === 'thoughts') return null
+        if (message.content.content_type === 'reasoning_recap') return null
+
+        // Skip messages marked as visually hidden (e.g., internal system prompts)
+        if (message.metadata?.is_visually_hidden_from_conversation) return null
+
         // Skip tool's intermediate message.
         if (message.author.role === 'tool') {
             if (
@@ -129,6 +136,9 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
 
         const postSteps: Array<(input: string) => string> = []
         if (message.author.role === 'assistant') {
+            // Handle new-style content references (web search citations with Unicode markers)
+            postSteps.push(input => transformContentReferences(input, message.metadata))
+            // Handle old-style footnotes (【11†(PrintWiki)】 format)
             postSteps.push(input => transformFootNotes(input, message.metadata))
         }
         // Only message from assistant will be reformatted
@@ -220,6 +230,55 @@ function transformFootNotes(
 }
 
 /**
+ * Transform new-style content references (web search citations) in assistant's message.
+ * Citations appear as plain text like "citeturn1search1" or "citeturn0search2turn1search8".
+ * The metadata.content_references array contains the URL and title for each citation.
+ */
+function transformContentReferences(
+    input: string,
+    metadata: ConversationNodeMessage['metadata'],
+): string {
+    const contentRefs = metadata?.content_references
+    if (!contentRefs || contentRefs.length === 0) return input
+
+    // Sort by matched_text length descending to match longer patterns first
+    // (e.g., "citeturn0search2turn1search8" before "citeturn0search2")
+    const sortedRefs = [...contentRefs].sort((a, b) => (b.matched_text?.length || 0) - (a.matched_text?.length || 0))
+
+    const usedRefs: Array<{ url: string; title: string }> = []
+    let output = input
+
+    for (const ref of sortedRefs) {
+        if (!ref.matched_text) continue
+
+        // Get URL and title from items array (new format) or direct fields
+        const item = ref.items?.[0]
+        const url = item?.url || ref.url
+        const title = item?.title || ref.title
+
+        if (!url) continue
+
+        // Replace all occurrences of this matched_text
+        if (output.includes(ref.matched_text)) {
+            usedRefs.push({ url, title: title || url })
+            const refIndex = usedRefs.length
+            // Use global replace in case the same citation appears multiple times
+            output = output.split(ref.matched_text).join(`[^${refIndex}]`)
+        }
+    }
+
+    // Add footnote definitions at the end
+    if (usedRefs.length > 0) {
+        const footnotes = usedRefs.map((ref, index) => {
+            return `[^${index + 1}]: [${ref.title}](${ref.url})`
+        }).join('\n')
+        output = `${output}\n\n${footnotes}`
+    }
+
+    return output
+}
+
+/**
  * Convert the content based on the type of message
  */
 function transformContent(
@@ -262,6 +321,6 @@ function transformContent(
             }).join('\n') || ''
         }
         default:
-            return postProcess('[Unsupported Content]')
+            return postProcess(`[Unsupported Content: ${content.content_type}]`)
     }
 }

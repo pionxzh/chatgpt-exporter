@@ -49,6 +49,25 @@ export interface Citation {
     }
 }
 
+export interface ContentReference {
+    type: 'grouped_webpages' & (string & {})
+    /** The text that was matched in the content, e.g., "citeturn0search3" */
+    matched_text?: string
+    start_idx: number
+    end_idx: number
+    /** Pre-formatted markdown link, e.g., "([Title](url))" */
+    alt?: string
+    /** Array of actual reference items with URL and title */
+    items?: Array<{
+        title: string
+        url: string
+        attribution?: string
+    }>
+    // Legacy fields (may still be present in some responses)
+    url?: string
+    title?: string
+}
+
 interface CiteMetadata {
     citation_format: {
         name: 'tether_og' & (string & {})
@@ -92,6 +111,10 @@ interface MessageMeta {
     timestamp_?: 'absolute' & (string & {})
     citations?: Citation[]
     _cite_metadata?: CiteMetadata
+    /** New-style content references for web search citations */
+    content_references?: ContentReference[]
+    /** Whether this message is hidden in the UI (e.g., internal system prompts) */
+    is_visually_hidden_from_conversation?: boolean
 }
 
 export type AuthorRole = 'system' | 'assistant' | 'user' | 'tool'
@@ -205,6 +228,19 @@ export interface ConversationNodeMessage {
     } | {
         content_type: 'model_editable_context'
         model_set_context: string
+    } | {
+        // Thinking/reasoning content from thinking models (hidden in UI)
+        content_type: 'thoughts'
+        thoughts: Array<{
+            summary: string
+            content: string
+            chunks: string[]
+            finished: boolean
+        }>
+    } | {
+        // Reasoning recap showing "Thought for Xs" (hidden in UI)
+        content_type: 'reasoning_recap'
+        content: string
     }
     create_time?: number
     update_time?: number
