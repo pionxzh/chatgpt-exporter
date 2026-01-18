@@ -50,7 +50,7 @@ export interface Citation {
 }
 
 export interface ContentReference {
-    type: 'grouped_webpages' & (string & {})
+    type: 'grouped_webpages' | 'sources_footnote' | 'nav_list' & (string & {})
     /** The text that was matched in the content, e.g., "citeturn0search3" */
     matched_text?: string
     start_idx: number

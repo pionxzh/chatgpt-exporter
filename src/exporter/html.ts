@@ -108,7 +108,11 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
 
         let postSteps: Array<(input: string) => string> = []
         if (message.author.role === 'assistant') {
-            postSteps = [...postSteps, input => transformFootNotes(input, message.metadata)]
+            // Handle new-style content references (web search citations with Unicode markers)
+            postSteps.push(input => transformFootNotes(input, message.metadata))
+            // Handle old-style footnotes (【11†(PrintWiki)】 format)
+            postSteps.push(input => transformContentReferences(input, message.metadata))
+
             postSteps.push((input) => {
                 const matches = input.match(LatexRegex)
 
@@ -245,6 +249,31 @@ function transformFootNotes(
 
         return match
     })
+}
+
+function transformContentReferences(
+    input: string,
+    metadata: ConversationNodeMessage['metadata'],
+) {
+    const contentRefs = metadata?.content_references
+    if (!contentRefs || contentRefs.length === 0) return input
+
+    const sortedRefs = [...contentRefs].sort((a, b) => (b.matched_text?.length || 0) - (a.matched_text?.length || 0))
+
+    for (const ref of sortedRefs) {
+        if (!ref.matched_text) continue
+
+        // For some reason, the matched_text contains non-breaking spaces but the content doesn't!
+        const matchedText = ref.matched_text.replaceAll(/\s/gu, ' ')
+
+        switch (ref.type) {
+            case 'sources_footnote':
+                break
+            default:
+                input = input.replaceAll(matchedText, '')
+        }
+    }
+    return input
 }
 
 /**
