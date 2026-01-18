@@ -175,20 +175,27 @@ function transformContentReferences(
 
     const sortedRefs = [...contentRefs].sort((a, b) => (b.matched_text?.length || 0) - (a.matched_text?.length || 0))
 
+    // Normalize unicode variants (non-breaking spaces, non-breaking hyphens) to regular ASCII
+    const normalize = (s: string) => s
+        .replaceAll(/[\u00A0\u202F\u2007\u2060]/gu, ' ')
+        .replaceAll(/[\u2010-\u2015\u2212]/gu, '-')
+
+    let output = normalize(input)
+
     for (const ref of sortedRefs) {
         if (!ref.matched_text) continue
 
-        // For some reason, the matched_text contains non-breaking spaces but the content doesn't!
-        const matchedText = ref.matched_text.replaceAll(/\s/gu, ' ')
+        const matchedText = normalize(ref.matched_text)
 
         switch (ref.type) {
             case 'sources_footnote':
                 break
             default:
-                input = input.replaceAll(matchedText, '')
+                // Use ref.alt which contains display text (links won't render in plain text)
+                output = output.replaceAll(matchedText, ref.alt || '')
         }
     }
-    return input
+    return output
 }
 
 /**
