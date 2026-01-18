@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.29.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.29.1...userscript-v2.29.2) (2026-01-18)
+
+
+### Bug Fixes
+
+* parse citations and suppress 'thoughts' ([748e1b9](https://github.com/pionxzh/chatgpt-exporter/commit/748e1b9703ab6fb0d09fad9ea779be4572852cd8))
+* support navlist and handle content reference in text and html ([54d4b6b](https://github.com/pionxzh/chatgpt-exporter/commit/54d4b6b15b8a99d1cad598d2de20189aeade46df))
+
 ## [2.29.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.29.0...userscript-v2.29.1) (2025-07-25)
 
 
