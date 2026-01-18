@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.29.1
+// @version            2.29.2
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -20810,7 +20810,8 @@ html {
       const avatarEl = message.author.role === "user" ? `<img alt="${author}" />` : '<svg width="41" height="41"><use xlink:href="#chatgpt" /></svg>';
       let postSteps = [];
       if (message.author.role === "assistant") {
-        postSteps = [...postSteps, (input) => transformFootNotes$2(input, message.metadata)];
+        postSteps.push((input) => transformFootNotes$2(input, message.metadata));
+        postSteps.push((input) => transformContentReferences$2(input, message.metadata));
         postSteps.push((input) => {
           const matches = input.match(LatexRegex2);
           const isCodeBlock = /```/.test(input);
@@ -20898,6 +20899,25 @@ html {
       if (citation) return "";
       return match;
     });
+  }
+  function transformContentReferences$2(input, metadata) {
+    const contentRefs = metadata == null ? void 0 : metadata.content_references;
+    if (!contentRefs || contentRefs.length === 0) return input;
+    const sortedRefs = [...contentRefs].sort((a2, b2) => {
+      var _a, _b;
+      return (((_a = b2.matched_text) == null ? void 0 : _a.length) || 0) - (((_b = a2.matched_text) == null ? void 0 : _b.length) || 0);
+    });
+    for (const ref of sortedRefs) {
+      if (!ref.matched_text) continue;
+      const matchedText = ref.matched_text.replaceAll(/\s/gu, " ");
+      switch (ref.type) {
+        case "sources_footnote":
+          break;
+        default:
+          input = input.replaceAll(matchedText, "");
+      }
+    }
+    return input;
   }
   function transformContent$2(content2, metadata, postProcess) {
     var _a, _b, _c, _d;
@@ -21306,14 +21326,17 @@ ${_metaList.join("\n")}
     const timeStampMarkdown = ScriptStorage.get(KEY_TIMESTAMP_MARKDOWN) ?? false;
     const timeStamp24H = ScriptStorage.get(KEY_TIMESTAMP_24H) ?? false;
     const content2 = conversationNodes.map(({ message }) => {
-      var _a, _b, _c;
+      var _a, _b, _c, _d;
       if (!message || !message.content) return null;
       if (message.recipient !== "all") return null;
+      if (message.content.content_type === "thoughts") return null;
+      if (message.content.content_type === "reasoning_recap") return null;
+      if ((_a = message.metadata) == null ? void 0 : _a.is_visually_hidden_from_conversation) return null;
       if (message.author.role === "tool") {
         if (
           // HACK: we special case the content_type 'multimodal_text' here because it is used by
           // the dalle tool to return the image result, and we do want to show that.
-          message.content.content_type !== "multimodal_text" && !(message.content.content_type === "execution_output" && ((_c = (_b = (_a = message.metadata) == null ? void 0 : _a.aggregate_result) == null ? void 0 : _b.messages) == null ? void 0 : _c.some((msg) => msg.message_type === "image")))
+          message.content.content_type !== "multimodal_text" && !(message.content.content_type === "execution_output" && ((_d = (_c = (_b = message.metadata) == null ? void 0 : _b.aggregate_result) == null ? void 0 : _c.messages) == null ? void 0 : _d.some((msg) => msg.message_type === "image")))
         ) {
           return null;
         }
@@ -21331,6 +21354,7 @@ ${_metaList.join("\n")}
       const author = transformAuthor$1(message.author);
       const postSteps = [];
       if (message.author.role === "assistant") {
+        postSteps.push((input) => transformContentReferences$1(input, message.metadata));
         postSteps.push((input) => transformFootNotes$1(input, message.metadata));
       }
       if (message.author.role === "assistant") {
@@ -21400,6 +21424,48 @@ ${content2}`;
 
 ${citationText}`;
   }
+  function transformContentReferences$1(input, metadata) {
+    var _a;
+    const contentRefs = metadata == null ? void 0 : metadata.content_references;
+    if (!contentRefs || contentRefs.length === 0) return input;
+    const sortedRefs = [...contentRefs].sort((a2, b2) => {
+      var _a2, _b;
+      return (((_a2 = b2.matched_text) == null ? void 0 : _a2.length) || 0) - (((_b = a2.matched_text) == null ? void 0 : _b.length) || 0);
+    });
+    const usedRefs = [];
+    let output2 = input;
+    for (const ref of sortedRefs) {
+      if (!ref.matched_text) continue;
+      const matchedText = ref.matched_text.replaceAll(/\s/gu, " ");
+      switch (ref.type) {
+        case "sources_footnote":
+          break;
+        case "nav_list":
+          output2 = output2.replaceAll(matchedText, ref.alt || "");
+          break;
+        default: {
+          const item = (_a = ref.items) == null ? void 0 : _a[0];
+          const url = (item == null ? void 0 : item.url) || ref.url;
+          const title2 = (item == null ? void 0 : item.title) || ref.title;
+          if (!url) continue;
+          if (output2.includes(ref.matched_text)) {
+            usedRefs.push({ url, title: title2 || url });
+            const refIndex = usedRefs.length;
+            output2 = output2.replaceAll(matchedText, `[^${refIndex}]`);
+          }
+        }
+      }
+    }
+    if (usedRefs.length > 0) {
+      const footnotes = usedRefs.map((ref, index2) => {
+        return `[^${index2 + 1}]: [${ref.title}](${ref.url})`;
+      }).join("\n");
+      output2 = `${output2}
+
+${footnotes}`;
+    }
+    return output2;
+  }
   function transformContent$1(content2, metadata, postProcess) {
     var _a, _b, _c, _d;
     switch (content2.content_type) {
@@ -21440,7 +21506,7 @@ ${content2.text}
         }).join("\n")) || "";
       }
       default:
-        return postProcess("[Unsupported Content]");
+        return postProcess(`[Unsupported Content: ${content2.content_type}]`);
     }
   }
   function copyToClipboard(text2) {
@@ -21491,6 +21557,7 @@ ${content2.text}
       });
     }
     if (message.author.role === "assistant") {
+      content2 = transformContentReferences(content2, message.metadata);
       content2 = transformFootNotes(content2, message.metadata);
     }
     if (message.author.role === "assistant" && content2) {
@@ -21565,6 +21632,25 @@ ${content2}`;
       default:
         return author.role;
     }
+  }
+  function transformContentReferences(input, metadata) {
+    const contentRefs = metadata == null ? void 0 : metadata.content_references;
+    if (!contentRefs || contentRefs.length === 0) return input;
+    const sortedRefs = [...contentRefs].sort((a2, b2) => {
+      var _a, _b;
+      return (((_a = b2.matched_text) == null ? void 0 : _a.length) || 0) - (((_b = a2.matched_text) == null ? void 0 : _b.length) || 0);
+    });
+    for (const ref of sortedRefs) {
+      if (!ref.matched_text) continue;
+      const matchedText = ref.matched_text.replaceAll(/\s/gu, " ");
+      switch (ref.type) {
+        case "sources_footnote":
+          break;
+        default:
+          input = input.replaceAll(matchedText, "");
+      }
+    }
+    return input;
   }
   function transformFootNotes(input, metadata) {
     const footNoteMarkRegex = /【(\d+)†\((.+?)\)】/g;
