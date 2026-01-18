@@ -50,7 +50,7 @@ export interface Citation {
 }
 
 export interface ContentReference {
-    type: 'grouped_webpages' | 'sources_footnote' | 'nav_list' & (string & {})
+    type: 'grouped_webpages' | 'sources_footnote' | 'nav_list' | 'alt_text' & (string & {})
     /** The text that was matched in the content, e.g., "citeturn0search3" */
     matched_text?: string
     start_idx: number
@@ -62,6 +62,12 @@ export interface ContentReference {
         title: string
         url: string
         attribution?: string
+        /** Additional sources for multi-citations */
+        supporting_websites?: Array<{
+            title: string
+            url: string
+            attribution?: string
+        }>
     }>
     // Legacy fields (may still be present in some responses)
     url?: string

@@ -108,9 +108,9 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
 
         let postSteps: Array<(input: string) => string> = []
         if (message.author.role === 'assistant') {
-            // Handle new-style content references (web search citations with Unicode markers)
-            postSteps.push(input => transformFootNotes(input, message.metadata))
             // Handle old-style footnotes (【11†(PrintWiki)】 format)
+            postSteps.push(input => transformFootNotes(input, message.metadata))
+            // Handle new-style content references (web search citations with Unicode markers)
             postSteps.push(input => transformContentReferences(input, message.metadata))
 
             postSteps.push((input) => {
@@ -260,20 +260,47 @@ function transformContentReferences(
 
     const sortedRefs = [...contentRefs].sort((a, b) => (b.matched_text?.length || 0) - (a.matched_text?.length || 0))
 
+    // Normalize unicode variants (non-breaking spaces, non-breaking hyphens) to regular ASCII
+    const normalize = (s: string) => s
+        .replaceAll(/[\u00A0\u202F\u2007\u2060]/gu, ' ')
+        .replaceAll(/[\u2010-\u2015\u2212]/gu, '-')
+
+    let output = normalize(input)
+
     for (const ref of sortedRefs) {
         if (!ref.matched_text) continue
 
-        // For some reason, the matched_text contains non-breaking spaces but the content doesn't!
-        const matchedText = ref.matched_text.replaceAll(/\s/gu, ' ')
+        const matchedText = normalize(ref.matched_text)
 
         switch (ref.type) {
             case 'sources_footnote':
                 break
+            case 'grouped_webpages': {
+                // For citations, build links from items including supporting_websites
+                const item = ref.items?.[0]
+                if (item) {
+                    const links: string[] = []
+                    // Primary source
+                    links.push(`[${item.attribution || item.title}](${item.url})`)
+                    // Supporting sources
+                    for (const sw of item.supporting_websites || []) {
+                        links.push(`[${sw.attribution || sw.title}](${sw.url})`)
+                    }
+                    // Markdown links will be converted to HTML by the subsequent toHtml step
+                    output = output.replaceAll(matchedText, `(${links.join(', ')})`)
+                }
+                else {
+                    output = output.replaceAll(matchedText, ref.alt || '')
+                }
+                break
+            }
             default:
-                input = input.replaceAll(matchedText, '')
+                // Use ref.alt which contains display text or pre-formatted markdown link
+                // Markdown links will be converted to HTML by the subsequent toHtml step
+                output = output.replaceAll(matchedText, ref.alt || '')
         }
     }
-    return input
+    return output
 }
 
 /**

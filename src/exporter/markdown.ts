@@ -245,45 +245,43 @@ function transformContentReferences(
     // (e.g., "citeturn0search2turn1search8" before "citeturn0search2")
     const sortedRefs = [...contentRefs].sort((a, b) => (b.matched_text?.length || 0) - (a.matched_text?.length || 0))
 
-    const usedRefs: Array<{ url: string; title: string }> = []
-    let output = input
+    // Normalize unicode variants (non-breaking spaces, non-breaking hyphens) to regular ASCII
+    const normalize = (s: string) => s
+        .replaceAll(/[\u00A0\u202F\u2007\u2060]/gu, ' ')
+        .replaceAll(/[\u2010-\u2015\u2212]/gu, '-')
+
+    let output = normalize(input)
 
     for (const ref of sortedRefs) {
         if (!ref.matched_text) continue
 
-        // For some reason, the matched_text contains non-breaking spaces but the content doesn't!
-        const matchedText = ref.matched_text.replaceAll(/\s/gu, ' ')
+        const matchedText = normalize(ref.matched_text)
 
         switch (ref.type) {
             case 'sources_footnote':
                 break
-            case 'nav_list':
-                output = output.replaceAll(matchedText, ref.alt || '')
-                break
-            default: {
-                // Get URL and title from items array (new format) or direct fields
+            case 'grouped_webpages': {
+                // For citations, build links from items including supporting_websites
                 const item = ref.items?.[0]
-                const url = item?.url || ref.url
-                const title = item?.title || ref.title
-
-                if (!url) continue
-
-                // Replace all occurrences of this matched_text
-                if (output.includes(ref.matched_text)) {
-                    usedRefs.push({ url, title: title || url })
-                    const refIndex = usedRefs.length
-                    output = output.replaceAll(matchedText, `[^${refIndex}]`)
+                if (item) {
+                    const links: string[] = []
+                    // Primary source
+                    links.push(`[${item.attribution || item.title}](${item.url})`)
+                    // Supporting sources
+                    for (const sw of item.supporting_websites || []) {
+                        links.push(`[${sw.attribution || sw.title}](${sw.url})`)
+                    }
+                    output = output.replaceAll(matchedText, `(${links.join(', ')})`)
                 }
+                else {
+                    output = output.replaceAll(matchedText, ref.alt || '')
+                }
+                break
             }
+            default:
+                // Use ref.alt which contains display text or pre-formatted markdown link
+                output = output.replaceAll(matchedText, ref.alt || '')
         }
-    }
-
-    // Add footnote definitions at the end
-    if (usedRefs.length > 0) {
-        const footnotes = usedRefs.map((ref, index) => {
-            return `[^${index + 1}]: [${ref.title}](${ref.url})`
-        }).join('\n')
-        output = `${output}\n\n${footnotes}`
     }
 
     return output
