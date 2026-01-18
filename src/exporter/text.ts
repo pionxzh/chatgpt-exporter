@@ -66,6 +66,7 @@ function transformMessage(message?: ConversationNodeMessage) {
     }
 
     if (message.author.role === 'assistant') {
+        content = transformContentReferences(content, message.metadata)
         content = transformFootNotes(content, message.metadata)
     }
 
@@ -163,6 +164,31 @@ function transformAuthor(author: ConversationNodeMessage['author']): string {
         default:
             return author.role
     }
+}
+
+function transformContentReferences(
+    input: string,
+    metadata: ConversationNodeMessage['metadata'],
+) {
+    const contentRefs = metadata?.content_references
+    if (!contentRefs || contentRefs.length === 0) return input
+
+    const sortedRefs = [...contentRefs].sort((a, b) => (b.matched_text?.length || 0) - (a.matched_text?.length || 0))
+
+    for (const ref of sortedRefs) {
+        if (!ref.matched_text) continue
+
+        // For some reason, the matched_text contains non-breaking spaces but the content doesn't!
+        const matchedText = ref.matched_text.replaceAll(/\s/gu, ' ')
+
+        switch (ref.type) {
+            case 'sources_footnote':
+                break
+            default:
+                input = input.replaceAll(matchedText, '')
+        }
+    }
+    return input
 }
 
 /**

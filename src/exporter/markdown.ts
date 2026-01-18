@@ -251,19 +251,30 @@ function transformContentReferences(
     for (const ref of sortedRefs) {
         if (!ref.matched_text) continue
 
-        // Get URL and title from items array (new format) or direct fields
-        const item = ref.items?.[0]
-        const url = item?.url || ref.url
-        const title = item?.title || ref.title
+        // For some reason, the matched_text contains non-breaking spaces but the content doesn't!
+        const matchedText = ref.matched_text.replaceAll(/\s/gu, ' ')
 
-        if (!url) continue
+        switch (ref.type) {
+            case 'sources_footnote':
+                break
+            case 'nav_list':
+                output = output.replaceAll(matchedText, ref.alt || '')
+                break
+            default: {
+                // Get URL and title from items array (new format) or direct fields
+                const item = ref.items?.[0]
+                const url = item?.url || ref.url
+                const title = item?.title || ref.title
 
-        // Replace all occurrences of this matched_text
-        if (output.includes(ref.matched_text)) {
-            usedRefs.push({ url, title: title || url })
-            const refIndex = usedRefs.length
-            // Use global replace in case the same citation appears multiple times
-            output = output.split(ref.matched_text).join(`[^${refIndex}]`)
+                if (!url) continue
+
+                // Replace all occurrences of this matched_text
+                if (output.includes(ref.matched_text)) {
+                    usedRefs.push({ url, title: title || url })
+                    const refIndex = usedRefs.length
+                    output = output.replaceAll(matchedText, `[^${refIndex}]`)
+                }
+            }
         }
     }
 
