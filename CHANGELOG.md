@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.29.3](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.29.2...userscript-v2.29.3) (2026-02-05)
+
+
+### Bug Fixes
+
+* improve content reference handling for citations and entities ([5f08862](https://github.com/pionxzh/chatgpt-exporter/commit/5f08862f3852ce970d663c0990d3877e599b5e7c))
+
 ## [2.29.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.29.1...userscript-v2.29.2) (2026-01-18)
 
 
