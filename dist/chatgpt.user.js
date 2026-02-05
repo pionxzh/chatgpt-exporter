@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.29.2
+// @version            2.29.3
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -20901,23 +20901,40 @@ html {
     });
   }
   function transformContentReferences$2(input, metadata) {
+    var _a;
     const contentRefs = metadata == null ? void 0 : metadata.content_references;
     if (!contentRefs || contentRefs.length === 0) return input;
     const sortedRefs = [...contentRefs].sort((a2, b2) => {
-      var _a, _b;
-      return (((_a = b2.matched_text) == null ? void 0 : _a.length) || 0) - (((_b = a2.matched_text) == null ? void 0 : _b.length) || 0);
+      var _a2, _b;
+      return (((_a2 = b2.matched_text) == null ? void 0 : _a2.length) || 0) - (((_b = a2.matched_text) == null ? void 0 : _b.length) || 0);
     });
+    const normalize2 = (s2) => s2.replaceAll(/[\u00A0\u202F\u2007\u2060]/gu, " ").replaceAll(/[\u2010-\u2015\u2212]/gu, "-");
+    let output2 = normalize2(input);
     for (const ref of sortedRefs) {
       if (!ref.matched_text) continue;
-      const matchedText = ref.matched_text.replaceAll(/\s/gu, " ");
+      const matchedText = normalize2(ref.matched_text);
       switch (ref.type) {
         case "sources_footnote":
           break;
+        case "grouped_webpages": {
+          const item = (_a = ref.items) == null ? void 0 : _a[0];
+          if (item) {
+            const links = [];
+            links.push(`[${item.attribution || item.title}](${item.url})`);
+            for (const sw of item.supporting_websites || []) {
+              links.push(`[${sw.attribution || sw.title}](${sw.url})`);
+            }
+            output2 = output2.replaceAll(matchedText, `(${links.join(", ")})`);
+          } else {
+            output2 = output2.replaceAll(matchedText, ref.alt || "");
+          }
+          break;
+        }
         default:
-          input = input.replaceAll(matchedText, "");
+          output2 = output2.replaceAll(matchedText, ref.alt || "");
       }
     }
-    return input;
+    return output2;
   }
   function transformContent$2(content2, metadata, postProcess) {
     var _a, _b, _c, _d;
@@ -21432,37 +21449,31 @@ ${citationText}`;
       var _a2, _b;
       return (((_a2 = b2.matched_text) == null ? void 0 : _a2.length) || 0) - (((_b = a2.matched_text) == null ? void 0 : _b.length) || 0);
     });
-    const usedRefs = [];
-    let output2 = input;
+    const normalize2 = (s2) => s2.replaceAll(/[\u00A0\u202F\u2007\u2060]/gu, " ").replaceAll(/[\u2010-\u2015\u2212]/gu, "-");
+    let output2 = normalize2(input);
     for (const ref of sortedRefs) {
       if (!ref.matched_text) continue;
-      const matchedText = ref.matched_text.replaceAll(/\s/gu, " ");
+      const matchedText = normalize2(ref.matched_text);
       switch (ref.type) {
         case "sources_footnote":
           break;
-        case "nav_list":
-          output2 = output2.replaceAll(matchedText, ref.alt || "");
-          break;
-        default: {
+        case "grouped_webpages": {
           const item = (_a = ref.items) == null ? void 0 : _a[0];
-          const url = (item == null ? void 0 : item.url) || ref.url;
-          const title2 = (item == null ? void 0 : item.title) || ref.title;
-          if (!url) continue;
-          if (output2.includes(ref.matched_text)) {
-            usedRefs.push({ url, title: title2 || url });
-            const refIndex = usedRefs.length;
-            output2 = output2.replaceAll(matchedText, `[^${refIndex}]`);
+          if (item) {
+            const links = [];
+            links.push(`[${item.attribution || item.title}](${item.url})`);
+            for (const sw of item.supporting_websites || []) {
+              links.push(`[${sw.attribution || sw.title}](${sw.url})`);
+            }
+            output2 = output2.replaceAll(matchedText, `(${links.join(", ")})`);
+          } else {
+            output2 = output2.replaceAll(matchedText, ref.alt || "");
           }
+          break;
         }
+        default:
+          output2 = output2.replaceAll(matchedText, ref.alt || "");
       }
-    }
-    if (usedRefs.length > 0) {
-      const footnotes = usedRefs.map((ref, index2) => {
-        return `[^${index2 + 1}]: [${ref.title}](${ref.url})`;
-      }).join("\n");
-      output2 = `${output2}
-
-${footnotes}`;
     }
     return output2;
   }
@@ -21640,17 +21651,19 @@ ${content2}`;
       var _a, _b;
       return (((_a = b2.matched_text) == null ? void 0 : _a.length) || 0) - (((_b = a2.matched_text) == null ? void 0 : _b.length) || 0);
     });
+    const normalize2 = (s2) => s2.replaceAll(/[\u00A0\u202F\u2007\u2060]/gu, " ").replaceAll(/[\u2010-\u2015\u2212]/gu, "-");
+    let output2 = normalize2(input);
     for (const ref of sortedRefs) {
       if (!ref.matched_text) continue;
-      const matchedText = ref.matched_text.replaceAll(/\s/gu, " ");
+      const matchedText = normalize2(ref.matched_text);
       switch (ref.type) {
         case "sources_footnote":
           break;
         default:
-          input = input.replaceAll(matchedText, "");
+          output2 = output2.replaceAll(matchedText, ref.alt || "");
       }
     }
-    return input;
+    return output2;
   }
   function transformFootNotes(input, metadata) {
     const footNoteMarkRegex = /【(\d+)†\((.+?)\)】/g;
