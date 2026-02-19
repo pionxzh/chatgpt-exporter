@@ -83,6 +83,13 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
         // ChatGPT is talking to tool
         if (message.recipient !== 'all') return null
 
+        // Skip "thinking" content (hidden reasoning steps from thinking models)
+        if (message.content.content_type === 'thoughts') return null
+        if (message.content.content_type === 'reasoning_recap') return null
+
+        // Skip messages marked as visually hidden (e.g., internal system prompts)
+        if (message.metadata?.is_visually_hidden_from_conversation) return null
+
         // Skip tool's intermediate message.
         if (message.author.role === 'tool') {
             if (
@@ -348,6 +355,7 @@ function transformContent(
             }).join('\n') || ''
         }
         default:
+            console.warn('[Exporter] Unsupported Content:', content.content_type, content)
             return postProcess(`[Unsupported Content: ${content.content_type} ]`)
     }
 }

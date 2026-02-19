@@ -330,6 +330,7 @@ function transformContent(
             }).join('\n') || ''
         }
         default:
+            console.warn('[Exporter] Unsupported Content:', content.content_type, content)
             return postProcess(`[Unsupported Content: ${content.content_type}]`)
     }
 }
