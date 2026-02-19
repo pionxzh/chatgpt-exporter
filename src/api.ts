@@ -32,6 +32,10 @@ type ModelSlug =
     | 'gpt-4'
     | 'gpt-4-browsing'
     | 'gpt-4o'
+    | 'gpt-5-t-mini'
+    | 'gpt-5-1-instant'
+    | 'gpt-5-1-thinking'
+    | 'gpt-5-2'
 
 export interface Citation {
     start_ix: number
@@ -674,11 +678,16 @@ const ModelMapping: { [key in ModelSlug]: string } & { [key: string]: string } =
     'text-davinci-002-render-sha': 'GPT-3.5',
     'text-davinci-002-render-paid': 'GPT-3.5',
     'text-davinci-002-browse': 'GPT-3.5',
-    'gpt-4': 'GPT-4',
     'gpt-4-browsing': 'GPT-4 (Browser)',
     'gpt-4o': 'GPT-4o',
+    'gpt-5-t-mini': 'GPT-5',
+    'gpt-5-1-instant': 'GPT-5.1',
+    'gpt-5-1-thinking': 'GPT-5.1',
+    'gpt-5-2': 'GPT-5.2',
 
     // fuzzy matching
+    'gpt-4': 'GPT-4',
+    'gpt-5': 'GPT-5',
     'text-davinci-002': 'GPT-3.5',
 }
 
