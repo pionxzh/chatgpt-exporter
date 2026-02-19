@@ -394,7 +394,7 @@ const sessionApi = urlcat(baseUrl, '/api/auth/session')
 const conversationApi = (id: string) => urlcat(apiUrl, '/conversation/:id', { id })
 const conversationsApi = (offset: number, limit: number) => urlcat(apiUrl, '/conversations', { offset, limit })
 const fileDownloadApi = (id: string) => urlcat(apiUrl, '/files/:id/download', { id })
-const projectsApi = () => urlcat(apiUrl, '/gizmos/snorlax/sidebar', { conversations_per_gizmo: 0 })
+const projectsApi = (cursor: number | null) => urlcat(apiUrl, '/gizmos/snorlax/sidebar', { conversations_per_gizmo: 0, cursor })
 const projectConversationsApi = (gizmo: string, offset: number, limit: number) => urlcat(apiUrl, '/gizmos/:gizmo/conversations', { gizmo, cursor: offset, limit })
 const accountsCheckApi = urlcat(apiUrl, '/accounts/check/v4-2023-04-27')
 
@@ -506,9 +506,17 @@ export async function fetchConversation(chatId: string, shouldReplaceAssets: boo
 }
 
 export async function fetchProjects(): Promise<ApiProjectInfo[]> {
-    const url = projectsApi()
-    const { items } = await fetchApi<{ items: ApiGizmo[] }>(url)
-    return items.map(gizmo => (gizmo.gizmo.gizmo))
+    let cursor: number | null = null
+    const allItems: ApiGizmo[] = []
+    while (true) {
+        const url = projectsApi(cursor)
+        const { items, cursor: nextCursor = null } = await fetchApi<{ cursor: number | null; items: ApiGizmo[] }>(url)
+        cursor = nextCursor
+        allItems.push(...items)
+        if (nextCursor === null) break
+    }
+
+    return allItems.map(gizmo => (gizmo.gizmo.gizmo))
 }
 
 async function fetchConversations(offset = 0, limit = 20, project: string | null = null): Promise<ApiConversations> {
