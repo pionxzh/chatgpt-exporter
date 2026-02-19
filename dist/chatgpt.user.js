@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.29.3
+// @version            2.29.4
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -1184,8 +1184,8 @@ html {
   const sessionApi = _default(baseUrl, "/api/auth/session");
   const conversationApi = (id) => _default(apiUrl, "/conversation/:id", { id });
   const conversationsApi = (offset, limit) => _default(apiUrl, "/conversations", { offset, limit });
-  const fileDownloadApi = (id) => _default(apiUrl, "/files/:id/download", { id });
-  const projectsApi = () => _default(apiUrl, "/gizmos/snorlax/sidebar", { conversations_per_gizmo: 0 });
+  const fileDownloadApi = (id) => _default(apiUrl, "/files/download/:id", { id, post_id: "", inline: false });
+  const projectsApi = (cursor) => _default(apiUrl, "/gizmos/snorlax/sidebar", { conversations_per_gizmo: 0, cursor });
   const projectConversationsApi = (gizmo, offset, limit) => _default(apiUrl, "/gizmos/:gizmo/conversations", { gizmo, cursor: offset, limit });
   const accountsCheckApi = _default(apiUrl, "/accounts/check/v4-2023-04-27");
   async function getCurrentChatId() {
@@ -1201,7 +1201,7 @@ html {
     throw new Error("No chat id found.");
   }
   async function fetchImageFromPointer(uri) {
-    const pointer = uri.replace("file-service://", "");
+    const pointer = uri.replace("sediment://", "");
     const imageDetails = await fetchApi(fileDownloadApi(pointer));
     if (imageDetails.status === "error") {
       console.error("Failed to fetch image asset", imageDetails.error_code, imageDetails.error_message);
@@ -1214,7 +1214,7 @@ html {
   }
   async function replaceImageAssets(conversation) {
     const isMultiModalInputImage = (part) => {
-      return typeof part === "object" && part !== null && "content_type" in part && part.content_type === "image_asset_pointer" && "asset_pointer" in part && typeof part.asset_pointer === "string" && part.asset_pointer.startsWith("file-service://");
+      return typeof part === "object" && part !== null && "content_type" in part && part.content_type === "image_asset_pointer" && "asset_pointer" in part && typeof part.asset_pointer === "string" && part.asset_pointer.startsWith("sediment://");
     };
     const imageAssets = Object.values(conversation.mapping).flatMap((node2) => {
       if (!node2.message) return [];
@@ -1268,9 +1268,16 @@ html {
     };
   }
   async function fetchProjects() {
-    const url = projectsApi();
-    const { items } = await fetchApi(url);
-    return items.map((gizmo) => gizmo.gizmo.gizmo);
+    let cursor = null;
+    const allItems = [];
+    while (true) {
+      const url = projectsApi(cursor);
+      const { items, cursor: nextCursor = null } = await fetchApi(url);
+      cursor = nextCursor;
+      allItems.push(...items);
+      if (nextCursor === null) break;
+    }
+    return allItems.map((gizmo) => gizmo.gizmo.gizmo);
   }
   async function fetchConversations(offset = 0, limit = 20, project = null) {
     if (project) {
@@ -1398,10 +1405,15 @@ html {
     "text-davinci-002-render-sha": "GPT-3.5",
     "text-davinci-002-render-paid": "GPT-3.5",
     "text-davinci-002-browse": "GPT-3.5",
-    "gpt-4": "GPT-4",
     "gpt-4-browsing": "GPT-4 (Browser)",
     "gpt-4o": "GPT-4o",
+    "gpt-5-t-mini": "GPT-5",
+    "gpt-5-1-instant": "GPT-5.1",
+    "gpt-5-1-thinking": "GPT-5.1",
+    "gpt-5-2": "GPT-5.2",
     // fuzzy matching
+    "gpt-4": "GPT-4",
+    "gpt-5": "GPT-5",
     "text-davinci-002": "GPT-3.5"
   };
   function processConversation(conversation) {
@@ -20792,20 +20804,23 @@ html {
     const timeStamp24H = ScriptStorage.get(KEY_TIMESTAMP_24H) ?? false;
     const LatexRegex2 = /(\s\$\$.+?\$\$\s|\s\$.+?\$\s|\\\[.+?\\\]|\\\(.+?\\\))|(^\$$[\S\s]+?^\$$)|(^\$\$[\S\s]+?^\$\$\$)/gm;
     const conversationHtml = conversationNodes.map(({ message }) => {
-      var _a, _b, _c, _d;
+      var _a, _b, _c, _d, _e;
       if (!message || !message.content) return null;
       if (message.recipient !== "all") return null;
+      if (message.content.content_type === "thoughts") return null;
+      if (message.content.content_type === "reasoning_recap") return null;
+      if ((_a = message.metadata) == null ? void 0 : _a.is_visually_hidden_from_conversation) return null;
       if (message.author.role === "tool") {
         if (
           // HACK: we special case the content_type 'multimodal_text' here because it is used by
           // the dalle tool to return the image result, and we do want to show that.
-          message.content.content_type !== "multimodal_text" && !(message.content.content_type === "execution_output" && ((_c = (_b = (_a = message.metadata) == null ? void 0 : _a.aggregate_result) == null ? void 0 : _b.messages) == null ? void 0 : _c.some((msg) => msg.message_type === "image")))
+          message.content.content_type !== "multimodal_text" && !(message.content.content_type === "execution_output" && ((_d = (_c = (_b = message.metadata) == null ? void 0 : _b.aggregate_result) == null ? void 0 : _c.messages) == null ? void 0 : _d.some((msg) => msg.message_type === "image")))
         ) {
           return null;
         }
       }
       const author = transformAuthor$2(message.author);
-      const model2 = ((_d = message == null ? void 0 : message.metadata) == null ? void 0 : _d.model_slug) === "gpt-4" ? "GPT-4" : "GPT-3";
+      const model2 = ((_e = message == null ? void 0 : message.metadata) == null ? void 0 : _e.model_slug) === "gpt-4" ? "GPT-4" : "GPT-3";
       const authorType = message.author.role === "user" ? "user" : model2;
       const avatarEl = message.author.role === "user" ? `<img alt="${author}" />` : '<svg width="41" height="41"><use xlink:href="#chatgpt" /></svg>';
       let postSteps = [];
@@ -20978,6 +20993,7 @@ ${content2.text}
         }).join("\n")) || "";
       }
       default:
+        console.warn("[Exporter] Unsupported Content:", content2.content_type, content2);
         return postProcess(`[Unsupported Content: ${content2.content_type} ]`);
     }
   }
@@ -21517,6 +21533,7 @@ ${content2.text}
         }).join("\n")) || "";
       }
       default:
+        console.warn("[Exporter] Unsupported Content:", content2.content_type, content2);
         return postProcess(`[Unsupported Content: ${content2.content_type}]`);
     }
   }
@@ -21546,14 +21563,17 @@ ${content2.text}
   }
   const LatexRegex = /(\s\$\$.+\$\$\s|\s\$.+\$\s|\\\[.+\\\]|\\\(.+\\\))|(^\$$[\S\s]+^\$$)|(^\$\$[\S\s]+^\$\$$)/gm;
   function transformMessage(message) {
-    var _a, _b, _c;
+    var _a, _b, _c, _d;
     if (!message || !message.content) return null;
     if (message.recipient !== "all") return null;
+    if (message.content.content_type === "thoughts") return null;
+    if (message.content.content_type === "reasoning_recap") return null;
+    if ((_a = message.metadata) == null ? void 0 : _a.is_visually_hidden_from_conversation) return null;
     if (message.author.role === "tool") {
       if (
         // HACK: we special case the content_type 'multimodal_text' here because it is used by
         // the dalle tool to return the image result, and we do want to show that.
-        message.content.content_type !== "multimodal_text" && !(message.content.content_type === "execution_output" && ((_c = (_b = (_a = message.metadata) == null ? void 0 : _a.aggregate_result) == null ? void 0 : _b.messages) == null ? void 0 : _c.some((msg) => msg.message_type === "image")))
+        message.content.content_type !== "multimodal_text" && !(message.content.content_type === "execution_output" && ((_d = (_c = (_b = message.metadata) == null ? void 0 : _b.aggregate_result) == null ? void 0 : _c.messages) == null ? void 0 : _d.some((msg) => msg.message_type === "image")))
       ) {
         return null;
       }
@@ -21616,6 +21636,7 @@ ${content2}`;
         }).join("\n")) || "";
       }
       default:
+        console.warn("[Exporter] Unsupported Content:", content2.content_type, content2);
         return "[Unsupported Content]";
     }
   }
@@ -23194,22 +23215,26 @@ ${content2}`;
   main();
   function main() {
     onloadSafe(() => {
+      console.log("[Exporter] Loaded");
       const styleEl = document.createElement("style");
       styleEl.id = "sentinel-css";
       document.head.append(styleEl);
       const injectionMap = /* @__PURE__ */ new Map();
       const injectNavMenu = (nav) => {
         if (injectionMap.has(nav)) return;
+        console.log("[Exporter] Injecting nav", nav);
         const container = getMenuContainer();
         injectionMap.set(nav, container);
         const chatList = nav.querySelector(":scope > div.sticky.bottom-0");
         if (chatList) {
           chatList.prepend(container);
+          console.log("[Exporter] Prepended container to chat list", chatList);
         } else {
           container.style.backgroundColor = "#171717";
           container.style.position = "sticky";
           container.style.bottom = "72px";
           nav.append(container);
+          console.log("[Exporter] Fallback to appending container to nav", nav);
         }
       };
       sentinel.on("nav", injectNavMenu);
