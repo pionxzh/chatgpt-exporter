@@ -131,7 +131,7 @@ export type AuthorRole = 'system' | 'assistant' | 'user' | 'tool'
 
 interface MultiModalInputImage {
     /**
-     * hack: this come from the api in the form of `file-service://file-base64`, but we replace it
+     * hack: this come from the api in the form of `sediment://file-base64`, but we replace it
      * automatically in the api wrapper with a data uri
      */
     asset_pointer: string
@@ -361,10 +361,13 @@ type ApiFileDownload = {
     status: 'success'
     /** signed download url */
     download_url: string
-    metadata: {}
-    file_name: string
+    metadata: {} | null
+    file_name: string | null
+    file_size_bytes: number | null
+    mimedata: string | null
+    mime_type: string | null
     /** iso8601 datetime string */
-    creation_time: string
+    creation_time: string | null
 } | {
     status: 'error'
     error_code: string
@@ -397,7 +400,7 @@ const enum ChatGPTCookie {
 const sessionApi = urlcat(baseUrl, '/api/auth/session')
 const conversationApi = (id: string) => urlcat(apiUrl, '/conversation/:id', { id })
 const conversationsApi = (offset: number, limit: number) => urlcat(apiUrl, '/conversations', { offset, limit })
-const fileDownloadApi = (id: string) => urlcat(apiUrl, '/files/:id/download', { id })
+const fileDownloadApi = (id: string) => urlcat(apiUrl, '/files/download/:id', { id, post_id: '', inline: false })
 const projectsApi = (cursor: number | null) => urlcat(apiUrl, '/gizmos/snorlax/sidebar', { conversations_per_gizmo: 0, cursor })
 const projectConversationsApi = (gizmo: string, offset: number, limit: number) => urlcat(apiUrl, '/gizmos/:gizmo/conversations', { gizmo, cursor: offset, limit })
 const accountsCheckApi = urlcat(apiUrl, '/accounts/check/v4-2023-04-27')
@@ -419,7 +422,7 @@ export async function getCurrentChatId(): Promise<string> {
 }
 
 async function fetchImageFromPointer(uri: string) {
-    const pointer = uri.replace('file-service://', '')
+    const pointer = uri.replace('sediment://', '')
     const imageDetails = await fetchApi<ApiFileDownload>(fileDownloadApi(pointer))
     if (imageDetails.status === 'error') {
         console.error('Failed to fetch image asset', imageDetails.error_code, imageDetails.error_message)
@@ -432,7 +435,7 @@ async function fetchImageFromPointer(uri: string) {
     return base64.replace(/^data:.*?;/, `data:${image.headers.get('content-type')};`)
 }
 
-/** replaces `file-service://` pointers with data uris containing the image */
+/** replaces `sediment://` pointers with data uris containing the image */
 /** avoid errors in parsing multimodal parts we don't understand */
 async function replaceImageAssets(conversation: ApiConversation): Promise<void> {
     const isMultiModalInputImage = (part: any): part is MultiModalInputImage => {
@@ -442,7 +445,7 @@ async function replaceImageAssets(conversation: ApiConversation): Promise<void> 
         && part.content_type === 'image_asset_pointer'
         && 'asset_pointer' in part
         && typeof part.asset_pointer === 'string'
-        && part.asset_pointer.startsWith('file-service://')
+        && part.asset_pointer.startsWith('sediment://')
     }
 
     const imageAssets = Object.values(conversation.mapping).flatMap((node) => {
