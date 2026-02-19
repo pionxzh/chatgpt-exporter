@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.29.4](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.29.3...userscript-v2.29.4) (2026-02-19)
+
+
+### Bug Fixes
+
+* add log on script startup for better debugging ([87e5679](https://github.com/pionxzh/chatgpt-exporter/commit/87e56790ee7395df50a8bd563450d7b930c4d32c))
+* chatgpt changed from file service to sediment ([ab01af1](https://github.com/pionxzh/chatgpt-exporter/commit/ab01af10afad4747965b11b6d42d9130364687d7)), closes [#333](https://github.com/pionxzh/chatgpt-exporter/issues/333)
+* handle skipping thought/reasoning message ([d659b9d](https://github.com/pionxzh/chatgpt-exporter/commit/d659b9db838c0d3b0539e41f67d6e4f79bcc67ff))
+* improve model name mapping ([c7ee677](https://github.com/pionxzh/chatgpt-exporter/commit/c7ee6776feda3f58e1aba62667791f28cf91596b))
+* load all projects  with cursor ([9452700](https://github.com/pionxzh/chatgpt-exporter/commit/9452700c2b44f1b66a6756cc73c8796628c6667e)), closes [#336](https://github.com/pionxzh/chatgpt-exporter/issues/336)
+
 ## [2.29.3](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.29.2...userscript-v2.29.3) (2026-02-05)
 
 
