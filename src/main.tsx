@@ -12,6 +12,9 @@ main()
 
 function main() {
     onloadSafe(() => {
+        // eslint-disable-next-line no-console
+        console.log('[Exporter] Loaded')
+
         const styleEl = document.createElement('style')
         styleEl.id = 'sentinel-css'
         document.head.append(styleEl)
@@ -20,6 +23,8 @@ function main() {
 
         const injectNavMenu = (nav: HTMLElement) => {
             if (injectionMap.has(nav)) return
+            // eslint-disable-next-line no-console
+            console.log('[Exporter] Injecting nav', nav)
 
             const container = getMenuContainer()
             injectionMap.set(nav, container)
@@ -27,6 +32,8 @@ function main() {
             const chatList = nav.querySelector(':scope > div.sticky.bottom-0')
             if (chatList) {
                 chatList.prepend(container)
+                // eslint-disable-next-line no-console
+                console.log('[Exporter] Prepended container to chat list', chatList)
             }
             else {
                 // fallback to the bottom of the nav
@@ -34,6 +41,8 @@ function main() {
                 container.style.position = 'sticky'
                 container.style.bottom = '72px'
                 nav.append(container)
+                // eslint-disable-next-line no-console
+                console.log('[Exporter] Fallback to appending container to nav', nav)
             }
         }
 
