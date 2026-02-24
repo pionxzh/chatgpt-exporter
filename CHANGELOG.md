@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.29.5](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.29.4...userscript-v2.29.5) (2026-02-24)
+
+
+### Bug Fixes
+
+* update script match for better coverage ([4300f4e](https://github.com/pionxzh/chatgpt-exporter/commit/4300f4e81c9bbd3904422beb6cf1e13f4226ddf6)), closes [#335](https://github.com/pionxzh/chatgpt-exporter/issues/335)
+
 ## [2.29.4](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.29.3...userscript-v2.29.4) (2026-02-19)
 
 
