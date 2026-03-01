@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.30.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.29.5...userscript-v2.30.0) (2026-03-01)
+
+
+### Features
+
+* include project name in export all zip filenames ([9c1ad6f](https://github.com/pionxzh/chatgpt-exporter/commit/9c1ad6f6c0edd10fc72b3ff4238e49e33dce9c11))
+
+
+### Bug Fixes
+
+* add explicit ApiConversations type annotation to resolve TS7022 ([b31d5cd](https://github.com/pionxzh/chatgpt-exporter/commit/b31d5cd565d74b502d06b14883b22b8ab105b82d))
+* handle alphanumeric cursor pagination for project conversations ([0e17703](https://github.com/pionxzh/chatgpt-exporter/commit/0e1770356ecc7ef5321c05297fbcd4a90baf0688)), closes [#341](https://github.com/pionxzh/chatgpt-exporter/issues/341)
+* improve shift select user experience ([df1af4b](https://github.com/pionxzh/chatgpt-exporter/commit/df1af4bdf874a4cbbbb288ffc1e8a18221184edc))
+* set a hard cap 100 on export conversations to avoid OOM ([2fd3516](https://github.com/pionxzh/chatgpt-exporter/commit/2fd3516993e06cff58e7394c9cbe257961d3fcc7))
+* stream conversation pages progressively to unblock Export All UI ([e927de3](https://github.com/pionxzh/chatgpt-exporter/commit/e927de365872384ccae915c34861fa9bc592afaf))
+* user need to select project first to load the conversation list ([9ce72c0](https://github.com/pionxzh/chatgpt-exporter/commit/9ce72c0f058be361a4edc3af0fc2227e03bc8f90))
+
 ## [2.29.5](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.29.4...userscript-v2.29.5) (2026-02-24)
 
 
