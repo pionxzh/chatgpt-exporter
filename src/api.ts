@@ -689,6 +689,39 @@ export interface ConversationResult {
     projectId?: string
 }
 
+export function shouldSkipMessageInExport(message?: ConversationNodeMessage): boolean {
+    if (!message || !message.content) return true
+
+    // ChatGPT is talking to tool
+    if (message.recipient !== 'all') return true
+
+    // Skip "thinking" content (hidden reasoning steps from thinking models)
+    if (message.content.content_type === 'thoughts') return true
+    if (message.content.content_type === 'reasoning_recap') return true
+
+    // Skip messages marked as visually hidden (e.g., internal system prompts)
+    if (message.metadata?.is_visually_hidden_from_conversation) return true
+
+    // Skip tool's intermediate message.
+    if (message.author.role === 'tool') {
+        const hasExecutionImages = message.content.content_type === 'execution_output'
+            && !!message.metadata?.aggregate_result?.messages?.some(msg => msg.message_type === 'image')
+
+        const hasDalleImage = message.content.content_type === 'multimodal_text'
+            && message.content.parts.some((part) => {
+                return typeof part !== 'string'
+                    && part.content_type === 'image_asset_pointer'
+                    && !!part.metadata?.dalle
+            })
+
+        if (!hasExecutionImages && !hasDalleImage) {
+            return true
+        }
+    }
+
+    return false
+}
+
 const ModelMapping: { [key in ModelSlug]: string } & { [key: string]: string } = {
     'text-davinci-002-render-sha': 'GPT-3.5',
     'text-davinci-002-render-paid': 'GPT-3.5',
@@ -773,6 +806,8 @@ function extractConversationResult(conversationMapping: Record<string, Conversat
             && node.message?.content.content_type !== 'model_editable_context'
             // Skip user custom instructions
             && node.message?.content.content_type !== 'user_editable_context'
+            // Skip hidden/tool-only messages that should not appear in exported output
+            && !shouldSkipMessageInExport(node.message)
         ) {
             result.unshift(node)
         }
