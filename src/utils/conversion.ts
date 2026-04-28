@@ -1,3 +1,4 @@
+import { shouldSkipMessageInExport } from '../api'
 import { jsonlStringify, nonNullable } from './utils'
 import type { ConversationNode, ConversationResult } from '../api'
 
@@ -22,7 +23,7 @@ interface OobaData {
 }
 
 function convertMessageToTavern(node: ConversationNode): TavernMessage | null {
-    if (!node.message || node.message.content.content_type !== 'text') {
+    if (!node.message || shouldSkipMessageInExport(node.message) || node.message.content.content_type !== 'text') {
         return null
     }
 
@@ -56,7 +57,11 @@ export function convertToTavern(conversation: ConversationResult): string {
 
 export function convertToOoba(conversation: ConversationResult): string {
     const pairs: [string, string][] = []
-    const messages = conversation.conversationNodes.filter(node => node.message?.author.role !== 'tool' && node.message?.content.content_type === 'text')
+    const messages = conversation.conversationNodes.filter((node) => {
+        return !!node.message
+            && !shouldSkipMessageInExport(node.message)
+            && node.message.content.content_type === 'text'
+    })
 
     let idx = 0
     while (idx < messages.length - 1) {
