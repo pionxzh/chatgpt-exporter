@@ -707,14 +707,13 @@ export function shouldSkipMessageInExport(message?: ConversationNodeMessage): bo
         const hasExecutionImages = message.content.content_type === 'execution_output'
             && !!message.metadata?.aggregate_result?.messages?.some(msg => msg.message_type === 'image')
 
-        const hasDalleImage = message.content.content_type === 'multimodal_text'
+        const hasMultimodalImage = message.content.content_type === 'multimodal_text'
             && message.content.parts.some((part) => {
                 return typeof part !== 'string'
                     && part.content_type === 'image_asset_pointer'
-                    && !!part.metadata?.dalle
             })
 
-        if (!hasExecutionImages && !hasDalleImage) {
+        if (!hasExecutionImages && !hasMultimodalImage) {
             return true
         }
     }
