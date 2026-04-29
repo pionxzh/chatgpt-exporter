@@ -199,7 +199,7 @@ interface MultiModalAudioTranscription {
 export interface ConversationNodeMessage {
     author: {
         role: AuthorRole
-        name?: 'browser' | 'python' & (string & {})
+        name?: 'browser' | 'python' | 'file_search' & (string & {})
         metadata: unknown
     }
     content: {
@@ -704,6 +704,8 @@ export function shouldSkipMessageInExport(message?: ConversationNodeMessage): bo
 
     // Skip tool's intermediate message.
     if (message.author.role === 'tool') {
+        if (message.author.name === 'file_search') return true
+
         const hasExecutionImages = message.content.content_type === 'execution_output'
             && !!message.metadata?.aggregate_result?.messages?.some(msg => msg.message_type === 'image')
 
