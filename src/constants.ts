@@ -21,3 +21,10 @@ export const KEY_EXPORT_ALL_LIMIT = 'exporter:export_all_limit'
 
 export const KEY_OAI_LOCALE = 'oai/apps/locale'
 export const KEY_OAI_HISTORY_DISABLED = 'oai/apps/historyDisabled'
+
+/**
+ * Fixed batch size for both the per-conversation API fetch loop and each
+ * generated download archive.  Not user-configurable—kept at 100 to stay
+ * well within ChatGPT web-session rate limits.
+ */
+export const EXPORT_OPERATION_BATCH = 100

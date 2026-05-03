@@ -447,8 +447,21 @@ html {
 }
 
 .SelectItem {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+}
+
+.SelectItem .CheckBoxLabel {
+    flex: 1;
+    min-width: 0;
+}
+
+.SelectItem .LabelText {
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .SelectItem label, .SelectItem input {
@@ -457,6 +470,365 @@ html {
 
 .SelectItem span {
     vertical-align: middle;
+}
+
+.SelectItemMeta {
+    flex-shrink: 0;
+    font-size: 0.7rem;
+    color: #9ca3af;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    min-width: 6.5rem;
+    text-align: right;
+}
+.SelectItemMetaActive {
+    color: #6b7280;
+    font-weight: 600;
+}
+@media (prefers-color-scheme: dark) {
+    .SelectItemMetaActive { color: #d1d5db; }
+}
+
+/* \u2500\u2500 Sortable column header row \u2500\u2500 */
+.SelectListHeader {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    border: 1px solid #6f6e77;
+    border-bottom: none;
+    background: #f9fafb;
+    user-select: none;
+}
+@media (prefers-color-scheme: dark) {
+    .SelectListHeader { background: #1f2937; }
+}
+.SelectListHeaderCell {
+    flex-shrink: 0;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #9ca3af;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    background: transparent;
+    border: none;
+    padding: 5px 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    min-width: 6.5rem;
+    text-align: right;
+}
+.SelectListHeaderCell:hover { color: #374151; }
+@media (prefers-color-scheme: dark) {
+    .SelectListHeaderCell:hover { color: #e5e7eb; }
+}
+.SelectListHeaderCellTitle {
+    flex: 1;
+    text-align: left;
+    padding-left: 28px; /* align with checkbox label */
+}
+.SelectListHeaderCellActive {
+    color: #2563eb;
+}
+@media (prefers-color-scheme: dark) {
+    .SelectListHeaderCellActive { color: #60a5fa; }
+}
+
+.SelectChips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 6px 12px;
+    border: 1px solid #6f6e77;
+    border-bottom: none;
+}
+
+.SelectChip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-size: 0.72rem;
+    background: #dbeafe;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    white-space: nowrap;
+}
+
+@media (prefers-color-scheme: dark) {
+    .SelectChip {
+        background: #1e3a5f;
+        color: #93c5fd;
+        border-color: #1e40af;
+    }
+}
+
+.SelectChipRemove {
+    cursor: pointer;
+    opacity: 0.6;
+    line-height: 1;
+    padding: 0 2px;
+}
+.SelectChipRemove:hover {
+    opacity: 1;
+    color: #dc2626;
+}
+
+.SelectFilterPopover {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: white;
+    border: 1px solid #6f6e77;
+    border-radius: 0 0 6px 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    overflow-y: auto;
+    max-height: 280px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .SelectFilterPopover {
+        background: #1f2937;
+        border-color: #374151;
+    }
+}
+
+.SelectFilterOption {
+    width: 100%;
+    text-align: left;
+    padding: 8px 14px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+}
+
+.SelectFilterOption:hover {
+    background: #f3f4f6;
+}
+
+@media (prefers-color-scheme: dark) {
+    .SelectFilterOption:hover {
+        background: #374151;
+    }
+}
+
+.SelectFilterOption strong {
+    display: block;
+    font-size: 0.82rem;
+}
+
+.SelectFilterOption small {
+    display: block;
+    font-size: 0.7rem;
+    color: #9ca3af;
+    margin-top: 1px;
+}
+
+/* Group header inside the filter picker popover */
+.SelectFilterGroupHeader {
+    padding: 6px 14px 2px;
+    font-size: 0.67rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #9ca3af;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* AND / OR logic toggle pill in the chip bar */
+.SelectChipLogic {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 7px;
+    border-radius: 9999px;
+    font-size: 0.67rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    background: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.SelectChipLogic:hover { background: #bae6fd; }
+.SelectChipLogicOr { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+.SelectChipLogicOr:hover { background: #fde68a; }
+
+@media (prefers-color-scheme: dark) {
+    .SelectChipLogic { background: #0c4a6e; color: #7dd3fc; border-color: #075985; }
+    .SelectChipLogicOr { background: #451a03; color: #fcd34d; border-color: #78350f; }
+}
+
+/* Include / exclude mode badge inside each chip */
+.SelectChipMode {
+    font-size: 0.6rem;
+    padding: 1px 4px;
+    border-radius: 3px;
+    background: rgba(29, 78, 216, 0.1);
+    color: inherit;
+    cursor: pointer;
+    opacity: 0.75;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.SelectChipMode:hover { opacity: 1; }
+.SelectChipModeExclude { background: rgba(220, 38, 38, 0.15); }
+
+/* Chip rendered in exclude mode */
+.SelectChipExclude {
+    background: #fee2e2;
+    color: #b91c1c;
+    border-color: #fecaca;
+}
+@media (prefers-color-scheme: dark) {
+    .SelectChipExclude { background: #450a0a; color: #f87171; border-color: #7f1d1d; }
+}
+
+/* Number input inside duration / recency chips */
+.SelectChip input[type="number"] {
+    width: 2.2rem;
+    background: transparent;
+    color: inherit;
+    font-size: inherit;
+    text-align: center;
+    border: none;
+    outline: none;
+    padding: 0;
+}
+
+/* \u2500\u2500 Picker: back button (stage 2 header) \u2500\u2500 */
+.SelectFilterBack {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 7px 14px 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-align: left;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #e5e7eb;
+    cursor: pointer;
+}
+.SelectFilterBack:hover { color: #374151; }
+@media (prefers-color-scheme: dark) {
+    .SelectFilterBack { color: #9ca3af; border-color: #374151; }
+    .SelectFilterBack:hover { color: #e5e7eb; }
+}
+
+/* \u2500\u2500 Picker: checkbox-style option in sub-view \u2500\u2500 */
+.SelectFilterCheckboxBtn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 7px 14px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    text-align: left;
+}
+.SelectFilterCheckboxBtn:hover { background: #f3f4f6; }
+@media (prefers-color-scheme: dark) {
+    .SelectFilterCheckboxBtn:hover { background: #374151; }
+}
+.SelectFilterCheckIcon {
+    flex-shrink: 0;
+    width: 1rem;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #9ca3af;
+}
+.SelectFilterCheckboxBtnChecked .SelectFilterCheckIcon { color: #2563eb; }
+@media (prefers-color-scheme: dark) {
+    .SelectFilterCheckboxBtnChecked .SelectFilterCheckIcon { color: #60a5fa; }
+}
+
+/* \u2500\u2500 Picker: apply/update button at bottom of sub-view \u2500\u2500 */
+.SelectFilterApplyBtn {
+    display: block;
+    width: calc(100% - 28px);
+    margin: 6px 14px;
+    padding: 5px 0;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+}
+.SelectFilterApplyBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+.SelectFilterApplyBtn:not(:disabled):hover { background: #1d4ed8; }
+
+/* \u2500\u2500 Chip: clickable value label that opens edit picker \u2500\u2500 */
+.SelectChipValueBtn {
+    background: transparent;
+    border: none;
+    color: inherit;
+    font-size: inherit;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 2px;
+}
+.SelectChipValueBtn:hover { opacity: 0.75; }
+
+/* \u2500\u2500 Date chip: full-width row in chip bar \u2500\u2500 */
+.SelectChipDateRow {
+    flex-basis: 100%;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 5px 8px;
+    background: #eff6ff;
+    border-radius: 6px;
+    border: 1px solid #bfdbfe;
+    color: #1d4ed8;
+    font-size: 0.75rem;
+}
+@media (prefers-color-scheme: dark) {
+    .SelectChipDateRow { background: #1e3a5f; color: #93c5fd; border-color: #1e40af; }
+}
+.SelectChipDateRow select,
+.SelectChipDateRow input[type="date"] {
+    background: transparent;
+    border: 1px solid currentColor;
+    border-radius: 3px;
+    color: inherit;
+    font-size: 0.72rem;
+    padding: 1px 4px;
+    outline: none;
+}
+.SelectChipDateRow input[type="date"] { min-width: 6rem; }
+.SelectChipDatePresets {
+    display: flex;
+    gap: 3px;
+    margin-left: auto;
+    flex-wrap: wrap;
+}
+.SelectChipDatePresets button {
+    padding: 1px 5px;
+    border-radius: 3px;
+    border: 1px solid currentColor;
+    background: transparent;
+    color: inherit;
+    font-size: 0.67rem;
+    cursor: pointer;
+}
+.SelectChipDatePresets button:hover { background: rgba(37, 99, 235, 0.12); }
+@media (prefers-color-scheme: dark) {
+    .SelectChipDatePresets button:hover { background: rgba(147, 197, 253, 0.12); }
 }
 
 @keyframes contentShow {
@@ -1115,6 +1487,7 @@ html {
   const KEY_EXPORT_ALL_LIMIT = "exporter:export_all_limit";
   const KEY_OAI_LOCALE = "oai/apps/locale";
   const KEY_OAI_HISTORY_DISABLED = "oai/apps/historyDisabled";
+  const EXPORT_OPERATION_BATCH = 100;
   var _GM_deleteValue = /* @__PURE__ */ (() => typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0)();
   var _GM_getValue = /* @__PURE__ */ (() => typeof GM_getValue != "undefined" ? GM_getValue : void 0)();
   var _GM_setValue = /* @__PURE__ */ (() => typeof GM_setValue != "undefined" ? GM_setValue : void 0)();
@@ -1331,26 +1704,29 @@ html {
       cursor: nextCursor ?? null
     };
   }
-  async function fetchAllConversations(project = null, maxConversations = 1e3, onBatch) {
+  async function fetchConversationsPage(project, offset, limit) {
+    return fetchConversations(offset, limit, project);
+  }
+  async function fetchAllConversations(project = null, maxConversations = 1e3, onBatch, onHasMore) {
     const conversations = [];
     const limit = project === null ? 100 : 50;
     let offset = 0;
     let cursor = 0;
     while (true) {
       try {
-        const result = project === null ? await fetchConversations(offset, limit) : await fetchProjectConversations(project, cursor, limit);
-        if (!result.items) {
+        const result2 = project === null ? await fetchConversations(offset, limit) : await fetchProjectConversations(project, cursor, limit);
+        if (!result2.items) {
           console.warn("fetchAllConversations received no items at offset:", offset);
           break;
         }
-        conversations.push(...result.items);
-        if (result.items.length === 0) break;
-        onBatch == null ? void 0 : onBatch(result.items);
-        if (result.total == null && result.cursor == null) break;
-        if (result.total !== null && offset + limit >= result.total) break;
+        conversations.push(...result2.items);
+        if (result2.items.length === 0) break;
+        onBatch == null ? void 0 : onBatch(result2.items);
+        if (result2.total == null && result2.cursor == null) break;
+        if (result2.total !== null && offset + limit >= result2.total) break;
         if (conversations.length >= maxConversations) break;
-        if (result.cursor != null) {
-          cursor = result.cursor;
+        if (result2.cursor != null) {
+          cursor = result2.cursor;
         } else {
           offset += limit;
         }
@@ -1359,7 +1735,9 @@ html {
         break;
       }
     }
-    return conversations.slice(0, maxConversations);
+    const result = conversations.slice(0, maxConversations);
+    onHasMore == null ? void 0 : onHasMore(result.length >= maxConversations);
+    return result;
   }
   async function archiveConversation(chatId) {
     const url = conversationApi(chatId);
@@ -1379,6 +1757,35 @@ html {
     });
     return success;
   }
+  class RateLimitError extends Error {
+    constructor(retryAfterHeader) {
+      super("Too Many Requests (429)");
+      /** Milliseconds to wait before retrying */
+      __publicField(this, "retryAfterMs");
+      this.name = "RateLimitError";
+      const secs = retryAfterHeader != null ? Number.parseInt(retryAfterHeader, 10) : Number.NaN;
+      this.retryAfterMs = Number.isFinite(secs) && secs > 0 ? secs * 1e3 : 3e4;
+    }
+  }
+  const RATE_LIMIT_HEADERS = [
+    "retry-after",
+    "x-ratelimit-limit-requests",
+    "x-ratelimit-remaining-requests",
+    "x-ratelimit-reset-requests",
+    "x-ratelimit-limit-tokens",
+    "x-ratelimit-remaining-tokens",
+    "x-ratelimit-reset-tokens"
+  ];
+  function logRateLimitHeaders(response) {
+    const found = {};
+    for (const h2 of RATE_LIMIT_HEADERS) {
+      const val = response.headers.get(h2);
+      if (val != null) found[h2] = val;
+    }
+    if (Object.keys(found).length > 0) {
+      console.info("[Exporter] Rate-limit headers:", found);
+    }
+  }
   async function fetchApi(url, options) {
     const accessToken = await getAccessToken();
     const accountId = await getTeamAccountId();
@@ -1391,10 +1798,40 @@ html {
         ...options == null ? void 0 : options.headers
       }
     });
+    logRateLimitHeaders(response);
     if (!response.ok) {
+      if (response.status === 429) {
+        throw new RateLimitError(response.headers.get("Retry-After"));
+      }
       throw new Error(response.statusText);
     }
     return response.json();
+  }
+  async function probeApi() {
+    const accessToken = await getAccessToken();
+    const accountId = await getTeamAccountId();
+    const url = conversationsApi(0, 1);
+    const response = await fetch(url, {
+      headers: {
+        "Authorization": `Bearer ${accessToken}`,
+        "X-Authorization": `Bearer ${accessToken}`,
+        ...accountId ? { "Chatgpt-Account-Id": accountId } : {}
+      }
+    });
+    const rateLimitHeaders = {};
+    for (const h2 of RATE_LIMIT_HEADERS) {
+      const val = response.headers.get(h2);
+      if (val != null) rateLimitHeaders[h2] = val;
+    }
+    if (!response.ok) {
+      if (response.status === 429) {
+        const secs = response.headers.get("retry-after");
+        const ms = secs ? Number.parseInt(secs, 10) * 1e3 : 6e4;
+        return { ok: false, retryAfterMs: ms, rateLimitHeaders };
+      }
+      return { ok: false, rateLimitHeaders };
+    }
+    return { ok: true, rateLimitHeaders };
   }
   async function _fetchSession() {
     const response = await fetch(sessionApi);
@@ -8206,11 +8643,62 @@ html {
     "Select Project": "Select Project",
     "(no project)": "(no project)",
     "Export All Limit": "Export All Limit",
-    "Export All Limit Description": "Set the maximum number of conversations to load in the 'Export All' dialog.",
+    "Export All Limit Description": "Set the maximum number of conversations to load. Exports run in waves of 100 conversations to stay within API rate limits.",
     "Select a source to load conversations": "Select a project above to load conversations.",
     Search: Search$8,
     "Last 100": "Last 100",
-    "No results": "No results"
+    "No results": "No results",
+    "Date From": "From",
+    "Date To": "To",
+    "Date Filter Label": "Date",
+    "Date Filter Hint": "Filters by the chosen timestamp field. Leave blank for no date restriction.",
+    "Date Filter Field Created": "Created",
+    "Date Filter Field Updated": "Updated",
+    "Date Preset 7d": "7d",
+    "Date Preset 30d": "30d",
+    "Date Preset 90d": "90d",
+    "Date Preset Year": "This year",
+    "Clear filter": "Clear",
+    "Selected count": "{{count}} selected",
+    "Export batch info": "Exports in batches of 100 per download",
+    "Exporting batch": "Exporting batch {{current}} of {{total}}",
+    "Export batches button": "Export ({{n}} downloads)",
+    "Batch progress": "Batch {{current}}/{{total}}",
+    "All conversations": "All conversations",
+    "Filters hint": "type # to add filters",
+    "Load more conversations": "Load {{n}} more",
+    "Load more conversations remaining": "Load {{n}} more · {{remaining}} left",
+    "Chip group chat class": "Chat class",
+    "Chip group origin": "Origin",
+    "Chip group status": "Status",
+    "Chip group duration": "Duration",
+    "Chip group recency": "Recency",
+    "Chip cc regular label": "💬 Regular",
+    "Chip cc regular desc": "Standard chats with no GPT or Project",
+    "Chip cc gpt label": "🤖 GPT",
+    "Chip cc gpt desc": "Used a GPT Store AI",
+    "Chip cc project label": "📂 Project",
+    "Chip cc project desc": "Started inside one of your Projects",
+    "Chip origin web label": "🌐 Web / App",
+    "Chip origin web desc": "Web app or mobile app",
+    "Chip status starred label": "⭐ Starred",
+    "Chip status starred desc": "Conversations you have starred",
+    "Chip status temporary label": "💬 Temporary",
+    "Chip status temporary desc": "Temporary chats not saved to history",
+    "Chip status pinned label": "📌 Pinned",
+    "Chip status pinned desc": "Conversations you have pinned",
+    "Chip duration label": "⏱ Long conversation",
+    "Chip duration desc": "Active span ≥ N days (adjustable on chip)",
+    "Chip recency label": "📅 Recently active",
+    "Chip recency desc": "Updated within N days (adjustable on chip)",
+    "Chip mode include": "include",
+    "Chip mode exclude": "exclude",
+    "Chip logic and": "AND",
+    "Chip logic or": "OR",
+    "Chip duration prefix": "⏱ active ≥",
+    "Chip duration suffix": "d",
+    "Chip recency prefix": "📅 updated <",
+    "Chip recency suffix": "d"
   };
   const title$7 = "ChatGPT Exporter";
   const ExportHelper$7 = "Exportar";
@@ -9694,8 +10182,48 @@ html {
       window.addEventListener("load", fn2);
     }
   }
+  const _WORKER_SRC = "onmessage=function(e){setTimeout(function(){postMessage(e.data)},e.data.ms)}";
+  let _sleepWorker = null;
+  let _sleepWorkerFailed = false;
+  const _pendingResolves = /* @__PURE__ */ new Map();
+  let _sleepIdCounter = 0;
+  function _getSleepWorker() {
+    if (_sleepWorkerFailed) return null;
+    if (_sleepWorker) return _sleepWorker;
+    try {
+      const blob = new Blob([_WORKER_SRC], { type: "application/javascript" });
+      const url = URL.createObjectURL(blob);
+      const w2 = new Worker(url);
+      URL.revokeObjectURL(url);
+      w2.onmessage = (e2) => {
+        const resolve = _pendingResolves.get(e2.data.id);
+        if (resolve) {
+          _pendingResolves.delete(e2.data.id);
+          resolve();
+        }
+      };
+      w2.onerror = () => {
+        _sleepWorkerFailed = true;
+        _sleepWorker = null;
+        for (const resolve of _pendingResolves.values()) resolve();
+        _pendingResolves.clear();
+      };
+      _sleepWorker = w2;
+      return w2;
+    } catch {
+      _sleepWorkerFailed = true;
+      return null;
+    }
+  }
   function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+    if (ms <= 0) return Promise.resolve();
+    const worker = _getSleepWorker();
+    if (!worker) return new Promise((resolve) => setTimeout(resolve, ms));
+    return new Promise((resolve) => {
+      const id = _sleepIdCounter++;
+      _pendingResolves.set(id, resolve);
+      worker.postMessage({ id, ms });
+    });
   }
   function dateStr(date = /* @__PURE__ */ new Date()) {
     const year = date.getFullYear();
@@ -9737,11 +10265,24 @@ html {
   function normalizeProjectName(projectName) {
     return projectName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
   }
-  function buildZipFileName(format, projectName) {
+  function partSuffix(partInfo) {
+    if (!partInfo || partInfo.total <= 1) return "";
+    const pad = (n2) => String(n2).padStart(2, "0");
+    return `-part-${pad(partInfo.part)}-of-${pad(partInfo.total)}`;
+  }
+  function buildZipFileName(format, projectName, partInfo) {
+    const suffix = partSuffix(partInfo);
     if (projectName) {
-      return `chatgpt-export-${format}-project-${normalizeProjectName(projectName)}.zip`;
+      return `chatgpt-export-${format}-project-${normalizeProjectName(projectName)}${suffix}.zip`;
     }
-    return `chatgpt-export-${format}.zip`;
+    return `chatgpt-export-${format}${suffix}.zip`;
+  }
+  function buildJsonBatchFileName(projectName, partInfo) {
+    const suffix = partSuffix(partInfo);
+    if (projectName) {
+      return `chatgpt-export-project-${normalizeProjectName(projectName)}${suffix}.json`;
+    }
+    return `chatgpt-export${suffix}.json`;
   }
   function getFileNameWithFormat(format, ext, {
     title: title2 = document.title,
@@ -20860,7 +21401,7 @@ html {
     downloadFile(fileName, "text/html", standardizeLineBreaks(html2));
     return true;
   }
-  async function exportAllToHtml(fileNameFormat, apiConversations, metaList, projectName) {
+  async function exportAllToHtml(fileNameFormat, apiConversations, metaList, projectName, partIndex, totalParts) {
     const userAvatar = await getUserAvatar();
     const zip = new JSZip();
     const filenameMap = /* @__PURE__ */ new Map();
@@ -20889,7 +21430,8 @@ html {
         level: 9
       }
     });
-    downloadFile(buildZipFileName("html", projectName), "application/zip", blob);
+    const partInfo = partIndex != null && totalParts != null ? { part: partIndex, total: totalParts } : void 0;
+    downloadFile(buildZipFileName("html", projectName, partInfo), "application/zip", blob);
     return true;
   }
   function conversationToHtml(conversation, avatar, metaList) {
@@ -21351,13 +21893,13 @@ ${content2.text}
     downloadFile(fileName, "application/json", content2);
     return true;
   }
-  async function exportAllToOfficialJson(_fileNameFormat, apiConversations, _metaList, projectName) {
+  async function exportAllToOfficialJson(_fileNameFormat, apiConversations, _metaList, projectName, partIndex, totalParts) {
+    const partInfo = partIndex != null && totalParts != null ? { part: partIndex, total: totalParts } : void 0;
     const content2 = conversationToJson(apiConversations);
-    const baseName = projectName ? `chatgpt-export-project-${normalizeProjectName(projectName)}` : "chatgpt-export";
-    downloadFile(`${baseName}.json`, "application/json", content2);
+    downloadFile(buildJsonBatchFileName(projectName, partInfo), "application/json", content2);
     return true;
   }
-  async function exportAllToJson(fileNameFormat, apiConversations, _metaList, projectName) {
+  async function exportAllToJson(fileNameFormat, apiConversations, _metaList, projectName, partIndex, totalParts) {
     const zip = new JSZip();
     const filenameMap = /* @__PURE__ */ new Map();
     const conversations = apiConversations.map((x2) => ({
@@ -21388,7 +21930,8 @@ ${content2.text}
         level: 9
       }
     });
-    downloadFile(buildZipFileName("json", projectName), "application/zip", blob);
+    const partInfo = partIndex != null && totalParts != null ? { part: partIndex, total: totalParts } : void 0;
+    downloadFile(buildZipFileName("json", projectName, partInfo), "application/zip", blob);
     return true;
   }
   function conversationToJson(conversation) {
@@ -21407,7 +21950,7 @@ ${content2.text}
     downloadFile(fileName, "text/markdown", standardizeLineBreaks(markdown));
     return true;
   }
-  async function exportAllToMarkdown(fileNameFormat, apiConversations, metaList, projectName) {
+  async function exportAllToMarkdown(fileNameFormat, apiConversations, metaList, projectName, partIndex, totalParts) {
     const zip = new JSZip();
     const filenameMap = /* @__PURE__ */ new Map();
     const conversations = apiConversations.map((x2) => processConversation(x2));
@@ -21435,7 +21978,8 @@ ${content2.text}
         level: 9
       }
     });
-    downloadFile(buildZipFileName("markdown", projectName), "application/zip", blob);
+    const partInfo = partIndex != null && totalParts != null ? { part: partIndex, total: totalParts } : void 0;
+    downloadFile(buildZipFileName("markdown", projectName, partInfo), "application/zip", blob);
     return true;
   }
   const LatexRegex$1 = /(\s\$\$.+\$\$\s|\s\$.+\$\s|\\\[.+\\\]|\\\(.+\\\))|(^\$$[\S\s]+^\$$)|(^\$\$[\S\s]+^\$\$$)/gm;
@@ -21818,6 +22362,9 @@ ${content2}`;
       });
     } };
   }
+  const MAX_RETRIES = 5;
+  const MAX_GLOBAL_PAUSES = 5;
+  const DEFAULT_429_PAUSE_MS = 6e4;
   class RequestQueue {
     constructor(minBackoff, maxBackoff) {
       __publicField(this, "eventEmitter", EventEmitter());
@@ -21828,12 +22375,20 @@ ${content2}`;
       __publicField(this, "backoff");
       __publicField(this, "total", 0);
       __publicField(this, "completed", 0);
+      /**
+       * Timestamp (ms since epoch) until which the whole queue is frozen after
+       * receiving a 429. While Date.now() < pauseUntil every process() iteration
+       * waits out the remainder before making the next request.
+       */
+      __publicField(this, "pauseUntil", 0);
+      /** How many global rate-limit pauses have been applied so far */
+      __publicField(this, "globalPauses", 0);
       this.minBackoff = minBackoff;
       this.maxBackoff = maxBackoff;
       this.backoff = minBackoff;
     }
     add(requestObject) {
-      this.queue.push(requestObject);
+      this.queue.push({ ...requestObject, retries: 0, rateRetries: 0 });
     }
     start() {
       if (this.status === "IDLE") {
@@ -21850,6 +22405,8 @@ ${content2}`;
       this.results = [];
       this.status = "IDLE";
       this.backoff = this.minBackoff;
+      this.pauseUntil = 0;
+      this.globalPauses = 0;
       this.total = 0;
       this.completed = 0;
     }
@@ -21865,9 +22422,17 @@ ${content2}`;
         this.done();
         return;
       }
+      const remaining = this.pauseUntil - Date.now();
+      if (remaining > 0) {
+        const waitSecs = Math.ceil(remaining / 1e3);
+        this.progress(this.queue[0].name, "rate_limited", waitSecs);
+        await sleep(remaining);
+        this.pauseUntil = 0;
+      }
       this.status = "IN_PROGRESS";
       const requestObject = this.queue.shift();
       const { name, request } = requestObject;
+      let waitMs = this.backoff;
       try {
         this.progress(name, "processing");
         const result = await request();
@@ -21875,21 +22440,48 @@ ${content2}`;
         this.completed++;
         this.progress(name, "processing");
         this.backoff = this.minBackoff;
+        requestObject.retries = 0;
       } catch (error2) {
-        console.error(`Request ${name} failed:`, error2);
-        this.progress(name, "retrying");
-        this.backoff = Math.min(this.backoff * this.backoffMultiplier, this.maxBackoff);
-        this.queue.unshift(requestObject);
+        if (error2 instanceof RateLimitError) {
+          this.globalPauses++;
+          if (this.globalPauses > MAX_GLOBAL_PAUSES) {
+            console.warn("[Exporter] Queue stopped: API rate limit did not clear after", MAX_GLOBAL_PAUSES, "pauses");
+            this.stop();
+            return;
+          }
+          const pauseMs = Math.max(
+            error2.retryAfterMs,
+            DEFAULT_429_PAUSE_MS * this.globalPauses
+          );
+          this.pauseUntil = Date.now() + pauseMs;
+          this.progress(name, "rate_limited", Math.round(pauseMs / 1e3));
+          console.warn(`[Exporter] Rate limited (429). Pausing queue for ${Math.round(pauseMs / 1e3)}s (pause #${this.globalPauses})`);
+          this.queue.unshift(requestObject);
+          waitMs = 0;
+        } else {
+          console.error(`[Exporter] "${name}" failed:`, error2);
+          requestObject.retries++;
+          if (requestObject.retries > MAX_RETRIES) {
+            console.warn(`[Exporter] "${name}" skipped after ${MAX_RETRIES} retries`);
+            waitMs = 0;
+          } else {
+            this.backoff = Math.min(this.backoff * this.backoffMultiplier, this.maxBackoff);
+            waitMs = this.backoff;
+            this.progress(name, "retrying");
+            this.queue.unshift(requestObject);
+          }
+        }
       }
-      await sleep(this.backoff);
+      await sleep(waitMs);
       this.process();
     }
-    progress(name, status) {
+    progress(name, status, rateLimitWaitSecs) {
       this.eventEmitter.emit("progress", {
         total: this.total,
         completed: this.completed,
         currentName: name,
-        currentStatus: status
+        currentStatus: status,
+        rateLimitWaitSecs
       });
     }
     done() {
@@ -22109,37 +22701,210 @@ ${content2}`;
     );
   };
   const useSettingContext = () => q$1(SettingContext);
-  const ProjectSelect = ({ projects, selected, setSelected, disabled }) => {
-    const { t: t2 } = useTranslation();
-    const value = selected === void 0 ? "__unselected__" : (selected == null ? void 0 : selected.id) || "";
-    return /* @__PURE__ */ o$8("div", { className: "flex items-center text-gray-600 dark:text-gray-300 flex justify-between mb-3", children: [
-      t2("Select Project"),
-      /* @__PURE__ */ o$8(
-        "select",
-        {
-          disabled,
-          className: "Select",
-          value,
-          onChange: (e2) => {
-            const projectId = e2.currentTarget.value;
-            const project = projects.find((p2) => p2.id === projectId);
-            setSelected(project || null);
-          },
-          children: [
-            selected === void 0 && /* @__PURE__ */ o$8("option", { value: "__unselected__", disabled: true, children: [
-              t2("Select Project"),
-              "..."
-            ] }),
-            /* @__PURE__ */ o$8("option", { value: "", children: t2("(no project)") }),
-            projects.map((project) => /* @__PURE__ */ o$8("option", { value: project.id, children: project.display.name }, project.id))
-          ]
-        }
-      )
-    ] });
-  };
-  const EXPORT_LIMIT = 100;
+  const exportingRef = { current: false };
+  function toMs(time) {
+    if (time == null) return 0;
+    if (typeof time === "number") return time * 1e3;
+    return new Date(time).getTime();
+  }
+  function chunkArray(arr, size) {
+    const result = [];
+    for (let i2 = 0; i2 < arr.length; i2 += size) {
+      result.push(arr.slice(i2, i2 + size));
+    }
+    return result;
+  }
+  function formatConvDate(time) {
+    if (!time) return "—";
+    const ms = typeof time === "number" ? time * 1e3 : new Date(time).getTime();
+    if (Number.isNaN(ms) || ms === 0) return "—";
+    const d2 = new Date(ms);
+    const diffDays = Math.floor((Date.now() - ms) / 864e5);
+    if (diffDays === 0) return "Today";
+    if (diffDays === 1) return "Yesterday";
+    return d2.toLocaleDateString(void 0, { year: "numeric", month: "short", day: "numeric" });
+  }
+  function textSearch(title2, query2) {
+    const q2 = query2.trim();
+    if (!q2) return true;
+    const lower = q2.toLowerCase();
+    if (!lower.includes("*") && !lower.includes("?")) {
+      return title2.toLowerCase().includes(lower);
+    }
+    const regexStr = lower.replace(/[\\\^$.|+()[\]{}]/g, "\\$&").replace(/\*/g, ".*").replace(/\?/g, ".");
+    try {
+      return new RegExp(regexStr).test(title2.toLowerCase());
+    } catch {
+      return title2.toLowerCase().includes(lower);
+    }
+  }
+  const NULL_ORIGIN_ID = "__web_app__";
+  const CHAT_CLASS_SUB_OPTIONS = [
+    { id: "regular", label: "💬 Regular", desc: "Standard chats with no GPT or Project" },
+    { id: "gpt", label: "🤖 GPT", desc: "Used a GPT Store AI" },
+    { id: "project", label: "📂 Project", desc: "Any conversation in a Project" }
+  ];
+  const STATUS_SUB_OPTIONS = [
+    { id: "starred", label: "⭐ Starred", desc: "Starred conversations" },
+    { id: "temporary", label: "💬 Temporary", desc: "Temporary chats not saved to history" },
+    { id: "pinned", label: "📌 Pinned", desc: "Pinned conversations" }
+  ];
+  const DATE_PRESETS = [
+    { days: 7, label: "7d" },
+    { days: 30, label: "30d" },
+    { days: 90, label: "90d" },
+    { days: 365, label: "Year" }
+  ];
+  const ROOT_PICKER_ITEMS = [
+    { id: "chat_class", label: "💬 Chat class", desc: "Regular, GPT, or Project chats", hasSubView: true },
+    { id: "origin", label: "🌐 Origin", desc: "How the conversation was started", hasSubView: true },
+    { id: "project", label: "📂 Project", desc: "Filter by specific project", hasSubView: true },
+    { id: "status", label: "⭐ Status", desc: "Starred, Temporary, or Pinned", hasSubView: true },
+    { id: "duration_gte", label: "⏱ Duration", desc: "Long conversation (≥ N days)", hasSubView: false },
+    { id: "recency_lte", label: "📅 Recency", desc: "Recently updated (< N days)", hasSubView: false },
+    { id: "date", label: "📅 Date range", desc: "Filter by created or updated date", hasSubView: false }
+  ];
+  function isChipDuplicate(chips, candidate) {
+    return chips.some((c2) => c2.type === candidate.type);
+  }
+  function getChipEncodedSelections(chip) {
+    switch (chip.type) {
+      case "chat_class":
+        return chip.values;
+      case "origin":
+        return chip.values.map((v2) => v2 === null ? NULL_ORIGIN_ID : v2);
+      case "project":
+        return chip.projectIds;
+      case "status":
+        return chip.values;
+      default:
+        return [];
+    }
+  }
+  function makeChipFromPickerState(view, selections, mode) {
+    switch (view) {
+      case "chat_class":
+        return { type: "chat_class", values: selections, mode };
+      case "origin":
+        return { type: "origin", values: selections.map((s2) => s2 === NULL_ORIGIN_ID ? null : s2), mode };
+      case "project":
+        return { type: "project", projectIds: selections, mode };
+      case "status":
+        return { type: "status", values: selections, mode };
+    }
+  }
+  function getChipValueLabel(chip, projects) {
+    switch (chip.type) {
+      case "chat_class": {
+        if (chip.values.length === 0) return "none";
+        if (chip.values.length === 3) return "all types";
+        const lbl = { regular: "💬 Regular", gpt: "🤖 GPT", project: "📂 Project" };
+        return chip.values.map((v2) => lbl[v2]).join(", ");
+      }
+      case "origin": {
+        if (chip.values.length === 0) return "none";
+        return chip.values.map((v2) => v2 === null ? "Web/App" : v2.charAt(0).toUpperCase() + v2.slice(1)).join(", ");
+      }
+      case "project": {
+        if (chip.projectIds.length === 0) return "any project";
+        return chip.projectIds.map((id) => {
+          var _a;
+          return ((_a = projects.find((p2) => p2.id === id)) == null ? void 0 : _a.display.name) ?? id.slice(0, 8);
+        }).join(", ");
+      }
+      case "status": {
+        if (chip.values.length === 0) return "none";
+        const lbl = { starred: "⭐ Starred", temporary: "💬 Temp", pinned: "📌 Pinned" };
+        return chip.values.map((v2) => lbl[v2]).join(", ");
+      }
+      default:
+        return null;
+    }
+  }
+  function getChipTypePrefix(type) {
+    if (type === "chat_class") return "💬 Chat";
+    if (type === "origin") return "🌐 Origin";
+    if (type === "project") return "📂 Project";
+    if (type === "status") return "⭐ Status";
+    return "";
+  }
+  function getPickerViewTitle(view) {
+    if (view === "chat_class") return "Chat class";
+    if (view === "origin") return "Origin";
+    if (view === "project") return "Project";
+    if (view === "status") return "Status";
+    return "";
+  }
+  function matchDateChip(c2, chip) {
+    if (chip.from) {
+      const fromMs = new Date(chip.from).getTime();
+      if (!Number.isNaN(fromMs) && toMs(c2[chip.field]) < fromMs) return false;
+    }
+    if (chip.to) {
+      const toEndMs = (/* @__PURE__ */ new Date(`${chip.to}T23:59:59.999`)).getTime();
+      if (!Number.isNaN(toEndMs) && toMs(c2[chip.field]) > toEndMs) return false;
+    }
+    return true;
+  }
+  function matchFilterChip(c2, chip, projectIdSet) {
+    let raw2 = true;
+    switch (chip.type) {
+      case "chat_class": {
+        if (chip.values.length === 0) break;
+        const gizmoId = c2.gizmo_id ?? null;
+        const isProject = gizmoId !== null && projectIdSet.has(gizmoId);
+        const isGpt = gizmoId !== null && !isProject;
+        raw2 = chip.values.some((v2) => {
+          if (v2 === "regular") return gizmoId === null;
+          if (v2 === "project") return isProject;
+          return isGpt;
+        });
+        break;
+      }
+      case "origin": {
+        if (chip.values.length === 0) break;
+        raw2 = chip.values.some((v2) => {
+          if (v2 === null) return (c2.conversation_origin ?? null) === null;
+          return c2.conversation_origin === v2;
+        });
+        break;
+      }
+      case "project": {
+        if (chip.projectIds.length === 0) break;
+        raw2 = c2.gizmo_id != null && chip.projectIds.includes(c2.gizmo_id);
+        break;
+      }
+      case "status": {
+        if (chip.values.length === 0) break;
+        raw2 = chip.values.some((v2) => {
+          if (v2 === "starred") return c2.is_starred === true;
+          if (v2 === "temporary") return c2.is_temporary_chat === true;
+          return c2.pinned_time != null;
+        });
+        break;
+      }
+      case "duration_gte":
+        raw2 = toMs(c2.update_time) - toMs(c2.create_time) >= chip.days * 864e5;
+        break;
+      case "recency_lte":
+        raw2 = Date.now() - toMs(c2.update_time) <= chip.days * 864e5;
+        break;
+    }
+    return chip.mode === "include" ? raw2 : !raw2;
+  }
+  function applyChips(conversations, chips, logic, projects) {
+    if (chips.length === 0) return conversations;
+    const projectIdSet = new Set(projects.map((p2) => p2.id));
+    const dateChip = chips.find((c2) => c2.type === "date");
+    const other = chips.filter((c2) => c2.type !== "date");
+    let result = conversations;
+    if (dateChip) result = result.filter((c2) => matchDateChip(c2, dateChip));
+    if (other.length === 0) return result;
+    return logic === "AND" ? result.filter((c2) => other.every((chip) => matchFilterChip(c2, chip, projectIdSet))) : result.filter((c2) => other.some((chip) => matchFilterChip(c2, chip, projectIdSet)));
+  }
   const ConversationSelect = ({
     conversations,
+    projects,
     selected,
     setSelected,
     disabled,
@@ -22148,28 +22913,455 @@ ${content2}`;
   }) => {
     const { t: t2 } = useTranslation();
     const [query2, setQuery] = h$4("");
+    const [chips, setChips] = h$4([]);
+    const [chipLogic, setChipLogic] = h$4("AND");
+    const [showPopover, setShowPopover] = h$4(false);
+    const [pickerView, setPickerView] = h$4("root");
+    const [pickerSelections, setPickerSelections] = h$4([]);
+    const [editingChipIndex, setEditingChipIndex] = h$4(null);
     const lastClickedIndex = _(-1);
-    const filtered = F$1(() => {
-      const q2 = query2.trim().toLowerCase();
-      if (!q2) return conversations;
-      return conversations.filter((c2) => c2.title.toLowerCase().includes(q2));
-    }, [conversations, query2]);
-    const atCap = selected.length >= EXPORT_LIMIT;
-    const allFilteredSelected = filtered.length > 0 && filtered.slice(0, EXPORT_LIMIT).every((c2) => selected.some((x2) => x2.id === c2.id));
-    return /* @__PURE__ */ o$8(k$3, { children: [
-      /* @__PURE__ */ o$8(
-        "input",
-        {
-          type: "search",
-          className: "SelectSearch",
-          placeholder: t2("Search"),
-          value: query2,
-          onInput: (e2) => {
-            lastClickedIndex.current = -1;
-            setQuery(e2.currentTarget.value);
-          }
+    const searchInputRef = _(null);
+    const skipNextBlur = _(false);
+    const [skipFirst, setSkipFirst] = h$4(0);
+    const [sortField, setSortField] = h$4("create_time");
+    const [sortDir, setSortDir] = h$4("desc");
+    const originSubOptions = F$1(() => {
+      const map2 = /* @__PURE__ */ new Map();
+      for (const c2 of conversations) {
+        const val = c2.conversation_origin ?? null;
+        const id = val === null ? NULL_ORIGIN_ID : val;
+        if (!map2.has(id)) {
+          const label = val === null ? "Web / App" : val.charAt(0).toUpperCase() + val.slice(1);
+          map2.set(id, label);
         }
-      ),
+      }
+      return [...map2.entries()].map(([id, label]) => ({
+        id,
+        label: `🌐 ${label}`,
+        desc: id === NULL_ORIGIN_ID ? "Web app or mobile app" : `Started via ${label}`
+      }));
+    }, [conversations]);
+    const projectSubOptions = F$1(
+      () => projects.map((p2) => ({ id: p2.id, label: `📂 ${p2.display.name}`, desc: "" })),
+      [projects]
+    );
+    const currentSubOptions = F$1(() => {
+      if (pickerView === "chat_class") return CHAT_CLASS_SUB_OPTIONS;
+      if (pickerView === "origin") return originSubOptions;
+      if (pickerView === "project") return projectSubOptions;
+      if (pickerView === "status") return STATUS_SUB_OPTIONS;
+      return [];
+    }, [pickerView, originSubOptions, projectSubOptions]);
+    const rootOptions = F$1(
+      () => ROOT_PICKER_ITEMS.filter((opt) => !chips.some((c2) => c2.type === opt.id)),
+      [chips]
+    );
+    const filtered = F$1(() => {
+      let result = conversations;
+      const q2 = query2.trim().replace(/#$/, "").trim();
+      if (q2) result = result.filter((c2) => textSearch(c2.title, q2));
+      result = applyChips(result, chips, chipLogic, projects);
+      const dir = sortDir === "asc" ? 1 : -1;
+      return [...result].sort((a2, b2) => {
+        if (sortField === "title") {
+          return dir * (a2.title ?? "").localeCompare(b2.title ?? "");
+        }
+        const aMs = toMs(sortField === "update_time" ? a2.update_time : a2.create_time);
+        const bMs = toMs(sortField === "update_time" ? b2.update_time : b2.create_time);
+        return dir * (aMs - bMs);
+      });
+    }, [conversations, query2, chips, chipLogic, projects, sortField, sortDir]);
+    const allFilteredSelected = filtered.length > 0 && filtered.every((c2) => selected.some((x2) => x2.id === c2.id));
+    const nonDateChips = F$1(() => chips.filter((c2) => c2.type !== "date"), [chips]);
+    const updateChip = T$4((index2, updated) => {
+      setChips((prev) => prev.map((c2, i2) => i2 === index2 ? updated : c2));
+    }, []);
+    const removeChip = T$4((index2) => {
+      setChips((prev) => prev.filter((_24, i2) => i2 !== index2));
+    }, []);
+    const toggleChipMode = T$4((index2) => {
+      setChips((prev) => prev.map((c2, i2) => {
+        if (i2 !== index2 || c2.type === "date") return c2;
+        return { ...c2, mode: c2.mode === "include" ? "exclude" : "include" };
+      }));
+    }, []);
+    const dateChip = F$1(
+      () => chips.find((c2) => c2.type === "date"),
+      [chips]
+    );
+    const updateDateChip = T$4((updates) => {
+      setChips((prev) => prev.map((c2) => {
+        if (c2.type !== "date") return c2;
+        return { ...c2, ...updates };
+      }));
+    }, []);
+    const setDatePreset = T$4((days) => {
+      const d2 = /* @__PURE__ */ new Date();
+      const from = new Date(d2.getTime() - days * 864e5).toISOString().slice(0, 10);
+      const to = d2.toISOString().slice(0, 10);
+      setChips((prev) => prev.map((c2) => {
+        if (c2.type !== "date") return c2;
+        return { ...c2, from, to };
+      }));
+    }, []);
+    const removeDateChip = T$4(() => {
+      setChips((prev) => prev.filter((c2) => c2.type !== "date"));
+    }, []);
+    const closePicker = T$4(() => {
+      setShowPopover(false);
+      setPickerView("root");
+      setPickerSelections([]);
+      setEditingChipIndex(null);
+    }, []);
+    const togglePickerSelection = T$4((id) => {
+      setPickerSelections(
+        (prev) => prev.includes(id) ? prev.filter((s2) => s2 !== id) : [...prev, id]
+      );
+    }, []);
+    const applyPickerSelections = T$4(() => {
+      if (pickerView === "root") return;
+      let mode = "include";
+      if (editingChipIndex !== null) {
+        const existing = chips[editingChipIndex];
+        if (existing && existing.type !== "date") mode = existing.mode;
+      }
+      const newChip = makeChipFromPickerState(pickerView, pickerSelections, mode);
+      if (editingChipIndex !== null) {
+        updateChip(editingChipIndex, newChip);
+      } else if (!isChipDuplicate(chips, newChip)) {
+        setChips((prev) => [...prev, newChip]);
+      }
+      setQuery((q2) => q2.endsWith("#") ? q2.slice(0, -1) : q2);
+      closePicker();
+    }, [pickerView, pickerSelections, editingChipIndex, chips, updateChip, closePicker]);
+    const openPickerForEdit = T$4((index2) => {
+      const chip = chips[index2];
+      if (!chip) return;
+      if (chip.type === "date" || chip.type === "duration_gte" || chip.type === "recency_lte") return;
+      setPickerSelections(getChipEncodedSelections(chip));
+      setPickerView(chip.type);
+      setEditingChipIndex(index2);
+      setShowPopover(true);
+    }, [chips]);
+    const addImmediateChip = T$4((type) => {
+      let chip;
+      if (type === "duration_gte") {
+        chip = { type: "duration_gte", days: 7, mode: "include" };
+      } else if (type === "recency_lte") {
+        chip = { type: "recency_lte", days: 30, mode: "include" };
+      } else {
+        chip = { type: "date", field: "create_time", from: "", to: "" };
+      }
+      if (!isChipDuplicate(chips, chip)) {
+        setChips((prev) => [...prev, chip]);
+      }
+      setQuery((q2) => q2.endsWith("#") ? q2.slice(0, -1) : q2);
+      closePicker();
+    }, [chips, closePicker]);
+    const handleSearchBlur = T$4(() => {
+      setTimeout(() => {
+        if (skipNextBlur.current) {
+          skipNextBlur.current = false;
+          return;
+        }
+        closePicker();
+      }, 200);
+    }, [closePicker]);
+    const handlePickerBack = T$4(() => {
+      if (editingChipIndex !== null) {
+        closePicker();
+      } else {
+        setPickerView("root");
+        setPickerSelections([]);
+      }
+    }, [editingChipIndex, closePicker]);
+    return /* @__PURE__ */ o$8(k$3, { children: [
+      chips.length > 0 && /* @__PURE__ */ o$8("div", { className: "SelectChips", children: [
+        nonDateChips.length > 1 && /* @__PURE__ */ o$8(
+          "button",
+          {
+            className: `SelectChipLogic${chipLogic === "OR" ? " SelectChipLogicOr" : ""}`,
+            title: "Toggle AND / OR logic between filters",
+            onClick: () => setChipLogic((l2) => l2 === "AND" ? "OR" : "AND"),
+            children: chipLogic === "AND" ? t2("Chip logic and") : t2("Chip logic or")
+          }
+        ),
+        chips.map((chip, i2) => {
+          if (chip.type === "date") return null;
+          const isExclude = chip.mode === "exclude";
+          const chipClass = `SelectChip${isExclude ? " SelectChipExclude" : ""}`;
+          const modeClass = `SelectChipMode${isExclude ? " SelectChipModeExclude" : ""}`;
+          const modeLabel = isExclude ? t2("Chip mode exclude") : t2("Chip mode include");
+          if (chip.type === "duration_gte") {
+            return /* @__PURE__ */ o$8("span", { className: chipClass, children: [
+              t2("Chip duration prefix"),
+              " ",
+              /* @__PURE__ */ o$8(
+                "input",
+                {
+                  type: "number",
+                  min: "1",
+                  value: chip.days,
+                  onChange: (e2) => updateChip(i2, {
+                    type: "duration_gte",
+                    days: Math.max(1, Number(e2.currentTarget.value)),
+                    mode: chip.mode
+                  })
+                }
+              ),
+              t2("Chip duration suffix"),
+              /* @__PURE__ */ o$8(
+                "button",
+                {
+                  className: modeClass,
+                  title: "Toggle include/exclude",
+                  onClick: () => toggleChipMode(i2),
+                  children: modeLabel
+                }
+              ),
+              /* @__PURE__ */ o$8("button", { className: "SelectChipRemove", onClick: () => removeChip(i2), children: "×" })
+            ] }, i2);
+          }
+          if (chip.type === "recency_lte") {
+            return /* @__PURE__ */ o$8("span", { className: chipClass, children: [
+              t2("Chip recency prefix"),
+              " ",
+              /* @__PURE__ */ o$8(
+                "input",
+                {
+                  type: "number",
+                  min: "1",
+                  value: chip.days,
+                  onChange: (e2) => updateChip(i2, {
+                    type: "recency_lte",
+                    days: Math.max(1, Number(e2.currentTarget.value)),
+                    mode: chip.mode
+                  })
+                }
+              ),
+              t2("Chip recency suffix"),
+              /* @__PURE__ */ o$8(
+                "button",
+                {
+                  className: modeClass,
+                  title: "Toggle include/exclude",
+                  onClick: () => toggleChipMode(i2),
+                  children: modeLabel
+                }
+              ),
+              /* @__PURE__ */ o$8("button", { className: "SelectChipRemove", onClick: () => removeChip(i2), children: "×" })
+            ] }, i2);
+          }
+          const prefix = getChipTypePrefix(chip.type);
+          const valueLabel = getChipValueLabel(chip, projects) ?? "";
+          return /* @__PURE__ */ o$8("span", { className: chipClass, children: [
+            /* @__PURE__ */ o$8("span", { style: { fontSize: "0.68rem", opacity: 0.7 }, children: [
+              prefix,
+              ":"
+            ] }),
+            " ",
+            /* @__PURE__ */ o$8(
+              "button",
+              {
+                className: "SelectChipValueBtn",
+                title: "Click to edit values",
+                onMouseDown: () => {
+                  skipNextBlur.current = true;
+                },
+                onClick: () => {
+                  var _a;
+                  openPickerForEdit(i2);
+                  (_a = searchInputRef.current) == null ? void 0 : _a.focus();
+                },
+                children: valueLabel
+              }
+            ),
+            /* @__PURE__ */ o$8(
+              "button",
+              {
+                className: modeClass,
+                title: "Toggle include/exclude",
+                onClick: () => toggleChipMode(i2),
+                children: modeLabel
+              }
+            ),
+            /* @__PURE__ */ o$8("button", { className: "SelectChipRemove", onClick: () => removeChip(i2), children: "×" })
+          ] }, i2);
+        }),
+        dateChip && /* @__PURE__ */ o$8("div", { className: "SelectChipDateRow", children: [
+          /* @__PURE__ */ o$8("span", { children: "📅" }),
+          /* @__PURE__ */ o$8(
+            "select",
+            {
+              value: dateChip.field,
+              onChange: (e2) => updateDateChip({ field: e2.currentTarget.value }),
+              children: [
+                /* @__PURE__ */ o$8("option", { value: "create_time", children: t2("Date Filter Field Created") }),
+                /* @__PURE__ */ o$8("option", { value: "update_time", children: t2("Date Filter Field Updated") })
+              ]
+            }
+          ),
+          /* @__PURE__ */ o$8(
+            "input",
+            {
+              type: "date",
+              value: dateChip.from,
+              onChange: (e2) => updateDateChip({ from: e2.currentTarget.value })
+            }
+          ),
+          /* @__PURE__ */ o$8("span", { children: "–" }),
+          /* @__PURE__ */ o$8(
+            "input",
+            {
+              type: "date",
+              value: dateChip.to,
+              onChange: (e2) => updateDateChip({ to: e2.currentTarget.value })
+            }
+          ),
+          /* @__PURE__ */ o$8("div", { className: "SelectChipDatePresets", children: [
+            DATE_PRESETS.map((p2) => /* @__PURE__ */ o$8(
+              "button",
+              {
+                onMouseDown: (e2) => {
+                  e2.preventDefault();
+                },
+                onClick: () => setDatePreset(p2.days),
+                children: p2.label
+              },
+              p2.days
+            )),
+            (dateChip.from || dateChip.to) && /* @__PURE__ */ o$8(
+              "button",
+              {
+                onMouseDown: (e2) => {
+                  e2.preventDefault();
+                },
+                onClick: () => updateDateChip({ from: "", to: "" }),
+                children: t2("Clear filter")
+              }
+            )
+          ] }),
+          /* @__PURE__ */ o$8(
+            "button",
+            {
+              className: "SelectChipRemove",
+              style: { marginLeft: "auto" },
+              onClick: removeDateChip,
+              children: "×"
+            }
+          )
+        ] })
+      ] }),
+      /* @__PURE__ */ o$8("div", { className: "relative", children: [
+        /* @__PURE__ */ o$8(
+          "input",
+          {
+            ref: searchInputRef,
+            type: "search",
+            className: "SelectSearch",
+            style: chips.length > 0 ? { borderRadius: 0 } : void 0,
+            placeholder: chips.length > 0 ? t2("Search") : `${t2("Search")} — ${t2("Filters hint")}`,
+            value: query2,
+            disabled,
+            onInput: (e2) => {
+              const val = e2.currentTarget.value;
+              lastClickedIndex.current = -1;
+              setQuery(val);
+              if (val.endsWith("#") && rootOptions.length > 0) {
+                setShowPopover(true);
+                setPickerView("root");
+                setPickerSelections([]);
+                setEditingChipIndex(null);
+              } else if (!val.includes("#")) {
+                setShowPopover(false);
+              }
+            },
+            onBlur: handleSearchBlur
+          }
+        ),
+        showPopover && pickerView === "root" && /* @__PURE__ */ o$8("div", { className: "SelectFilterPopover", children: rootOptions.map((opt) => /* @__PURE__ */ o$8(
+          "button",
+          {
+            className: "SelectFilterOption",
+            onMouseDown: (e2) => {
+              e2.preventDefault();
+            },
+            onClick: () => {
+              if (opt.hasSubView) {
+                setPickerView(opt.id);
+                setPickerSelections([]);
+              } else {
+                addImmediateChip(opt.id);
+              }
+            },
+            children: [
+              /* @__PURE__ */ o$8("strong", { children: opt.label }),
+              /* @__PURE__ */ o$8("small", { children: opt.desc })
+            ]
+          },
+          opt.id
+        )) }),
+        showPopover && pickerView !== "root" && /* @__PURE__ */ o$8("div", { className: "SelectFilterPopover", children: [
+          /* @__PURE__ */ o$8(
+            "button",
+            {
+              className: "SelectFilterBack",
+              onMouseDown: (e2) => {
+                e2.preventDefault();
+              },
+              onClick: handlePickerBack,
+              children: [
+                "← ",
+                getPickerViewTitle(pickerView)
+              ]
+            }
+          ),
+          currentSubOptions.length === 0 && pickerView === "project" && /* @__PURE__ */ o$8(
+            "div",
+            {
+              className: "SelectFilterOption",
+              style: { color: "#9ca3af", cursor: "default" },
+              children: [
+                t2("Loading"),
+                "..."
+              ]
+            }
+          ),
+          currentSubOptions.map((opt) => {
+            const isSelected = pickerSelections.includes(opt.id);
+            return /* @__PURE__ */ o$8(
+              "button",
+              {
+                className: `SelectFilterCheckboxBtn${isSelected ? " SelectFilterCheckboxBtnChecked" : ""}`,
+                onMouseDown: (e2) => {
+                  e2.preventDefault();
+                },
+                onClick: () => togglePickerSelection(opt.id),
+                children: [
+                  /* @__PURE__ */ o$8("span", { className: "SelectFilterCheckIcon", children: isSelected ? "●" : "○" }),
+                  /* @__PURE__ */ o$8("div", { children: [
+                    /* @__PURE__ */ o$8("strong", { children: opt.label }),
+                    opt.desc && /* @__PURE__ */ o$8("small", { style: { display: "block", fontSize: "0.7rem", color: "#9ca3af" }, children: opt.desc })
+                  ] })
+                ]
+              },
+              opt.id
+            );
+          }),
+          /* @__PURE__ */ o$8(
+            "button",
+            {
+              className: "SelectFilterApplyBtn",
+              disabled: pickerSelections.length === 0,
+              onMouseDown: (e2) => {
+                e2.preventDefault();
+              },
+              onClick: applyPickerSelections,
+              children: editingChipIndex !== null ? "Update filter" : "Add filter"
+            }
+          )
+        ] })
+      ] }),
       /* @__PURE__ */ o$8("div", { className: "SelectToolbar", children: [
         /* @__PURE__ */ o$8(
           CheckBox,
@@ -22179,11 +23371,11 @@ ${content2}`;
             checked: allFilteredSelected,
             onCheckedChange: (checked) => {
               lastClickedIndex.current = -1;
-              setSelected(checked ? filtered.slice(0, EXPORT_LIMIT) : []);
+              setSelected(checked ? filtered : []);
             }
           }
         ),
-        /* @__PURE__ */ o$8("div", { className: "flex items-center gap-2 ml-auto", children: [
+        /* @__PURE__ */ o$8("div", { className: "flex items-center gap-2 ml-auto flex-wrap", children: [
           loading && conversations.length > 0 && /* @__PURE__ */ o$8("span", { className: "flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400", children: [
             /* @__PURE__ */ o$8(IconLoading, { className: "w-3 h-3" }),
             t2("Loading"),
@@ -22196,16 +23388,103 @@ ${content2}`;
             {
               className: "Button neutral",
               disabled: disabled || conversations.length === 0,
-              onClick: () => setSelected(conversations.slice(0, EXPORT_LIMIT)),
+              onClick: () => setSelected(filtered.slice(0, EXPORT_OPERATION_BATCH)),
               children: t2("Last 100")
             }
           ),
-          /* @__PURE__ */ o$8("span", { className: `text-sm font-medium tabular-nums ${atCap ? "text-red-500 dark:text-red-400" : "text-gray-500 dark:text-gray-400"}`, children: [
+          /* @__PURE__ */ o$8(
+            "input",
+            {
+              type: "number",
+              min: "0",
+              step: "100",
+              value: skipFirst,
+              title: "Starting position for next batch (e.g. 200 to resume after 2 batches)",
+              disabled: disabled || conversations.length === 0,
+              onChange: (e2) => setSkipFirst(Math.max(0, Math.floor(Number(e2.currentTarget.value)))),
+              style: {
+                width: "4rem",
+                fontSize: "0.75rem",
+                padding: "2px 5px",
+                border: "1px solid #9ca3af",
+                borderRadius: "3px",
+                background: "transparent",
+                color: "inherit"
+              }
+            }
+          ),
+          /* @__PURE__ */ o$8(
+            "button",
+            {
+              className: "Button neutral",
+              title: `Select 100 conversations starting at position #${skipFirst + 1}`,
+              disabled: disabled || conversations.length === 0 || skipFirst >= filtered.length,
+              onClick: () => setSelected(filtered.slice(skipFirst, skipFirst + EXPORT_OPERATION_BATCH)),
+              children: "→ 100"
+            }
+          ),
+          /* @__PURE__ */ o$8("span", { className: "text-sm font-medium tabular-nums text-gray-500 dark:text-gray-400", children: [
             selected.length,
-            "/",
-            EXPORT_LIMIT
+            " / ",
+            filtered.length
           ] })
         ] })
+      ] }),
+      /* @__PURE__ */ o$8("div", { className: "SelectListHeader", children: [
+        /* @__PURE__ */ o$8(
+          "button",
+          {
+            className: `SelectListHeaderCell SelectListHeaderCellTitle${sortField === "title" ? " SelectListHeaderCellActive" : ""}`,
+            onClick: () => {
+              if (sortField === "title") {
+                setSortDir((d2) => d2 === "asc" ? "desc" : "asc");
+              } else {
+                setSortField("title");
+                setSortDir("asc");
+              }
+            },
+            children: [
+              "Title ",
+              sortField === "title" ? sortDir === "asc" ? "↑" : "↓" : "↕"
+            ]
+          }
+        ),
+        /* @__PURE__ */ o$8(
+          "button",
+          {
+            className: `SelectListHeaderCell${sortField === "create_time" ? " SelectListHeaderCellActive" : ""}`,
+            onClick: () => {
+              if (sortField === "create_time") {
+                setSortDir((d2) => d2 === "asc" ? "desc" : "asc");
+              } else {
+                setSortField("create_time");
+                setSortDir("desc");
+              }
+            },
+            children: [
+              "Created ",
+              sortField === "create_time" ? sortDir === "asc" ? "↑" : "↓" : "↕"
+            ]
+          }
+        ),
+        /* @__PURE__ */ o$8(
+          "button",
+          {
+            className: `SelectListHeaderCell${sortField === "update_time" ? " SelectListHeaderCellActive" : ""}`,
+            onClick: () => {
+              if (sortField === "update_time") {
+                setSortDir((d2) => d2 === "asc" ? "desc" : "asc");
+              } else {
+                setSortField("update_time");
+                setSortDir("desc");
+              }
+            },
+            children: [
+              "Updated ",
+              sortField === "update_time" ? sortDir === "asc" ? "↑" : "↓" : "↕"
+            ]
+          }
+        )
       ] }),
       /* @__PURE__ */ o$8("ul", { className: "SelectList", children: [
         loading && conversations.length === 0 && /* @__PURE__ */ o$8("li", { className: "SelectItem", children: [
@@ -22219,13 +23498,12 @@ ${content2}`;
         ] }),
         filtered.map((c2, index2) => {
           const isSelected = selected.some((x2) => x2.id === c2.id);
-          const itemDisabled = disabled || atCap && !isSelected;
           return /* @__PURE__ */ o$8(
             "li",
             {
               className: "SelectItem",
               onClickCapture: (e2) => {
-                if (itemDisabled) return;
+                if (disabled) return;
                 if (e2.shiftKey && lastClickedIndex.current !== -1) {
                   e2.preventDefault();
                   const start = Math.min(lastClickedIndex.current, index2);
@@ -22233,30 +23511,43 @@ ${content2}`;
                   const rangeItems = filtered.slice(start, end + 1);
                   const newSelected = [...selected];
                   for (const item of rangeItems) {
-                    if (!newSelected.some((x2) => x2.id === item.id)) {
-                      if (newSelected.length >= EXPORT_LIMIT) break;
-                      newSelected.push(item);
-                    }
+                    if (!newSelected.some((x2) => x2.id === item.id)) newSelected.push(item);
                   }
                   setSelected(newSelected);
                   return;
                 }
                 lastClickedIndex.current = index2;
               },
-              children: /* @__PURE__ */ o$8(
-                CheckBox,
-                {
-                  label: c2.title,
-                  disabled: itemDisabled,
-                  checked: isSelected,
-                  onCheckedChange: (checked) => {
-                    if (checked && atCap) return;
-                    setSelected(
-                      checked ? [...selected, c2] : selected.filter((x2) => x2.id !== c2.id)
-                    );
+              children: [
+                /* @__PURE__ */ o$8(
+                  CheckBox,
+                  {
+                    label: c2.title,
+                    disabled,
+                    checked: isSelected,
+                    onCheckedChange: (checked) => {
+                      setSelected(checked ? [...selected, c2] : selected.filter((x2) => x2.id !== c2.id));
+                    }
                   }
-                }
-              )
+                ),
+                c2.is_starred && /* @__PURE__ */ o$8("span", { title: "Starred", style: { color: "#f59e0b", flexShrink: 0 }, children: "★" }),
+                /* @__PURE__ */ o$8(
+                  "span",
+                  {
+                    className: `SelectItemMeta${sortField === "create_time" ? " SelectItemMetaActive" : ""}`,
+                    title: `Created: ${c2.create_time ?? "—"}`,
+                    children: formatConvDate(c2.create_time)
+                  }
+                ),
+                /* @__PURE__ */ o$8(
+                  "span",
+                  {
+                    className: `SelectItemMeta${sortField === "update_time" ? " SelectItemMetaActive" : ""}`,
+                    title: `Updated: ${c2.update_time ?? "—"}`,
+                    children: formatConvDate(c2.update_time)
+                  }
+                )
+              ]
             },
             c2.id
           );
@@ -22284,10 +23575,12 @@ ${content2}`;
     const [loading, setLoading] = h$4(false);
     const [error2, setError] = h$4("");
     const [processing, setProcessing] = h$4(false);
-    const [selectedProject, setSelectedProject] = h$4(void 0);
     const [selected, setSelected] = h$4([]);
     const [exportType, setExportType] = h$4(exportAllOptions[0].label);
     const disabled = processing || !!error2 || selected.length === 0;
+    const [hasMore, setHasMore] = h$4(false);
+    const [loadingMore, setLoadingMore] = h$4(false);
+    const [totalAvailable, setTotalAvailable] = h$4(null);
     const requestQueue = F$1(() => new RequestQueue(200, 1600), []);
     const archiveQueue = F$1(() => new RequestQueue(200, 1600), []);
     const deleteQueue = F$1(() => new RequestQueue(200, 1600), []);
@@ -22295,8 +23588,16 @@ ${content2}`;
       total: 0,
       completed: 0,
       currentName: "",
-      currentStatus: ""
+      currentStatus: "",
+      rateLimitWaitSecs: void 0,
+      batchIndex: 0,
+      totalBatches: 0
     });
+    const pendingBatchesRef = _([]);
+    const batchIndexRef = _(0);
+    const totalBatchesRef = _(0);
+    const cancelledRef = _(false);
+    const fetchGenRef = _(0);
     const onUpload = T$4((e2) => {
       var _a, _b;
       const file = (_b = (_a = e2.target) == null ? void 0 : _a.files) == null ? void 0 : _b[0];
@@ -22313,137 +23614,246 @@ ${content2}`;
         setLocalConversations(data);
       };
       fileReader.readAsText(file);
-    }, [t2, setExportSource, setLocalConversations]);
+    }, [t2]);
+    const startApiBatch = T$4((chunk) => {
+      requestQueue.clear();
+      chunk.forEach(({ id, title: title2 }) => {
+        requestQueue.add({ name: title2, request: () => fetchConversation(id, exportType !== "JSON") });
+      });
+      requestQueue.start();
+    }, [requestQueue, exportType]);
     p$6(() => {
-      const off = requestQueue.on("progress", (progress2) => {
+      const off = requestQueue.on("progress", (prog) => {
         setProcessing(true);
-        setProgress(progress2);
+        setProgress({
+          ...prog,
+          rateLimitWaitSecs: prog.rateLimitWaitSecs,
+          batchIndex: batchIndexRef.current,
+          totalBatches: totalBatchesRef.current,
+          completed: batchIndexRef.current * EXPORT_OPERATION_BATCH + prog.completed,
+          total: totalBatchesRef.current * EXPORT_OPERATION_BATCH
+        });
       });
       return () => off();
     }, [requestQueue]);
     p$6(() => {
-      const off = archiveQueue.on("progress", (progress2) => {
+      const off = archiveQueue.on("progress", (prog) => {
         setProcessing(true);
-        setProgress(progress2);
+        setProgress({ ...prog, rateLimitWaitSecs: prog.rateLimitWaitSecs, batchIndex: 0, totalBatches: 0 });
       });
       return () => off();
     }, [archiveQueue]);
     p$6(() => {
-      const off = deleteQueue.on("progress", (progress2) => {
+      const off = deleteQueue.on("progress", (prog) => {
         setProcessing(true);
-        setProgress(progress2);
+        setProgress({ ...prog, rateLimitWaitSecs: prog.rateLimitWaitSecs, batchIndex: 0, totalBatches: 0 });
       });
       return () => off();
     }, [deleteQueue]);
     p$6(() => {
-      const off = requestQueue.on("done", (results) => {
+      const off = requestQueue.on("done", async (results) => {
         var _a;
-        setProcessing(false);
+        if (cancelledRef.current) {
+          cancelledRef.current = false;
+          setProcessing(false);
+          exportingRef.current = false;
+          return;
+        }
+        const batchIdx = batchIndexRef.current;
+        const totalBatches2 = totalBatchesRef.current;
+        const partIndex = batchIdx + 1;
         const callback = (_a = exportAllOptions.find((o3) => o3.label === exportType)) == null ? void 0 : _a.callback;
-        if (callback) callback(format, results, metaList, selectedProject == null ? void 0 : selectedProject.display.name);
+        if (callback) {
+          await callback(format, results, metaList, void 0, partIndex, totalBatches2);
+        }
+        if (partIndex < totalBatches2) {
+          await sleep(400);
+          batchIndexRef.current++;
+          const nextChunk = pendingBatchesRef.current[batchIndexRef.current];
+          if (nextChunk) startApiBatch(nextChunk);
+        } else {
+          setProcessing(false);
+        }
       });
       return () => off();
-    }, [requestQueue, exportAllOptions, exportType, format, metaList, selectedProject]);
+    }, [requestQueue, exportAllOptions, exportType, format, metaList, startApiBatch]);
     p$6(() => {
       const off = archiveQueue.on("done", () => {
         setProcessing(false);
-        setApiConversations(apiConversations.filter((c2) => !selected.some((s2) => s2.id === c2.id)));
+        setApiConversations((prev) => prev.filter((c2) => !selected.some((s2) => s2.id === c2.id)));
         setSelected([]);
         alert(t2("Conversation Archived Message"));
       });
       return () => off();
-    }, [archiveQueue, apiConversations, selected, t2]);
+    }, [archiveQueue, selected, t2]);
     p$6(() => {
       const off = deleteQueue.on("done", () => {
         setProcessing(false);
-        setApiConversations(apiConversations.filter((c2) => !selected.some((s2) => s2.id === c2.id)));
+        setApiConversations((prev) => prev.filter((c2) => !selected.some((s2) => s2.id === c2.id)));
         setSelected([]);
         alert(t2("Conversation Deleted Message"));
       });
       return () => off();
-    }, [deleteQueue, apiConversations, selected, t2]);
+    }, [deleteQueue, selected, t2]);
+    const cancelExport = T$4(() => {
+      cancelledRef.current = true;
+      requestQueue.stop();
+      archiveQueue.stop();
+      deleteQueue.stop();
+    }, [requestQueue, archiveQueue, deleteQueue]);
     const exportAllFromApi = T$4(() => {
       if (disabled) return;
-      requestQueue.clear();
-      selected.forEach(({ id, title: title2 }) => {
-        requestQueue.add({
-          name: title2,
-          request: () => fetchConversation(id, exportType !== "JSON")
-        });
+      cancelledRef.current = false;
+      const chunks = chunkArray(selected, EXPORT_OPERATION_BATCH);
+      pendingBatchesRef.current = chunks;
+      batchIndexRef.current = 0;
+      totalBatchesRef.current = chunks.length;
+      setProcessing(true);
+      setProgress({
+        total: selected.length,
+        completed: 0,
+        currentName: "",
+        currentStatus: "processing",
+        rateLimitWaitSecs: void 0,
+        batchIndex: 0,
+        totalBatches: chunks.length
       });
-      requestQueue.start();
-    }, [disabled, selected, requestQueue, exportType]);
-    const exportAllFromLocal = T$4(() => {
+      startApiBatch(chunks[0]);
+    }, [disabled, selected, startApiBatch]);
+    const exportAllFromLocal = T$4(async () => {
       var _a;
       if (disabled) return;
       const results = localConversations.filter((c2) => selected.some((s2) => s2.id === c2.id));
       const callback = (_a = exportAllOptions.find((o3) => o3.label === exportType)) == null ? void 0 : _a.callback;
-      if (callback) callback(format, results, metaList, selectedProject == null ? void 0 : selectedProject.display.name);
-    }, [
-      disabled,
-      selected,
-      localConversations,
-      exportAllOptions,
-      exportType,
-      format,
-      metaList,
-      selectedProject
-    ]);
+      if (!callback) return;
+      const chunks = chunkArray(results, EXPORT_OPERATION_BATCH);
+      setProcessing(true);
+      for (let i2 = 0; i2 < chunks.length; i2++) {
+        await callback(format, chunks[i2], metaList, void 0, i2 + 1, chunks.length);
+        if (i2 < chunks.length - 1) await sleep(400);
+      }
+      setProcessing(false);
+    }, [disabled, selected, localConversations, exportAllOptions, exportType, format, metaList]);
     const exportAll = F$1(() => {
       return exportSource === "API" ? exportAllFromApi : exportAllFromLocal;
     }, [exportSource, exportAllFromApi, exportAllFromLocal]);
     const deleteAll = T$4(() => {
       if (disabled) return;
-      const result = confirm(t2("Conversation Delete Alert"));
-      if (!result) return;
+      if (!confirm(t2("Conversation Delete Alert"))) return;
       deleteQueue.clear();
       selected.forEach(({ id, title: title2 }) => {
-        deleteQueue.add({
-          name: title2,
-          request: () => deleteConversation(id)
-        });
+        deleteQueue.add({ name: title2, request: () => deleteConversation(id) });
       });
       deleteQueue.start();
     }, [disabled, selected, deleteQueue, t2]);
     const archiveAll = T$4(() => {
       if (disabled) return;
-      const result = confirm(t2("Conversation Archive Alert"));
-      if (!result) return;
+      if (!confirm(t2("Conversation Archive Alert"))) return;
       archiveQueue.clear();
       selected.forEach(({ id, title: title2 }) => {
-        archiveQueue.add({
-          name: title2,
-          request: () => archiveConversation(id)
-        });
+        archiveQueue.add({ name: title2, request: () => archiveConversation(id) });
       });
       archiveQueue.start();
     }, [disabled, selected, archiveQueue, t2]);
     p$6(() => {
-      fetchProjects().then(setProjects).catch((err) => setError(err.toString()));
+      fetchProjects().then(setProjects).catch((err) => console.error("Failed to fetch projects:", err));
     }, []);
     p$6(() => {
-      if (selectedProject === void 0) return;
+      const genRef = fetchGenRef;
+      return () => {
+        exportingRef.current = false;
+        genRef.current++;
+        requestQueue.clear();
+        archiveQueue.clear();
+        deleteQueue.clear();
+      };
+    }, [requestQueue, archiveQueue, deleteQueue]);
+    p$6(() => {
+      exportingRef.current = processing;
+    }, [processing]);
+    p$6(() => {
+      const gen = ++fetchGenRef.current;
+      const alive = () => gen === fetchGenRef.current;
       setSelected([]);
       setApiConversations([]);
+      setHasMore(false);
+      setTotalAvailable(null);
       setLoading(true);
       fetchAllConversations(
-        (selectedProject == null ? void 0 : selectedProject.id) ?? null,
+        null,
         exportAllLimit,
-        (batch) => setApiConversations((prev) => [...prev, ...batch])
+        (batch) => {
+          if (alive()) setApiConversations((prev) => [...prev, ...batch]);
+        },
+        (hasMore2) => {
+          if (alive()) setHasMore(hasMore2);
+        }
       ).catch((err) => {
+        if (!alive()) return;
         console.error("Error fetching conversations:", err);
         setError(err.message || "Failed to load conversations");
-      }).finally(() => setLoading(false));
-    }, [selectedProject, exportAllLimit]);
+      }).finally(() => {
+        if (alive()) setLoading(false);
+      });
+    }, [exportAllLimit]);
+    const loadMore = T$4(async () => {
+      if (loadingMore) return;
+      setLoadingMore(true);
+      try {
+        const page = await fetchConversationsPage(null, apiConversations.length, EXPORT_OPERATION_BATCH);
+        setApiConversations((prev) => [...prev, ...page.items]);
+        if (page.total !== null) setTotalAvailable(page.total);
+        setHasMore(
+          page.items.length >= EXPORT_OPERATION_BATCH && (page.total === null || apiConversations.length + page.items.length < page.total)
+        );
+      } catch (err) {
+        console.error("loadMore error", err);
+      } finally {
+        setLoadingMore(false);
+      }
+    }, [loadingMore, apiConversations.length]);
+    const totalBatches = Math.ceil(selected.length / EXPORT_OPERATION_BATCH) || 1;
+    const [probeStatus, setProbeStatus] = h$4(null);
+    const [probeRetryAfterSecs, setProbeRetryAfterSecs] = h$4();
+    const [probeHeaders, setProbeHeaders] = h$4({});
+    const runProbe = T$4(async () => {
+      setProbeStatus("testing");
+      try {
+        const result = await probeApi();
+        setProbeHeaders(result.rateLimitHeaders);
+        if (result.ok) {
+          setProbeStatus("ok");
+        } else {
+          setProbeStatus("rate_limited");
+          setProbeRetryAfterSecs(result.retryAfterMs != null ? Math.round(result.retryAfterMs / 1e3) : void 0);
+        }
+      } catch {
+        setProbeStatus("error");
+      }
+    }, []);
+    const probeLabel = probeStatus === "testing" ? "⏳ Testing…" : probeStatus === "ok" ? "✅ API ready" : probeStatus === "rate_limited" ? `🚫 Rate limited${probeRetryAfterSecs != null ? ` · wait ${probeRetryAfterSecs}s` : ""}` : probeStatus === "error" ? "⚠️ Error" : null;
     return /* @__PURE__ */ o$8(k$3, { children: [
       /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$f99233281efd08a0, { className: "DialogTitle", children: t2("Export Dialog Title") }),
       /* @__PURE__ */ o$8("div", { className: "flex items-center text-gray-600 dark:text-gray-300 flex justify-between border-b-[1px] pb-3 mb-3 dark:border-gray-700", children: [
         t2("Export from official export file"),
         " (conversations.json) ",
-        exportSource === "API" && /* @__PURE__ */ o$8("button", { className: "btn relative btn-neutral", onClick: () => {
-          var _a;
-          return (_a = fileInputRef.current) == null ? void 0 : _a.click();
-        }, children: /* @__PURE__ */ o$8(IconUpload, { className: "w-4 h-4" }) })
+        /* @__PURE__ */ o$8("div", { className: "flex items-center gap-2", children: [
+          exportSource === "API" && /* @__PURE__ */ o$8(
+            "button",
+            {
+              className: "Button neutral",
+              style: { fontSize: "0.72rem", padding: "2px 8px" },
+              disabled: probeStatus === "testing" || processing,
+              title: Object.keys(probeHeaders).length > 0 ? `Rate-limit headers: ${JSON.stringify(probeHeaders)}` : "Check if the API is currently rate-limiting requests",
+              onClick: runProbe,
+              children: probeLabel ?? "Test API"
+            }
+          ),
+          exportSource === "API" && /* @__PURE__ */ o$8("button", { className: "btn relative btn-neutral", onClick: () => {
+            var _a;
+            return (_a = fileInputRef.current) == null ? void 0 : _a.click();
+          }, children: /* @__PURE__ */ o$8(IconUpload, { className: "w-4 h-4" }) })
+        ] })
       ] }),
       /* @__PURE__ */ o$8(
         "input",
@@ -22455,48 +23865,126 @@ ${content2}`;
           onChange: onUpload
         }
       ),
-      exportSource === "API" && /* @__PURE__ */ o$8("div", { className: "flex items-center text-gray-600 dark:text-gray-300 flex justify-between mb-3", children: t2("Export from API") }),
-      /* @__PURE__ */ o$8(ProjectSelect, { projects, selected: selectedProject, setSelected: setSelectedProject, disabled: processing }),
-      selectedProject === void 0 ? /* @__PURE__ */ o$8("div", { className: "SelectList flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm", children: t2("Select a source to load conversations") }) : /* @__PURE__ */ o$8(
+      /* @__PURE__ */ o$8(
         ConversationSelect,
         {
           conversations,
+          projects,
           selected,
           setSelected,
           disabled: processing,
           loading,
           error: error2
-        },
-        (selectedProject == null ? void 0 : selectedProject.id) ?? "no-project"
+        }
       ),
-      /* @__PURE__ */ o$8("div", { className: "flex mt-6", style: { justifyContent: "space-between" }, children: [
-        /* @__PURE__ */ o$8("select", { className: "Select", disabled: processing, value: exportType, onChange: (e2) => setExportType(e2.currentTarget.value), children: exportAllOptions.map(({ label }) => /* @__PURE__ */ o$8("option", { value: label, children: label }, t2(label))) }),
+      exportSource === "API" && !loading && !processing && hasMore && /* @__PURE__ */ o$8("div", { className: "flex items-center justify-center mt-2 mb-1 gap-2", children: [
+        /* @__PURE__ */ o$8(
+          "button",
+          {
+            className: "Button neutral",
+            style: { fontSize: "0.8rem", padding: "4px 14px" },
+            disabled: loadingMore,
+            onClick: loadMore,
+            children: loadingMore ? `${t2("Loading")}...` : totalAvailable !== null ? t2("Load more conversations remaining", { n: EXPORT_OPERATION_BATCH, remaining: totalAvailable - apiConversations.length }) : t2("Load more conversations", { n: EXPORT_OPERATION_BATCH })
+          }
+        ),
+        totalAvailable !== null && !loadingMore && /* @__PURE__ */ o$8("span", { className: "text-xs text-gray-400 dark:text-gray-500 tabular-nums", children: [
+          apiConversations.length,
+          " / ",
+          totalAvailable
+        ] })
+      ] }),
+      /* @__PURE__ */ o$8("div", { className: "flex mt-3 items-center gap-2", children: [
+        /* @__PURE__ */ o$8(
+          "select",
+          {
+            className: "Select shrink-0",
+            disabled: processing,
+            value: exportType,
+            onChange: (e2) => setExportType(e2.currentTarget.value),
+            children: exportAllOptions.map(({ label }) => /* @__PURE__ */ o$8("option", { value: label, children: label }, t2(label)))
+          }
+        ),
         /* @__PURE__ */ o$8("div", { className: "flex flex-grow" }),
         /* @__PURE__ */ o$8("button", { className: "Button red", disabled: disabled || exportSource === "Local", onClick: archiveAll, children: t2("Archive") }),
-        /* @__PURE__ */ o$8("button", { className: "Button red ml-4", disabled: disabled || exportSource === "Local", onClick: deleteAll, children: t2("Delete") }),
-        /* @__PURE__ */ o$8("button", { className: "Button green ml-4", disabled, onClick: exportAll, children: t2("Export") })
+        /* @__PURE__ */ o$8("button", { className: "Button red", disabled: disabled || exportSource === "Local", onClick: deleteAll, children: t2("Delete") }),
+        /* @__PURE__ */ o$8("button", { className: "Button green", disabled, onClick: exportAll, children: t2("Export") })
       ] }),
+      totalBatches > 1 && !processing && /* @__PURE__ */ o$8("p", { className: "mt-1.5 text-xs text-right text-gray-400 dark:text-gray-500", children: `${totalBatches} downloads · 100 conversations each` }),
       processing && /* @__PURE__ */ o$8(k$3, { children: [
-        /* @__PURE__ */ o$8("div", { className: "mt-2 mb-1 justify-between flex", children: [
-          /* @__PURE__ */ o$8("span", { className: "truncate mr-8", children: progress.currentName }),
-          /* @__PURE__ */ o$8("span", { children: `${progress.completed}/${progress.total}` })
+        /* @__PURE__ */ o$8("div", { className: "mt-2 mb-1 justify-between flex items-center gap-2", children: [
+          /* @__PURE__ */ o$8("span", { className: "truncate text-sm text-gray-600 dark:text-gray-300", children: progress.currentStatus === "rate_limited" ? `⏳ Rate limited — waiting ${progress.rateLimitWaitSecs ?? "…"}s` : progress.currentName }),
+          /* @__PURE__ */ o$8("span", { className: "shrink-0 tabular-nums text-sm text-gray-500 dark:text-gray-400", children: progress.totalBatches > 1 ? `${t2("Batch progress").replace("{{current}}", String(progress.batchIndex + 1)).replace("{{total}}", String(progress.totalBatches))} · ${progress.completed}/${progress.total}` : `${progress.completed}/${progress.total}` })
         ] }),
-        /* @__PURE__ */ o$8("div", { className: "w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700", children: /* @__PURE__ */ o$8("div", { className: "bg-blue-600 h-2.5 rounded-full", style: { width: `${progress.completed / progress.total * 100}%` } }) })
+        /* @__PURE__ */ o$8("div", { className: "w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700", children: /* @__PURE__ */ o$8(
+          "div",
+          {
+            className: `h-2.5 rounded-full ${progress.currentStatus === "rate_limited" ? "bg-amber-500" : "bg-blue-600"}`,
+            style: { width: `${progress.total > 0 ? progress.completed / progress.total * 100 : 0}%` }
+          }
+        ) })
       ] }),
-      /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$f39c2d165cd861fe, { asChild: true, children: /* @__PURE__ */ o$8("button", { className: "IconButton CloseButton", "aria-label": "Close", children: /* @__PURE__ */ o$8(IconCross, {}) }) })
+      processing ? /* @__PURE__ */ o$8(k$3, { children: [
+        /* @__PURE__ */ o$8(
+          "button",
+          {
+            className: "Button",
+            style: {
+              position: "absolute",
+              top: "12px",
+              right: "40px",
+              fontSize: "0.75rem",
+              padding: "3px 10px",
+              background: "#ef4444",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+              fontWeight: 600
+            },
+            title: "Stop the export — any batches already downloaded are kept",
+            onClick: cancelExport,
+            children: "Cancel"
+          }
+        ),
+        /* @__PURE__ */ o$8(
+          "button",
+          {
+            className: "IconButton CloseButton",
+            "aria-label": "Export in progress",
+            title: "Click Cancel to stop the export",
+            style: { cursor: "not-allowed", opacity: 0.25 },
+            children: /* @__PURE__ */ o$8(IconCross, {})
+          }
+        )
+      ] }) : /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$f39c2d165cd861fe, { asChild: true, children: /* @__PURE__ */ o$8("button", { className: "IconButton CloseButton", "aria-label": "Close", children: /* @__PURE__ */ o$8(IconCross, {}) }) })
     ] });
   };
   const ExportDialog = ({ format, open, onOpenChange, children }) => {
+    const guardClose = (e2) => {
+      if (exportingRef.current) e2.preventDefault();
+    };
     return /* @__PURE__ */ o$8(
       $5d3850c4d0b4e6c7$export$be92b6f5f03c0fe9,
       {
         open,
-        onOpenChange,
+        onOpenChange: (val) => {
+          if (!val && exportingRef.current) return;
+          onOpenChange(val);
+        },
         children: [
           /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$41fb9f06171c75f4, { asChild: true, children }),
           /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$602eac185826482c, { children: [
             /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$c6fdb837b070b4ff, { className: "DialogOverlay" }),
-            /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$7c6e2c02157bb7d2, { className: "DialogContent", children: open && /* @__PURE__ */ o$8(DialogContent, { format }) })
+            /* @__PURE__ */ o$8(
+              $5d3850c4d0b4e6c7$export$7c6e2c02157bb7d2,
+              {
+                className: "DialogContent",
+                onEscapeKeyDown: guardClose,
+                onInteractOutside: guardClose,
+                children: open && /* @__PURE__ */ o$8(DialogContent, { format })
+              }
+            )
           ] })
         ]
       }

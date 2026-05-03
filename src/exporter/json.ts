@@ -3,9 +3,10 @@ import { fetchConversation, getCurrentChatId, processConversation } from '../api
 import i18n from '../i18n'
 import { checkIfConversationStarted } from '../page'
 import { convertToOoba, convertToTavern } from '../utils/conversion'
-import { buildZipFileName, downloadFile, getFileNameWithFormat, normalizeProjectName } from '../utils/download'
+import { buildJsonBatchFileName, buildZipFileName, downloadFile, getFileNameWithFormat } from '../utils/download'
 import type { ApiConversationWithId } from '../api'
 import type { ExportMeta } from '../ui/SettingContext'
+import type { PartInfo } from '../utils/download'
 
 export async function exportToJson(fileNameFormat: string) {
     if (!checkIfConversationStarted()) {
@@ -61,17 +62,17 @@ export async function exportToOoba(fileNameFormat: string) {
     return true
 }
 
-export async function exportAllToOfficialJson(_fileNameFormat: string, apiConversations: ApiConversationWithId[], _metaList?: ExportMeta[], projectName?: string) {
+export async function exportAllToOfficialJson(_fileNameFormat: string, apiConversations: ApiConversationWithId[], _metaList?: ExportMeta[], projectName?: string, partIndex?: number, totalParts?: number) {
+    const partInfo: PartInfo | undefined = (partIndex != null && totalParts != null)
+        ? { part: partIndex, total: totalParts }
+        : undefined
     const content = conversationToJson(apiConversations)
-    const baseName = projectName
-        ? `chatgpt-export-project-${normalizeProjectName(projectName)}`
-        : 'chatgpt-export'
-    downloadFile(`${baseName}.json`, 'application/json', content)
+    downloadFile(buildJsonBatchFileName(projectName, partInfo), 'application/json', content)
 
     return true
 }
 
-export async function exportAllToJson(fileNameFormat: string, apiConversations: ApiConversationWithId[], _metaList?: ExportMeta[], projectName?: string) {
+export async function exportAllToJson(fileNameFormat: string, apiConversations: ApiConversationWithId[], _metaList?: ExportMeta[], projectName?: string, partIndex?: number, totalParts?: number) {
     const zip = new JSZip()
     const filenameMap = new Map<string, number>()
     const conversations = apiConversations.map(x => ({
@@ -104,7 +105,10 @@ export async function exportAllToJson(fileNameFormat: string, apiConversations: 
             level: 9,
         },
     })
-    downloadFile(buildZipFileName('json', projectName), 'application/zip', blob)
+    const partInfo: PartInfo | undefined = (partIndex != null && totalParts != null)
+        ? { part: partIndex, total: totalParts }
+        : undefined
+    downloadFile(buildZipFileName('json', projectName, partInfo), 'application/zip', blob)
 
     return true
 }

@@ -206,8 +206,21 @@
 }
 
 .SelectItem {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+}
+
+.SelectItem .CheckBoxLabel {
+    flex: 1;
+    min-width: 0;
+}
+
+.SelectItem .LabelText {
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .SelectItem label, .SelectItem input {
@@ -216,6 +229,365 @@
 
 .SelectItem span {
     vertical-align: middle;
+}
+
+.SelectItemMeta {
+    flex-shrink: 0;
+    font-size: 0.7rem;
+    color: #9ca3af;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    min-width: 6.5rem;
+    text-align: right;
+}
+.SelectItemMetaActive {
+    color: #6b7280;
+    font-weight: 600;
+}
+@media (prefers-color-scheme: dark) {
+    .SelectItemMetaActive { color: #d1d5db; }
+}
+
+/* ── Sortable column header row ── */
+.SelectListHeader {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    border: 1px solid #6f6e77;
+    border-bottom: none;
+    background: #f9fafb;
+    user-select: none;
+}
+@media (prefers-color-scheme: dark) {
+    .SelectListHeader { background: #1f2937; }
+}
+.SelectListHeaderCell {
+    flex-shrink: 0;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #9ca3af;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    background: transparent;
+    border: none;
+    padding: 5px 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    min-width: 6.5rem;
+    text-align: right;
+}
+.SelectListHeaderCell:hover { color: #374151; }
+@media (prefers-color-scheme: dark) {
+    .SelectListHeaderCell:hover { color: #e5e7eb; }
+}
+.SelectListHeaderCellTitle {
+    flex: 1;
+    text-align: left;
+    padding-left: 28px; /* align with checkbox label */
+}
+.SelectListHeaderCellActive {
+    color: #2563eb;
+}
+@media (prefers-color-scheme: dark) {
+    .SelectListHeaderCellActive { color: #60a5fa; }
+}
+
+.SelectChips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 6px 12px;
+    border: 1px solid #6f6e77;
+    border-bottom: none;
+}
+
+.SelectChip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-size: 0.72rem;
+    background: #dbeafe;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    white-space: nowrap;
+}
+
+@media (prefers-color-scheme: dark) {
+    .SelectChip {
+        background: #1e3a5f;
+        color: #93c5fd;
+        border-color: #1e40af;
+    }
+}
+
+.SelectChipRemove {
+    cursor: pointer;
+    opacity: 0.6;
+    line-height: 1;
+    padding: 0 2px;
+}
+.SelectChipRemove:hover {
+    opacity: 1;
+    color: #dc2626;
+}
+
+.SelectFilterPopover {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: white;
+    border: 1px solid #6f6e77;
+    border-radius: 0 0 6px 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    overflow-y: auto;
+    max-height: 280px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .SelectFilterPopover {
+        background: #1f2937;
+        border-color: #374151;
+    }
+}
+
+.SelectFilterOption {
+    width: 100%;
+    text-align: left;
+    padding: 8px 14px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+}
+
+.SelectFilterOption:hover {
+    background: #f3f4f6;
+}
+
+@media (prefers-color-scheme: dark) {
+    .SelectFilterOption:hover {
+        background: #374151;
+    }
+}
+
+.SelectFilterOption strong {
+    display: block;
+    font-size: 0.82rem;
+}
+
+.SelectFilterOption small {
+    display: block;
+    font-size: 0.7rem;
+    color: #9ca3af;
+    margin-top: 1px;
+}
+
+/* Group header inside the filter picker popover */
+.SelectFilterGroupHeader {
+    padding: 6px 14px 2px;
+    font-size: 0.67rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #9ca3af;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* AND / OR logic toggle pill in the chip bar */
+.SelectChipLogic {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 7px;
+    border-radius: 9999px;
+    font-size: 0.67rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    background: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.SelectChipLogic:hover { background: #bae6fd; }
+.SelectChipLogicOr { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+.SelectChipLogicOr:hover { background: #fde68a; }
+
+@media (prefers-color-scheme: dark) {
+    .SelectChipLogic { background: #0c4a6e; color: #7dd3fc; border-color: #075985; }
+    .SelectChipLogicOr { background: #451a03; color: #fcd34d; border-color: #78350f; }
+}
+
+/* Include / exclude mode badge inside each chip */
+.SelectChipMode {
+    font-size: 0.6rem;
+    padding: 1px 4px;
+    border-radius: 3px;
+    background: rgba(29, 78, 216, 0.1);
+    color: inherit;
+    cursor: pointer;
+    opacity: 0.75;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.SelectChipMode:hover { opacity: 1; }
+.SelectChipModeExclude { background: rgba(220, 38, 38, 0.15); }
+
+/* Chip rendered in exclude mode */
+.SelectChipExclude {
+    background: #fee2e2;
+    color: #b91c1c;
+    border-color: #fecaca;
+}
+@media (prefers-color-scheme: dark) {
+    .SelectChipExclude { background: #450a0a; color: #f87171; border-color: #7f1d1d; }
+}
+
+/* Number input inside duration / recency chips */
+.SelectChip input[type="number"] {
+    width: 2.2rem;
+    background: transparent;
+    color: inherit;
+    font-size: inherit;
+    text-align: center;
+    border: none;
+    outline: none;
+    padding: 0;
+}
+
+/* ── Picker: back button (stage 2 header) ── */
+.SelectFilterBack {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 7px 14px 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-align: left;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #e5e7eb;
+    cursor: pointer;
+}
+.SelectFilterBack:hover { color: #374151; }
+@media (prefers-color-scheme: dark) {
+    .SelectFilterBack { color: #9ca3af; border-color: #374151; }
+    .SelectFilterBack:hover { color: #e5e7eb; }
+}
+
+/* ── Picker: checkbox-style option in sub-view ── */
+.SelectFilterCheckboxBtn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 7px 14px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    text-align: left;
+}
+.SelectFilterCheckboxBtn:hover { background: #f3f4f6; }
+@media (prefers-color-scheme: dark) {
+    .SelectFilterCheckboxBtn:hover { background: #374151; }
+}
+.SelectFilterCheckIcon {
+    flex-shrink: 0;
+    width: 1rem;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #9ca3af;
+}
+.SelectFilterCheckboxBtnChecked .SelectFilterCheckIcon { color: #2563eb; }
+@media (prefers-color-scheme: dark) {
+    .SelectFilterCheckboxBtnChecked .SelectFilterCheckIcon { color: #60a5fa; }
+}
+
+/* ── Picker: apply/update button at bottom of sub-view ── */
+.SelectFilterApplyBtn {
+    display: block;
+    width: calc(100% - 28px);
+    margin: 6px 14px;
+    padding: 5px 0;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+}
+.SelectFilterApplyBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+.SelectFilterApplyBtn:not(:disabled):hover { background: #1d4ed8; }
+
+/* ── Chip: clickable value label that opens edit picker ── */
+.SelectChipValueBtn {
+    background: transparent;
+    border: none;
+    color: inherit;
+    font-size: inherit;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 2px;
+}
+.SelectChipValueBtn:hover { opacity: 0.75; }
+
+/* ── Date chip: full-width row in chip bar ── */
+.SelectChipDateRow {
+    flex-basis: 100%;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 5px 8px;
+    background: #eff6ff;
+    border-radius: 6px;
+    border: 1px solid #bfdbfe;
+    color: #1d4ed8;
+    font-size: 0.75rem;
+}
+@media (prefers-color-scheme: dark) {
+    .SelectChipDateRow { background: #1e3a5f; color: #93c5fd; border-color: #1e40af; }
+}
+.SelectChipDateRow select,
+.SelectChipDateRow input[type="date"] {
+    background: transparent;
+    border: 1px solid currentColor;
+    border-radius: 3px;
+    color: inherit;
+    font-size: 0.72rem;
+    padding: 1px 4px;
+    outline: none;
+}
+.SelectChipDateRow input[type="date"] { min-width: 6rem; }
+.SelectChipDatePresets {
+    display: flex;
+    gap: 3px;
+    margin-left: auto;
+    flex-wrap: wrap;
+}
+.SelectChipDatePresets button {
+    padding: 1px 5px;
+    border-radius: 3px;
+    border: 1px solid currentColor;
+    background: transparent;
+    color: inherit;
+    font-size: 0.67rem;
+    cursor: pointer;
+}
+.SelectChipDatePresets button:hover { background: rgba(37, 99, 235, 0.12); }
+@media (prefers-color-scheme: dark) {
+    .SelectChipDatePresets button:hover { background: rgba(147, 197, 253, 0.12); }
 }
 
 @keyframes contentShow {

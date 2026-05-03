@@ -11,6 +11,7 @@ import { standardizeLineBreaks } from '../utils/text'
 import { dateStr, getColorScheme, timestamp, unixTimestampToISOString } from '../utils/utils'
 import type { ApiConversationWithId, ConversationNodeMessage, ConversationResult } from '../api'
 import type { ExportMeta } from '../ui/SettingContext'
+import type { PartInfo } from '../utils/download'
 
 export async function exportToHtml(fileNameFormat: string, metaList: ExportMeta[]) {
     if (!checkIfConversationStarted()) {
@@ -31,7 +32,7 @@ export async function exportToHtml(fileNameFormat: string, metaList: ExportMeta[
     return true
 }
 
-export async function exportAllToHtml(fileNameFormat: string, apiConversations: ApiConversationWithId[], metaList?: ExportMeta[], projectName?: string) {
+export async function exportAllToHtml(fileNameFormat: string, apiConversations: ApiConversationWithId[], metaList?: ExportMeta[], projectName?: string, partIndex?: number, totalParts?: number) {
     const userAvatar = await getUserAvatar()
 
     const zip = new JSZip()
@@ -63,7 +64,10 @@ export async function exportAllToHtml(fileNameFormat: string, apiConversations: 
             level: 9,
         },
     })
-    downloadFile(buildZipFileName('html', projectName), 'application/zip', blob)
+    const partInfo: PartInfo | undefined = (partIndex != null && totalParts != null)
+        ? { part: partIndex, total: totalParts }
+        : undefined
+    downloadFile(buildZipFileName('html', projectName, partInfo), 'application/zip', blob)
 
     return true
 }

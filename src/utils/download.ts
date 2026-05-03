@@ -28,11 +28,31 @@ export function normalizeProjectName(projectName: string) {
         .replace(/^-+|-+$/g, '')
 }
 
-export function buildZipFileName(format: string, projectName?: string) {
+export interface PartInfo {
+    part: number
+    total: number
+}
+
+function partSuffix(partInfo?: PartInfo): string {
+    if (!partInfo || partInfo.total <= 1) return ''
+    const pad = (n: number) => String(n).padStart(2, '0')
+    return `-part-${pad(partInfo.part)}-of-${pad(partInfo.total)}`
+}
+
+export function buildZipFileName(format: string, projectName?: string, partInfo?: PartInfo) {
+    const suffix = partSuffix(partInfo)
     if (projectName) {
-        return `chatgpt-export-${format}-project-${normalizeProjectName(projectName)}.zip`
+        return `chatgpt-export-${format}-project-${normalizeProjectName(projectName)}${suffix}.zip`
     }
-    return `chatgpt-export-${format}.zip`
+    return `chatgpt-export-${format}${suffix}.zip`
+}
+
+export function buildJsonBatchFileName(projectName?: string, partInfo?: PartInfo) {
+    const suffix = partSuffix(partInfo)
+    if (projectName) {
+        return `chatgpt-export-project-${normalizeProjectName(projectName)}${suffix}.json`
+    }
+    return `chatgpt-export${suffix}.json`
 }
 
 export function getFileNameWithFormat(format: string, ext: string, {

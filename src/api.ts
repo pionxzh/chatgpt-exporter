@@ -291,7 +291,24 @@ export type ApiConversationWithId = ApiConversation & {
 export interface ApiConversationItem {
     id: string
     title: string
-    create_time: number
+    /** ISO 8601 string from the list endpoint (e.g. "2025-07-10T14:53:58.103234Z") */
+    create_time: number | string
+    /** ISO 8601 string from the list endpoint */
+    update_time?: number | string
+    /** True when the user has starred/pinned this conversation */
+    is_starred?: boolean | null
+    /** True for temporary chats that are not saved to history */
+    is_temporary_chat?: boolean
+    /** Non-null when the conversation belongs to a custom GPT or project */
+    gizmo_id?: string | null
+    /** How the conversation was initiated, e.g. "apple" for Siri/iOS, null for web/app */
+    conversation_origin?: string | null
+    /** ISO 8601 timestamp if the conversation is pinned, null otherwise */
+    pinned_time?: string | null
+    /** True when this conversation is archived */
+    is_archived?: boolean
+    /** True when memory is disabled for this conversation */
+    is_do_not_remember?: boolean | null
 }
 
 export interface ApiConversations {
@@ -548,7 +565,20 @@ async function fetchProjectConversations(project: string, cursor: string | numbe
     }
 }
 
-export async function fetchAllConversations(project: string | null = null, maxConversations = 1000, onBatch?: (batch: ApiConversationItem[]) => void): Promise<ApiConversationItem[]> {
+/**
+ * Fetch a single page of conversations starting at `offset`.
+ * Useful for "load more" functionality in the UI — call this after the initial
+ * full load to append additional pages without re-fetching everything.
+ */
+export async function fetchConversationsPage(
+    project: string | null,
+    offset: number,
+    limit: number,
+): Promise<ApiConversations> {
+    return fetchConversations(offset, limit, project)
+}
+
+export async function fetchAllConversations(project: string | null = null, maxConversations = 1000, onBatch?: (batch: ApiConversationItem[]) => void, onHasMore?: (hasMore: boolean) => void): Promise<ApiConversationItem[]> {
     const conversations: ApiConversationItem[] = []
     const limit = project === null ? 100 : 50 // gizmos api uses a smaller limit
     let offset = 0
@@ -585,7 +615,34 @@ export async function fetchAllConversations(project: string | null = null, maxCo
         }
     }
     // Ensure we don't return more than the requested limit if the last batch pushed us over
-    return conversations.slice(0, maxConversations)
+    const result = conversations.slice(0, maxConversations)
+    // Let the caller know whether the fetch was cut off by the user limit vs the API having no more data
+    onHasMore?.(result.length >= maxConversations)
+    return result
+}
+
+/**
+ * Fetch conversations from every source: the main conversation list (no-project)
+ * plus each project's own list.  Deduplicates by ID so a conversation that
+ * appears in both won't be exported twice.
+ */
+export async function fetchAllConversationsAll(
+    projects: ApiProjectInfo[],
+    maxConversations = 1000,
+    onBatch?: (batch: ApiConversationItem[]) => void,
+): Promise<void> {
+    const seen = new Set<string>()
+    const notify = (items: ApiConversationItem[]) => {
+        const novel = items.filter(c => !seen.has(c.id))
+        for (const c of novel) seen.add(c.id)
+        if (novel.length > 0) onBatch?.(novel)
+    }
+    // Main conversation list first (no-project or all, depending on the API)
+    await fetchAllConversations(null, maxConversations, notify)
+    // Then each project's conversations
+    for (const project of projects) {
+        await fetchAllConversations(project.id, maxConversations, notify)
+    }
 }
 
 export async function archiveConversation(chatId: string): Promise<boolean> {
@@ -608,6 +665,45 @@ export async function deleteConversation(chatId: string): Promise<boolean> {
     return success
 }
 
+/**
+ * Thrown when the API responds with 429 Too Many Requests.
+ * Carries the wait time from the `Retry-After` header (or a safe default).
+ */
+export class RateLimitError extends Error {
+    /** Milliseconds to wait before retrying */
+    readonly retryAfterMs: number
+    constructor(retryAfterHeader: string | null) {
+        super('Too Many Requests (429)')
+        this.name = 'RateLimitError'
+        const secs = retryAfterHeader != null ? Number.parseInt(retryAfterHeader, 10) : Number.NaN
+        // Default to 30 s if the header is missing or unparseable
+        this.retryAfterMs = Number.isFinite(secs) && secs > 0 ? secs * 1000 : 30_000
+    }
+}
+
+/** Header names ChatGPT might use for rate-limit signalling */
+const RATE_LIMIT_HEADERS = [
+    'retry-after',
+    'x-ratelimit-limit-requests',
+    'x-ratelimit-remaining-requests',
+    'x-ratelimit-reset-requests',
+    'x-ratelimit-limit-tokens',
+    'x-ratelimit-remaining-tokens',
+    'x-ratelimit-reset-tokens',
+]
+
+function logRateLimitHeaders(response: Response) {
+    const found: Record<string, string> = {}
+    for (const h of RATE_LIMIT_HEADERS) {
+        const val = response.headers.get(h)
+        if (val != null) found[h] = val
+    }
+    if (Object.keys(found).length > 0) {
+        // eslint-disable-next-line no-console
+        console.info('[Exporter] Rate-limit headers:', found)
+    }
+}
+
 async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
     const accessToken = await getAccessToken()
     const accountId = await getTeamAccountId()
@@ -621,10 +717,56 @@ async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
             ...options?.headers,
         },
     })
+
+    logRateLimitHeaders(response)
+
     if (!response.ok) {
+        if (response.status === 429) {
+            throw new RateLimitError(response.headers.get('Retry-After'))
+        }
         throw new Error(response.statusText)
     }
     return response.json()
+}
+
+/**
+ * Lightweight probe: fetch exactly 1 conversation to check whether the API
+ * is currently accepting requests. Returns a status object that the UI can
+ * display before the user starts a large export.
+ */
+export async function probeApi(): Promise<{
+    ok: boolean
+    retryAfterMs?: number
+    rateLimitHeaders: Record<string, string>
+}> {
+    const accessToken = await getAccessToken()
+    const accountId = await getTeamAccountId()
+    const url = conversationsApi(0, 1)
+
+    const response = await fetch(url, {
+        headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'X-Authorization': `Bearer ${accessToken}`,
+            ...(accountId ? { 'Chatgpt-Account-Id': accountId } : {}),
+        },
+    })
+
+    const rateLimitHeaders: Record<string, string> = {}
+    for (const h of RATE_LIMIT_HEADERS) {
+        const val = response.headers.get(h)
+        if (val != null) rateLimitHeaders[h] = val
+    }
+
+    if (!response.ok) {
+        if (response.status === 429) {
+            const secs = response.headers.get('retry-after')
+            const ms = secs ? Number.parseInt(secs, 10) * 1000 : 60_000
+            return { ok: false, retryAfterMs: ms, rateLimitHeaders }
+        }
+        return { ok: false, rateLimitHeaders }
+    }
+
+    return { ok: true, rateLimitHeaders }
 }
 
 async function _fetchSession(): Promise<ApiSession> {

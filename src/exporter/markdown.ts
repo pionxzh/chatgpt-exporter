@@ -10,6 +10,7 @@ import { standardizeLineBreaks } from '../utils/text'
 import { dateStr, timestamp, unixTimestampToISOString } from '../utils/utils'
 import type { ApiConversationWithId, Citation, ConversationNodeMessage, ConversationResult } from '../api'
 import type { ExportMeta } from '../ui/SettingContext'
+import type { PartInfo } from '../utils/download'
 
 export async function exportToMarkdown(fileNameFormat: string, metaList: ExportMeta[]) {
     if (!checkIfConversationStarted()) {
@@ -28,7 +29,7 @@ export async function exportToMarkdown(fileNameFormat: string, metaList: ExportM
     return true
 }
 
-export async function exportAllToMarkdown(fileNameFormat: string, apiConversations: ApiConversationWithId[], metaList?: ExportMeta[], projectName?: string) {
+export async function exportAllToMarkdown(fileNameFormat: string, apiConversations: ApiConversationWithId[], metaList?: ExportMeta[], projectName?: string, partIndex?: number, totalParts?: number) {
     const zip = new JSZip()
     const filenameMap = new Map<string, number>()
     const conversations = apiConversations.map(x => processConversation(x))
@@ -58,7 +59,10 @@ export async function exportAllToMarkdown(fileNameFormat: string, apiConversatio
             level: 9,
         },
     })
-    downloadFile(buildZipFileName('markdown', projectName), 'application/zip', blob)
+    const partInfo: PartInfo | undefined = (partIndex != null && totalParts != null)
+        ? { part: partIndex, total: totalParts }
+        : undefined
+    downloadFile(buildZipFileName('markdown', projectName, partInfo), 'application/zip', blob)
 
     return true
 }
