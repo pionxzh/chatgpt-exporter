@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.30.0
+// @version            2.31.0
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -130,14 +130,6 @@ html {
     --ce-text-primary: var(--text-primary, #ececec);
     --ce-menu-primary: var(--sidebar-surface-primary, #171717);
     --ce-menu-secondary: var(--sidebar-surface-secondary, #212121);
-}
-
-.text-menu {
-    color: var(--ce-text-primary);
-}
-
-.bg-menu {
-    background-color: var(--ce-menu-primary);
 }
 
 .border-menu {
@@ -485,7 +477,7 @@ html {
     color: #6b7280;
     font-weight: 600;
 }
-@media (prefers-color-scheme: dark) {
+.dark {
     .SelectItemMetaActive { color: #d1d5db; }
 }
 
@@ -499,9 +491,11 @@ html {
     background: #f9fafb;
     user-select: none;
 }
-@media (prefers-color-scheme: dark) {
+
+.dark {
     .SelectListHeader { background: #1f2937; }
 }
+
 .SelectListHeaderCell {
     flex-shrink: 0;
     font-size: 0.68rem;
@@ -518,7 +512,7 @@ html {
     text-align: right;
 }
 .SelectListHeaderCell:hover { color: #374151; }
-@media (prefers-color-scheme: dark) {
+.dark {
     .SelectListHeaderCell:hover { color: #e5e7eb; }
 }
 .SelectListHeaderCellTitle {
@@ -529,307 +523,10 @@ html {
 .SelectListHeaderCellActive {
     color: #2563eb;
 }
-@media (prefers-color-scheme: dark) {
+.dark {
     .SelectListHeaderCellActive { color: #60a5fa; }
 }
 
-.SelectChips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    padding: 6px 12px;
-    border: 1px solid #6f6e77;
-    border-bottom: none;
-}
-
-.SelectChip {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 2px 8px;
-    border-radius: 9999px;
-    font-size: 0.72rem;
-    background: #dbeafe;
-    color: #1d4ed8;
-    border: 1px solid #bfdbfe;
-    white-space: nowrap;
-}
-
-@media (prefers-color-scheme: dark) {
-    .SelectChip {
-        background: #1e3a5f;
-        color: #93c5fd;
-        border-color: #1e40af;
-    }
-}
-
-.SelectChipRemove {
-    cursor: pointer;
-    opacity: 0.6;
-    line-height: 1;
-    padding: 0 2px;
-}
-.SelectChipRemove:hover {
-    opacity: 1;
-    color: #dc2626;
-}
-
-.SelectFilterPopover {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    z-index: 50;
-    background: white;
-    border: 1px solid #6f6e77;
-    border-radius: 0 0 6px 6px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    overflow-y: auto;
-    max-height: 280px;
-}
-
-@media (prefers-color-scheme: dark) {
-    .SelectFilterPopover {
-        background: #1f2937;
-        border-color: #374151;
-    }
-}
-
-.SelectFilterOption {
-    width: 100%;
-    text-align: left;
-    padding: 8px 14px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: inherit;
-}
-
-.SelectFilterOption:hover {
-    background: #f3f4f6;
-}
-
-@media (prefers-color-scheme: dark) {
-    .SelectFilterOption:hover {
-        background: #374151;
-    }
-}
-
-.SelectFilterOption strong {
-    display: block;
-    font-size: 0.82rem;
-}
-
-.SelectFilterOption small {
-    display: block;
-    font-size: 0.7rem;
-    color: #9ca3af;
-    margin-top: 1px;
-}
-
-/* Group header inside the filter picker popover */
-.SelectFilterGroupHeader {
-    padding: 6px 14px 2px;
-    font-size: 0.67rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: #9ca3af;
-    pointer-events: none;
-    user-select: none;
-}
-
-/* AND / OR logic toggle pill in the chip bar */
-.SelectChipLogic {
-    display: inline-flex;
-    align-items: center;
-    padding: 2px 7px;
-    border-radius: 9999px;
-    font-size: 0.67rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    background: #e0f2fe;
-    color: #0369a1;
-    border: 1px solid #bae6fd;
-    cursor: pointer;
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-.SelectChipLogic:hover { background: #bae6fd; }
-.SelectChipLogicOr { background: #fef3c7; color: #b45309; border-color: #fde68a; }
-.SelectChipLogicOr:hover { background: #fde68a; }
-
-@media (prefers-color-scheme: dark) {
-    .SelectChipLogic { background: #0c4a6e; color: #7dd3fc; border-color: #075985; }
-    .SelectChipLogicOr { background: #451a03; color: #fcd34d; border-color: #78350f; }
-}
-
-/* Include / exclude mode badge inside each chip */
-.SelectChipMode {
-    font-size: 0.6rem;
-    padding: 1px 4px;
-    border-radius: 3px;
-    background: rgba(29, 78, 216, 0.1);
-    color: inherit;
-    cursor: pointer;
-    opacity: 0.75;
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-.SelectChipMode:hover { opacity: 1; }
-.SelectChipModeExclude { background: rgba(220, 38, 38, 0.15); }
-
-/* Chip rendered in exclude mode */
-.SelectChipExclude {
-    background: #fee2e2;
-    color: #b91c1c;
-    border-color: #fecaca;
-}
-@media (prefers-color-scheme: dark) {
-    .SelectChipExclude { background: #450a0a; color: #f87171; border-color: #7f1d1d; }
-}
-
-/* Number input inside duration / recency chips */
-.SelectChip input[type="number"] {
-    width: 2.2rem;
-    background: transparent;
-    color: inherit;
-    font-size: inherit;
-    text-align: center;
-    border: none;
-    outline: none;
-    padding: 0;
-}
-
-/* \u2500\u2500 Picker: back button (stage 2 header) \u2500\u2500 */
-.SelectFilterBack {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    padding: 7px 14px 6px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: #6b7280;
-    text-align: left;
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid #e5e7eb;
-    cursor: pointer;
-}
-.SelectFilterBack:hover { color: #374151; }
-@media (prefers-color-scheme: dark) {
-    .SelectFilterBack { color: #9ca3af; border-color: #374151; }
-    .SelectFilterBack:hover { color: #e5e7eb; }
-}
-
-/* \u2500\u2500 Picker: checkbox-style option in sub-view \u2500\u2500 */
-.SelectFilterCheckboxBtn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-    padding: 7px 14px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: inherit;
-    text-align: left;
-}
-.SelectFilterCheckboxBtn:hover { background: #f3f4f6; }
-@media (prefers-color-scheme: dark) {
-    .SelectFilterCheckboxBtn:hover { background: #374151; }
-}
-.SelectFilterCheckIcon {
-    flex-shrink: 0;
-    width: 1rem;
-    text-align: center;
-    font-size: 0.85rem;
-    color: #9ca3af;
-}
-.SelectFilterCheckboxBtnChecked .SelectFilterCheckIcon { color: #2563eb; }
-@media (prefers-color-scheme: dark) {
-    .SelectFilterCheckboxBtnChecked .SelectFilterCheckIcon { color: #60a5fa; }
-}
-
-/* \u2500\u2500 Picker: apply/update button at bottom of sub-view \u2500\u2500 */
-.SelectFilterApplyBtn {
-    display: block;
-    width: calc(100% - 28px);
-    margin: 6px 14px;
-    padding: 5px 0;
-    background: #2563eb;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-align: center;
-}
-.SelectFilterApplyBtn:disabled { opacity: 0.4; cursor: not-allowed; }
-.SelectFilterApplyBtn:not(:disabled):hover { background: #1d4ed8; }
-
-/* \u2500\u2500 Chip: clickable value label that opens edit picker \u2500\u2500 */
-.SelectChipValueBtn {
-    background: transparent;
-    border: none;
-    color: inherit;
-    font-size: inherit;
-    cursor: pointer;
-    padding: 0;
-    text-decoration: underline;
-    text-decoration-style: dotted;
-    text-underline-offset: 2px;
-}
-.SelectChipValueBtn:hover { opacity: 0.75; }
-
-/* \u2500\u2500 Date chip: full-width row in chip bar \u2500\u2500 */
-.SelectChipDateRow {
-    flex-basis: 100%;
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 5px;
-    padding: 5px 8px;
-    background: #eff6ff;
-    border-radius: 6px;
-    border: 1px solid #bfdbfe;
-    color: #1d4ed8;
-    font-size: 0.75rem;
-}
-@media (prefers-color-scheme: dark) {
-    .SelectChipDateRow { background: #1e3a5f; color: #93c5fd; border-color: #1e40af; }
-}
-.SelectChipDateRow select,
-.SelectChipDateRow input[type="date"] {
-    background: transparent;
-    border: 1px solid currentColor;
-    border-radius: 3px;
-    color: inherit;
-    font-size: 0.72rem;
-    padding: 1px 4px;
-    outline: none;
-}
-.SelectChipDateRow input[type="date"] { min-width: 6rem; }
-.SelectChipDatePresets {
-    display: flex;
-    gap: 3px;
-    margin-left: auto;
-    flex-wrap: wrap;
-}
-.SelectChipDatePresets button {
-    padding: 1px 5px;
-    border-radius: 3px;
-    border: 1px solid currentColor;
-    background: transparent;
-    color: inherit;
-    font-size: 0.67rem;
-    cursor: pointer;
-}
-.SelectChipDatePresets button:hover { background: rgba(37, 99, 235, 0.12); }
-@media (prefers-color-scheme: dark) {
-    .SelectChipDatePresets button:hover { background: rgba(147, 197, 253, 0.12); }
-}
 
 @keyframes contentShow {
     from {
@@ -1591,7 +1288,6 @@ html {
   const conversationApi = (id) => _default(apiUrl, "/conversation/:id", { id });
   const conversationsApi = (offset, limit) => _default(apiUrl, "/conversations", { offset, limit });
   const fileDownloadApi = (id) => _default(apiUrl, "/files/download/:id", { id, post_id: "", inline: false });
-  const projectsApi = (cursor) => _default(apiUrl, "/gizmos/snorlax/sidebar", { conversations_per_gizmo: 0, cursor });
   const projectConversationsApi = (gizmo, cursor, limit) => _default(apiUrl, "/gizmos/:gizmo/conversations", { gizmo, cursor, limit });
   const accountsCheckApi = _default(apiUrl, "/accounts/check/v4-2023-04-27");
   async function getCurrentChatId() {
@@ -1672,18 +1368,6 @@ html {
       id: chatId,
       ...conversation
     };
-  }
-  async function fetchProjects() {
-    let cursor = null;
-    const allItems = [];
-    while (true) {
-      const url = projectsApi(cursor);
-      const { items, cursor: nextCursor = null } = await fetchApi(url);
-      cursor = nextCursor;
-      allItems.push(...items);
-      if (nextCursor === null) break;
-    }
-    return allItems.map((gizmo) => gizmo.gizmo.gizmo);
   }
   async function fetchConversations(offset = 0, limit = 20, project = null) {
     if (project) {
@@ -1879,6 +1563,25 @@ html {
     }
     return null;
   }
+  function shouldSkipMessageInExport(message) {
+    var _a, _b, _c, _d;
+    if (!message || !message.content) return true;
+    if (message.recipient !== "all") return true;
+    if (message.content.content_type === "thoughts") return true;
+    if (message.content.content_type === "reasoning_recap") return true;
+    if ((_a = message.metadata) == null ? void 0 : _a.is_visually_hidden_from_conversation) return true;
+    if (message.author.role === "tool") {
+      if (message.author.name === "file_search") return true;
+      const hasExecutionImages = message.content.content_type === "execution_output" && !!((_d = (_c = (_b = message.metadata) == null ? void 0 : _b.aggregate_result) == null ? void 0 : _c.messages) == null ? void 0 : _d.some((msg) => msg.message_type === "image"));
+      const hasMultimodalImage = message.content.content_type === "multimodal_text" && message.content.parts.some((part) => {
+        return typeof part !== "string" && part.content_type === "image_asset_pointer";
+      });
+      if (!hasExecutionImages && !hasMultimodalImage) {
+        return true;
+      }
+    }
+    return false;
+  }
   const ModelMapping = {
     "text-davinci-002-render-sha": "GPT-3.5",
     "text-davinci-002-render-paid": "GPT-3.5",
@@ -1951,7 +1654,7 @@ html {
       }
       if (
         // Skip system messages
-        ((_a = node2.message) == null ? void 0 : _a.author.role) !== "system" && ((_b = node2.message) == null ? void 0 : _b.content.content_type) !== "model_editable_context" && ((_c = node2.message) == null ? void 0 : _c.content.content_type) !== "user_editable_context"
+        ((_a = node2.message) == null ? void 0 : _a.author.role) !== "system" && ((_b = node2.message) == null ? void 0 : _b.content.content_type) !== "model_editable_context" && ((_c = node2.message) == null ? void 0 : _c.content.content_type) !== "user_editable_context" && !shouldSkipMessageInExport(node2.message)
       ) {
         result.unshift(node2);
       }
@@ -8665,40 +8368,8 @@ html {
     "Export batches button": "Export ({{n}} downloads)",
     "Batch progress": "Batch {{current}}/{{total}}",
     "All conversations": "All conversations",
-    "Filters hint": "type # to add filters",
     "Load more conversations": "Load {{n}} more",
-    "Load more conversations remaining": "Load {{n}} more · {{remaining}} left",
-    "Chip group chat class": "Chat class",
-    "Chip group origin": "Origin",
-    "Chip group status": "Status",
-    "Chip group duration": "Duration",
-    "Chip group recency": "Recency",
-    "Chip cc regular label": "💬 Regular",
-    "Chip cc regular desc": "Standard chats with no GPT or Project",
-    "Chip cc gpt label": "🤖 GPT",
-    "Chip cc gpt desc": "Used a GPT Store AI",
-    "Chip cc project label": "📂 Project",
-    "Chip cc project desc": "Started inside one of your Projects",
-    "Chip origin web label": "🌐 Web / App",
-    "Chip origin web desc": "Web app or mobile app",
-    "Chip status starred label": "⭐ Starred",
-    "Chip status starred desc": "Conversations you have starred",
-    "Chip status temporary label": "💬 Temporary",
-    "Chip status temporary desc": "Temporary chats not saved to history",
-    "Chip status pinned label": "📌 Pinned",
-    "Chip status pinned desc": "Conversations you have pinned",
-    "Chip duration label": "⏱ Long conversation",
-    "Chip duration desc": "Active span ≥ N days (adjustable on chip)",
-    "Chip recency label": "📅 Recently active",
-    "Chip recency desc": "Updated within N days (adjustable on chip)",
-    "Chip mode include": "include",
-    "Chip mode exclude": "exclude",
-    "Chip logic and": "AND",
-    "Chip logic or": "OR",
-    "Chip duration prefix": "⏱ active ≥",
-    "Chip duration suffix": "d",
-    "Chip recency prefix": "📅 updated <",
-    "Chip recency suffix": "d"
+    "Load more conversations remaining": "Load {{n}} more · {{remaining}} left"
   };
   const title$7 = "ChatGPT Exporter";
   const ExportHelper$7 = "Exportar";
@@ -21441,23 +21112,11 @@ html {
     const timeStamp24H = ScriptStorage.get(KEY_TIMESTAMP_24H) ?? false;
     const LatexRegex2 = /(\s\$\$.+?\$\$\s|\s\$.+?\$\s|\\\[.+?\\\]|\\\(.+?\\\))|(^\$$[\S\s]+?^\$$)|(^\$\$[\S\s]+?^\$\$\$)/gm;
     const conversationHtml = conversationNodes.map(({ message }) => {
-      var _a, _b, _c, _d, _e;
+      var _a;
       if (!message || !message.content) return null;
-      if (message.recipient !== "all") return null;
-      if (message.content.content_type === "thoughts") return null;
-      if (message.content.content_type === "reasoning_recap") return null;
-      if ((_a = message.metadata) == null ? void 0 : _a.is_visually_hidden_from_conversation) return null;
-      if (message.author.role === "tool") {
-        if (
-          // HACK: we special case the content_type 'multimodal_text' here because it is used by
-          // the dalle tool to return the image result, and we do want to show that.
-          message.content.content_type !== "multimodal_text" && !(message.content.content_type === "execution_output" && ((_d = (_c = (_b = message.metadata) == null ? void 0 : _b.aggregate_result) == null ? void 0 : _c.messages) == null ? void 0 : _d.some((msg) => msg.message_type === "image")))
-        ) {
-          return null;
-        }
-      }
+      if (shouldSkipMessageInExport(message)) return null;
       const author = transformAuthor$2(message.author);
-      const model2 = ((_e = message == null ? void 0 : message.metadata) == null ? void 0 : _e.model_slug) === "gpt-4" ? "GPT-4" : "GPT-3";
+      const model2 = ((_a = message == null ? void 0 : message.metadata) == null ? void 0 : _a.model_slug) === "gpt-4" ? "GPT-4" : "GPT-3";
       const authorType = message.author.role === "user" ? "user" : model2;
       const avatarEl = message.author.role === "user" ? `<img alt="${author}" />` : '<svg width="41" height="41"><use xlink:href="#chatgpt" /></svg>';
       let postSteps = [];
@@ -21777,7 +21436,7 @@ ${content2.text}
     return true;
   }
   function convertMessageToTavern(node2) {
-    if (!node2.message || node2.message.content.content_type !== "text") {
+    if (!node2.message || shouldSkipMessageInExport(node2.message) || node2.message.content.content_type !== "text") {
       return null;
     }
     const authorRole = node2.message.author.role;
@@ -21807,8 +21466,7 @@ ${content2.text}
   function convertToOoba(conversation) {
     const pairs = [];
     const messages = conversation.conversationNodes.filter((node2) => {
-      var _a, _b;
-      return ((_a = node2.message) == null ? void 0 : _a.author.role) !== "tool" && ((_b = node2.message) == null ? void 0 : _b.content.content_type) === "text";
+      return !!node2.message && !shouldSkipMessageInExport(node2.message) && node2.message.content.content_type === "text";
     });
     let idx = 0;
     while (idx < messages.length - 1) {
@@ -21999,21 +21657,8 @@ ${_metaList.join("\n")}
     const timeStampMarkdown = ScriptStorage.get(KEY_TIMESTAMP_MARKDOWN) ?? false;
     const timeStamp24H = ScriptStorage.get(KEY_TIMESTAMP_24H) ?? false;
     const content2 = conversationNodes.map(({ message }) => {
-      var _a, _b, _c, _d;
       if (!message || !message.content) return null;
-      if (message.recipient !== "all") return null;
-      if (message.content.content_type === "thoughts") return null;
-      if (message.content.content_type === "reasoning_recap") return null;
-      if ((_a = message.metadata) == null ? void 0 : _a.is_visually_hidden_from_conversation) return null;
-      if (message.author.role === "tool") {
-        if (
-          // HACK: we special case the content_type 'multimodal_text' here because it is used by
-          // the dalle tool to return the image result, and we do want to show that.
-          message.content.content_type !== "multimodal_text" && !(message.content.content_type === "execution_output" && ((_d = (_c = (_b = message.metadata) == null ? void 0 : _b.aggregate_result) == null ? void 0 : _c.messages) == null ? void 0 : _d.some((msg) => msg.message_type === "image")))
-        ) {
-          return null;
-        }
-      }
+      if (shouldSkipMessageInExport(message)) return null;
       const timestamp2 = (message == null ? void 0 : message.create_time) ?? "";
       const showTimestamp = enableTimestamp && timeStampMarkdown && timestamp2;
       let timestampHtml = "";
@@ -22203,21 +21848,8 @@ ${content2.text}
   }
   const LatexRegex = /(\s\$\$.+\$\$\s|\s\$.+\$\s|\\\[.+\\\]|\\\(.+\\\))|(^\$$[\S\s]+^\$$)|(^\$\$[\S\s]+^\$\$$)/gm;
   function transformMessage(message) {
-    var _a, _b, _c, _d;
     if (!message || !message.content) return null;
-    if (message.recipient !== "all") return null;
-    if (message.content.content_type === "thoughts") return null;
-    if (message.content.content_type === "reasoning_recap") return null;
-    if ((_a = message.metadata) == null ? void 0 : _a.is_visually_hidden_from_conversation) return null;
-    if (message.author.role === "tool") {
-      if (
-        // HACK: we special case the content_type 'multimodal_text' here because it is used by
-        // the dalle tool to return the image result, and we do want to show that.
-        message.content.content_type !== "multimodal_text" && !(message.content.content_type === "execution_output" && ((_d = (_c = (_b = message.metadata) == null ? void 0 : _b.aggregate_result) == null ? void 0 : _c.messages) == null ? void 0 : _d.some((msg) => msg.message_type === "image")))
-      ) {
-        return null;
-      }
-    }
+    if (shouldSkipMessageInExport(message)) return null;
     const author = transformAuthor(message.author);
     let content2 = transformContent(message.content, message.metadata);
     const matches = content2.match(LatexRegex);
@@ -22738,173 +22370,8 @@ ${content2}`;
       return title2.toLowerCase().includes(lower);
     }
   }
-  const NULL_ORIGIN_ID = "__web_app__";
-  const CHAT_CLASS_SUB_OPTIONS = [
-    { id: "regular", label: "💬 Regular", desc: "Standard chats with no GPT or Project" },
-    { id: "gpt", label: "🤖 GPT", desc: "Used a GPT Store AI" },
-    { id: "project", label: "📂 Project", desc: "Any conversation in a Project" }
-  ];
-  const STATUS_SUB_OPTIONS = [
-    { id: "starred", label: "⭐ Starred", desc: "Starred conversations" },
-    { id: "temporary", label: "💬 Temporary", desc: "Temporary chats not saved to history" },
-    { id: "pinned", label: "📌 Pinned", desc: "Pinned conversations" }
-  ];
-  const DATE_PRESETS = [
-    { days: 7, label: "7d" },
-    { days: 30, label: "30d" },
-    { days: 90, label: "90d" },
-    { days: 365, label: "Year" }
-  ];
-  const ROOT_PICKER_ITEMS = [
-    { id: "chat_class", label: "💬 Chat class", desc: "Regular, GPT, or Project chats", hasSubView: true },
-    { id: "origin", label: "🌐 Origin", desc: "How the conversation was started", hasSubView: true },
-    { id: "project", label: "📂 Project", desc: "Filter by specific project", hasSubView: true },
-    { id: "status", label: "⭐ Status", desc: "Starred, Temporary, or Pinned", hasSubView: true },
-    { id: "duration_gte", label: "⏱ Duration", desc: "Long conversation (≥ N days)", hasSubView: false },
-    { id: "recency_lte", label: "📅 Recency", desc: "Recently updated (< N days)", hasSubView: false },
-    { id: "date", label: "📅 Date range", desc: "Filter by created or updated date", hasSubView: false }
-  ];
-  function isChipDuplicate(chips, candidate) {
-    return chips.some((c2) => c2.type === candidate.type);
-  }
-  function getChipEncodedSelections(chip) {
-    switch (chip.type) {
-      case "chat_class":
-        return chip.values;
-      case "origin":
-        return chip.values.map((v2) => v2 === null ? NULL_ORIGIN_ID : v2);
-      case "project":
-        return chip.projectIds;
-      case "status":
-        return chip.values;
-      default:
-        return [];
-    }
-  }
-  function makeChipFromPickerState(view, selections, mode) {
-    switch (view) {
-      case "chat_class":
-        return { type: "chat_class", values: selections, mode };
-      case "origin":
-        return { type: "origin", values: selections.map((s2) => s2 === NULL_ORIGIN_ID ? null : s2), mode };
-      case "project":
-        return { type: "project", projectIds: selections, mode };
-      case "status":
-        return { type: "status", values: selections, mode };
-    }
-  }
-  function getChipValueLabel(chip, projects) {
-    switch (chip.type) {
-      case "chat_class": {
-        if (chip.values.length === 0) return "none";
-        if (chip.values.length === 3) return "all types";
-        const lbl = { regular: "💬 Regular", gpt: "🤖 GPT", project: "📂 Project" };
-        return chip.values.map((v2) => lbl[v2]).join(", ");
-      }
-      case "origin": {
-        if (chip.values.length === 0) return "none";
-        return chip.values.map((v2) => v2 === null ? "Web/App" : v2.charAt(0).toUpperCase() + v2.slice(1)).join(", ");
-      }
-      case "project": {
-        if (chip.projectIds.length === 0) return "any project";
-        return chip.projectIds.map((id) => {
-          var _a;
-          return ((_a = projects.find((p2) => p2.id === id)) == null ? void 0 : _a.display.name) ?? id.slice(0, 8);
-        }).join(", ");
-      }
-      case "status": {
-        if (chip.values.length === 0) return "none";
-        const lbl = { starred: "⭐ Starred", temporary: "💬 Temp", pinned: "📌 Pinned" };
-        return chip.values.map((v2) => lbl[v2]).join(", ");
-      }
-      default:
-        return null;
-    }
-  }
-  function getChipTypePrefix(type) {
-    if (type === "chat_class") return "💬 Chat";
-    if (type === "origin") return "🌐 Origin";
-    if (type === "project") return "📂 Project";
-    if (type === "status") return "⭐ Status";
-    return "";
-  }
-  function getPickerViewTitle(view) {
-    if (view === "chat_class") return "Chat class";
-    if (view === "origin") return "Origin";
-    if (view === "project") return "Project";
-    if (view === "status") return "Status";
-    return "";
-  }
-  function matchDateChip(c2, chip) {
-    if (chip.from) {
-      const fromMs = new Date(chip.from).getTime();
-      if (!Number.isNaN(fromMs) && toMs(c2[chip.field]) < fromMs) return false;
-    }
-    if (chip.to) {
-      const toEndMs = (/* @__PURE__ */ new Date(`${chip.to}T23:59:59.999`)).getTime();
-      if (!Number.isNaN(toEndMs) && toMs(c2[chip.field]) > toEndMs) return false;
-    }
-    return true;
-  }
-  function matchFilterChip(c2, chip, projectIdSet) {
-    let raw2 = true;
-    switch (chip.type) {
-      case "chat_class": {
-        if (chip.values.length === 0) break;
-        const gizmoId = c2.gizmo_id ?? null;
-        const isProject = gizmoId !== null && projectIdSet.has(gizmoId);
-        const isGpt = gizmoId !== null && !isProject;
-        raw2 = chip.values.some((v2) => {
-          if (v2 === "regular") return gizmoId === null;
-          if (v2 === "project") return isProject;
-          return isGpt;
-        });
-        break;
-      }
-      case "origin": {
-        if (chip.values.length === 0) break;
-        raw2 = chip.values.some((v2) => {
-          if (v2 === null) return (c2.conversation_origin ?? null) === null;
-          return c2.conversation_origin === v2;
-        });
-        break;
-      }
-      case "project": {
-        if (chip.projectIds.length === 0) break;
-        raw2 = c2.gizmo_id != null && chip.projectIds.includes(c2.gizmo_id);
-        break;
-      }
-      case "status": {
-        if (chip.values.length === 0) break;
-        raw2 = chip.values.some((v2) => {
-          if (v2 === "starred") return c2.is_starred === true;
-          if (v2 === "temporary") return c2.is_temporary_chat === true;
-          return c2.pinned_time != null;
-        });
-        break;
-      }
-      case "duration_gte":
-        raw2 = toMs(c2.update_time) - toMs(c2.create_time) >= chip.days * 864e5;
-        break;
-      case "recency_lte":
-        raw2 = Date.now() - toMs(c2.update_time) <= chip.days * 864e5;
-        break;
-    }
-    return chip.mode === "include" ? raw2 : !raw2;
-  }
-  function applyChips(conversations, chips, logic, projects) {
-    if (chips.length === 0) return conversations;
-    const projectIdSet = new Set(projects.map((p2) => p2.id));
-    const dateChip = chips.find((c2) => c2.type === "date");
-    const other = chips.filter((c2) => c2.type !== "date");
-    let result = conversations;
-    if (dateChip) result = result.filter((c2) => matchDateChip(c2, dateChip));
-    if (other.length === 0) return result;
-    return logic === "AND" ? result.filter((c2) => other.every((chip) => matchFilterChip(c2, chip, projectIdSet))) : result.filter((c2) => other.some((chip) => matchFilterChip(c2, chip, projectIdSet)));
-  }
   const ConversationSelect = ({
     conversations,
-    projects,
     selected,
     setSelected,
     disabled,
@@ -22913,54 +22380,14 @@ ${content2}`;
   }) => {
     const { t: t2 } = useTranslation();
     const [query2, setQuery] = h$4("");
-    const [chips, setChips] = h$4([]);
-    const [chipLogic, setChipLogic] = h$4("AND");
-    const [showPopover, setShowPopover] = h$4(false);
-    const [pickerView, setPickerView] = h$4("root");
-    const [pickerSelections, setPickerSelections] = h$4([]);
-    const [editingChipIndex, setEditingChipIndex] = h$4(null);
     const lastClickedIndex = _(-1);
-    const searchInputRef = _(null);
-    const skipNextBlur = _(false);
     const [skipFirst, setSkipFirst] = h$4(0);
     const [sortField, setSortField] = h$4("create_time");
     const [sortDir, setSortDir] = h$4("desc");
-    const originSubOptions = F$1(() => {
-      const map2 = /* @__PURE__ */ new Map();
-      for (const c2 of conversations) {
-        const val = c2.conversation_origin ?? null;
-        const id = val === null ? NULL_ORIGIN_ID : val;
-        if (!map2.has(id)) {
-          const label = val === null ? "Web / App" : val.charAt(0).toUpperCase() + val.slice(1);
-          map2.set(id, label);
-        }
-      }
-      return [...map2.entries()].map(([id, label]) => ({
-        id,
-        label: `🌐 ${label}`,
-        desc: id === NULL_ORIGIN_ID ? "Web app or mobile app" : `Started via ${label}`
-      }));
-    }, [conversations]);
-    const projectSubOptions = F$1(
-      () => projects.map((p2) => ({ id: p2.id, label: `📂 ${p2.display.name}`, desc: "" })),
-      [projects]
-    );
-    const currentSubOptions = F$1(() => {
-      if (pickerView === "chat_class") return CHAT_CLASS_SUB_OPTIONS;
-      if (pickerView === "origin") return originSubOptions;
-      if (pickerView === "project") return projectSubOptions;
-      if (pickerView === "status") return STATUS_SUB_OPTIONS;
-      return [];
-    }, [pickerView, originSubOptions, projectSubOptions]);
-    const rootOptions = F$1(
-      () => ROOT_PICKER_ITEMS.filter((opt) => !chips.some((c2) => c2.type === opt.id)),
-      [chips]
-    );
     const filtered = F$1(() => {
       let result = conversations;
-      const q2 = query2.trim().replace(/#$/, "").trim();
+      const q2 = query2.trim();
       if (q2) result = result.filter((c2) => textSearch(c2.title, q2));
-      result = applyChips(result, chips, chipLogic, projects);
       const dir = sortDir === "asc" ? 1 : -1;
       return [...result].sort((a2, b2) => {
         if (sortField === "title") {
@@ -22970,398 +22397,24 @@ ${content2}`;
         const bMs = toMs(sortField === "update_time" ? b2.update_time : b2.create_time);
         return dir * (aMs - bMs);
       });
-    }, [conversations, query2, chips, chipLogic, projects, sortField, sortDir]);
+    }, [conversations, query2, sortField, sortDir]);
     const allFilteredSelected = filtered.length > 0 && filtered.every((c2) => selected.some((x2) => x2.id === c2.id));
-    const nonDateChips = F$1(() => chips.filter((c2) => c2.type !== "date"), [chips]);
-    const updateChip = T$4((index2, updated) => {
-      setChips((prev) => prev.map((c2, i2) => i2 === index2 ? updated : c2));
-    }, []);
-    const removeChip = T$4((index2) => {
-      setChips((prev) => prev.filter((_24, i2) => i2 !== index2));
-    }, []);
-    const toggleChipMode = T$4((index2) => {
-      setChips((prev) => prev.map((c2, i2) => {
-        if (i2 !== index2 || c2.type === "date") return c2;
-        return { ...c2, mode: c2.mode === "include" ? "exclude" : "include" };
-      }));
-    }, []);
-    const dateChip = F$1(
-      () => chips.find((c2) => c2.type === "date"),
-      [chips]
-    );
-    const updateDateChip = T$4((updates) => {
-      setChips((prev) => prev.map((c2) => {
-        if (c2.type !== "date") return c2;
-        return { ...c2, ...updates };
-      }));
-    }, []);
-    const setDatePreset = T$4((days) => {
-      const d2 = /* @__PURE__ */ new Date();
-      const from = new Date(d2.getTime() - days * 864e5).toISOString().slice(0, 10);
-      const to = d2.toISOString().slice(0, 10);
-      setChips((prev) => prev.map((c2) => {
-        if (c2.type !== "date") return c2;
-        return { ...c2, from, to };
-      }));
-    }, []);
-    const removeDateChip = T$4(() => {
-      setChips((prev) => prev.filter((c2) => c2.type !== "date"));
-    }, []);
-    const closePicker = T$4(() => {
-      setShowPopover(false);
-      setPickerView("root");
-      setPickerSelections([]);
-      setEditingChipIndex(null);
-    }, []);
-    const togglePickerSelection = T$4((id) => {
-      setPickerSelections(
-        (prev) => prev.includes(id) ? prev.filter((s2) => s2 !== id) : [...prev, id]
-      );
-    }, []);
-    const applyPickerSelections = T$4(() => {
-      if (pickerView === "root") return;
-      let mode = "include";
-      if (editingChipIndex !== null) {
-        const existing = chips[editingChipIndex];
-        if (existing && existing.type !== "date") mode = existing.mode;
-      }
-      const newChip = makeChipFromPickerState(pickerView, pickerSelections, mode);
-      if (editingChipIndex !== null) {
-        updateChip(editingChipIndex, newChip);
-      } else if (!isChipDuplicate(chips, newChip)) {
-        setChips((prev) => [...prev, newChip]);
-      }
-      setQuery((q2) => q2.endsWith("#") ? q2.slice(0, -1) : q2);
-      closePicker();
-    }, [pickerView, pickerSelections, editingChipIndex, chips, updateChip, closePicker]);
-    const openPickerForEdit = T$4((index2) => {
-      const chip = chips[index2];
-      if (!chip) return;
-      if (chip.type === "date" || chip.type === "duration_gte" || chip.type === "recency_lte") return;
-      setPickerSelections(getChipEncodedSelections(chip));
-      setPickerView(chip.type);
-      setEditingChipIndex(index2);
-      setShowPopover(true);
-    }, [chips]);
-    const addImmediateChip = T$4((type) => {
-      let chip;
-      if (type === "duration_gte") {
-        chip = { type: "duration_gte", days: 7, mode: "include" };
-      } else if (type === "recency_lte") {
-        chip = { type: "recency_lte", days: 30, mode: "include" };
-      } else {
-        chip = { type: "date", field: "create_time", from: "", to: "" };
-      }
-      if (!isChipDuplicate(chips, chip)) {
-        setChips((prev) => [...prev, chip]);
-      }
-      setQuery((q2) => q2.endsWith("#") ? q2.slice(0, -1) : q2);
-      closePicker();
-    }, [chips, closePicker]);
-    const handleSearchBlur = T$4(() => {
-      setTimeout(() => {
-        if (skipNextBlur.current) {
-          skipNextBlur.current = false;
-          return;
-        }
-        closePicker();
-      }, 200);
-    }, [closePicker]);
-    const handlePickerBack = T$4(() => {
-      if (editingChipIndex !== null) {
-        closePicker();
-      } else {
-        setPickerView("root");
-        setPickerSelections([]);
-      }
-    }, [editingChipIndex, closePicker]);
     return /* @__PURE__ */ o$8(k$3, { children: [
-      chips.length > 0 && /* @__PURE__ */ o$8("div", { className: "SelectChips", children: [
-        nonDateChips.length > 1 && /* @__PURE__ */ o$8(
-          "button",
-          {
-            className: `SelectChipLogic${chipLogic === "OR" ? " SelectChipLogicOr" : ""}`,
-            title: "Toggle AND / OR logic between filters",
-            onClick: () => setChipLogic((l2) => l2 === "AND" ? "OR" : "AND"),
-            children: chipLogic === "AND" ? t2("Chip logic and") : t2("Chip logic or")
+      /* @__PURE__ */ o$8(
+        "input",
+        {
+          type: "search",
+          className: "SelectSearch",
+          placeholder: t2("Search"),
+          value: query2,
+          disabled,
+          onInput: (e2) => {
+            const val = e2.currentTarget.value;
+            lastClickedIndex.current = -1;
+            setQuery(val);
           }
-        ),
-        chips.map((chip, i2) => {
-          if (chip.type === "date") return null;
-          const isExclude = chip.mode === "exclude";
-          const chipClass = `SelectChip${isExclude ? " SelectChipExclude" : ""}`;
-          const modeClass = `SelectChipMode${isExclude ? " SelectChipModeExclude" : ""}`;
-          const modeLabel = isExclude ? t2("Chip mode exclude") : t2("Chip mode include");
-          if (chip.type === "duration_gte") {
-            return /* @__PURE__ */ o$8("span", { className: chipClass, children: [
-              t2("Chip duration prefix"),
-              " ",
-              /* @__PURE__ */ o$8(
-                "input",
-                {
-                  type: "number",
-                  min: "1",
-                  value: chip.days,
-                  onChange: (e2) => updateChip(i2, {
-                    type: "duration_gte",
-                    days: Math.max(1, Number(e2.currentTarget.value)),
-                    mode: chip.mode
-                  })
-                }
-              ),
-              t2("Chip duration suffix"),
-              /* @__PURE__ */ o$8(
-                "button",
-                {
-                  className: modeClass,
-                  title: "Toggle include/exclude",
-                  onClick: () => toggleChipMode(i2),
-                  children: modeLabel
-                }
-              ),
-              /* @__PURE__ */ o$8("button", { className: "SelectChipRemove", onClick: () => removeChip(i2), children: "×" })
-            ] }, i2);
-          }
-          if (chip.type === "recency_lte") {
-            return /* @__PURE__ */ o$8("span", { className: chipClass, children: [
-              t2("Chip recency prefix"),
-              " ",
-              /* @__PURE__ */ o$8(
-                "input",
-                {
-                  type: "number",
-                  min: "1",
-                  value: chip.days,
-                  onChange: (e2) => updateChip(i2, {
-                    type: "recency_lte",
-                    days: Math.max(1, Number(e2.currentTarget.value)),
-                    mode: chip.mode
-                  })
-                }
-              ),
-              t2("Chip recency suffix"),
-              /* @__PURE__ */ o$8(
-                "button",
-                {
-                  className: modeClass,
-                  title: "Toggle include/exclude",
-                  onClick: () => toggleChipMode(i2),
-                  children: modeLabel
-                }
-              ),
-              /* @__PURE__ */ o$8("button", { className: "SelectChipRemove", onClick: () => removeChip(i2), children: "×" })
-            ] }, i2);
-          }
-          const prefix = getChipTypePrefix(chip.type);
-          const valueLabel = getChipValueLabel(chip, projects) ?? "";
-          return /* @__PURE__ */ o$8("span", { className: chipClass, children: [
-            /* @__PURE__ */ o$8("span", { style: { fontSize: "0.68rem", opacity: 0.7 }, children: [
-              prefix,
-              ":"
-            ] }),
-            " ",
-            /* @__PURE__ */ o$8(
-              "button",
-              {
-                className: "SelectChipValueBtn",
-                title: "Click to edit values",
-                onMouseDown: () => {
-                  skipNextBlur.current = true;
-                },
-                onClick: () => {
-                  var _a;
-                  openPickerForEdit(i2);
-                  (_a = searchInputRef.current) == null ? void 0 : _a.focus();
-                },
-                children: valueLabel
-              }
-            ),
-            /* @__PURE__ */ o$8(
-              "button",
-              {
-                className: modeClass,
-                title: "Toggle include/exclude",
-                onClick: () => toggleChipMode(i2),
-                children: modeLabel
-              }
-            ),
-            /* @__PURE__ */ o$8("button", { className: "SelectChipRemove", onClick: () => removeChip(i2), children: "×" })
-          ] }, i2);
-        }),
-        dateChip && /* @__PURE__ */ o$8("div", { className: "SelectChipDateRow", children: [
-          /* @__PURE__ */ o$8("span", { children: "📅" }),
-          /* @__PURE__ */ o$8(
-            "select",
-            {
-              value: dateChip.field,
-              onChange: (e2) => updateDateChip({ field: e2.currentTarget.value }),
-              children: [
-                /* @__PURE__ */ o$8("option", { value: "create_time", children: t2("Date Filter Field Created") }),
-                /* @__PURE__ */ o$8("option", { value: "update_time", children: t2("Date Filter Field Updated") })
-              ]
-            }
-          ),
-          /* @__PURE__ */ o$8(
-            "input",
-            {
-              type: "date",
-              value: dateChip.from,
-              onChange: (e2) => updateDateChip({ from: e2.currentTarget.value })
-            }
-          ),
-          /* @__PURE__ */ o$8("span", { children: "–" }),
-          /* @__PURE__ */ o$8(
-            "input",
-            {
-              type: "date",
-              value: dateChip.to,
-              onChange: (e2) => updateDateChip({ to: e2.currentTarget.value })
-            }
-          ),
-          /* @__PURE__ */ o$8("div", { className: "SelectChipDatePresets", children: [
-            DATE_PRESETS.map((p2) => /* @__PURE__ */ o$8(
-              "button",
-              {
-                onMouseDown: (e2) => {
-                  e2.preventDefault();
-                },
-                onClick: () => setDatePreset(p2.days),
-                children: p2.label
-              },
-              p2.days
-            )),
-            (dateChip.from || dateChip.to) && /* @__PURE__ */ o$8(
-              "button",
-              {
-                onMouseDown: (e2) => {
-                  e2.preventDefault();
-                },
-                onClick: () => updateDateChip({ from: "", to: "" }),
-                children: t2("Clear filter")
-              }
-            )
-          ] }),
-          /* @__PURE__ */ o$8(
-            "button",
-            {
-              className: "SelectChipRemove",
-              style: { marginLeft: "auto" },
-              onClick: removeDateChip,
-              children: "×"
-            }
-          )
-        ] })
-      ] }),
-      /* @__PURE__ */ o$8("div", { className: "relative", children: [
-        /* @__PURE__ */ o$8(
-          "input",
-          {
-            ref: searchInputRef,
-            type: "search",
-            className: "SelectSearch",
-            style: chips.length > 0 ? { borderRadius: 0 } : void 0,
-            placeholder: chips.length > 0 ? t2("Search") : `${t2("Search")} — ${t2("Filters hint")}`,
-            value: query2,
-            disabled,
-            onInput: (e2) => {
-              const val = e2.currentTarget.value;
-              lastClickedIndex.current = -1;
-              setQuery(val);
-              if (val.endsWith("#") && rootOptions.length > 0) {
-                setShowPopover(true);
-                setPickerView("root");
-                setPickerSelections([]);
-                setEditingChipIndex(null);
-              } else if (!val.includes("#")) {
-                setShowPopover(false);
-              }
-            },
-            onBlur: handleSearchBlur
-          }
-        ),
-        showPopover && pickerView === "root" && /* @__PURE__ */ o$8("div", { className: "SelectFilterPopover", children: rootOptions.map((opt) => /* @__PURE__ */ o$8(
-          "button",
-          {
-            className: "SelectFilterOption",
-            onMouseDown: (e2) => {
-              e2.preventDefault();
-            },
-            onClick: () => {
-              if (opt.hasSubView) {
-                setPickerView(opt.id);
-                setPickerSelections([]);
-              } else {
-                addImmediateChip(opt.id);
-              }
-            },
-            children: [
-              /* @__PURE__ */ o$8("strong", { children: opt.label }),
-              /* @__PURE__ */ o$8("small", { children: opt.desc })
-            ]
-          },
-          opt.id
-        )) }),
-        showPopover && pickerView !== "root" && /* @__PURE__ */ o$8("div", { className: "SelectFilterPopover", children: [
-          /* @__PURE__ */ o$8(
-            "button",
-            {
-              className: "SelectFilterBack",
-              onMouseDown: (e2) => {
-                e2.preventDefault();
-              },
-              onClick: handlePickerBack,
-              children: [
-                "← ",
-                getPickerViewTitle(pickerView)
-              ]
-            }
-          ),
-          currentSubOptions.length === 0 && pickerView === "project" && /* @__PURE__ */ o$8(
-            "div",
-            {
-              className: "SelectFilterOption",
-              style: { color: "#9ca3af", cursor: "default" },
-              children: [
-                t2("Loading"),
-                "..."
-              ]
-            }
-          ),
-          currentSubOptions.map((opt) => {
-            const isSelected = pickerSelections.includes(opt.id);
-            return /* @__PURE__ */ o$8(
-              "button",
-              {
-                className: `SelectFilterCheckboxBtn${isSelected ? " SelectFilterCheckboxBtnChecked" : ""}`,
-                onMouseDown: (e2) => {
-                  e2.preventDefault();
-                },
-                onClick: () => togglePickerSelection(opt.id),
-                children: [
-                  /* @__PURE__ */ o$8("span", { className: "SelectFilterCheckIcon", children: isSelected ? "●" : "○" }),
-                  /* @__PURE__ */ o$8("div", { children: [
-                    /* @__PURE__ */ o$8("strong", { children: opt.label }),
-                    opt.desc && /* @__PURE__ */ o$8("small", { style: { display: "block", fontSize: "0.7rem", color: "#9ca3af" }, children: opt.desc })
-                  ] })
-                ]
-              },
-              opt.id
-            );
-          }),
-          /* @__PURE__ */ o$8(
-            "button",
-            {
-              className: "SelectFilterApplyBtn",
-              disabled: pickerSelections.length === 0,
-              onMouseDown: (e2) => {
-                e2.preventDefault();
-              },
-              onClick: applyPickerSelections,
-              children: editingChipIndex !== null ? "Update filter" : "Add filter"
-            }
-          )
-        ] })
-      ] }),
+        }
+      ),
       /* @__PURE__ */ o$8("div", { className: "SelectToolbar", children: [
         /* @__PURE__ */ o$8(
           CheckBox,
@@ -23571,7 +22624,6 @@ ${content2}`;
     const [apiConversations, setApiConversations] = h$4([]);
     const [localConversations, setLocalConversations] = h$4([]);
     const conversations = exportSource === "API" ? apiConversations : localConversations;
-    const [projects, setProjects] = h$4([]);
     const [loading, setLoading] = h$4(false);
     const [error2, setError] = h$4("");
     const [processing, setProcessing] = h$4(false);
@@ -23756,9 +22808,6 @@ ${content2}`;
       archiveQueue.start();
     }, [disabled, selected, archiveQueue, t2]);
     p$6(() => {
-      fetchProjects().then(setProjects).catch((err) => console.error("Failed to fetch projects:", err));
-    }, []);
-    p$6(() => {
       const genRef = fetchGenRef;
       return () => {
         exportingRef.current = false;
@@ -23869,7 +22918,6 @@ ${content2}`;
         ConversationSelect,
         {
           conversations,
-          projects,
           selected,
           setSelected,
           disabled: processing,
@@ -24015,10 +23063,9 @@ ${content2}`;
       {
         className: `
             menu-item
-            flex flex-shrink-0 py-3 px-3 items-center gap-3 rounded-lg mb-2
-            bg-menu hover:bg-gray-500/10
+            __menu-item hoverable
+            flex flex-shrink-0 py-3 px-4 items-center gap-3 rounded-lg mb-2
             transition-colors duration-200
-            text-menu text-sm
             cursor-pointer
             border border-menu ${className}`,
         onClick: handleClick,
@@ -24720,7 +23767,7 @@ ${content2}`;
             /* @__PURE__ */ o$8($cef8881cdc69808e$export$41fb9f06171c75f4, { children: /* @__PURE__ */ o$8(
               MenuItem,
               {
-                className: "mt-1",
+                className: "border-0 ms-2 me-1.5",
                 text: t2("ExportHelper"),
                 icon: IconArrowRightFromBracket,
                 onClick: () => {
@@ -24871,7 +23918,7 @@ ${content2}`;
                           width: "16",
                           height: "8",
                           style: {
-                            "fill": "var(--ce-menu-primary)",
+                            "fill": "var(--ce-menu-secondary)",
                             "stroke": "var(--ce-border-light)",
                             "stoke-width": "2px"
                           }
@@ -24899,34 +23946,25 @@ ${content2}`;
       styleEl.id = "sentinel-css";
       document.head.append(styleEl);
       const injectionMap = /* @__PURE__ */ new Map();
-      const injectNavMenu = (nav) => {
-        if (injectionMap.has(nav)) return;
-        console.log("[Exporter] Injecting nav", nav);
+      const injectNavMenu = (target) => {
+        if (injectionMap.has(target)) return;
+        console.log("[Exporter] Injecting nav", target);
         const container = getMenuContainer();
-        injectionMap.set(nav, container);
-        const chatList = nav.querySelector(":scope > div.sticky.bottom-0");
-        if (chatList) {
-          chatList.prepend(container);
-          console.log("[Exporter] Prepended container to chat list", chatList);
-        } else {
-          container.style.backgroundColor = "#171717";
-          container.style.position = "sticky";
-          container.style.bottom = "72px";
-          nav.append(container);
-          console.log("[Exporter] Fallback to appending container to nav", nav);
-        }
+        injectionMap.set(target, container);
+        target.before(container);
       };
-      sentinel.on("nav", injectNavMenu);
+      const selector = '[data-testid="accounts-profile-button"]';
+      sentinel.on("selector", injectNavMenu);
       setInterval(() => {
-        injectionMap.forEach((container, nav) => {
-          if (!nav.isConnected) {
+        injectionMap.forEach((container, target) => {
+          if (!target.isConnected) {
             container.remove();
-            injectionMap.delete(nav);
+            injectionMap.delete(target);
           }
         });
-        const navList = Array.from(document.querySelectorAll("nav")).filter((nav) => !injectionMap.has(nav));
-        navList.forEach(injectNavMenu);
-      }, 300);
+        const targets = Array.from(document.querySelectorAll(selector)).filter((target) => !injectionMap.has(target));
+        targets.forEach(injectNavMenu);
+      }, 1e3);
       if (isSharePage()) {
         sentinel.on(`div[role="presentation"] > .w-full > div >.flex.w-full`, (target) => {
           target.prepend(getMenuContainer());
