@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.31.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.30.0...userscript-v2.31.0) (2026-05-03)
+
+
+### Features
+
+* batched export, smart rate-limit backoff, filter chips, and dialog UX improvements ([#348](https://github.com/pionxzh/chatgpt-exporter/issues/348)) ([462836d](https://github.com/pionxzh/chatgpt-exporter/commit/462836d1b22a8002cf8bc9d9d1f1c6de820624e4))
+
+
+### Bug Fixes
+
+* adapt to chatgpt new sidebar ([fa68986](https://github.com/pionxzh/chatgpt-exporter/commit/fa68986831e36a35ab4a8f9fbd472f4a1db99c8e)), closes [#352](https://github.com/pionxzh/chatgpt-exporter/issues/352)
+* disable the chip system ([e3a54a3](https://github.com/pionxzh/chatgpt-exporter/commit/e3a54a3bd2e1bde60ef60ff71c40c135912bd2d4))
+* preserve multimodal tool image exports ([7998a4f](https://github.com/pionxzh/chatgpt-exporter/commit/7998a4fcc52a6ad16d9e7607a124d43143e95b7b))
+* skip file search tool exports ([986e053](https://github.com/pionxzh/chatgpt-exporter/commit/986e0538717adb31954d00e580a1c01a492495d3))
+* skip hidden tool messages in exports ([3d49174](https://github.com/pionxzh/chatgpt-exporter/commit/3d491744f49824e79198b77d6b8b745fc6a5ad32))
+
 ## [2.30.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.29.5...userscript-v2.30.0) (2026-03-01)
 
 
