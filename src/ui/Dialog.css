@@ -244,7 +244,7 @@
     color: #6b7280;
     font-weight: 600;
 }
-@media (prefers-color-scheme: dark) {
+.dark {
     .SelectItemMetaActive { color: #d1d5db; }
 }
 
@@ -258,9 +258,11 @@
     background: #f9fafb;
     user-select: none;
 }
-@media (prefers-color-scheme: dark) {
+
+.dark {
     .SelectListHeader { background: #1f2937; }
 }
+
 .SelectListHeaderCell {
     flex-shrink: 0;
     font-size: 0.68rem;
@@ -277,7 +279,7 @@
     text-align: right;
 }
 .SelectListHeaderCell:hover { color: #374151; }
-@media (prefers-color-scheme: dark) {
+.dark {
     .SelectListHeaderCell:hover { color: #e5e7eb; }
 }
 .SelectListHeaderCellTitle {
@@ -288,7 +290,7 @@
 .SelectListHeaderCellActive {
     color: #2563eb;
 }
-@media (prefers-color-scheme: dark) {
+.dark {
     .SelectListHeaderCellActive { color: #60a5fa; }
 }
 

@@ -19,46 +19,34 @@ function main() {
         styleEl.id = 'sentinel-css'
         document.head.append(styleEl)
 
-        const injectionMap = new Map<HTMLElement, HTMLElement>()
+        const injectionMap = new Map<Element, Element>()
 
-        const injectNavMenu = (nav: HTMLElement) => {
-            if (injectionMap.has(nav)) return
+        const injectNavMenu = (target: Element) => {
+            if (injectionMap.has(target)) return
+
             // eslint-disable-next-line no-console
-            console.log('[Exporter] Injecting nav', nav)
+            console.log('[Exporter] Injecting nav', target)
 
             const container = getMenuContainer()
-            injectionMap.set(nav, container)
-
-            const chatList = nav.querySelector(':scope > div.sticky.bottom-0')
-            if (chatList) {
-                chatList.prepend(container)
-                // eslint-disable-next-line no-console
-                console.log('[Exporter] Prepended container to chat list', chatList)
-            }
-            else {
-                // fallback to the bottom of the nav
-                container.style.backgroundColor = '#171717'
-                container.style.position = 'sticky'
-                container.style.bottom = '72px'
-                nav.append(container)
-                // eslint-disable-next-line no-console
-                console.log('[Exporter] Fallback to appending container to nav', nav)
-            }
+            injectionMap.set(target, container)
+            target.before(container)
         }
 
-        sentinel.on('nav', injectNavMenu)
+        const selector = '[data-testid="accounts-profile-button"]'
+
+        sentinel.on('selector', injectNavMenu)
 
         setInterval(() => {
-            injectionMap.forEach((container, nav) => {
-                if (!nav.isConnected) {
+            injectionMap.forEach((container, target) => {
+                if (!target.isConnected) {
                     container.remove()
-                    injectionMap.delete(nav)
+                    injectionMap.delete(target)
                 }
             })
 
-            const navList = Array.from(document.querySelectorAll('nav')).filter(nav => !injectionMap.has(nav))
-            navList.forEach(injectNavMenu)
-        }, 300)
+            const targets = Array.from(document.querySelectorAll(selector)).filter(target => !injectionMap.has(target))
+            targets.forEach(injectNavMenu)
+        }, 1000)
 
         // Support for share page
         if (isSharePage()) {

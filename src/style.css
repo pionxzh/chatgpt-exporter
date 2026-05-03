@@ -36,14 +36,6 @@ html {
     --ce-menu-secondary: var(--sidebar-surface-secondary, #212121);
 }
 
-.text-menu {
-    color: var(--ce-text-primary);
-}
-
-.bg-menu {
-    background-color: var(--ce-menu-primary);
-}
-
 .border-menu {
     border-color: var(--ce-border-light);
 }

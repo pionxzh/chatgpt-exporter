@@ -91,7 +91,7 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
             >
                 <HoverCard.Trigger>
                     <MenuItem
-                        className="mt-1"
+                        className="border-0 ms-2 me-1.5"
                         text={t('ExportHelper')}
                         icon={IconArrowRightFromBracket}
                         onClick={() => {
@@ -213,7 +213,7 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                                 width="16"
                                 height="8"
                                 style={{
-                                    'fill': 'var(--ce-menu-primary)',
+                                    'fill': 'var(--ce-menu-secondary)',
                                     'stroke': 'var(--ce-border-light)',
                                     'stoke-width': '2px',
                                 }}

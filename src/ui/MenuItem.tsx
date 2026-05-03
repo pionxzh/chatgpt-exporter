@@ -44,10 +44,9 @@ export const MenuItem: FC<MenuItemProps> = ({ text, successText, disabled = fals
         <div
             className={`
             menu-item
-            flex flex-shrink-0 py-3 px-3 items-center gap-3 rounded-lg mb-2
-            bg-menu hover:bg-gray-500/10
+            __menu-item hoverable
+            flex flex-shrink-0 py-3 px-4 items-center gap-3 rounded-lg mb-2
             transition-colors duration-200
-            text-menu text-sm
             cursor-pointer
             border border-menu ${className}`}
             onClick={handleClick}
