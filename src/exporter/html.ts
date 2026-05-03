@@ -1,5 +1,5 @@
 import JSZip from 'jszip'
-import { fetchConversation, getCurrentChatId, processConversation } from '../api'
+import { fetchConversation, getCurrentChatId, processConversation, shouldSkipMessageInExport } from '../api'
 import { KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_HTML, baseUrl } from '../constants'
 import i18n from '../i18n'
 import { checkIfConversationStarted, getUserAvatar } from '../page'
@@ -84,31 +84,7 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
     const conversationHtml = conversationNodes.map(({ message }) => {
         if (!message || !message.content) return null
 
-        // ChatGPT is talking to tool
-        if (message.recipient !== 'all') return null
-
-        // Skip "thinking" content (hidden reasoning steps from thinking models)
-        if (message.content.content_type === 'thoughts') return null
-        if (message.content.content_type === 'reasoning_recap') return null
-
-        // Skip messages marked as visually hidden (e.g., internal system prompts)
-        if (message.metadata?.is_visually_hidden_from_conversation) return null
-
-        // Skip tool's intermediate message.
-        if (message.author.role === 'tool') {
-            if (
-                // HACK: we special case the content_type 'multimodal_text' here because it is used by
-                // the dalle tool to return the image result, and we do want to show that.
-                message.content.content_type !== 'multimodal_text'
-                // Code execution result with image
-            && !(
-                message.content.content_type === 'execution_output'
-                && message.metadata?.aggregate_result?.messages?.some(msg => msg.message_type === 'image')
-            )
-            ) {
-                return null
-            }
-        }
+        if (shouldSkipMessageInExport(message)) return null
 
         const author = transformAuthor(message.author)
         const model = message?.metadata?.model_slug === 'gpt-4' ? 'GPT-4' : 'GPT-3'
