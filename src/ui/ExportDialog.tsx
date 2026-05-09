@@ -1,7 +1,7 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import { useTranslation } from 'react-i18next'
-import { archiveConversation, deleteConversation, fetchAllConversations, fetchConversation, fetchConversationsPage, probeApi } from '../api'
+import { archiveConversation, deleteConversation, fetchAllConversations, fetchConversation, fetchConversationsPage, fetchProjects, probeApi } from '../api'
 import { EXPORT_OPERATION_BATCH } from '../constants'
 import { exportAllToHtml } from '../exporter/html'
 import { exportAllToJson, exportAllToOfficialJson } from '../exporter/json'
@@ -11,7 +11,7 @@ import { sleep } from '../utils/utils'
 import { CheckBox } from './CheckBox'
 import { IconCross, IconLoading, IconUpload } from './Icons'
 import { useSettingContext } from './SettingContext'
-import type { ApiConversationItem, ApiConversationWithId } from '../api'
+import type { ApiConversationItem, ApiConversationWithId, ApiProjectInfo } from '../api'
 import type { FC } from '../type'
 import type { ChangeEvent } from 'preact/compat'
 
@@ -74,6 +74,45 @@ function textSearch(title: string, query: string): boolean {
     catch {
         return title.toLowerCase().includes(lower)
     }
+}
+
+// ---------------------------------------------------------------------------
+// ProjectSelect component
+// ---------------------------------------------------------------------------
+
+interface ProjectSelectProps {
+    projects: ApiProjectInfo[]
+    selected: string | null
+    setSelected: (projectId: string | null) => void
+    disabled: boolean
+    loading: boolean
+}
+
+const ProjectSelect: FC<ProjectSelectProps> = ({ projects, selected, setSelected, disabled, loading }) => {
+    const { t } = useTranslation()
+
+    return (
+        <div className="ProjectSelect flex items-center text-gray-600 dark:text-gray-300 justify-between mb-3">
+            {t('Select Project')}
+            <div className="flex items-center gap-2">
+                {loading && <IconLoading className="w-3 h-3" />}
+                <select
+                    disabled={disabled}
+                    className="Select"
+                    value={selected ?? ''}
+                    onChange={(e) => {
+                        const val = e.currentTarget.value
+                        setSelected(val || null)
+                    }}
+                >
+                    <option value="">{t('All conversations')}</option>
+                    {projects.map(project => (
+                        <option key={project.id} value={project.id}>{project.display.name}</option>
+                    ))}
+                </select>
+            </div>
+        </div>
+    )
 }
 
 // ---------------------------------------------------------------------------
@@ -330,6 +369,11 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
     const [localConversations, setLocalConversations] = useState<ApiConversationWithId[]>([])
     const conversations = exportSource === 'API' ? apiConversations : localConversations
 
+    const [projects, setProjects] = useState<ApiProjectInfo[]>([])
+    const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
+    const [projectsLoading, setProjectsLoading] = useState(false)
+    const selectedProject = projects.find(p => p.id === selectedProjectId) ?? null
+
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
     const [processing, setProcessing] = useState(false)
@@ -435,7 +479,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
             const partIndex = batchIdx + 1
             const callback = exportAllOptions.find(o => o.label === exportType)?.callback
             if (callback) {
-                await callback(format, results, metaList, undefined, partIndex, totalBatches)
+                await callback(format, results, metaList, selectedProject?.display.name, partIndex, totalBatches)
             }
             if (partIndex < totalBatches) {
                 await sleep(400)
@@ -448,7 +492,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
             }
         })
         return () => off()
-    }, [requestQueue, exportAllOptions, exportType, format, metaList, startApiBatch])
+    }, [requestQueue, exportAllOptions, exportType, format, metaList, startApiBatch, selectedProject])
 
     useEffect(() => {
         const off = archiveQueue.on('done', () => {
@@ -505,11 +549,11 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
         const chunks = chunkArray(results, EXPORT_OPERATION_BATCH)
         setProcessing(true)
         for (let i = 0; i < chunks.length; i++) {
-            await callback(format, chunks[i], metaList, undefined, i + 1, chunks.length)
+            await callback(format, chunks[i], metaList, selectedProject?.display.name, i + 1, chunks.length)
             if (i < chunks.length - 1) await sleep(400)
         }
         setProcessing(false)
-    }, [disabled, selected, localConversations, exportAllOptions, exportType, format, metaList])
+    }, [disabled, selected, localConversations, exportAllOptions, exportType, format, metaList, selectedProject])
 
     const exportAll = useMemo(() => {
         return exportSource === 'API' ? exportAllFromApi : exportAllFromLocal
@@ -552,7 +596,16 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
         exportingRef.current = processing
     }, [processing])
 
-    // Auto-load conversations on dialog open
+    // Fetch projects on mount
+    useEffect(() => {
+        setProjectsLoading(true)
+        fetchProjects()
+            .then(setProjects)
+            .catch(err => console.error('Error fetching projects:', err))
+            .finally(() => setProjectsLoading(false))
+    }, [])
+
+    // Auto-load conversations on dialog open (or when project changes)
     useEffect(() => {
         const gen = ++fetchGenRef.current
         const alive = () => gen === fetchGenRef.current
@@ -562,7 +615,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
         setTotalAvailable(null)
         setLoading(true)
         fetchAllConversations(
-            null,
+            selectedProjectId,
             exportAllLimit,
             (batch) => { if (alive()) setApiConversations(prev => [...prev, ...batch]) },
             (hasMore) => { if (alive()) setHasMore(hasMore) },
@@ -573,13 +626,13 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                 setError(err.message || 'Failed to load conversations')
             })
             .finally(() => { if (alive()) setLoading(false) })
-    }, [exportAllLimit])
+    }, [exportAllLimit, selectedProjectId])
 
     const loadMore = useCallback(async () => {
         if (loadingMore) return
         setLoadingMore(true)
         try {
-            const page = await fetchConversationsPage(null, apiConversations.length, EXPORT_OPERATION_BATCH)
+            const page = await fetchConversationsPage(selectedProjectId, apiConversations.length, EXPORT_OPERATION_BATCH)
             setApiConversations(prev => [...prev, ...page.items])
             if (page.total !== null) setTotalAvailable(page.total)
             setHasMore(
@@ -593,7 +646,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
         finally {
             setLoadingMore(false)
         }
-    }, [loadingMore, apiConversations.length])
+    }, [loadingMore, apiConversations.length, selectedProjectId])
 
     const totalBatches = Math.ceil(selected.length / EXPORT_OPERATION_BATCH) || 1
 
@@ -664,6 +717,15 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                 ref={fileInputRef}
                 onChange={onUpload}
             />
+            {exportSource === 'API' && (
+                <ProjectSelect
+                    projects={projects}
+                    selected={selectedProjectId}
+                    setSelected={setSelectedProjectId}
+                    disabled={processing}
+                    loading={projectsLoading}
+                />
+            )}
             <ConversationSelect
                 conversations={conversations}
                 selected={selected}
