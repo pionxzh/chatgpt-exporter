@@ -1,6 +1,6 @@
 import JSZip from 'jszip'
 import { fetchConversation, getCurrentChatId, processConversation, shouldSkipMessageInExport } from '../api'
-import { KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_MARKDOWN, baseUrl } from '../constants'
+import { KEY_THINKING_ENABLED, KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_MARKDOWN, baseUrl } from '../constants'
 import i18n from '../i18n'
 import { checkIfConversationStarted } from '../page'
 import { buildZipFileName, downloadFile, getFileNameWithFormat } from '../utils/download'
@@ -8,7 +8,7 @@ import { fromMarkdown, toMarkdown } from '../utils/markdown'
 import { ScriptStorage } from '../utils/storage'
 import { standardizeLineBreaks } from '../utils/text'
 import { dateStr, timestamp, unixTimestampToISOString } from '../utils/utils'
-import type { ApiConversationWithId, Citation, ConversationNodeMessage, ConversationResult } from '../api'
+import type { ApiConversationWithId, Citation, ConversationNodeMessage, ConversationResult, ThinkingContent } from '../api'
 import type { ExportMeta } from '../ui/SettingContext'
 import type { PartInfo } from '../utils/download'
 
@@ -20,7 +20,8 @@ export async function exportToMarkdown(fileNameFormat: string, metaList: ExportM
 
     const chatId = await getCurrentChatId()
     const rawConversation = await fetchConversation(chatId, true)
-    const conversation = processConversation(rawConversation)
+    const enableThinking = ScriptStorage.get<boolean>(KEY_THINKING_ENABLED) ?? false
+    const conversation = processConversation(rawConversation, { enableThinking })
     const markdown = conversationToMarkdown(conversation, metaList)
 
     const fileName = getFileNameWithFormat(fileNameFormat, 'md', { title: conversation.title, chatId, createTime: conversation.createTime, updateTime: conversation.updateTime })
@@ -32,7 +33,8 @@ export async function exportToMarkdown(fileNameFormat: string, metaList: ExportM
 export async function exportAllToMarkdown(fileNameFormat: string, apiConversations: ApiConversationWithId[], metaList?: ExportMeta[], projectName?: string, partIndex?: number, totalParts?: number) {
     const zip = new JSZip()
     const filenameMap = new Map<string, number>()
-    const conversations = apiConversations.map(x => processConversation(x))
+    const enableThinking = ScriptStorage.get<boolean>(KEY_THINKING_ENABLED) ?? false
+    const conversations = apiConversations.map(x => processConversation(x, { enableThinking }))
     conversations.forEach((conversation) => {
         let fileName = getFileNameWithFormat(fileNameFormat, 'md', {
             title: conversation.title,
@@ -97,7 +99,7 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
     const timeStampMarkdown = ScriptStorage.get<boolean>(KEY_TIMESTAMP_MARKDOWN) ?? false
     const timeStamp24H = ScriptStorage.get<boolean>(KEY_TIMESTAMP_24H) ?? false
 
-    const content = conversationNodes.map(({ message }) => {
+    const content = conversationNodes.map(({ message, thinking }) => {
         if (!message || !message.content) return null
 
         if (shouldSkipMessageInExport(message)) return null
@@ -113,6 +115,7 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
         }
 
         const author = transformAuthor(message.author)
+        const thinkingBlock = thinking ? formatThinkingMarkdown(thinking) : ''
 
         const postSteps: Array<(input: string) => string> = []
         if (message.author.role === 'assistant') {
@@ -157,7 +160,7 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
         const postProcess = (input: string) => postSteps.reduce((acc, fn) => fn(acc), input)
         const content = transformContent(message.content, message.metadata, postProcess)
 
-        return `#### ${author}:\n${timestampHtml}${content}`
+        return `#### ${author}:\n${timestampHtml}${thinkingBlock}${content}`
     }).filter(Boolean).join('\n\n')
 
     const markdown = `${frontMatter}# ${title}\n\n${content}`
@@ -313,4 +316,28 @@ function transformContent(
             console.warn('[Exporter] Unsupported Content:', content.content_type, content)
             return postProcess(`[Unsupported Content: ${content.content_type}]`)
     }
+}
+
+function formatThinkingMarkdown(thinking: ThinkingContent): string {
+    const durationLabel = thinking.durationSeconds != null
+        ? `Thought for ${thinking.durationSeconds} seconds`
+        : 'Thinking'
+
+    const parts: string[] = []
+
+    if (thinking.activities?.length) {
+        parts.push(thinking.activities.map(a => `- ${a}`).join('\n'))
+    }
+
+    const thoughts = thinking.thoughts
+        .map(t => t.content || t.summary)
+        .filter(Boolean)
+        .join('\n\n')
+    if (thoughts) parts.push(thoughts)
+
+    const body = parts.join('\n\n')
+
+    if (!body) return ''
+
+    return `<details>\n<summary>${durationLabel}</summary>\n\n${body}\n\n</details>\n\n`
 }

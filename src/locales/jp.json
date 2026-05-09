@@ -33,6 +33,8 @@
   "Export Format": "エクスポートフォーマット",
   "Export Metadata": "メタデータをエクスポート",
   "Export Metadata Description": "エクスポートされたMarkdownおよびHTMLファイルにメタデータを追加します。",
+  "Export Thinking Process": "思考プロセスをエクスポート",
+  "Export Thinking Process Description": "エクスポートされたMarkdownおよびHTMLファイルにモデルの思考・推論プロセスを含めます。",
   "OpenAI Official Format": "OpenAI公式フォーマット",
   "Conversation Archive Alert": "選択したすべての会話をアーカイブしてもよろしいですか？",
   "Conversation Archived Message": "選択したすべての会話がアーカイブされました。変更を表示するには、ページを更新してください。",

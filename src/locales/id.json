@@ -33,6 +33,8 @@
   "Export Format": "Format Ekspor",
   "Export Metadata": "Ekspor Metada",
   "Export Metadata Description": "Tambahkan metadata ke file Markdown dan HTML yang diekspor.",
+  "Export Thinking Process": "Ekspor Proses Berpikir",
+  "Export Thinking Process Description": "Sertakan proses berpikir/penalaran model dalam file Markdown dan HTML yang diekspor.",
   "OpenAI Official Format": "Format Resmi OpenAI",
   "Conversation Archive Alert": "Apakah Anda yakin ingin mengarsipkan semua percakapan yang dipilih?",
   "Conversation Archived Message": "Semua percakapan yang dipilih telah diarsipkan. Harap segarkan halaman untuk melihat perubahan.",

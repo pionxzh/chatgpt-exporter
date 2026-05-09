@@ -35,6 +35,7 @@ export const SettingDialog: FC<SettingDialogProps> = ({
         enableTimestampMarkdown, setEnableTimestampMarkdown,
         enableMeta, setEnableMeta,
         exportMetaList, setExportMetaList,
+        enableThinking, setEnableThinking,
         exportAllLimit, setExportAllLimit,
         /* eslint-enable pionxzh/consistent-list-newline */
     } = useSettingContext()
@@ -109,6 +110,19 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                                         <span className="select-all" style={{ 'text-decoration': 'underline', 'text-underline-offset': 4 }}>{preview}</span>
                                     </p>
                                 </dd>
+                            </div>
+                        </div>
+                        <div className="relative flex bg-white dark:bg-white/5 rounded p-4">
+                            <div>
+                                <dt className="text-md font-medium text-gray-800 dark:text-white">
+                                    {t('Export Thinking Process')}
+                                </dt>
+                                <dd className="text-sm text-gray-700 dark:text-gray-300">
+                                    {t('Export Thinking Process Description')}
+                                </dd>
+                            </div>
+                            <div className="absolute right-4">
+                                <Toggle label="" checked={enableThinking} onCheckedUpdate={setEnableThinking} />
                             </div>
                         </div>
                         <div className="relative flex bg-white dark:bg-white/5 rounded p-4">

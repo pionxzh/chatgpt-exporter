@@ -125,6 +125,10 @@ interface MessageMeta {
     content_references?: ContentReference[]
     /** Whether this message is hidden in the UI (e.g., internal system prompts) */
     is_visually_hidden_from_conversation?: boolean
+    /** Duration of reasoning in seconds (from reasoning_recap messages) */
+    finished_duration_sec?: number
+    /** Reasoning activity title shown in the thinking panel */
+    reasoning_title?: string
 }
 
 export type AuthorRole = 'system' | 'assistant' | 'user' | 'tool'
@@ -258,9 +262,16 @@ export interface ConversationNodeMessage {
     id: string
     metadata?: MessageMeta
     recipient: 'all' | 'browser' | 'python' | 'dalle.text2im' & (string & {})
+    channel?: string | null
     status: string
     end_turn?: boolean
     weight: number
+}
+
+export interface ThinkingContent {
+    thoughts: Array<{ summary: string; content: string }>
+    activities?: string[]
+    durationSeconds?: number
 }
 
 export interface ConversationNode {
@@ -268,6 +279,7 @@ export interface ConversationNode {
     id: string
     message?: ConversationNodeMessage
     parent?: string
+    thinking?: ThinkingContent
 }
 
 export interface ApiConversation {
@@ -882,7 +894,11 @@ const ModelMapping: { [key in ModelSlug]: string } & { [key: string]: string } =
     'text-davinci-002': 'GPT-3.5',
 }
 
-export function processConversation(conversation: ApiConversationWithId): ConversationResult {
+export interface ProcessConversationOptions {
+    enableThinking?: boolean
+}
+
+export function processConversation(conversation: ApiConversationWithId, options?: ProcessConversationOptions): ConversationResult {
     const title = conversation.title || 'ChatGPT Conversation'
     const createTime = conversation.create_time
     const updateTime = conversation.update_time
@@ -894,6 +910,10 @@ export function processConversation(conversation: ApiConversationWithId): Conver
 
     const conversationNodes = extractConversationResult(conversation.mapping, startNodeId)
     const mergedConversationNodes = mergeContinuationNodes(conversationNodes)
+
+    if (options?.enableThinking) {
+        attachThinkingToNodes(conversation.mapping, mergedConversationNodes, startNodeId)
+    }
 
     return {
         id: conversation.id,
@@ -974,8 +994,8 @@ function mergeContinuationNodes(nodes: ConversationNode[]): ConversationNode[] {
          && prevNode.message.recipient === 'all' && node.message.recipient === 'all'
          && prevNode.message.content.content_type === 'text' && node.message.content.content_type === 'text'
         ) {
-            // the last part of the previous node should directly concat to the first part of the current node
-            prevNode.message.content.parts[prevNode.message.content.parts.length - 1] += node.message.content.parts[0]
+            const separator = prevNode.message.channel !== node.message.channel ? '\n\n' : ''
+            prevNode.message.content.parts[prevNode.message.content.parts.length - 1] += separator + node.message.content.parts[0]
             prevNode.message.content.parts.push(...node.message.content.parts.slice(1))
         }
         else {
@@ -983,4 +1003,87 @@ function mergeContinuationNodes(nodes: ConversationNode[]): ConversationNode[] {
         }
     }
     return result
+}
+
+/**
+ * Walk the raw conversation mapping and attach thinking/reasoning content
+ * to the corresponding assistant response nodes.
+ */
+function hasThinkingContent(thinking: ThinkingContent): boolean {
+    return thinking.thoughts.length > 0
+        || (thinking.activities != null && thinking.activities.length > 0)
+}
+
+function attachThinkingToNodes(
+    mapping: Record<string, ConversationNode>,
+    resultNodes: ConversationNode[],
+    startNodeId: string,
+): void {
+    const resultNodeIds = new Set(resultNodes.map(n => n.id))
+
+    let currentNodeId: string | undefined = startNodeId
+    let targetNodeId: string | null = null
+    let thinking: ThinkingContent = { thoughts: [] }
+
+    while (currentNodeId) {
+        const node: ConversationNode = mapping[currentNodeId]
+        if (!node || node.parent === undefined) break
+
+        const message = node.message
+        if (message?.content) {
+            const ct = message.content.content_type
+
+            if (resultNodeIds.has(node.id) && message.author.role !== 'user') {
+                if (hasThinkingContent(thinking)) {
+                    const saveToId = targetNodeId ?? node.id
+                    const target = resultNodes.find(n => n.id === saveToId)
+                    if (target) target.thinking = thinking
+                }
+                targetNodeId = node.id
+                thinking = { thoughts: [] }
+            }
+            else if (ct === 'reasoning_recap') {
+                const duration = message.metadata?.finished_duration_sec
+                if (typeof duration === 'number') {
+                    thinking.durationSeconds = duration
+                }
+                else {
+                    const match = message.content.content.match(/(\d+)/)
+                    if (match) thinking.durationSeconds = Number.parseInt(match[1])
+                }
+            }
+            else if (ct === 'thoughts') {
+                for (const thought of message.content.thoughts) {
+                    if (thought.content || thought.summary) {
+                        thinking.thoughts.unshift({
+                            summary: thought.summary,
+                            content: thought.content,
+                        })
+                    }
+                }
+            }
+            else if (message.metadata?.reasoning_title) {
+                if (!thinking.activities) thinking.activities = []
+                const title = message.metadata.reasoning_title
+                if (!thinking.activities.includes(title)) {
+                    thinking.activities.unshift(title)
+                }
+            }
+            else if (message.author.role === 'user' && !message.metadata?.is_visually_hidden_from_conversation) {
+                if (targetNodeId && hasThinkingContent(thinking)) {
+                    const target = resultNodes.find(n => n.id === targetNodeId)
+                    if (target) target.thinking = thinking
+                }
+                targetNodeId = null
+                thinking = { thoughts: [] }
+            }
+        }
+
+        currentNodeId = node.parent
+    }
+
+    if (targetNodeId && hasThinkingContent(thinking)) {
+        const target = resultNodes.find(n => n.id === targetNodeId)
+        if (target) target.thinking = thinking
+    }
 }

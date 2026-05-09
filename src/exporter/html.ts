@@ -1,6 +1,6 @@
 import JSZip from 'jszip'
 import { fetchConversation, getCurrentChatId, processConversation, shouldSkipMessageInExport } from '../api'
-import { KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_HTML, baseUrl } from '../constants'
+import { KEY_THINKING_ENABLED, KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_HTML, baseUrl } from '../constants'
 import i18n from '../i18n'
 import { checkIfConversationStarted, getUserAvatar } from '../page'
 import templateHtml from '../template.html?raw'
@@ -9,7 +9,7 @@ import { fromMarkdown, toHtml } from '../utils/markdown'
 import { ScriptStorage } from '../utils/storage'
 import { standardizeLineBreaks } from '../utils/text'
 import { dateStr, getColorScheme, timestamp, unixTimestampToISOString } from '../utils/utils'
-import type { ApiConversationWithId, ConversationNodeMessage, ConversationResult } from '../api'
+import type { ApiConversationWithId, ConversationNodeMessage, ConversationResult, ThinkingContent } from '../api'
 import type { ExportMeta } from '../ui/SettingContext'
 import type { PartInfo } from '../utils/download'
 
@@ -23,7 +23,8 @@ export async function exportToHtml(fileNameFormat: string, metaList: ExportMeta[
 
     const chatId = await getCurrentChatId()
     const rawConversation = await fetchConversation(chatId, true)
-    const conversation = processConversation(rawConversation)
+    const enableThinking = ScriptStorage.get<boolean>(KEY_THINKING_ENABLED) ?? false
+    const conversation = processConversation(rawConversation, { enableThinking })
     const html = conversationToHtml(conversation, userAvatar, metaList)
 
     const fileName = getFileNameWithFormat(fileNameFormat, 'html', { title: conversation.title, chatId, createTime: conversation.createTime, updateTime: conversation.updateTime })
@@ -37,7 +38,8 @@ export async function exportAllToHtml(fileNameFormat: string, apiConversations: 
 
     const zip = new JSZip()
     const filenameMap = new Map<string, number>()
-    const conversations = apiConversations.map(x => processConversation(x))
+    const enableThinking = ScriptStorage.get<boolean>(KEY_THINKING_ENABLED) ?? false
+    const conversations = apiConversations.map(x => processConversation(x, { enableThinking }))
     conversations.forEach((conversation) => {
         let fileName = getFileNameWithFormat(fileNameFormat, 'html', {
             title: conversation.title,
@@ -81,7 +83,7 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
 
     const LatexRegex = /(\s\$\$.+?\$\$\s|\s\$.+?\$\s|\\\[.+?\\\]|\\\(.+?\\\))|(^\$$[\S\s]+?^\$$)|(^\$\$[\S\s]+?^\$\$\$)/gm
 
-    const conversationHtml = conversationNodes.map(({ message }) => {
+    const conversationHtml = conversationNodes.map(({ message, thinking }) => {
         if (!message || !message.content) return null
 
         if (shouldSkipMessageInExport(message)) return null
@@ -149,12 +151,15 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
             timestampHtml = `<time class="time" datetime="${date.toISOString()}" title="${date.toLocaleString()}">${conversationTime}</time>`
         }
 
+        const thinkingBlock = thinking ? formatThinkingHtml(thinking) : ''
+
         return `
 <div class="conversation-item">
     <div class="author ${authorType}">
         ${avatarEl}
     </div>
     <div class="conversation-content-wrapper">
+        ${thinkingBlock}
         <div class="conversation-content">
             ${content}
         </div>
@@ -338,6 +343,32 @@ function transformContent(
             console.warn('[Exporter] Unsupported Content:', content.content_type, content)
             return postProcess(`[Unsupported Content: ${content.content_type} ]`)
     }
+}
+
+function formatThinkingHtml(thinking: ThinkingContent): string {
+    const durationLabel = thinking.durationSeconds != null
+        ? `Thought for ${thinking.durationSeconds} seconds`
+        : 'Thinking'
+
+    const parts: string[] = []
+
+    if (thinking.activities?.length) {
+        const items = thinking.activities.map(a => `<li>${escapeHtml(a)}</li>`).join('')
+        parts.push(`<ul>${items}</ul>`)
+    }
+
+    const thoughts = thinking.thoughts
+        .map(t => t.content || t.summary)
+        .filter(Boolean)
+        .map(text => `<p>${escapeHtml(text)}</p>`)
+        .join('\n')
+    if (thoughts) parts.push(thoughts)
+
+    const body = parts.join('\n')
+
+    if (!body) return ''
+
+    return `<details class="thinking"><summary>${escapeHtml(durationLabel)}</summary>${body}</details>`
 }
 
 function escapeHtml(html: string) {

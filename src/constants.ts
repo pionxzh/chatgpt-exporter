@@ -17,6 +17,7 @@ export const KEY_TIMESTAMP_MARKDOWN = 'exporter:timestamp_markdown'
 export const KEY_TIMESTAMP_HTML = 'exporter:timestamp_html'
 export const KEY_META_ENABLED = 'exporter:enable_meta'
 export const KEY_META_LIST = 'exporter:meta_list'
+export const KEY_THINKING_ENABLED = 'exporter:enable_thinking'
 export const KEY_EXPORT_ALL_LIMIT = 'exporter:export_all_limit'
 
 export const KEY_OAI_LOCALE = 'oai/apps/locale'

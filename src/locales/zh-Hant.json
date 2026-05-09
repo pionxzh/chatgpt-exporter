@@ -33,6 +33,8 @@
   "Export Format": "匯出格式",
   "Export Metadata": "匯出元資料",
   "Export Metadata Description": "會添加至 Markdown 以及 HTML 匯出。",
+  "Export Thinking Process": "匯出思考過程",
+  "Export Thinking Process Description": "在匯出的 Markdown 和 HTML 檔案中包含模型的思考/推理過程。",
   "OpenAI Official Format": "OpenAI 官方格式",
   "Conversation Archive Alert": "確定要封存所有選取的對話？",
   "Conversation Archived Message": "所有選取的對話已封存。請重新整理頁面。",

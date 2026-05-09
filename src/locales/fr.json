@@ -33,6 +33,8 @@
   "Export Format": "Format d'exportation",
   "Export Metadata": "Exporter les métadonnées",
   "Export Metadata Description": "Ajouter des métadonnées aux fichiers Markdown et HTML exportés.",
+  "Export Thinking Process": "Exporter le processus de réflexion",
+  "Export Thinking Process Description": "Inclure le processus de réflexion/raisonnement du modèle dans les fichiers Markdown et HTML exportés.",
   "OpenAI Official Format": "Format officiel OpenAI",
   "Conversation Archive Alert": "Êtes-vous sûr de vouloir archiver toutes les conversations sélectionnées ?",
   "Conversation Archived Message": "Toutes les conversations sélectionnées ont été archivées. Veuillez actualiser la page pour voir les changements.",

@@ -33,6 +33,8 @@
   "Export Format": "导出格式",
   "Export Metadata": "导出元数据",
   "Export Metadata Description": "会添加至 Markdown 以及 HTML 导出。",
+  "Export Thinking Process": "导出思考过程",
+  "Export Thinking Process Description": "在导出的 Markdown 和 HTML 文件中包含模型的思考/推理过程。",
   "OpenAI Official Format": "OpenAI 官方格式",
   "Conversation Archive Alert": "确定要归档所有选取的对话？",
   "Conversation Archived Message": "所有所选的对话已归档。请刷新页面。",

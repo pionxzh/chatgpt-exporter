@@ -33,6 +33,8 @@
   "Export Format": "Dışa Aktarma Formatı",
   "Export Metadata": "Üst veriyi dışa aktar",
   "Export Metadata Description": "Dışa aktarılan Markdown ve HTML dosyalarına üst veri ekle",
+  "Export Thinking Process": "Düşünme Sürecini Dışa Aktar",
+  "Export Thinking Process Description": "Dışa aktarılan Markdown ve HTML dosyalarına modelin düşünme/akıl yürütme sürecini dahil et.",
   "OpenAI Official Format": "OpenAI Resmi Format",
   "Conversation Archive Alert": "Seçilen tüm konuşmaları arşivlemek istediğinizden emin misiniz?",
   "Conversation Archived Message": "Seçilen tüm konuşmalar arşivlendi. Değişiklikleri görmek için sayfayı yenileyin.",
