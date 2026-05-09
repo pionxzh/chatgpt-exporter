@@ -8,7 +8,6 @@ import { exportToJson, exportToOoba, exportToTavern } from '../exporter/json'
 import { exportToMarkdown } from '../exporter/markdown'
 import { exportToText } from '../exporter/text'
 import { useWindowResize } from '../hooks/useWindowResize'
-import { getHistoryDisabled } from '../page'
 import { Divider } from './Divider'
 import { ExportDialog } from './ExportDialog'
 import { FileCode, IconArrowRightFromBracket, IconCamera, IconCopy, IconJSON, IconMarkdown, IconSetting, IconZip } from './Icons'
@@ -21,7 +20,6 @@ import './Dialog.css'
 
 function MenuInner({ container }: { container: HTMLDivElement }) {
     const { t } = useTranslation()
-    const disabled = getHistoryDisabled()
 
     const [open, setOpen] = useState(false)
     const [jsonOpen, setJsonOpen] = useState(false)
@@ -63,17 +61,6 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
     const isMobile = width < 768
     const Portal = isMobile ? 'div' : HoverCard.Portal
 
-    if (disabled) {
-        return (
-            <MenuItem
-                className="mt-1"
-                text="Chat History disabled"
-                icon={IconArrowRightFromBracket}
-                disabled
-            />
-        )
-    }
-
     return (
         <>
             {isMobile && open && (
@@ -91,7 +78,7 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
             >
                 <HoverCard.Trigger>
                     <MenuItem
-                        className="border-0 ms-2 me-1.5"
+                        className="border-0 ms-2 me-1.5 mb-2"
                         text={t('ExportHelper')}
                         icon={IconArrowRightFromBracket}
                         onClick={() => {
@@ -110,9 +97,10 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                         bg-menu
                         border border-menu
                         transition-opacity duration-200 shadow-md
+                        gap-1 py-2 px-1
                         ${isMobile
-                            ? 'gap-x-1 px-1.5 pt-2 rounded animate-slideUp'
-                            : 'gap-x-1 px-1.5 py-2 pb-0 rounded-md animate-fadeIn'}`}
+                            ? 'rounded animate-slideUp'
+                            : 'rounded-md animate-fadeIn'}`}
                         style={{
                             width: isMobile ? 316 : 268,
                             left: -6,

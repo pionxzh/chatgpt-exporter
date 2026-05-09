@@ -45,7 +45,7 @@ export const MenuItem: FC<MenuItemProps> = ({ text, successText, disabled = fals
             className={`
             menu-item
             __menu-item hoverable
-            flex flex-shrink-0 py-3 px-4 items-center gap-3 rounded-lg mb-2
+            flex flex-shrink-0 m-0 items-center gap-3 rounded-lg
             transition-colors duration-200
             cursor-pointer
             border border-menu ${className}`}

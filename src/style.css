@@ -34,6 +34,11 @@ html {
     --ce-text-primary: var(--text-primary, #ececec);
     --ce-menu-primary: var(--sidebar-surface-primary, #171717);
     --ce-menu-secondary: var(--sidebar-surface-secondary, #212121);
+    --ce-border-light: var(--border-default, rgba(0, 0, 0, .05));
+}
+
+.bg-menu {
+    background-color: var(--ce-menu-secondary);
 }
 
 .border-menu {

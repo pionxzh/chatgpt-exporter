@@ -1,5 +1,4 @@
 import { unsafeWindow } from 'vite-plugin-monkey/dist/client'
-import { KEY_OAI_HISTORY_DISABLED } from './constants'
 import { getBase64FromImageUrl, getBase64FromImg } from './utils/dom'
 
 declare global {
@@ -74,10 +73,6 @@ declare global {
             }
         }
     }
-}
-
-export function getHistoryDisabled(): boolean {
-    return localStorage.getItem(KEY_OAI_HISTORY_DISABLED) === '"true"'
 }
 
 export function getPageAccessToken(): string | null {
