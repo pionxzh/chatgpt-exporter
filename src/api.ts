@@ -997,6 +997,22 @@ function mergeContinuationNodes(nodes: ConversationNode[]): ConversationNode[] {
             const separator = prevNode.message.channel !== node.message.channel ? '\n\n' : ''
             prevNode.message.content.parts[prevNode.message.content.parts.length - 1] += separator + node.message.content.parts[0]
             prevNode.message.content.parts.push(...node.message.content.parts.slice(1))
+
+            if (node.message.metadata) {
+                const prevMeta = (prevNode.message.metadata ??= {} as any)
+                if (node.message.metadata.citations?.length) {
+                    prevMeta.citations = [
+                        ...(prevMeta.citations || []),
+                        ...node.message.metadata.citations,
+                    ]
+                }
+                if (node.message.metadata.content_references?.length) {
+                    prevMeta.content_references = [
+                        ...(prevMeta.content_references || []),
+                        ...node.message.metadata.content_references,
+                    ]
+                }
+            }
         }
         else {
             result.push(node)
