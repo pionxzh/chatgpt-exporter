@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.31.0
+// @version            2.32.0
 // @author             pionxzh
 // @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
 // @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
@@ -130,6 +130,11 @@ html {
     --ce-text-primary: var(--text-primary, #ececec);
     --ce-menu-primary: var(--sidebar-surface-primary, #171717);
     --ce-menu-secondary: var(--sidebar-surface-secondary, #212121);
+    --ce-border-light: var(--border-default, rgba(0, 0, 0, .05));
+}
+
+.bg-menu {
+    background-color: var(--ce-menu-secondary);
 }
 
 .border-menu {
@@ -250,12 +255,13 @@ html {
     width: 90vw;
     max-width: 560px;
     max-height: 85vh;
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow: hidden;
     padding: 16px 24px;
     z-index: 1001;
     outline: none;
     animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
 }
 
 .dark .DialogContent {
@@ -275,6 +281,7 @@ html {
     font-weight: 500;
     color: #1a1523;
     font-size: 20px;
+    flex-shrink: 0;
 }
 
 .dark .DialogTitle {
@@ -412,6 +419,7 @@ html {
     color: inherit;
     font-size: 14px;
     outline: none;
+    flex-shrink: 0;
 }
 .SelectSearch::placeholder {
     color: #9ca3af;
@@ -424,12 +432,18 @@ html {
     border-radius: 0;
     border: 1px solid #6f6e77;
     border-bottom: none;
+    flex-shrink: 0;
+}
+
+.ProjectSelect .Select {
+    width: auto;
 }
 
 .SelectList {
     position: relative;
     width: 100%;
-    height: 270px;
+    flex: 1;
+    min-height: 120px;
     padding: 12px 16px;
     overflow-x: hidden;
     overflow-y: auto;
@@ -490,6 +504,7 @@ html {
     border-bottom: none;
     background: #f9fafb;
     user-select: none;
+    flex-shrink: 0;
 }
 
 .dark {
@@ -628,6 +643,10 @@ html {
 
 .select-all {
     user-select: all!important;
+}
+
+.shrink-0 {
+    flex-shrink: 0;
 }
 
 .space-y-6>:not([hidden])~:not([hidden]) {
@@ -1181,9 +1200,9 @@ html {
   const KEY_TIMESTAMP_HTML = "exporter:timestamp_html";
   const KEY_META_ENABLED = "exporter:enable_meta";
   const KEY_META_LIST = "exporter:meta_list";
+  const KEY_THINKING_ENABLED = "exporter:enable_thinking";
   const KEY_EXPORT_ALL_LIMIT = "exporter:export_all_limit";
   const KEY_OAI_LOCALE = "oai/apps/locale";
-  const KEY_OAI_HISTORY_DISABLED = "oai/apps/historyDisabled";
   const EXPORT_OPERATION_BATCH = 100;
   var _GM_deleteValue = /* @__PURE__ */ (() => typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0)();
   var _GM_getValue = /* @__PURE__ */ (() => typeof GM_getValue != "undefined" ? GM_getValue : void 0)();
@@ -1218,9 +1237,6 @@ html {
       reader.onload = () => resolve(reader.result);
       reader.readAsDataURL(blob);
     });
-  }
-  function getHistoryDisabled() {
-    return localStorage.getItem(KEY_OAI_HISTORY_DISABLED) === '"true"';
   }
   function getPageAccessToken() {
     var _a, _b, _c, _d, _e, _f;
@@ -1288,6 +1304,7 @@ html {
   const conversationApi = (id) => _default(apiUrl, "/conversation/:id", { id });
   const conversationsApi = (offset, limit) => _default(apiUrl, "/conversations", { offset, limit });
   const fileDownloadApi = (id) => _default(apiUrl, "/files/download/:id", { id, post_id: "", inline: false });
+  const projectsApi = (cursor) => _default(apiUrl, "/gizmos/snorlax/sidebar", { conversations_per_gizmo: 0, cursor });
   const projectConversationsApi = (gizmo, cursor, limit) => _default(apiUrl, "/gizmos/:gizmo/conversations", { gizmo, cursor, limit });
   const accountsCheckApi = _default(apiUrl, "/accounts/check/v4-2023-04-27");
   async function getCurrentChatId() {
@@ -1368,6 +1385,18 @@ html {
       id: chatId,
       ...conversation
     };
+  }
+  async function fetchProjects() {
+    let cursor = null;
+    const allItems = [];
+    while (true) {
+      const url = projectsApi(cursor);
+      const { items, cursor: nextCursor = null } = await fetchApi(url);
+      cursor = nextCursor;
+      allItems.push(...items);
+      if (nextCursor === null) break;
+    }
+    return allItems.map((gizmo) => gizmo.gizmo.gizmo);
   }
   async function fetchConversations(offset = 0, limit = 20, project = null) {
     if (project) {
@@ -1597,7 +1626,7 @@ html {
     "gpt-5": "GPT-5",
     "text-davinci-002": "GPT-3.5"
   };
-  function processConversation(conversation) {
+  function processConversation(conversation, options) {
     var _a;
     const title2 = conversation.title || "ChatGPT Conversation";
     const createTime = conversation.create_time;
@@ -1607,6 +1636,9 @@ html {
     if (!startNodeId) throw new Error("Failed to find start node.");
     const conversationNodes = extractConversationResult(conversation.mapping, startNodeId);
     const mergedConversationNodes = mergeContinuationNodes(conversationNodes);
+    if (options == null ? void 0 : options.enableThinking) {
+      attachThinkingToNodes(conversation.mapping, mergedConversationNodes, startNodeId);
+    }
     return {
       id: conversation.id,
       title: title2,
@@ -1663,18 +1695,96 @@ html {
     return result;
   }
   function mergeContinuationNodes(nodes) {
-    var _a, _b;
+    var _a, _b, _c, _d, _e;
     const result = [];
     for (const node2 of nodes) {
       const prevNode = result[result.length - 1];
       if (((_a = prevNode == null ? void 0 : prevNode.message) == null ? void 0 : _a.author.role) === "assistant" && ((_b = node2.message) == null ? void 0 : _b.author.role) === "assistant" && prevNode.message.recipient === "all" && node2.message.recipient === "all" && prevNode.message.content.content_type === "text" && node2.message.content.content_type === "text") {
-        prevNode.message.content.parts[prevNode.message.content.parts.length - 1] += node2.message.content.parts[0];
+        const separator = prevNode.message.channel !== node2.message.channel ? "\n\n" : "";
+        prevNode.message.content.parts[prevNode.message.content.parts.length - 1] += separator + node2.message.content.parts[0];
         prevNode.message.content.parts.push(...node2.message.content.parts.slice(1));
+        if (node2.message.metadata) {
+          const prevMeta = (_c = prevNode.message).metadata ?? (_c.metadata = {});
+          if ((_d = node2.message.metadata.citations) == null ? void 0 : _d.length) {
+            prevMeta.citations = [
+              ...prevMeta.citations || [],
+              ...node2.message.metadata.citations
+            ];
+          }
+          if ((_e = node2.message.metadata.content_references) == null ? void 0 : _e.length) {
+            prevMeta.content_references = [
+              ...prevMeta.content_references || [],
+              ...node2.message.metadata.content_references
+            ];
+          }
+        }
       } else {
         result.push(node2);
       }
     }
     return result;
+  }
+  function hasThinkingContent(thinking) {
+    return thinking.thoughts.length > 0 || thinking.activities != null && thinking.activities.length > 0;
+  }
+  function attachThinkingToNodes(mapping, resultNodes, startNodeId) {
+    var _a, _b, _c;
+    const resultNodeIds = new Set(resultNodes.map((n2) => n2.id));
+    let currentNodeId = startNodeId;
+    let targetNodeId = null;
+    let thinking = { thoughts: [] };
+    while (currentNodeId) {
+      const node2 = mapping[currentNodeId];
+      if (!node2 || node2.parent === void 0) break;
+      const message = node2.message;
+      if (message == null ? void 0 : message.content) {
+        const ct = message.content.content_type;
+        if (resultNodeIds.has(node2.id) && message.author.role !== "user") {
+          if (hasThinkingContent(thinking)) {
+            const saveToId = targetNodeId ?? node2.id;
+            const target = resultNodes.find((n2) => n2.id === saveToId);
+            if (target) target.thinking = thinking;
+          }
+          targetNodeId = node2.id;
+          thinking = { thoughts: [] };
+        } else if (ct === "reasoning_recap") {
+          const duration = (_a = message.metadata) == null ? void 0 : _a.finished_duration_sec;
+          if (typeof duration === "number") {
+            thinking.durationSeconds = duration;
+          } else {
+            const match = message.content.content.match(/(\d+)/);
+            if (match) thinking.durationSeconds = Number.parseInt(match[1]);
+          }
+        } else if (ct === "thoughts") {
+          for (const thought of message.content.thoughts) {
+            if (thought.content || thought.summary) {
+              thinking.thoughts.unshift({
+                summary: thought.summary,
+                content: thought.content
+              });
+            }
+          }
+        } else if ((_b = message.metadata) == null ? void 0 : _b.reasoning_title) {
+          if (!thinking.activities) thinking.activities = [];
+          const title2 = message.metadata.reasoning_title;
+          if (!thinking.activities.includes(title2)) {
+            thinking.activities.unshift(title2);
+          }
+        } else if (message.author.role === "user" && !((_c = message.metadata) == null ? void 0 : _c.is_visually_hidden_from_conversation)) {
+          if (targetNodeId && hasThinkingContent(thinking)) {
+            const target = resultNodes.find((n2) => n2.id === targetNodeId);
+            if (target) target.thinking = thinking;
+          }
+          targetNodeId = null;
+          thinking = { thoughts: [] };
+        }
+      }
+      currentNodeId = node2.parent;
+    }
+    if (targetNodeId && hasThinkingContent(thinking)) {
+      const target = resultNodes.find((n2) => n2.id === targetNodeId);
+      if (target) target.thinking = thinking;
+    }
   }
   function _extends() {
     _extends = Object.assign ? Object.assign.bind() : function(target) {
@@ -8337,6 +8447,8 @@ html {
     "Export Format": "Export Format",
     "Export Metadata": "Export Metadata",
     "Export Metadata Description": "Add metadata to exported Markdown and HTML files.",
+    "Export Thinking Process": "Export Thinking Process",
+    "Export Thinking Process Description": "Include the model's thinking/reasoning process in exported Markdown and HTML files.",
     "OpenAI Official Format": "OpenAI Official Format",
     "Conversation Archive Alert": "Are you sure you want to archive all selected conversations?",
     "Conversation Archived Message": "All selected conversations have been archived. Please refresh the page to see the changes.",
@@ -8420,6 +8532,8 @@ html {
     "Export Format": "Formato de Exportación",
     "Export Metadata": "Exportar Metadatos",
     "Export Metadata Description": "Añadir Metadatos a los archivos Markdown y HTML exportados.",
+    "Export Thinking Process": "Exportar Proceso de Pensamiento",
+    "Export Thinking Process Description": "Incluir el proceso de pensamiento/razonamiento del modelo en los archivos Markdown y HTML exportados.",
     "OpenAI Official Format": "Formato Oficial de OpenAI",
     "Conversation Archive Alert": "¿Estás seguro que quieres archivar todas las conversaciones seleccionadas?",
     "Conversation Archived Message": "Todos las conversaciones seleccionadas se han archivado. Por favor refresca la página para ver los cambios.",
@@ -8484,6 +8598,8 @@ html {
     "Export Format": "Format d'exportation",
     "Export Metadata": "Exporter les métadonnées",
     "Export Metadata Description": "Ajouter des métadonnées aux fichiers Markdown et HTML exportés.",
+    "Export Thinking Process": "Exporter le processus de réflexion",
+    "Export Thinking Process Description": "Inclure le processus de réflexion/raisonnement du modèle dans les fichiers Markdown et HTML exportés.",
     "OpenAI Official Format": "Format officiel OpenAI",
     "Conversation Archive Alert": "Êtes-vous sûr de vouloir archiver toutes les conversations sélectionnées ?",
     "Conversation Archived Message": "Toutes les conversations sélectionnées ont été archivées. Veuillez actualiser la page pour voir les changements.",
@@ -8548,6 +8664,8 @@ html {
     "Export Format": "Format Ekspor",
     "Export Metadata": "Ekspor Metada",
     "Export Metadata Description": "Tambahkan metadata ke file Markdown dan HTML yang diekspor.",
+    "Export Thinking Process": "Ekspor Proses Berpikir",
+    "Export Thinking Process Description": "Sertakan proses berpikir/penalaran model dalam file Markdown dan HTML yang diekspor.",
     "OpenAI Official Format": "Format Resmi OpenAI",
     "Conversation Archive Alert": "Apakah Anda yakin ingin mengarsipkan semua percakapan yang dipilih?",
     "Conversation Archived Message": "Semua percakapan yang dipilih telah diarsipkan. Harap segarkan halaman untuk melihat perubahan.",
@@ -8612,6 +8730,8 @@ html {
     "Export Format": "エクスポートフォーマット",
     "Export Metadata": "メタデータをエクスポート",
     "Export Metadata Description": "エクスポートされたMarkdownおよびHTMLファイルにメタデータを追加します。",
+    "Export Thinking Process": "思考プロセスをエクスポート",
+    "Export Thinking Process Description": "エクスポートされたMarkdownおよびHTMLファイルにモデルの思考・推論プロセスを含めます。",
     "OpenAI Official Format": "OpenAI公式フォーマット",
     "Conversation Archive Alert": "選択したすべての会話をアーカイブしてもよろしいですか？",
     "Conversation Archived Message": "選択したすべての会話がアーカイブされました。変更を表示するには、ページを更新してください。",
@@ -8676,6 +8796,8 @@ html {
     "Export Format": "Формат экспорта",
     "Export Metadata": "Экспорт метаданных",
     "Export Metadata Description": "Добавляйте метаданные в экспортированные файлы Markdown и HTML.",
+    "Export Thinking Process": "Экспорт процесса мышления",
+    "Export Thinking Process Description": "Включить процесс мышления/рассуждения модели в экспортированные файлы Markdown и HTML.",
     "OpenAI Official Format": "Официальный формат OpenAI",
     "Conversation Archive Alert": "Вы уверены, что хотите архивировать все выбранные разговоры?",
     "Conversation Archived Message": "Все выбранные разговоры были заархивированы. Пожалуйста, обновите страницу, чтобы увидеть изменения.",
@@ -8740,6 +8862,8 @@ html {
     "Export Format": "Dışa Aktarma Formatı",
     "Export Metadata": "Üst veriyi dışa aktar",
     "Export Metadata Description": "Dışa aktarılan Markdown ve HTML dosyalarına üst veri ekle",
+    "Export Thinking Process": "Düşünme Sürecini Dışa Aktar",
+    "Export Thinking Process Description": "Dışa aktarılan Markdown ve HTML dosyalarına modelin düşünme/akıl yürütme sürecini dahil et.",
     "OpenAI Official Format": "OpenAI Resmi Format",
     "Conversation Archive Alert": "Seçilen tüm konuşmaları arşivlemek istediğinizden emin misiniz?",
     "Conversation Archived Message": "Seçilen tüm konuşmalar arşivlendi. Değişiklikleri görmek için sayfayı yenileyin.",
@@ -8804,6 +8928,8 @@ html {
     "Export Format": "导出格式",
     "Export Metadata": "导出元数据",
     "Export Metadata Description": "会添加至 Markdown 以及 HTML 导出。",
+    "Export Thinking Process": "导出思考过程",
+    "Export Thinking Process Description": "在导出的 Markdown 和 HTML 文件中包含模型的思考/推理过程。",
     "OpenAI Official Format": "OpenAI 官方格式",
     "Conversation Archive Alert": "确定要归档所有选取的对话？",
     "Conversation Archived Message": "所有所选的对话已归档。请刷新页面。",
@@ -8868,6 +8994,8 @@ html {
     "Export Format": "匯出格式",
     "Export Metadata": "匯出元資料",
     "Export Metadata Description": "會添加至 Markdown 以及 HTML 匯出。",
+    "Export Thinking Process": "匯出思考過程",
+    "Export Thinking Process Description": "在匯出的 Markdown 和 HTML 檔案中包含模型的思考/推理過程。",
     "OpenAI Official Format": "OpenAI 官方格式",
     "Conversation Archive Alert": "確定要封存所有選取的對話？",
     "Conversation Archived Message": "所有選取的對話已封存。請重新整理頁面。",
@@ -9636,6 +9764,35 @@ html {
             overflow: hidden;
             flex: 1 1 auto;
             flex-direction: column;
+        }
+
+        .thinking {
+            font-size: 0.875rem;
+            line-height: 1.5;
+            margin-bottom: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            padding: 0.5rem 0.75rem;
+        }
+
+        .thinking summary {
+            cursor: pointer;
+            font-weight: 500;
+            color: #6b7280;
+        }
+
+        .thinking p {
+            margin: 0.5rem 0;
+            color: #6b7280;
+        }
+
+        .dark .thinking {
+            border-color: #4b5563;
+        }
+
+        .dark .thinking summary,
+        .dark .thinking p {
+            color: #9ca3af;
         }
 
         .conversation-content {
@@ -21066,7 +21223,8 @@ html {
     const userAvatar = await getUserAvatar();
     const chatId = await getCurrentChatId();
     const rawConversation = await fetchConversation(chatId, true);
-    const conversation = processConversation(rawConversation);
+    const enableThinking = ScriptStorage.get(KEY_THINKING_ENABLED) ?? false;
+    const conversation = processConversation(rawConversation, { enableThinking });
     const html2 = conversationToHtml(conversation, userAvatar, metaList);
     const fileName = getFileNameWithFormat(fileNameFormat, "html", { title: conversation.title, chatId, createTime: conversation.createTime, updateTime: conversation.updateTime });
     downloadFile(fileName, "text/html", standardizeLineBreaks(html2));
@@ -21076,7 +21234,8 @@ html {
     const userAvatar = await getUserAvatar();
     const zip = new JSZip();
     const filenameMap = /* @__PURE__ */ new Map();
-    const conversations = apiConversations.map((x2) => processConversation(x2));
+    const enableThinking = ScriptStorage.get(KEY_THINKING_ENABLED) ?? false;
+    const conversations = apiConversations.map((x2) => processConversation(x2, { enableThinking }));
     conversations.forEach((conversation) => {
       let fileName = getFileNameWithFormat(fileNameFormat, "html", {
         title: conversation.title,
@@ -21111,7 +21270,7 @@ html {
     const timeStampHtml = ScriptStorage.get(KEY_TIMESTAMP_HTML) ?? false;
     const timeStamp24H = ScriptStorage.get(KEY_TIMESTAMP_24H) ?? false;
     const LatexRegex2 = /(\s\$\$.+?\$\$\s|\s\$.+?\$\s|\\\[.+?\\\]|\\\(.+?\\\))|(^\$$[\S\s]+?^\$$)|(^\$\$[\S\s]+?^\$\$\$)/gm;
-    const conversationHtml = conversationNodes.map(({ message }) => {
+    const conversationHtml = conversationNodes.map(({ message, thinking }) => {
       var _a;
       if (!message || !message.content) return null;
       if (shouldSkipMessageInExport(message)) return null;
@@ -21156,12 +21315,14 @@ html {
         conversationTime = date2.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: !timeStamp24H });
         timestampHtml = `<time class="time" datetime="${date2.toISOString()}" title="${date2.toLocaleString()}">${conversationTime}</time>`;
       }
+      const thinkingBlock = thinking ? formatThinkingHtml(thinking) : "";
       return `
 <div class="conversation-item">
     <div class="author ${authorType}">
         ${avatarEl}
     </div>
     <div class="conversation-content-wrapper">
+        ${thinkingBlock}
         <div class="conversation-content">
             ${content2}
         </div>
@@ -21292,6 +21453,20 @@ ${content2.text}
         console.warn("[Exporter] Unsupported Content:", content2.content_type, content2);
         return postProcess(`[Unsupported Content: ${content2.content_type} ]`);
     }
+  }
+  function formatThinkingHtml(thinking) {
+    var _a;
+    const durationLabel = thinking.durationSeconds != null ? `Thought for ${thinking.durationSeconds} seconds` : "Thinking";
+    const parts = [];
+    if ((_a = thinking.activities) == null ? void 0 : _a.length) {
+      const items = thinking.activities.map((a2) => `<li>${escapeHtml(a2)}</li>`).join("");
+      parts.push(`<ul>${items}</ul>`);
+    }
+    const thoughts = thinking.thoughts.map((t2) => t2.content || t2.summary).filter(Boolean).map((text2) => `<p>${escapeHtml(text2)}</p>`).join("\n");
+    if (thoughts) parts.push(thoughts);
+    const body2 = parts.join("\n");
+    if (!body2) return "";
+    return `<details class="thinking"><summary>${escapeHtml(durationLabel)}</summary>${body2}</details>`;
   }
   function escapeHtml(html2) {
     return html2.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
@@ -21602,7 +21777,8 @@ ${content2.text}
     }
     const chatId = await getCurrentChatId();
     const rawConversation = await fetchConversation(chatId, true);
-    const conversation = processConversation(rawConversation);
+    const enableThinking = ScriptStorage.get(KEY_THINKING_ENABLED) ?? false;
+    const conversation = processConversation(rawConversation, { enableThinking });
     const markdown = conversationToMarkdown(conversation, metaList);
     const fileName = getFileNameWithFormat(fileNameFormat, "md", { title: conversation.title, chatId, createTime: conversation.createTime, updateTime: conversation.updateTime });
     downloadFile(fileName, "text/markdown", standardizeLineBreaks(markdown));
@@ -21611,7 +21787,8 @@ ${content2.text}
   async function exportAllToMarkdown(fileNameFormat, apiConversations, metaList, projectName, partIndex, totalParts) {
     const zip = new JSZip();
     const filenameMap = /* @__PURE__ */ new Map();
-    const conversations = apiConversations.map((x2) => processConversation(x2));
+    const enableThinking = ScriptStorage.get(KEY_THINKING_ENABLED) ?? false;
+    const conversations = apiConversations.map((x2) => processConversation(x2, { enableThinking }));
     conversations.forEach((conversation) => {
       let fileName = getFileNameWithFormat(fileNameFormat, "md", {
         title: conversation.title,
@@ -21656,7 +21833,7 @@ ${_metaList.join("\n")}
     const enableTimestamp = ScriptStorage.get(KEY_TIMESTAMP_ENABLED) ?? false;
     const timeStampMarkdown = ScriptStorage.get(KEY_TIMESTAMP_MARKDOWN) ?? false;
     const timeStamp24H = ScriptStorage.get(KEY_TIMESTAMP_24H) ?? false;
-    const content2 = conversationNodes.map(({ message }) => {
+    const content2 = conversationNodes.map(({ message, thinking }) => {
       if (!message || !message.content) return null;
       if (shouldSkipMessageInExport(message)) return null;
       const timestamp2 = (message == null ? void 0 : message.create_time) ?? "";
@@ -21670,6 +21847,7 @@ ${_metaList.join("\n")}
 `;
       }
       const author = transformAuthor$1(message.author);
+      const thinkingBlock = thinking ? formatThinkingMarkdown(thinking) : "";
       const postSteps = [];
       if (message.author.role === "assistant") {
         postSteps.push((input) => transformContentReferences$1(input, message.metadata));
@@ -21698,7 +21876,7 @@ ${_metaList.join("\n")}
       const postProcess = (input) => postSteps.reduce((acc, fn2) => fn2(acc), input);
       const content22 = transformContent$1(message.content, message.metadata, postProcess);
       return `#### ${author}:
-${timestampHtml}${content22}`;
+${timestampHtml}${thinkingBlock}${content22}`;
     }).filter(Boolean).join("\n\n");
     const markdown = `${frontMatter}# ${title2}
 
@@ -21821,6 +21999,26 @@ ${content2.text}
         console.warn("[Exporter] Unsupported Content:", content2.content_type, content2);
         return postProcess(`[Unsupported Content: ${content2.content_type}]`);
     }
+  }
+  function formatThinkingMarkdown(thinking) {
+    var _a;
+    const durationLabel = thinking.durationSeconds != null ? `Thought for ${thinking.durationSeconds} seconds` : "Thinking";
+    const parts = [];
+    if ((_a = thinking.activities) == null ? void 0 : _a.length) {
+      parts.push(thinking.activities.map((a2) => `- ${a2}`).join("\n"));
+    }
+    const thoughts = thinking.thoughts.map((t2) => t2.content || t2.summary).filter(Boolean).join("\n\n");
+    if (thoughts) parts.push(thoughts);
+    const body2 = parts.join("\n\n");
+    if (!body2) return "";
+    return `<details>
+<summary>${durationLabel}</summary>
+
+${body2}
+
+</details>
+
+`;
   }
   function copyToClipboard(text2) {
     try {
@@ -22122,22 +22320,22 @@ ${content2}`;
     }
   }
   function FileCode() {
-    return /* @__PURE__ */ o$8("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 384 512", className: "w-4 h-4", fill: "currentColor", children: /* @__PURE__ */ o$8("path", { d: "M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zM256 0V128H384L256 0zM153 289l-31 31 31 31c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L71 337c-9.4-9.4-9.4-24.6 0-33.9l48-48c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9zM265 255l48 48c9.4 9.4 9.4 24.6 0 33.9l-48 48c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l31-31-31-31c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0z" }) });
+    return /* @__PURE__ */ o$8("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 384 512", className: "w-4 h-4 shrink-0", fill: "currentColor", children: /* @__PURE__ */ o$8("path", { d: "M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zM256 0V128H384L256 0zM153 289l-31 31 31 31c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L71 337c-9.4-9.4-9.4-24.6 0-33.9l48-48c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9zM265 255l48 48c9.4 9.4 9.4 24.6 0 33.9l-48 48c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l31-31-31-31c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0z" }) });
   }
   function IconCamera() {
-    return /* @__PURE__ */ o$8("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 512 512", className: "w-4 h-4", fill: "currentColor", children: /* @__PURE__ */ o$8("path", { d: "M149.1 64.8L138.7 96H64C28.7 96 0 124.7 0 160V416c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H373.3L362.9 64.8C356.4 45.2 338.1 32 317.4 32H194.6c-20.7 0-39 13.2-45.5 32.8zM256 384c-53 0-96-43-96-96s43-96 96-96s96 43 96 96s-43 96-96 96z" }) });
+    return /* @__PURE__ */ o$8("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 512 512", className: "w-4 h-4 shrink-0", fill: "currentColor", children: /* @__PURE__ */ o$8("path", { d: "M149.1 64.8L138.7 96H64C28.7 96 0 124.7 0 160V416c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H373.3L362.9 64.8C356.4 45.2 338.1 32 317.4 32H194.6c-20.7 0-39 13.2-45.5 32.8zM256 384c-53 0-96-43-96-96s43-96 96-96s96 43 96 96s-43 96-96 96z" }) });
   }
   function IconMarkdown() {
-    return /* @__PURE__ */ o$8("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 640 512", className: "w-4 h-4", fill: "currentColor", children: /* @__PURE__ */ o$8("path", { d: "M593.8 59.1H46.2C20.7 59.1 0 79.8 0 105.2v301.5c0 25.5 20.7 46.2 46.2 46.2h547.7c25.5 0 46.2-20.7 46.1-46.1V105.2c0-25.4-20.7-46.1-46.2-46.1zM338.5 360.6H277v-120l-61.5 76.9-61.5-76.9v120H92.3V151.4h61.5l61.5 76.9 61.5-76.9h61.5v209.2zm135.3 3.1L381.5 256H443V151.4h61.5V256H566z" }) });
+    return /* @__PURE__ */ o$8("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 640 512", className: "w-4 h-4 shrink-0", fill: "currentColor", children: /* @__PURE__ */ o$8("path", { d: "M593.8 59.1H46.2C20.7 59.1 0 79.8 0 105.2v301.5c0 25.5 20.7 46.2 46.2 46.2h547.7c25.5 0 46.2-20.7 46.1-46.1V105.2c0-25.4-20.7-46.1-46.2-46.1zM338.5 360.6H277v-120l-61.5 76.9-61.5-76.9v120H92.3V151.4h61.5l61.5 76.9 61.5-76.9h61.5v209.2zm135.3 3.1L381.5 256H443V151.4h61.5V256H566z" }) });
   }
   function IconCopy() {
-    return /* @__PURE__ */ o$8("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 512 512", className: "w-4 h-4", fill: "currentColor", children: /* @__PURE__ */ o$8("path", { d: "M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z" }) });
+    return /* @__PURE__ */ o$8("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 512 512", className: "w-4 h-4 shrink-0", fill: "currentColor", children: /* @__PURE__ */ o$8("path", { d: "M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z" }) });
   }
   function IconArrowRightFromBracket() {
-    return /* @__PURE__ */ o$8("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 576 512", className: "w-4 h-4", fill: "currentColor", children: /* @__PURE__ */ o$8("path", { d: "M534.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L434.7 224 224 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l210.7 0-73.4 73.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l128-128zM192 96c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0c-53 0-96 43-96 96l0 256c0 53 43 96 96 96l64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32l64 0z" }) });
+    return /* @__PURE__ */ o$8("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 576 512", className: "w-4 h-4 shrink-0", fill: "currentColor", children: /* @__PURE__ */ o$8("path", { d: "M534.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L434.7 224 224 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l210.7 0-73.4 73.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l128-128zM192 96c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0c-53 0-96 43-96 96l0 256c0 53 43 96 96 96l64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32l64 0z" }) });
   }
   function IconSetting() {
-    return /* @__PURE__ */ o$8("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 15 15", className: "w-4 h-4", stroke: "currentColor", "stroke-width": "0.5", children: /* @__PURE__ */ o$8("path", { d: "M7.07095 0.650238C6.67391 0.650238 6.32977 0.925096 6.24198 1.31231L6.0039 2.36247C5.6249 2.47269 5.26335 2.62363 4.92436 2.81013L4.01335 2.23585C3.67748 2.02413 3.23978 2.07312 2.95903 2.35386L2.35294 2.95996C2.0722 3.2407 2.0232 3.6784 2.23493 4.01427L2.80942 4.92561C2.62307 5.2645 2.47227 5.62594 2.36216 6.00481L1.31209 6.24287C0.924883 6.33065 0.650024 6.6748 0.650024 7.07183V7.92897C0.650024 8.32601 0.924883 8.67015 1.31209 8.75794L2.36228 8.99603C2.47246 9.375 2.62335 9.73652 2.80979 10.0755L2.2354 10.9867C2.02367 11.3225 2.07267 11.7602 2.35341 12.041L2.95951 12.6471C3.24025 12.9278 3.67795 12.9768 4.01382 12.7651L4.92506 12.1907C5.26384 12.377 5.62516 12.5278 6.0039 12.6379L6.24198 13.6881C6.32977 14.0753 6.67391 14.3502 7.07095 14.3502H7.92809C8.32512 14.3502 8.66927 14.0753 8.75705 13.6881L8.99505 12.6383C9.37411 12.5282 9.73573 12.3773 10.0748 12.1909L10.986 12.7653C11.3218 12.977 11.7595 12.928 12.0403 12.6473L12.6464 12.0412C12.9271 11.7604 12.9761 11.3227 12.7644 10.9869L12.1902 10.076C12.3768 9.73688 12.5278 9.37515 12.638 8.99596L13.6879 8.75794C14.0751 8.67015 14.35 8.32601 14.35 7.92897V7.07183C14.35 6.6748 14.0751 6.33065 13.6879 6.24287L12.6381 6.00488C12.528 5.62578 12.3771 5.26414 12.1906 4.92507L12.7648 4.01407C12.9766 3.6782 12.9276 3.2405 12.6468 2.95975L12.0407 2.35366C11.76 2.07292 11.3223 2.02392 10.9864 2.23565L10.0755 2.80989C9.73622 2.62328 9.37437 2.47229 8.99505 2.36209L8.75705 1.31231C8.66927 0.925096 8.32512 0.650238 7.92809 0.650238H7.07095ZM4.92053 3.81251C5.44724 3.44339 6.05665 3.18424 6.71543 3.06839L7.07095 1.50024H7.92809L8.28355 3.06816C8.94267 3.18387 9.5524 3.44302 10.0794 3.81224L11.4397 2.9547L12.0458 3.56079L11.1882 4.92117C11.5573 5.44798 11.8164 6.0575 11.9321 6.71638L13.5 7.07183V7.92897L11.932 8.28444C11.8162 8.94342 11.557 9.55301 11.1878 10.0798L12.0453 11.4402L11.4392 12.0462L10.0787 11.1886C9.55192 11.5576 8.94241 11.8166 8.28355 11.9323L7.92809 13.5002H7.07095L6.71543 11.932C6.0569 11.8162 5.44772 11.5572 4.92116 11.1883L3.56055 12.046L2.95445 11.4399L3.81213 10.0794C3.4431 9.55266 3.18403 8.94326 3.06825 8.2845L1.50002 7.92897V7.07183L3.06818 6.71632C3.18388 6.05765 3.44283 5.44833 3.81171 4.92165L2.95398 3.561L3.56008 2.95491L4.92053 3.81251ZM9.02496 7.50008C9.02496 8.34226 8.34223 9.02499 7.50005 9.02499C6.65786 9.02499 5.97513 8.34226 5.97513 7.50008C5.97513 6.65789 6.65786 5.97516 7.50005 5.97516C8.34223 5.97516 9.02496 6.65789 9.02496 7.50008ZM9.92496 7.50008C9.92496 8.83932 8.83929 9.92499 7.50005 9.92499C6.1608 9.92499 5.07513 8.83932 5.07513 7.50008C5.07513 6.16084 6.1608 5.07516 7.50005 5.07516C8.83929 5.07516 9.92496 6.16084 9.92496 7.50008Z", fill: "currentColor", fillRule: "evenodd", clipRule: "evenodd" }) });
+    return /* @__PURE__ */ o$8("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 15 15", className: "w-4 h-4 shrink-0", stroke: "currentColor", "stroke-width": "0.5", children: /* @__PURE__ */ o$8("path", { d: "M7.07095 0.650238C6.67391 0.650238 6.32977 0.925096 6.24198 1.31231L6.0039 2.36247C5.6249 2.47269 5.26335 2.62363 4.92436 2.81013L4.01335 2.23585C3.67748 2.02413 3.23978 2.07312 2.95903 2.35386L2.35294 2.95996C2.0722 3.2407 2.0232 3.6784 2.23493 4.01427L2.80942 4.92561C2.62307 5.2645 2.47227 5.62594 2.36216 6.00481L1.31209 6.24287C0.924883 6.33065 0.650024 6.6748 0.650024 7.07183V7.92897C0.650024 8.32601 0.924883 8.67015 1.31209 8.75794L2.36228 8.99603C2.47246 9.375 2.62335 9.73652 2.80979 10.0755L2.2354 10.9867C2.02367 11.3225 2.07267 11.7602 2.35341 12.041L2.95951 12.6471C3.24025 12.9278 3.67795 12.9768 4.01382 12.7651L4.92506 12.1907C5.26384 12.377 5.62516 12.5278 6.0039 12.6379L6.24198 13.6881C6.32977 14.0753 6.67391 14.3502 7.07095 14.3502H7.92809C8.32512 14.3502 8.66927 14.0753 8.75705 13.6881L8.99505 12.6383C9.37411 12.5282 9.73573 12.3773 10.0748 12.1909L10.986 12.7653C11.3218 12.977 11.7595 12.928 12.0403 12.6473L12.6464 12.0412C12.9271 11.7604 12.9761 11.3227 12.7644 10.9869L12.1902 10.076C12.3768 9.73688 12.5278 9.37515 12.638 8.99596L13.6879 8.75794C14.0751 8.67015 14.35 8.32601 14.35 7.92897V7.07183C14.35 6.6748 14.0751 6.33065 13.6879 6.24287L12.6381 6.00488C12.528 5.62578 12.3771 5.26414 12.1906 4.92507L12.7648 4.01407C12.9766 3.6782 12.9276 3.2405 12.6468 2.95975L12.0407 2.35366C11.76 2.07292 11.3223 2.02392 10.9864 2.23565L10.0755 2.80989C9.73622 2.62328 9.37437 2.47229 8.99505 2.36209L8.75705 1.31231C8.66927 0.925096 8.32512 0.650238 7.92809 0.650238H7.07095ZM4.92053 3.81251C5.44724 3.44339 6.05665 3.18424 6.71543 3.06839L7.07095 1.50024H7.92809L8.28355 3.06816C8.94267 3.18387 9.5524 3.44302 10.0794 3.81224L11.4397 2.9547L12.0458 3.56079L11.1882 4.92117C11.5573 5.44798 11.8164 6.0575 11.9321 6.71638L13.5 7.07183V7.92897L11.932 8.28444C11.8162 8.94342 11.557 9.55301 11.1878 10.0798L12.0453 11.4402L11.4392 12.0462L10.0787 11.1886C9.55192 11.5576 8.94241 11.8166 8.28355 11.9323L7.92809 13.5002H7.07095L6.71543 11.932C6.0569 11.8162 5.44772 11.5572 4.92116 11.1883L3.56055 12.046L2.95445 11.4399L3.81213 10.0794C3.4431 9.55266 3.18403 8.94326 3.06825 8.2845L1.50002 7.92897V7.07183L3.06818 6.71632C3.18388 6.05765 3.44283 5.44833 3.81171 4.92165L2.95398 3.561L3.56008 2.95491L4.92053 3.81251ZM9.02496 7.50008C9.02496 8.34226 8.34223 9.02499 7.50005 9.02499C6.65786 9.02499 5.97513 8.34226 5.97513 7.50008C5.97513 6.65789 6.65786 5.97516 7.50005 5.97516C8.34223 5.97516 9.02496 6.65789 9.02496 7.50008ZM9.92496 7.50008C9.92496 8.83932 8.83929 9.92499 7.50005 9.92499C6.1608 9.92499 5.07513 8.83932 5.07513 7.50008C5.07513 6.16084 6.1608 5.07516 7.50005 5.07516C8.83929 5.07516 9.92496 6.16084 9.92496 7.50008Z", fill: "currentColor", fillRule: "evenodd", clipRule: "evenodd" }) });
   }
   function IconCross() {
     return /* @__PURE__ */ o$8("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 15 15", width: "15", height: "15", children: /* @__PURE__ */ o$8("path", { d: "M11.7816 4.03157C12.0062 3.80702 12.0062 3.44295 11.7816 3.2184C11.5571 2.99385 11.193 2.99385 10.9685 3.2184L7.50005 6.68682L4.03164 3.2184C3.80708 2.99385 3.44301 2.99385 3.21846 3.2184C2.99391 3.44295 2.99391 3.80702 3.21846 4.03157L6.68688 7.49999L3.21846 10.9684C2.99391 11.193 2.99391 11.557 3.21846 11.7816C3.44301 12.0061 3.80708 12.0061 4.03164 11.7816L7.50005 8.31316L10.9685 11.7816C11.193 12.0061 11.5571 12.0061 11.7816 11.7816C12.0062 11.557 12.0062 11.193 11.7816 10.9684L8.31322 7.49999L11.7816 4.03157Z", fill: "currentColor", fillRule: "evenodd", clipRule: "evenodd" }) });
@@ -22152,7 +22350,7 @@ ${content2}`;
     ] });
   }
   function IconZip() {
-    return /* @__PURE__ */ o$8("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24", className: "w-4 h-4", "stroke-width": "2", stroke: "currentColor", fill: "none", strokeLinecap: "round", strokeLinejoin: "round", children: [
+    return /* @__PURE__ */ o$8("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24", className: "w-4 h-4 shrink-0", "stroke-width": "2", stroke: "currentColor", fill: "none", strokeLinecap: "round", strokeLinejoin: "round", children: [
       /* @__PURE__ */ o$8("path", { stroke: "none", d: "M0 0h24v24H0z", fill: "none" }),
       /* @__PURE__ */ o$8("path", { d: "M6 20.735a2 2 0 0 1 -1 -1.735v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2h-1" }),
       /* @__PURE__ */ o$8("path", { d: "M11 17a2 2 0 0 1 2 2v2a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-2a2 2 0 0 1 2 -2z" }),
@@ -22278,6 +22476,9 @@ ${content2}`;
     exportMetaList: defaultExportMetaList,
     setExportMetaList: (_24) => {
     },
+    enableThinking: false,
+    setEnableThinking: (_24) => {
+    },
     exportAllLimit: defaultExportAllLimit,
     setExportAllLimit: (_24) => {
     },
@@ -22292,18 +22493,21 @@ ${content2}`;
     const [enableTimestampMarkdown, setEnableTimestampMarkdown] = useGMStorage(KEY_TIMESTAMP_MARKDOWN, false);
     const [enableMeta, setEnableMeta] = useGMStorage(KEY_META_ENABLED, false);
     const [exportMetaList, setExportMetaList] = useGMStorage(KEY_META_LIST, defaultExportMetaList);
+    const [enableThinking, setEnableThinking] = useGMStorage(KEY_THINKING_ENABLED, false);
     const [exportAllLimit, setExportAllLimit] = useGMStorage(KEY_EXPORT_ALL_LIMIT, defaultExportAllLimit);
     const resetDefault = T$4(() => {
       setFormat(defaultFormat);
       setEnableTimestamp(false);
       setEnableMeta(false);
       setExportMetaList(defaultExportMetaList);
+      setEnableThinking(false);
       setExportAllLimit(defaultExportAllLimit);
     }, [
       setFormat,
       setEnableTimestamp,
       setEnableMeta,
       setExportMetaList,
+      setEnableThinking,
       setExportAllLimit
     ]);
     return /* @__PURE__ */ o$8(
@@ -22324,6 +22528,8 @@ ${content2}`;
           setEnableMeta,
           exportMetaList,
           setExportMetaList,
+          enableThinking,
+          setEnableThinking,
           exportAllLimit,
           setExportAllLimit,
           resetDefault
@@ -22370,6 +22576,31 @@ ${content2}`;
       return title2.toLowerCase().includes(lower);
     }
   }
+  const ProjectSelect = ({ projects, selected, setSelected, disabled, loading }) => {
+    const { t: t2 } = useTranslation();
+    return /* @__PURE__ */ o$8("div", { className: "ProjectSelect flex items-center text-gray-600 dark:text-gray-300 justify-between mb-3", children: [
+      t2("Select Project"),
+      /* @__PURE__ */ o$8("div", { className: "flex items-center gap-2", children: [
+        loading && /* @__PURE__ */ o$8(IconLoading, { className: "w-3 h-3" }),
+        /* @__PURE__ */ o$8(
+          "select",
+          {
+            disabled,
+            className: "Select",
+            value: selected ?? "",
+            onChange: (e2) => {
+              const val = e2.currentTarget.value;
+              setSelected(val || null);
+            },
+            children: [
+              /* @__PURE__ */ o$8("option", { value: "", children: t2("All conversations") }),
+              projects.map((project) => /* @__PURE__ */ o$8("option", { value: project.id, children: project.display.name }, project.id))
+            ]
+          }
+        )
+      ] })
+    ] });
+  };
   const ConversationSelect = ({
     conversations,
     selected,
@@ -22624,6 +22855,10 @@ ${content2}`;
     const [apiConversations, setApiConversations] = h$4([]);
     const [localConversations, setLocalConversations] = h$4([]);
     const conversations = exportSource === "API" ? apiConversations : localConversations;
+    const [projects, setProjects] = h$4([]);
+    const [selectedProjectId, setSelectedProjectId] = h$4(null);
+    const [projectsLoading, setProjectsLoading] = h$4(false);
+    const selectedProject = projects.find((p2) => p2.id === selectedProjectId) ?? null;
     const [loading, setLoading] = h$4(false);
     const [error2, setError] = h$4("");
     const [processing, setProcessing] = h$4(false);
@@ -22716,7 +22951,7 @@ ${content2}`;
         const partIndex = batchIdx + 1;
         const callback = (_a = exportAllOptions.find((o3) => o3.label === exportType)) == null ? void 0 : _a.callback;
         if (callback) {
-          await callback(format, results, metaList, void 0, partIndex, totalBatches2);
+          await callback(format, results, metaList, selectedProject == null ? void 0 : selectedProject.display.name, partIndex, totalBatches2);
         }
         if (partIndex < totalBatches2) {
           await sleep(400);
@@ -22728,7 +22963,7 @@ ${content2}`;
         }
       });
       return () => off();
-    }, [requestQueue, exportAllOptions, exportType, format, metaList, startApiBatch]);
+    }, [requestQueue, exportAllOptions, exportType, format, metaList, startApiBatch, selectedProject]);
     p$6(() => {
       const off = archiveQueue.on("done", () => {
         setProcessing(false);
@@ -22781,11 +23016,11 @@ ${content2}`;
       const chunks = chunkArray(results, EXPORT_OPERATION_BATCH);
       setProcessing(true);
       for (let i2 = 0; i2 < chunks.length; i2++) {
-        await callback(format, chunks[i2], metaList, void 0, i2 + 1, chunks.length);
+        await callback(format, chunks[i2], metaList, selectedProject == null ? void 0 : selectedProject.display.name, i2 + 1, chunks.length);
         if (i2 < chunks.length - 1) await sleep(400);
       }
       setProcessing(false);
-    }, [disabled, selected, localConversations, exportAllOptions, exportType, format, metaList]);
+    }, [disabled, selected, localConversations, exportAllOptions, exportType, format, metaList, selectedProject]);
     const exportAll = F$1(() => {
       return exportSource === "API" ? exportAllFromApi : exportAllFromLocal;
     }, [exportSource, exportAllFromApi, exportAllFromLocal]);
@@ -22821,6 +23056,10 @@ ${content2}`;
       exportingRef.current = processing;
     }, [processing]);
     p$6(() => {
+      setProjectsLoading(true);
+      fetchProjects().then(setProjects).catch((err) => console.error("Error fetching projects:", err)).finally(() => setProjectsLoading(false));
+    }, []);
+    p$6(() => {
       const gen = ++fetchGenRef.current;
       const alive = () => gen === fetchGenRef.current;
       setSelected([]);
@@ -22829,7 +23068,7 @@ ${content2}`;
       setTotalAvailable(null);
       setLoading(true);
       fetchAllConversations(
-        null,
+        selectedProjectId,
         exportAllLimit,
         (batch) => {
           if (alive()) setApiConversations((prev) => [...prev, ...batch]);
@@ -22844,12 +23083,12 @@ ${content2}`;
       }).finally(() => {
         if (alive()) setLoading(false);
       });
-    }, [exportAllLimit]);
+    }, [exportAllLimit, selectedProjectId]);
     const loadMore = T$4(async () => {
       if (loadingMore) return;
       setLoadingMore(true);
       try {
-        const page = await fetchConversationsPage(null, apiConversations.length, EXPORT_OPERATION_BATCH);
+        const page = await fetchConversationsPage(selectedProjectId, apiConversations.length, EXPORT_OPERATION_BATCH);
         setApiConversations((prev) => [...prev, ...page.items]);
         if (page.total !== null) setTotalAvailable(page.total);
         setHasMore(
@@ -22860,7 +23099,7 @@ ${content2}`;
       } finally {
         setLoadingMore(false);
       }
-    }, [loadingMore, apiConversations.length]);
+    }, [loadingMore, apiConversations.length, selectedProjectId]);
     const totalBatches = Math.ceil(selected.length / EXPORT_OPERATION_BATCH) || 1;
     const [probeStatus, setProbeStatus] = h$4(null);
     const [probeRetryAfterSecs, setProbeRetryAfterSecs] = h$4();
@@ -22912,6 +23151,16 @@ ${content2}`;
           className: "hidden",
           ref: fileInputRef,
           onChange: onUpload
+        }
+      ),
+      exportSource === "API" && /* @__PURE__ */ o$8(
+        ProjectSelect,
+        {
+          projects,
+          selected: selectedProjectId,
+          setSelected: setSelectedProjectId,
+          disabled: processing,
+          loading: projectsLoading
         }
       ),
       /* @__PURE__ */ o$8(
@@ -23064,7 +23313,7 @@ ${content2}`;
         className: `
             menu-item
             __menu-item hoverable
-            flex flex-shrink-0 py-3 px-4 items-center gap-3 rounded-lg mb-2
+            flex flex-shrink-0 m-0 items-center gap-3 rounded-lg
             transition-colors duration-200
             cursor-pointer
             border border-menu ${className}`,
@@ -23471,6 +23720,8 @@ ${content2}`;
       setEnableMeta,
       exportMetaList,
       setExportMetaList,
+      enableThinking,
+      setEnableThinking,
       exportAllLimit,
       setExportAllLimit
       /* eslint-enable pionxzh/consistent-list-newline */
@@ -23543,6 +23794,13 @@ ${content2}`;
                     ] })
                   ] })
                 ] }) }),
+                /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: [
+                  /* @__PURE__ */ o$8("div", { children: [
+                    /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: t2("Export Thinking Process") }),
+                    /* @__PURE__ */ o$8("dd", { className: "text-sm text-gray-700 dark:text-gray-300", children: t2("Export Thinking Process Description") })
+                  ] }),
+                  /* @__PURE__ */ o$8("div", { className: "absolute right-4", children: /* @__PURE__ */ o$8(Toggle, { label: "", checked: enableThinking, onCheckedUpdate: setEnableThinking }) })
+                ] }),
                 /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: /* @__PURE__ */ o$8("div", { children: [
                   /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: [
                     t2("Export All Limit"),
@@ -23703,7 +23961,6 @@ ${content2}`;
   };
   function MenuInner({ container }) {
     const { t: t2 } = useTranslation();
-    const disabled = getHistoryDisabled();
     const [open, setOpen] = h$4(false);
     const [jsonOpen, setJsonOpen] = h$4(false);
     const [exportOpen, setExportOpen] = h$4(false);
@@ -23737,17 +23994,6 @@ ${content2}`;
     const width = useWindowResize(() => window.innerWidth);
     const isMobile = width < 768;
     const Portal = isMobile ? "div" : $cef8881cdc69808e$export$602eac185826482c;
-    if (disabled) {
-      return /* @__PURE__ */ o$8(
-        MenuItem,
-        {
-          className: "mt-1",
-          text: "Chat History disabled",
-          icon: IconArrowRightFromBracket,
-          disabled: true
-        }
-      );
-    }
     return /* @__PURE__ */ o$8(k$3, { children: [
       isMobile && open && /* @__PURE__ */ o$8(
         "div",
@@ -23767,7 +24013,7 @@ ${content2}`;
             /* @__PURE__ */ o$8($cef8881cdc69808e$export$41fb9f06171c75f4, { children: /* @__PURE__ */ o$8(
               MenuItem,
               {
-                className: "border-0 ms-2 me-1.5",
+                className: "border-0 ms-2 me-1.5 mb-2",
                 text: t2("ExportHelper"),
                 icon: IconArrowRightFromBracket,
                 onClick: () => {
@@ -23789,7 +24035,8 @@ ${content2}`;
                         bg-menu
                         border border-menu
                         transition-opacity duration-200 shadow-md
-                        ${isMobile ? "gap-x-1 px-1.5 pt-2 rounded animate-slideUp" : "gap-x-1 px-1.5 py-2 pb-0 rounded-md animate-fadeIn"}`,
+                        gap-1 py-2 px-1
+                        ${isMobile ? "rounded animate-slideUp" : "rounded-md animate-fadeIn"}`,
                     style: {
                       width: isMobile ? 316 : 268,
                       left: -6,
