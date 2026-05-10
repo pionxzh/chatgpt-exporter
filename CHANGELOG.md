@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.32.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.31.0...userscript-v2.32.0) (2026-05-10)
+
+
+### Features
+
+* add optional export of thinking/reasoning process ([4df6676](https://github.com/pionxzh/chatgpt-exporter/commit/4df6676826591e7770d6d121c77f1214f19178eb))
+* restore project filter in export dialog and improve layout ([e03f32b](https://github.com/pionxzh/chatgpt-exporter/commit/e03f32b2a26c9c75df5b07014d1d818be3102f79))
+
+
+### Bug Fixes
+
+* improve the UI and missing bg ([8460531](https://github.com/pionxzh/chatgpt-exporter/commit/84605316a95da5f5d9d6b3a8027e591aa65c05a4))
+* preserve citations and content references when merging continuation nodes ([5cd8986](https://github.com/pionxzh/chatgpt-exporter/commit/5cd8986e42cb69c7b346d9c4dcf5864d1ac432f4))
+
 ## [2.31.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.30.0...userscript-v2.31.0) (2026-05-03)
 
 
