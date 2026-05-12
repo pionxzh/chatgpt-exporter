@@ -46,6 +46,13 @@
     flex-shrink: 0;
 }
 
+.DialogBody {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
 .dark .DialogTitle {
     color: #fff;
 }
