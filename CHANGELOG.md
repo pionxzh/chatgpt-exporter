@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.32.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.32.0...userscript-v2.32.1) (2026-05-12)
+
+
+### Bug Fixes
+
+* add scrolling to settings dialog ([a106e8b](https://github.com/pionxzh/chatgpt-exporter/commit/a106e8bac27d6545afb723331519747db454a107))
+
 ## [2.32.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.31.0...userscript-v2.32.0) (2026-05-10)
 
 
