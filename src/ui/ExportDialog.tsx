@@ -693,7 +693,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                     {exportSource === 'API' && (
                         <button
                             className="Button neutral"
-                            style={{ fontSize: '0.72rem', padding: '2px 8px' }}
+                            style={{ fontSize: '0.72rem', padding: '2px 8px', whiteSpace: 'nowrap' }}
                             disabled={probeStatus === 'testing' || processing}
                             title={Object.keys(probeHeaders).length > 0
                                 ? `Rate-limit headers: ${JSON.stringify(probeHeaders)}`
@@ -758,7 +758,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                 </div>
             )}
 
-            <div className="flex mt-3 items-center gap-2">
+            <div className="ActionBar flex flex-wrap mt-3 items-center gap-2">
                 <select
                     className="Select shrink-0"
                     disabled={processing}
@@ -798,6 +798,14 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                                 ? `${t('Batch progress').replace('{{current}}', String(progress.batchIndex + 1)).replace('{{total}}', String(progress.totalBatches))} \u00B7 ${progress.completed}/${progress.total}`
                                 : `${progress.completed}/${progress.total}`}
                         </span>
+                        <button
+                            className="Button red"
+                            style={{ fontSize: '0.75rem', padding: '3px 10px', height: 'auto' }}
+                            title="Stop the export — any batches already downloaded are kept"
+                            onClick={cancelExport}
+                        >
+                            Cancel
+                        </button>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
                         <div
@@ -809,36 +817,14 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
             )}
             {processing
                 ? (
-                    <>
-                        <button
-                            className="Button"
-                            style={{
-                                position: 'absolute',
-                                top: '12px',
-                                right: '40px',
-                                fontSize: '0.75rem',
-                                padding: '3px 10px',
-                                background: '#ef4444',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '4px',
-                                cursor: 'pointer',
-                                fontWeight: 600,
-                            }}
-                            title="Stop the export — any batches already downloaded are kept"
-                            onClick={cancelExport}
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            className="IconButton CloseButton"
-                            aria-label="Export in progress"
-                            title="Click Cancel to stop the export"
-                            style={{ cursor: 'not-allowed', opacity: 0.25 }}
-                        >
-                            <IconCross />
-                        </button>
-                    </>
+                    <button
+                        className="IconButton CloseButton"
+                        aria-label="Export in progress"
+                        title="Click Cancel to stop the export"
+                        style={{ cursor: 'not-allowed', opacity: 0.25 }}
+                    >
+                        <IconCross />
+                    </button>
                     )
                 : (
                     <Dialog.Close asChild>

@@ -11,7 +11,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
 }
 
 .Select {
-    padding: 0 0 0 0.5rem;
+    padding: 0 2.5rem 0 0.5rem;
     width: 7.5rem;
     border-radius: 4px;
     box-shadow: 0 0 0 1px #6f6e77;
@@ -25,7 +25,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
 
 html {
     --ce-text-primary: var(--text-primary, #0d0d0d);
-    --ce-menu-primary: var(--sidebar-surface-primary, #f9f9f9);
+    --ce-menu-primary: #ffffff;
     --ce-menu-secondary: var(--sidebar-surface-secondary, #ececec);
     --ce-border-light: var(--border-light, rgba(0, 0, 0, .1));
 }
@@ -37,8 +37,8 @@ html {
     --ce-border-light: var(--border-default, rgba(0, 0, 0, .05));
 }
 
-.bg-menu {
-    background-color: var(--ce-menu-secondary);
+.dark.bg-menu {
+    background-color: var(--ce-menu-primary);
 }
 
 .border-menu {

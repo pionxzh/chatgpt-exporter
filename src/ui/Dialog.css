@@ -312,6 +312,17 @@
 }
 
 
+@media (max-width: 480px) {
+    .DialogContent { max-height: 90vh; }
+    .SelectListHeaderCell:last-child { display: none; }
+    .SelectItemMeta:last-child { display: none; }
+    .SelectToolbar .Button.neutral,
+    .SelectToolbar input[type="number"] { display: none; }
+    .ActionBar { justify-content: flex-end; }
+    .ActionBar > .Select { width: 100%; }
+    .ActionBar > .flex-grow { display: none; }
+}
+
 @keyframes contentShow {
     from {
         opacity: 0;
