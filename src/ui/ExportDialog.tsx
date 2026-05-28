@@ -866,7 +866,7 @@ export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange
             <Dialog.Portal>
                 <Dialog.Overlay className="DialogOverlay" />
                 <Dialog.Content
-                    className="DialogContent"
+                    className="DialogContent _export"
                     onEscapeKeyDown={guardClose}
                     onInteractOutside={guardClose}
                 >

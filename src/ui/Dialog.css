@@ -32,6 +32,14 @@
     border-width: 1px;
 }
 
+.DialogContent._export {
+    background-color: #ffffff;
+}
+
+.dark .DialogContent._export {
+    background-color: #2a2a2a;
+}
+
 .DialogContent input[type="checkbox"] {
     border: none;
     outline: none;

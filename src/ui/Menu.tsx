@@ -95,12 +95,12 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                         className={`
                         grid grid-cols-2
                         bg-menu
-                        border border-menu
-                        transition-opacity duration-200 shadow-md
+                        ce-card
+                        transition-opacity duration-200
                         gap-1 py-2 px-1
                         ${isMobile
-                            ? 'rounded animate-slideUp'
-                            : 'rounded-md animate-fadeIn'}`}
+                            ? 'animate-slideUp'
+                            : 'animate-fadeIn'}`}
                         style={{
                             width: isMobile ? 316 : 268,
                             left: -6,

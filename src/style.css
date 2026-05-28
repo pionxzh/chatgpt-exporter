@@ -11,8 +11,9 @@ body[data-time-format="24"] span[data-time-format="24"] {
 }
 
 .Select {
-    padding: 0 2.5rem 0 0.5rem;
-    width: 7.5rem;
+    padding: 0 2rem 0 0.5rem;
+    width: auto;
+    min-width: 7.5rem;
     border-radius: 4px;
     box-shadow: 0 0 0 1px #6f6e77;
 }
@@ -27,17 +28,17 @@ html {
     --ce-text-primary: var(--text-primary, #0d0d0d);
     --ce-menu-primary: #ffffff;
     --ce-menu-secondary: var(--sidebar-surface-secondary, #ececec);
-    --ce-border-light: var(--border-light, rgba(0, 0, 0, .1));
+    --ce-border-light: #0d0d0d26;
 }
 
 .dark {
     --ce-text-primary: var(--text-primary, #ececec);
-    --ce-menu-primary: var(--sidebar-surface-primary, #171717);
+    --ce-menu-primary: #2A2A2A;
     --ce-menu-secondary: var(--sidebar-surface-secondary, #212121);
-    --ce-border-light: var(--border-default, rgba(0, 0, 0, .05));
+    --ce-border-light: var(--border-default, rgba(255, 255, 255, .15));
 }
 
-.dark.bg-menu {
+.dark .bg-menu {
     background-color: var(--ce-menu-primary);
 }
 
@@ -51,6 +52,15 @@ html {
 
 .menu-item[disabled] {
     filter: brightness(0.5);
+}
+
+.ce-card {
+    border-radius: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.dark .ce-card {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .inputFieldSet {
