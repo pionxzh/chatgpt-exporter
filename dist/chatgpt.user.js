@@ -3,13 +3,13 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.32.1
+// @version            2.32.2
 // @author             pionxzh
-// @description        Easily export the whole ChatGPT conversation history for further analysis or sharing.
-// @description:zh-CN  轻松导出 ChatGPT 聊天记录，以便进一步分析或分享。
-// @description:zh-TW  輕鬆匯出 ChatGPT 聊天紀錄，以便進一步分析或分享。
+// @description        Export ChatGPT conversations with one click — backup & share effortlessly!
+// @description:zh-CN  一键导出 ChatGPT 对话，轻松备份与分享
+// @description:zh-TW  一鍵導出 ChatGPT 對話，輕鬆備份與分享
 // @license            MIT
-// @icon               https://chat.openai.com/favicon.ico
+// @icon               https://chatgpt.com/favicon.ico
 // @match              https://chat.openai.com/
 // @match              https://chat.openai.com/?*
 // @match              https://chat.openai.com/c/*
@@ -26,14 +26,6 @@
 // @match              https://chatgpt.com/gpts/*
 // @match              https://chatgpt.com/share/*
 // @match              https://chatgpt.com/share/*/continue
-// @match              https://new.oaifree.com/
-// @match              https://new.oaifree.com/?model=*
-// @match              https://new.oaifree.com/c/*
-// @match              https://new.oaifree.com/g/*
-// @match              https://new.oaifree.com/gpts
-// @match              https://new.oaifree.com/gpts/*
-// @match              https://new.oaifree.com/share/*
-// @match              https://new.oaifree.com/share/*/continue
 // @require            https://cdn.jsdelivr.net/npm/jszip@3.9.1/dist/jszip.min.js
 // @require            https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js
 // @grant              GM_deleteValue
@@ -107,8 +99,9 @@ body[data-time-format="24"] span[data-time-format="24"] {
 }
 
 .Select {
-    padding: 0 0 0 0.5rem;
-    width: 7.5rem;
+    padding: 0 2rem 0 0.5rem;
+    width: auto;
+    min-width: 7.5rem;
     border-radius: 4px;
     box-shadow: 0 0 0 1px #6f6e77;
 }
@@ -121,20 +114,20 @@ body[data-time-format="24"] span[data-time-format="24"] {
 
 html {
     --ce-text-primary: var(--text-primary, #0d0d0d);
-    --ce-menu-primary: var(--sidebar-surface-primary, #f9f9f9);
+    --ce-menu-primary: #ffffff;
     --ce-menu-secondary: var(--sidebar-surface-secondary, #ececec);
-    --ce-border-light: var(--border-light, rgba(0, 0, 0, .1));
+    --ce-border-light: #0d0d0d26;
 }
 
 .dark {
     --ce-text-primary: var(--text-primary, #ececec);
-    --ce-menu-primary: var(--sidebar-surface-primary, #171717);
+    --ce-menu-primary: #2A2A2A;
     --ce-menu-secondary: var(--sidebar-surface-secondary, #212121);
-    --ce-border-light: var(--border-default, rgba(0, 0, 0, .05));
+    --ce-border-light: var(--border-default, rgba(255, 255, 255, .15));
 }
 
-.bg-menu {
-    background-color: var(--ce-menu-secondary);
+.dark .bg-menu {
+    background-color: var(--ce-menu-primary);
 }
 
 .border-menu {
@@ -147,6 +140,15 @@ html {
 
 .menu-item[disabled] {
     filter: brightness(0.5);
+}
+
+.ce-card {
+    border-radius: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.dark .ce-card {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .inputFieldSet {
@@ -268,6 +270,14 @@ html {
     background-color: #2a2a2a;
     border-color: #40414f;
     border-width: 1px;
+}
+
+.DialogContent._export {
+    background-color: #ffffff;
+}
+
+.dark .DialogContent._export {
+    background-color: #2a2a2a;
 }
 
 .DialogContent input[type="checkbox"] {
@@ -549,6 +559,17 @@ html {
     .SelectListHeaderCellActive { color: #60a5fa; }
 }
 
+
+@media (max-width: 480px) {
+    .DialogContent { max-height: 90vh; }
+    .SelectListHeaderCell:last-child { display: none; }
+    .SelectItemMeta:last-child { display: none; }
+    .SelectToolbar .Button.neutral,
+    .SelectToolbar input[type="number"] { display: none; }
+    .ActionBar { justify-content: flex-end; }
+    .ActionBar > .Select { width: 100%; }
+    .ActionBar > .flex-grow { display: none; }
+}
 
 @keyframes contentShow {
     from {
@@ -1194,8 +1215,7 @@ html {
   }
   const API_MAPPING = {
     "https://chat.openai.com": "https://chat.openai.com/backend-api",
-    "https://chatgpt.com": "https://chatgpt.com/backend-api",
-    "https://new.oaifree.com": "https://new.oaifree.com/backend-api"
+    "https://chatgpt.com": "https://chatgpt.com/backend-api"
   };
   const baseUrl = new URL(location.href).origin;
   const apiUrl = API_MAPPING[baseUrl];
@@ -23137,7 +23157,7 @@ ${content2}`;
             "button",
             {
               className: "Button neutral",
-              style: { fontSize: "0.72rem", padding: "2px 8px" },
+              style: { fontSize: "0.72rem", padding: "2px 8px", whiteSpace: "nowrap" },
               disabled: probeStatus === "testing" || processing,
               title: Object.keys(probeHeaders).length > 0 ? `Rate-limit headers: ${JSON.stringify(probeHeaders)}` : "Check if the API is currently rate-limiting requests",
               onClick: runProbe,
@@ -23198,7 +23218,7 @@ ${content2}`;
           totalAvailable
         ] })
       ] }),
-      /* @__PURE__ */ o$8("div", { className: "flex mt-3 items-center gap-2", children: [
+      /* @__PURE__ */ o$8("div", { className: "ActionBar flex flex-wrap mt-3 items-center gap-2", children: [
         /* @__PURE__ */ o$8(
           "select",
           {
@@ -23218,7 +23238,17 @@ ${content2}`;
       processing && /* @__PURE__ */ o$8(k$3, { children: [
         /* @__PURE__ */ o$8("div", { className: "mt-2 mb-1 justify-between flex items-center gap-2", children: [
           /* @__PURE__ */ o$8("span", { className: "truncate text-sm text-gray-600 dark:text-gray-300", children: progress.currentStatus === "rate_limited" ? `⏳ Rate limited — waiting ${progress.rateLimitWaitSecs ?? "…"}s` : progress.currentName }),
-          /* @__PURE__ */ o$8("span", { className: "shrink-0 tabular-nums text-sm text-gray-500 dark:text-gray-400", children: progress.totalBatches > 1 ? `${t2("Batch progress").replace("{{current}}", String(progress.batchIndex + 1)).replace("{{total}}", String(progress.totalBatches))} · ${progress.completed}/${progress.total}` : `${progress.completed}/${progress.total}` })
+          /* @__PURE__ */ o$8("span", { className: "shrink-0 tabular-nums text-sm text-gray-500 dark:text-gray-400", children: progress.totalBatches > 1 ? `${t2("Batch progress").replace("{{current}}", String(progress.batchIndex + 1)).replace("{{total}}", String(progress.totalBatches))} · ${progress.completed}/${progress.total}` : `${progress.completed}/${progress.total}` }),
+          /* @__PURE__ */ o$8(
+            "button",
+            {
+              className: "Button red",
+              style: { fontSize: "0.75rem", padding: "3px 10px", height: "auto" },
+              title: "Stop the export — any batches already downloaded are kept",
+              onClick: cancelExport,
+              children: "Cancel"
+            }
+          )
         ] }),
         /* @__PURE__ */ o$8("div", { className: "w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700", children: /* @__PURE__ */ o$8(
           "div",
@@ -23228,40 +23258,16 @@ ${content2}`;
           }
         ) })
       ] }),
-      processing ? /* @__PURE__ */ o$8(k$3, { children: [
-        /* @__PURE__ */ o$8(
-          "button",
-          {
-            className: "Button",
-            style: {
-              position: "absolute",
-              top: "12px",
-              right: "40px",
-              fontSize: "0.75rem",
-              padding: "3px 10px",
-              background: "#ef4444",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-              fontWeight: 600
-            },
-            title: "Stop the export — any batches already downloaded are kept",
-            onClick: cancelExport,
-            children: "Cancel"
-          }
-        ),
-        /* @__PURE__ */ o$8(
-          "button",
-          {
-            className: "IconButton CloseButton",
-            "aria-label": "Export in progress",
-            title: "Click Cancel to stop the export",
-            style: { cursor: "not-allowed", opacity: 0.25 },
-            children: /* @__PURE__ */ o$8(IconCross, {})
-          }
-        )
-      ] }) : /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$f39c2d165cd861fe, { asChild: true, children: /* @__PURE__ */ o$8("button", { className: "IconButton CloseButton", "aria-label": "Close", children: /* @__PURE__ */ o$8(IconCross, {}) }) })
+      processing ? /* @__PURE__ */ o$8(
+        "button",
+        {
+          className: "IconButton CloseButton",
+          "aria-label": "Export in progress",
+          title: "Click Cancel to stop the export",
+          style: { cursor: "not-allowed", opacity: 0.25 },
+          children: /* @__PURE__ */ o$8(IconCross, {})
+        }
+      ) : /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$f39c2d165cd861fe, { asChild: true, children: /* @__PURE__ */ o$8("button", { className: "IconButton CloseButton", "aria-label": "Close", children: /* @__PURE__ */ o$8(IconCross, {}) }) })
     ] });
   };
   const ExportDialog = ({ format, open, onOpenChange, children }) => {
@@ -23283,7 +23289,7 @@ ${content2}`;
             /* @__PURE__ */ o$8(
               $5d3850c4d0b4e6c7$export$7c6e2c02157bb7d2,
               {
-                className: "DialogContent",
+                className: "DialogContent _export",
                 onEscapeKeyDown: guardClose,
                 onInteractOutside: guardClose,
                 children: open && /* @__PURE__ */ o$8(DialogContent, { format })
@@ -24042,10 +24048,10 @@ ${content2}`;
                     className: `
                         grid grid-cols-2
                         bg-menu
-                        border border-menu
-                        transition-opacity duration-200 shadow-md
+                        ce-card
+                        transition-opacity duration-200
                         gap-1 py-2 px-1
-                        ${isMobile ? "rounded animate-slideUp" : "rounded-md animate-fadeIn"}`,
+                        ${isMobile ? "animate-slideUp" : "animate-fadeIn"}`,
                     style: {
                       width: isMobile ? 316 : 268,
                       left: -6,
