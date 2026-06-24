@@ -16,6 +16,9 @@ export const KEY_META_ENABLED = 'exporter:enable_meta'
 export const KEY_META_LIST = 'exporter:meta_list'
 export const KEY_THINKING_ENABLED = 'exporter:enable_thinking'
 export const KEY_EXPORT_ALL_LIMIT = 'exporter:export_all_limit'
+export const KEY_LAST_EXPORT_TIME = 'exporter:last_export_time'
+export const KEY_LAST_EXPORT_AUTO_SELECT = 'exporter:last_export_auto_select'
+export const KEY_LAST_EXPORT_TIME_FIELD = 'exporter:last_export_time_field'
 
 export const KEY_OAI_LOCALE = 'oai/apps/locale'
 

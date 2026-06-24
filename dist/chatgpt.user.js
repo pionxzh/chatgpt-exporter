@@ -1229,6 +1229,9 @@ html {
   const KEY_META_LIST = "exporter:meta_list";
   const KEY_THINKING_ENABLED = "exporter:enable_thinking";
   const KEY_EXPORT_ALL_LIMIT = "exporter:export_all_limit";
+  const KEY_LAST_EXPORT_TIME = "exporter:last_export_time";
+  const KEY_LAST_EXPORT_AUTO_SELECT = "exporter:last_export_auto_select";
+  const KEY_LAST_EXPORT_TIME_FIELD = "exporter:last_export_time_field";
   const KEY_OAI_LOCALE = "oai/apps/locale";
   const EXPORT_OPERATION_BATCH = 100;
   var _GM_deleteValue = /* @__PURE__ */ (() => typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0)();
@@ -8454,6 +8457,9 @@ html {
     Save: Save$8,
     Delete: Delete$8,
     "Select All": "Select All",
+    "Select New": "Select New",
+    "Last exported": "Last exported",
+    "Clear last export": "Clear last export",
     Export: Export$8,
     "Error": "Error",
     Loading: Loading$8,
@@ -8486,6 +8492,10 @@ html {
     "(no project)": "(no project)",
     "Export All Limit": "Export All Limit",
     "Export All Limit Description": "Set the maximum number of conversations to load. Exports run in waves of 100 conversations to stay within API rate limits.",
+    "Auto Select New Conversations": "Auto Select New Conversations",
+    "Auto Select New Conversations Description": "After exporting, automatically check new conversations later than the last export time when reopening the export dialog.",
+    "Last Export Time Field": "Last Export Time Field",
+    "Last Export Time Field Description": "Choose whether 'Select New' compares against conversation creation or update time.",
     "Select a source to load conversations": "Select a project above to load conversations.",
     Search: Search$8,
     "Last 100": "Last 100",
@@ -8539,6 +8549,9 @@ html {
     Save: Save$7,
     Delete: Delete$7,
     "Select All": "Seleccionar Todos",
+    "Select New": "Select New",
+    "Last exported": "Last exported",
+    "Clear last export": "Clear last export",
     Export: Export$7,
     "Error": "Error",
     Loading: Loading$7,
@@ -8571,6 +8584,10 @@ html {
     "(no project)": "(sin proyecto)",
     "Export All Limit": "Límite de Exportar Todos",
     "Export All Limit Description": "Establece el número máximo de conversaciones a cargar en el diálogo 'Exportar Todos'.",
+    "Auto Select New Conversations": "Auto Select New Conversations",
+    "Auto Select New Conversations Description": "After exporting, automatically check new conversations later than the last export time when reopening the export dialog.",
+    "Last Export Time Field": "Last Export Time Field",
+    "Last Export Time Field Description": "Choose whether 'Select New' compares against conversation creation or update time.",
     "Select a source to load conversations": "Selecciona un proyecto arriba para cargar conversaciones.",
     Search: Search$7,
     "Last 100": "Últimas 100",
@@ -8605,6 +8622,9 @@ html {
     Save: Save$6,
     Delete: Delete$6,
     "Select All": "Tout sélectionner",
+    "Select New": "Sélectionner nouveaux",
+    "Last exported": "Dernière exportation",
+    "Clear last export": "Effacer dernière exportation",
     Export: Export$6,
     "Error": "Erreur",
     Loading: Loading$6,
@@ -8637,6 +8657,10 @@ html {
     "(no project)": "(aucun projet)",
     "Export All Limit": "Limite d'Exportation Multiple",
     "Export All Limit Description": "Définit le nombre maximal de conversations à charger dans la boîte de dialogue 'Tout exporter'.",
+    "Auto Select New Conversations": "Sélectionner automatiquement les nouvelles conversations",
+    "Auto Select New Conversations Description": "Après l'exportation, coche automatiquement les nouvelles conversations ultérieures à l'heure de dernière exportation lors de la réouverture de la boîte de dialogue.",
+    "Last Export Time Field": "Champ de l'heure de dernière exportation",
+    "Last Export Time Field Description": "Choisissez si 'Sélectionner nouveaux' compare avec l'heure de création ou de mise à jour.",
     "Select a source to load conversations": "Sélectionnez un projet ci-dessus pour charger les conversations.",
     Search: Search$6,
     "Last 100": "100 dernières",
@@ -8671,6 +8695,9 @@ html {
     Save: Save$5,
     Delete: Delete$5,
     "Select All": "Pilih Semua",
+    "Select New": "Select New",
+    "Last exported": "Last exported",
+    "Clear last export": "Clear last export",
     Export: Export$5,
     "Error": "Kesalahan",
     Loading: Loading$5,
@@ -8703,6 +8730,10 @@ html {
     "(no project)": "(tidak ada proyek)",
     "Export All Limit": "Batas Ekspor Semua",
     "Export All Limit Description": "Atur jumlah maksimum percakapan yang akan dimuat dalam dialog 'Ekspor Semua'.",
+    "Auto Select New Conversations": "Auto Select New Conversations",
+    "Auto Select New Conversations Description": "After exporting, automatically check new conversations later than the last export time when reopening the export dialog.",
+    "Last Export Time Field": "Last Export Time Field",
+    "Last Export Time Field Description": "Choose whether 'Select New' compares against conversation creation or update time.",
     "Select a source to load conversations": "Pilih proyek di atas untuk memuat percakapan.",
     Search: Search$5,
     "Last 100": "100 Terakhir",
@@ -8737,6 +8768,9 @@ html {
     Save: Save$4,
     Delete: Delete$4,
     "Select All": "すべて選択",
+    "Select New": "Select New",
+    "Last exported": "Last exported",
+    "Clear last export": "Clear last export",
     Export: Export$4,
     "Error": "エラー",
     Loading: Loading$4,
@@ -8769,6 +8803,10 @@ html {
     "(no project)": "（プロジェクトなし）",
     "Export All Limit": "すべてエクスポートの上限",
     "Export All Limit Description": "「すべてエクスポート」ダイアログで読み込む会話の最大数を設定します。",
+    "Auto Select New Conversations": "Auto Select New Conversations",
+    "Auto Select New Conversations Description": "After exporting, automatically check new conversations later than the last export time when reopening the export dialog.",
+    "Last Export Time Field": "Last Export Time Field",
+    "Last Export Time Field Description": "Choose whether 'Select New' compares against conversation creation or update time.",
     "Select a source to load conversations": "上からプロジェクトを選択して会話を読み込んでください。",
     Search: Search$4,
     "Last 100": "最新100件",
@@ -8803,6 +8841,9 @@ html {
     Save: Save$3,
     Delete: Delete$3,
     "Select All": "Выбрать все",
+    "Select New": "Select New",
+    "Last exported": "Last exported",
+    "Clear last export": "Clear last export",
     Export: Export$3,
     "Error": "Ошибка",
     Loading: Loading$3,
@@ -8835,6 +8876,10 @@ html {
     "(no project)": "(нет проекта)",
     "Export All Limit": "Лимит экспорта всех",
     "Export All Limit Description": "Установите максимальное количество бесед для загрузки в диалоге 'Экспортировать все'.",
+    "Auto Select New Conversations": "Auto Select New Conversations",
+    "Auto Select New Conversations Description": "After exporting, automatically check new conversations later than the last export time when reopening the export dialog.",
+    "Last Export Time Field": "Last Export Time Field",
+    "Last Export Time Field Description": "Choose whether 'Select New' compares against conversation creation or update time.",
     "Select a source to load conversations": "Выберите проект выше, чтобы загрузить беседы.",
     Search: Search$3,
     "Last 100": "Последние 100",
@@ -8869,6 +8914,9 @@ html {
     Save: Save$2,
     Delete: Delete$2,
     "Select All": "Tümünü Seç",
+    "Select New": "Select New",
+    "Last exported": "Last exported",
+    "Clear last export": "Clear last export",
     Export: Export$2,
     "Error": "Hata",
     Loading: Loading$2,
@@ -8901,6 +8949,10 @@ html {
     "(no project)": "(proje yok)",
     "Export All Limit": "Tümünü Dışa Aktarma Limiti",
     "Export All Limit Description": "'Tümünü Dışa Aktar' iletişim kutusunda yüklenecek maksimum konuşma sayısını ayarlayın.",
+    "Auto Select New Conversations": "Auto Select New Conversations",
+    "Auto Select New Conversations Description": "After exporting, automatically check new conversations later than the last export time when reopening the export dialog.",
+    "Last Export Time Field": "Last Export Time Field",
+    "Last Export Time Field Description": "Choose whether 'Select New' compares against conversation creation or update time.",
     "Select a source to load conversations": "Konuşmaları yüklemek için yukarıdan bir proje seçin.",
     Search: Search$2,
     "Last 100": "Son 100",
@@ -8935,6 +8987,9 @@ html {
     Save: Save$1,
     Delete: Delete$1,
     "Select All": "全选",
+    "Select New": "选择新增",
+    "Last exported": "上次导出时间",
+    "Clear last export": "清除上次导出时间",
     Export: Export$1,
     "Error": "错误",
     Loading: Loading$1,
@@ -8967,6 +9022,10 @@ html {
     "(no project)": "（无项目）",
     "Export All Limit": "批量导出上限",
     "Export All Limit Description": "设置“批量导出”对话框中加载的最大对话数量。",
+    "Auto Select New Conversations": "自动选择新增会话",
+    "Auto Select New Conversations Description": "导出完成后，下次打开批量导出对话框时自动勾选晚于上次导出时间的新会话。",
+    "Last Export Time Field": "上次导出时间字段",
+    "Last Export Time Field Description": "选择“选择新增”按对话创建时间还是更新时间对比。",
     "Select a source to load conversations": "请在上方选择一个项目以加载对话。",
     Search: Search$1,
     "Last 100": "最新 100 条",
@@ -9001,6 +9060,9 @@ html {
     Save,
     Delete,
     "Select All": "全選",
+    "Select New": "選取新增",
+    "Last exported": "上次匯出時間",
+    "Clear last export": "清除上次匯出時間",
     Export,
     "Error": "錯誤",
     Loading,
@@ -9033,6 +9095,10 @@ html {
     "(no project)": "（無專案）",
     "Export All Limit": "批量匯出上限",
     "Export All Limit Description": "設定「批量匯出」對話方塊中載入的最大對話數量。",
+    "Auto Select New Conversations": "自動選取新增會話",
+    "Auto Select New Conversations Description": "匯出完成後，下次開啟批量匯出對話方塊時自動勾選晚於上次匯出時間的新會話。",
+    "Last Export Time Field": "上次匯出時間欄位",
+    "Last Export Time Field Description": "選擇「選取新增」按對話建立時間還是更新時間對比。",
     "Select a source to load conversations": "請在上方選擇一個專案以載入對話。",
     Search,
     "Last 100": "最新 100 條",
@@ -22477,6 +22543,8 @@ ${content2}`;
   }
   const defaultFormat = "ChatGPT-{title}";
   const defaultExportAllLimit = 1e3;
+  const defaultLastExportAutoSelect = false;
+  const defaultLastExportTimeField = "create_time";
   const defaultExportMetaList = [
     { name: "title", value: "{title}" },
     { name: "source", value: "{source}" }
@@ -22509,6 +22577,12 @@ ${content2}`;
     exportAllLimit: defaultExportAllLimit,
     setExportAllLimit: (_24) => {
     },
+    lastExportAutoSelect: defaultLastExportAutoSelect,
+    setLastExportAutoSelect: (_24) => {
+    },
+    lastExportTimeField: defaultLastExportTimeField,
+    setLastExportTimeField: (_24) => {
+    },
     resetDefault: () => {
     }
   });
@@ -22522,6 +22596,8 @@ ${content2}`;
     const [exportMetaList, setExportMetaList] = useGMStorage(KEY_META_LIST, defaultExportMetaList);
     const [enableThinking, setEnableThinking] = useGMStorage(KEY_THINKING_ENABLED, false);
     const [exportAllLimit, setExportAllLimit] = useGMStorage(KEY_EXPORT_ALL_LIMIT, defaultExportAllLimit);
+    const [lastExportAutoSelect, setLastExportAutoSelect] = useGMStorage(KEY_LAST_EXPORT_AUTO_SELECT, defaultLastExportAutoSelect);
+    const [lastExportTimeField, setLastExportTimeField] = useGMStorage(KEY_LAST_EXPORT_TIME_FIELD, defaultLastExportTimeField);
     const resetDefault = T$4(() => {
       setFormat(defaultFormat);
       setEnableTimestamp(false);
@@ -22529,13 +22605,17 @@ ${content2}`;
       setExportMetaList(defaultExportMetaList);
       setEnableThinking(false);
       setExportAllLimit(defaultExportAllLimit);
+      setLastExportAutoSelect(defaultLastExportAutoSelect);
+      setLastExportTimeField(defaultLastExportTimeField);
     }, [
       setFormat,
       setEnableTimestamp,
       setEnableMeta,
       setExportMetaList,
       setEnableThinking,
-      setExportAllLimit
+      setExportAllLimit,
+      setLastExportAutoSelect,
+      setLastExportTimeField
     ]);
     return /* @__PURE__ */ o$8(
       SettingContext.Provider,
@@ -22559,6 +22639,10 @@ ${content2}`;
           setEnableThinking,
           exportAllLimit,
           setExportAllLimit,
+          lastExportAutoSelect,
+          setLastExportAutoSelect,
+          lastExportTimeField,
+          setLastExportTimeField,
           resetDefault
         },
         children
@@ -22588,6 +22672,15 @@ ${content2}`;
     if (diffDays === 0) return "Today";
     if (diffDays === 1) return "Yesterday";
     return d2.toLocaleDateString(void 0, { year: "numeric", month: "short", day: "numeric" });
+  }
+  function getLastExportTime() {
+    const stored = ScriptStorage.get(KEY_LAST_EXPORT_TIME);
+    if (typeof stored === "number" && stored > 0) return stored;
+    return 0;
+  }
+  function getMaxConversationTime(conversations, field) {
+    if (conversations.length === 0) return 0;
+    return Math.max(...conversations.map((c2) => toMs(c2[field])));
   }
   function textSearch(title2, query2) {
     const q2 = query2.trim();
@@ -22634,7 +22727,10 @@ ${content2}`;
     setSelected,
     disabled,
     loading,
-    error: error2
+    error: error2,
+    lastExportTime,
+    lastExportAutoSelect,
+    lastExportTimeField
   }) => {
     const { t: t2 } = useTranslation();
     const [query2, setQuery] = h$4("");
@@ -22657,6 +22753,10 @@ ${content2}`;
       });
     }, [conversations, query2, sortField, sortDir]);
     const allFilteredSelected = filtered.length > 0 && filtered.every((c2) => selected.some((x2) => x2.id === c2.id));
+    const newConversations = F$1(() => {
+      if (!lastExportAutoSelect || !lastExportTime || !lastExportTimeField) return [];
+      return filtered.filter((c2) => toMs(c2[lastExportTimeField]) > lastExportTime);
+    }, [filtered, lastExportAutoSelect, lastExportTime, lastExportTimeField]);
     return /* @__PURE__ */ o$8(k$3, { children: [
       /* @__PURE__ */ o$8(
         "input",
@@ -22701,6 +22801,19 @@ ${content2}`;
               disabled: disabled || conversations.length === 0,
               onClick: () => setSelected(filtered.slice(0, EXPORT_OPERATION_BATCH)),
               children: t2("Last 100")
+            }
+          ),
+          lastExportAutoSelect && /* @__PURE__ */ o$8(
+            "button",
+            {
+              className: "Button neutral",
+              disabled: disabled || newConversations.length === 0,
+              title: lastExportTime ? new Date(lastExportTime).toLocaleString() : void 0,
+              onClick: () => {
+                lastClickedIndex.current = -1;
+                setSelected(newConversations);
+              },
+              children: t2("Select New")
             }
           ),
           /* @__PURE__ */ o$8(
@@ -22869,7 +22982,7 @@ ${content2}`;
   };
   const DialogContent = ({ format }) => {
     const { t: t2 } = useTranslation();
-    const { enableMeta, exportMetaList, exportAllLimit } = useSettingContext();
+    const { enableMeta, exportMetaList, exportAllLimit, lastExportAutoSelect, lastExportTimeField } = useSettingContext();
     const metaList = F$1(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList]);
     const exportAllOptions = F$1(() => [
       { label: "Markdown", callback: exportAllToMarkdown },
@@ -22890,6 +23003,7 @@ ${content2}`;
     const [error2, setError] = h$4("");
     const [processing, setProcessing] = h$4(false);
     const [selected, setSelected] = h$4([]);
+    const [lastExportTime, setLastExportTime] = h$4(() => getLastExportTime());
     const [exportType, setExportType] = h$4(exportAllOptions[0].label);
     const disabled = processing || !!error2 || selected.length === 0;
     const [hasMore, setHasMore] = h$4(false);
@@ -22912,6 +23026,8 @@ ${content2}`;
     const totalBatchesRef = _(0);
     const cancelledRef = _(false);
     const fetchGenRef = _(0);
+    const selectedRef = _([]);
+    const autoSelectedRef = _(false);
     const onUpload = T$4((e2) => {
       var _a, _b;
       const file = (_b = (_a = e2.target) == null ? void 0 : _a.files) == null ? void 0 : _b[0];
@@ -22929,6 +23045,10 @@ ${content2}`;
       };
       fileReader.readAsText(file);
     }, [t2]);
+    const clearLastExport = T$4(() => {
+      ScriptStorage.delete(KEY_LAST_EXPORT_TIME);
+      setLastExportTime(0);
+    }, []);
     const startApiBatch = T$4((chunk) => {
       requestQueue.clear();
       chunk.forEach(({ id, title: title2 }) => {
@@ -22986,11 +23106,16 @@ ${content2}`;
           const nextChunk = pendingBatchesRef.current[batchIndexRef.current];
           if (nextChunk) startApiBatch(nextChunk);
         } else {
+          const maxTime = getMaxConversationTime(selected, lastExportTimeField);
+          if (maxTime > 0) {
+            ScriptStorage.set(KEY_LAST_EXPORT_TIME, maxTime);
+            setLastExportTime(maxTime);
+          }
           setProcessing(false);
         }
       });
       return () => off();
-    }, [requestQueue, exportAllOptions, exportType, format, metaList, startApiBatch, selectedProject]);
+    }, [requestQueue, exportAllOptions, exportType, format, metaList, startApiBatch, selectedProject, selected, lastExportTimeField]);
     p$6(() => {
       const off = archiveQueue.on("done", () => {
         setProcessing(false);
@@ -23046,8 +23171,13 @@ ${content2}`;
         await callback(format, chunks[i2], metaList, selectedProject == null ? void 0 : selectedProject.display.name, i2 + 1, chunks.length);
         if (i2 < chunks.length - 1) await sleep(400);
       }
+      const maxTime = getMaxConversationTime(results, lastExportTimeField);
+      if (maxTime > 0) {
+        ScriptStorage.set(KEY_LAST_EXPORT_TIME, maxTime);
+        setLastExportTime(maxTime);
+      }
       setProcessing(false);
-    }, [disabled, selected, localConversations, exportAllOptions, exportType, format, metaList, selectedProject]);
+    }, [disabled, selected, localConversations, exportAllOptions, exportType, format, metaList, selectedProject, lastExportTimeField]);
     const exportAll = F$1(() => {
       return exportSource === "API" ? exportAllFromApi : exportAllFromLocal;
     }, [exportSource, exportAllFromApi, exportAllFromLocal]);
@@ -23083,13 +23213,18 @@ ${content2}`;
       exportingRef.current = processing;
     }, [processing]);
     p$6(() => {
+      selectedRef.current = selected;
+    }, [selected]);
+    p$6(() => {
       setProjectsLoading(true);
       fetchProjects().then(setProjects).catch((err) => console.error("Error fetching projects:", err)).finally(() => setProjectsLoading(false));
     }, []);
     p$6(() => {
       const gen = ++fetchGenRef.current;
       const alive = () => gen === fetchGenRef.current;
+      const loaded = [];
       setSelected([]);
+      autoSelectedRef.current = false;
       setApiConversations([]);
       setHasMore(false);
       setTotalAvailable(null);
@@ -23098,7 +23233,9 @@ ${content2}`;
         selectedProjectId,
         exportAllLimit,
         (batch) => {
-          if (alive()) setApiConversations((prev) => [...prev, ...batch]);
+          if (!alive()) return;
+          loaded.push(...batch);
+          setApiConversations((prev) => [...prev, ...batch]);
         },
         (hasMore2) => {
           if (alive()) setHasMore(hasMore2);
@@ -23108,9 +23245,18 @@ ${content2}`;
         console.error("Error fetching conversations:", err);
         setError(err.message || "Failed to load conversations");
       }).finally(() => {
-        if (alive()) setLoading(false);
+        if (!alive()) return;
+        setLoading(false);
+        const storedTime = getLastExportTime();
+        if (lastExportAutoSelect && storedTime && !autoSelectedRef.current && selectedRef.current.length === 0) {
+          const newConversations = loaded.filter((c2) => toMs(c2[lastExportTimeField]) > storedTime);
+          if (newConversations.length > 0) {
+            setSelected(newConversations);
+            autoSelectedRef.current = true;
+          }
+        }
       });
-    }, [exportAllLimit, selectedProjectId]);
+    }, [exportAllLimit, selectedProjectId, lastExportAutoSelect, lastExportTimeField]);
     const loadMore = T$4(async () => {
       if (loadingMore) return;
       setLoadingMore(true);
@@ -23190,6 +23336,21 @@ ${content2}`;
           loading: projectsLoading
         }
       ),
+      exportSource === "API" && lastExportAutoSelect && lastExportTime > 0 && /* @__PURE__ */ o$8("div", { className: "flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2", children: [
+        /* @__PURE__ */ o$8("span", { children: [
+          t2("Last exported"),
+          ": ",
+          new Date(lastExportTime).toLocaleString()
+        ] }),
+        /* @__PURE__ */ o$8(
+          "button",
+          {
+            className: "hover:underline",
+            onClick: clearLastExport,
+            children: t2("Clear last export")
+          }
+        )
+      ] }),
       /* @__PURE__ */ o$8(
         ConversationSelect,
         {
@@ -23198,7 +23359,10 @@ ${content2}`;
           setSelected,
           disabled: processing,
           loading,
-          error: error2
+          error: error2,
+          lastExportTime,
+          lastExportAutoSelect,
+          lastExportTimeField
         }
       ),
       exportSource === "API" && !loading && !processing && hasMore && /* @__PURE__ */ o$8("div", { className: "flex items-center justify-center mt-2 mb-1 gap-2", children: [
@@ -23736,7 +23900,11 @@ ${content2}`;
       enableThinking,
       setEnableThinking,
       exportAllLimit,
-      setExportAllLimit
+      setExportAllLimit,
+      lastExportAutoSelect,
+      setLastExportAutoSelect,
+      lastExportTimeField,
+      setLastExportTimeField
       /* eslint-enable pionxzh/consistent-list-newline */
     } = useSettingContext();
     const { t: t2, i18n } = useTranslation();
@@ -23846,6 +24014,30 @@ ${content2}`;
                       ] })
                     ] })
                   ] }) }),
+                  /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: [
+                    /* @__PURE__ */ o$8("div", { children: [
+                      /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: t2("Auto Select New Conversations") }),
+                      /* @__PURE__ */ o$8("dd", { className: "text-sm text-gray-700 dark:text-gray-300 mt-2", children: [
+                        t2("Auto Select New Conversations Description"),
+                        lastExportAutoSelect && /* @__PURE__ */ o$8("div", { className: "mt-3", children: [
+                          /* @__PURE__ */ o$8("span", { className: "text-sm text-gray-700 dark:text-gray-300", children: t2("Last Export Time Field Description") }),
+                          /* @__PURE__ */ o$8(
+                            "select",
+                            {
+                              className: "Select mt-2",
+                              value: lastExportTimeField,
+                              onChange: (e2) => setLastExportTimeField(e2.currentTarget.value),
+                              children: [
+                                /* @__PURE__ */ o$8("option", { value: "create_time", children: t2("Date Filter Field Created") }),
+                                /* @__PURE__ */ o$8("option", { value: "update_time", children: t2("Date Filter Field Updated") })
+                              ]
+                            }
+                          )
+                        ] })
+                      ] })
+                    ] }),
+                    /* @__PURE__ */ o$8("div", { className: "absolute right-4", children: /* @__PURE__ */ o$8(Toggle, { label: "", checked: lastExportAutoSelect, onCheckedUpdate: setLastExportAutoSelect }) })
+                  ] }),
                   /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: [
                     /* @__PURE__ */ o$8("div", { children: [
                       /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: t2("Conversation Timestamp") }),

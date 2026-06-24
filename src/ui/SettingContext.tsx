@@ -3,6 +3,8 @@ import { useCallback } from 'preact/hooks'
 import {
     KEY_EXPORT_ALL_LIMIT,
     KEY_FILENAME_FORMAT,
+    KEY_LAST_EXPORT_AUTO_SELECT,
+    KEY_LAST_EXPORT_TIME_FIELD,
     KEY_META_ENABLED,
     KEY_META_LIST,
     KEY_THINKING_ENABLED,
@@ -16,6 +18,10 @@ import type { FC } from 'preact/compat'
 
 const defaultFormat = 'ChatGPT-{title}'
 const defaultExportAllLimit = 1000
+const defaultLastExportAutoSelect = false
+const defaultLastExportTimeField: LastExportTimeField = 'create_time'
+
+export type LastExportTimeField = 'create_time' | 'update_time'
 
 export interface ExportMeta {
     name: string
@@ -48,6 +54,13 @@ const SettingContext = createContext({
     setEnableThinking: (_: boolean) => {},
     exportAllLimit: defaultExportAllLimit,
     setExportAllLimit: (_: number) => {},
+
+    lastExportAutoSelect: defaultLastExportAutoSelect,
+    setLastExportAutoSelect: (_: boolean) => {},
+
+    lastExportTimeField: defaultLastExportTimeField as LastExportTimeField,
+    setLastExportTimeField: (_: LastExportTimeField) => {},
+
     resetDefault: () => {},
 })
 
@@ -64,6 +77,8 @@ export const SettingProvider: FC = ({ children }) => {
     const [exportMetaList, setExportMetaList] = useGMStorage(KEY_META_LIST, defaultExportMetaList)
     const [enableThinking, setEnableThinking] = useGMStorage(KEY_THINKING_ENABLED, false)
     const [exportAllLimit, setExportAllLimit] = useGMStorage(KEY_EXPORT_ALL_LIMIT, defaultExportAllLimit)
+    const [lastExportAutoSelect, setLastExportAutoSelect] = useGMStorage(KEY_LAST_EXPORT_AUTO_SELECT, defaultLastExportAutoSelect)
+    const [lastExportTimeField, setLastExportTimeField] = useGMStorage<LastExportTimeField>(KEY_LAST_EXPORT_TIME_FIELD, defaultLastExportTimeField)
 
     const resetDefault = useCallback(() => {
         setFormat(defaultFormat)
@@ -72,6 +87,8 @@ export const SettingProvider: FC = ({ children }) => {
         setExportMetaList(defaultExportMetaList)
         setEnableThinking(false)
         setExportAllLimit(defaultExportAllLimit)
+        setLastExportAutoSelect(defaultLastExportAutoSelect)
+        setLastExportTimeField(defaultLastExportTimeField)
     }, [
         setFormat,
         setEnableTimestamp,
@@ -79,6 +96,8 @@ export const SettingProvider: FC = ({ children }) => {
         setExportMetaList,
         setEnableThinking,
         setExportAllLimit,
+        setLastExportAutoSelect,
+        setLastExportTimeField,
     ])
 
     return (
@@ -106,6 +125,12 @@ export const SettingProvider: FC = ({ children }) => {
 
                 exportAllLimit,
                 setExportAllLimit,
+
+                lastExportAutoSelect,
+                setLastExportAutoSelect,
+
+                lastExportTimeField,
+                setLastExportTimeField,
 
                 resetDefault,
             }}
