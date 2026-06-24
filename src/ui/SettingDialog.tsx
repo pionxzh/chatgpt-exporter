@@ -10,6 +10,7 @@ import { timestamp as _timestamp, dateStr, unixTimestampToISOString } from '../u
 import { IconCross, IconTrash } from './Icons'
 import { useSettingContext } from './SettingContext'
 import { Toggle } from './Toggle'
+import type { LastExportTimeField } from './SettingContext'
 import type { FC } from '../type'
 
 function Variable({ name, title }: { name: string; title: string }) {
@@ -37,6 +38,8 @@ export const SettingDialog: FC<SettingDialogProps> = ({
         exportMetaList, setExportMetaList,
         enableThinking, setEnableThinking,
         exportAllLimit, setExportAllLimit,
+        lastExportAutoSelect, setLastExportAutoSelect,
+        lastExportTimeField, setLastExportTimeField,
         /* eslint-enable pionxzh/consistent-list-newline */
     } = useSettingContext()
     const { t, i18n } = useTranslation()
@@ -156,6 +159,34 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                                             </span>
                                         </div>
                                     </dd>
+                                </div>
+                            </div>
+                            <div className="relative flex bg-white dark:bg-white/5 rounded p-4">
+                                <div>
+                                    <dt className="text-md font-medium text-gray-800 dark:text-white">
+                                        {t('Auto Select New Conversations')}
+                                    </dt>
+                                    <dd className="text-sm text-gray-700 dark:text-gray-300 mt-2">
+                                        {t('Auto Select New Conversations Description')}
+                                        {lastExportAutoSelect && (
+                                            <div className="mt-3">
+                                                <span className="text-sm text-gray-700 dark:text-gray-300">
+                                                    {t('Last Export Time Field Description')}
+                                                </span>
+                                                <select
+                                                    className="Select mt-2"
+                                                    value={lastExportTimeField}
+                                                    onChange={e => setLastExportTimeField(e.currentTarget.value as LastExportTimeField)}
+                                                >
+                                                    <option value="create_time">{t('Date Filter Field Created')}</option>
+                                                    <option value="update_time">{t('Date Filter Field Updated')}</option>
+                                                </select>
+                                            </div>
+                                        )}
+                                    </dd>
+                                </div>
+                                <div className="absolute right-4">
+                                    <Toggle label="" checked={lastExportAutoSelect} onCheckedUpdate={setLastExportAutoSelect} />
                                 </div>
                             </div>
                             <div className="relative flex bg-white dark:bg-white/5 rounded p-4">

@@ -2,15 +2,17 @@ import * as Dialog from '@radix-ui/react-dialog'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import { useTranslation } from 'react-i18next'
 import { archiveConversation, deleteConversation, fetchAllConversations, fetchConversation, fetchConversationsPage, fetchProjects, probeApi } from '../api'
-import { EXPORT_OPERATION_BATCH } from '../constants'
+import { EXPORT_OPERATION_BATCH, KEY_LAST_EXPORT_TIME } from '../constants'
 import { exportAllToHtml } from '../exporter/html'
 import { exportAllToJson, exportAllToOfficialJson } from '../exporter/json'
 import { exportAllToMarkdown } from '../exporter/markdown'
 import { RequestQueue } from '../utils/queue'
+import { ScriptStorage } from '../utils/storage'
 import { sleep } from '../utils/utils'
 import { CheckBox } from './CheckBox'
 import { IconCross, IconLoading, IconUpload } from './Icons'
 import { useSettingContext } from './SettingContext'
+import type { LastExportTimeField } from './SettingContext'
 import type { ApiConversationItem, ApiConversationWithId, ApiProjectInfo } from '../api'
 import type { FC } from '../type'
 import type { ChangeEvent } from 'preact/compat'
@@ -54,6 +56,24 @@ function formatConvDate(time: number | string | undefined): string {
     if (diffDays === 1) return 'Yesterday'
     // Always show the year so "Jun 17" vs "Jun 17, 2025" confusion is impossible
     return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+}
+
+/** Read the persisted last-export timestamp in milliseconds, or 0 if none. */
+function getLastExportTime(): number {
+    const stored = ScriptStorage.get<number>(KEY_LAST_EXPORT_TIME)
+    if (typeof stored === 'number' && stored > 0) return stored
+    return 0
+}
+
+interface TimeStamped {
+    create_time?: number | string
+    update_time?: number | string
+}
+
+/** Compute the maximum value of the chosen time field across conversations, in milliseconds. */
+function getMaxConversationTime(conversations: TimeStamped[], field: LastExportTimeField): number {
+    if (conversations.length === 0) return 0
+    return Math.max(...conversations.map(c => toMs(c[field])))
 }
 
 /** Text search supporting * and ? wildcards. Falls back to substring. */
@@ -126,6 +146,9 @@ interface ConversationSelectProps {
     disabled: boolean
     loading: boolean
     error: string
+    lastExportTime?: number
+    lastExportAutoSelect?: boolean
+    lastExportTimeField?: LastExportTimeField
 }
 
 const ConversationSelect: FC<ConversationSelectProps> = ({
@@ -135,6 +158,9 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
     disabled,
     loading,
     error,
+    lastExportTime,
+    lastExportAutoSelect,
+    lastExportTimeField,
 }) => {
     const { t } = useTranslation()
     const [query, setQuery] = useState('')
@@ -161,6 +187,11 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
     }, [conversations, query, sortField, sortDir])
 
     const allFilteredSelected = filtered.length > 0 && filtered.every(c => selected.some(x => x.id === c.id))
+
+    const newConversations = useMemo(() => {
+        if (!lastExportAutoSelect || !lastExportTime || !lastExportTimeField) return []
+        return filtered.filter(c => toMs(c[lastExportTimeField]) > lastExportTime)
+    }, [filtered, lastExportAutoSelect, lastExportTime, lastExportTimeField])
 
     return (
         <>
@@ -203,6 +234,19 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
                     >
                         {t('Last 100')}
                     </button>
+                    {lastExportAutoSelect && (
+                        <button
+                            className="Button neutral"
+                            disabled={disabled || newConversations.length === 0}
+                            title={lastExportTime ? new Date(lastExportTime).toLocaleString() : undefined}
+                            onClick={() => {
+                                lastClickedIndex.current = -1
+                                setSelected(newConversations)
+                            }}
+                        >
+                            {t('Select New')}
+                        </button>
+                    )}
                     {/* Resume control: select the next 100 starting at a given offset */}
                     <input
                         type="number"
@@ -353,7 +397,7 @@ interface DialogContentProps {
 
 const DialogContent: FC<DialogContentProps> = ({ format }) => {
     const { t } = useTranslation()
-    const { enableMeta, exportMetaList, exportAllLimit } = useSettingContext()
+    const { enableMeta, exportMetaList, exportAllLimit, lastExportAutoSelect, lastExportTimeField } = useSettingContext()
     const metaList = useMemo(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList])
 
     const exportAllOptions = useMemo(() => [
@@ -379,6 +423,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
     const [processing, setProcessing] = useState(false)
 
     const [selected, setSelected] = useState<ApiConversationItem[]>([])
+    const [lastExportTime, setLastExportTime] = useState(() => getLastExportTime())
     const [exportType, setExportType] = useState(exportAllOptions[0].label)
     const disabled = processing || !!error || selected.length === 0
 
@@ -408,6 +453,10 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
     const cancelledRef = useRef(false)
     /** Incremented on each new fetch; callbacks check this to discard stale results after remount */
     const fetchGenRef = useRef(0)
+    /** Mirrors the current selected array so async fetch callbacks can read it without stale closures */
+    const selectedRef = useRef<ApiConversationItem[]>([])
+    /** Whether we already auto-selected new conversations after the current fetch */
+    const autoSelectedRef = useRef(false)
 
     const onUpload = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         const file = (e.target as HTMLInputElement)?.files?.[0]
@@ -425,6 +474,11 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
         }
         fileReader.readAsText(file)
     }, [t])
+
+    const clearLastExport = useCallback(() => {
+        ScriptStorage.delete(KEY_LAST_EXPORT_TIME)
+        setLastExportTime(0)
+    }, [])
 
     const startApiBatch = useCallback((chunk: ApiConversationItem[]) => {
         requestQueue.clear()
@@ -488,11 +542,16 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                 if (nextChunk) startApiBatch(nextChunk)
             }
             else {
+                const maxTime = getMaxConversationTime(selected, lastExportTimeField)
+                if (maxTime > 0) {
+                    ScriptStorage.set(KEY_LAST_EXPORT_TIME, maxTime)
+                    setLastExportTime(maxTime)
+                }
                 setProcessing(false)
             }
         })
         return () => off()
-    }, [requestQueue, exportAllOptions, exportType, format, metaList, startApiBatch, selectedProject])
+    }, [requestQueue, exportAllOptions, exportType, format, metaList, startApiBatch, selectedProject, selected, lastExportTimeField])
 
     useEffect(() => {
         const off = archiveQueue.on('done', () => {
@@ -552,8 +611,13 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
             await callback(format, chunks[i], metaList, selectedProject?.display.name, i + 1, chunks.length)
             if (i < chunks.length - 1) await sleep(400)
         }
+        const maxTime = getMaxConversationTime(results, lastExportTimeField)
+        if (maxTime > 0) {
+            ScriptStorage.set(KEY_LAST_EXPORT_TIME, maxTime)
+            setLastExportTime(maxTime)
+        }
         setProcessing(false)
-    }, [disabled, selected, localConversations, exportAllOptions, exportType, format, metaList, selectedProject])
+    }, [disabled, selected, localConversations, exportAllOptions, exportType, format, metaList, selectedProject, lastExportTimeField])
 
     const exportAll = useMemo(() => {
         return exportSource === 'API' ? exportAllFromApi : exportAllFromLocal
@@ -596,6 +660,11 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
         exportingRef.current = processing
     }, [processing])
 
+    // Keep selectedRef in sync so async callbacks see the latest selection
+    useEffect(() => {
+        selectedRef.current = selected
+    }, [selected])
+
     // Fetch projects on mount
     useEffect(() => {
         setProjectsLoading(true)
@@ -609,7 +678,9 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
     useEffect(() => {
         const gen = ++fetchGenRef.current
         const alive = () => gen === fetchGenRef.current
+        const loaded: ApiConversationItem[] = []
         setSelected([])
+        autoSelectedRef.current = false
         setApiConversations([])
         setHasMore(false)
         setTotalAvailable(null)
@@ -617,7 +688,11 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
         fetchAllConversations(
             selectedProjectId,
             exportAllLimit,
-            (batch) => { if (alive()) setApiConversations(prev => [...prev, ...batch]) },
+            (batch) => {
+                if (!alive()) return
+                loaded.push(...batch)
+                setApiConversations(prev => [...prev, ...batch])
+            },
             (hasMore) => { if (alive()) setHasMore(hasMore) },
         )
             .catch((err: Error) => {
@@ -625,8 +700,19 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                 console.error('Error fetching conversations:', err)
                 setError(err.message || 'Failed to load conversations')
             })
-            .finally(() => { if (alive()) setLoading(false) })
-    }, [exportAllLimit, selectedProjectId])
+            .finally(() => {
+                if (!alive()) return
+                setLoading(false)
+                const storedTime = getLastExportTime()
+                if (lastExportAutoSelect && storedTime && !autoSelectedRef.current && selectedRef.current.length === 0) {
+                    const newConversations = loaded.filter(c => toMs(c[lastExportTimeField]) > storedTime)
+                    if (newConversations.length > 0) {
+                        setSelected(newConversations)
+                        autoSelectedRef.current = true
+                    }
+                }
+            })
+    }, [exportAllLimit, selectedProjectId, lastExportAutoSelect, lastExportTimeField])
 
     const loadMore = useCallback(async () => {
         if (loadingMore) return
@@ -726,6 +812,19 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                     loading={projectsLoading}
                 />
             )}
+            {exportSource === 'API' && lastExportAutoSelect && lastExportTime > 0 && (
+                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
+                    <span>
+                        {t('Last exported')}: {new Date(lastExportTime).toLocaleString()}
+                    </span>
+                    <button
+                        className="hover:underline"
+                        onClick={clearLastExport}
+                    >
+                        {t('Clear last export')}
+                    </button>
+                </div>
+            )}
             <ConversationSelect
                 conversations={conversations}
                 selected={selected}
@@ -733,6 +832,9 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                 disabled={processing}
                 loading={loading}
                 error={error}
+                lastExportTime={lastExportTime}
+                lastExportAutoSelect={lastExportAutoSelect}
+                lastExportTimeField={lastExportTimeField}
             />
 
             {/* Load-more button */}
