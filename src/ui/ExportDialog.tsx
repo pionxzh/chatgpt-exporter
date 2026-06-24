@@ -2,11 +2,12 @@ import * as Dialog from '@radix-ui/react-dialog'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import { useTranslation } from 'react-i18next'
 import { archiveConversation, deleteConversation, fetchAllConversations, fetchConversation, fetchConversationsPage, fetchProjects, probeApi } from '../api'
-import { EXPORT_OPERATION_BATCH } from '../constants'
+import { EXPORT_OPERATION_BATCH, KEY_EXPORTED_UPDATE_TIMES } from '../constants'
 import { exportAllToHtml } from '../exporter/html'
 import { exportAllToJson, exportAllToOfficialJson } from '../exporter/json'
 import { exportAllToMarkdown } from '../exporter/markdown'
 import { RequestQueue } from '../utils/queue'
+import { ScriptStorage } from '../utils/storage'
 import { sleep } from '../utils/utils'
 import { CheckBox } from './CheckBox'
 import { IconCross, IconLoading, IconUpload } from './Icons'
@@ -54,6 +55,24 @@ function formatConvDate(time: number | string | undefined): string {
     if (diffDays === 1) return 'Yesterday'
     // Always show the year so "Jun 17" vs "Jun 17, 2025" confusion is impossible
     return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+}
+
+/** Read the persisted per-conversation last-exported update_time map (conversation id → ms). */
+function getExportedUpdateTimes(): Record<string, number> {
+    const stored = ScriptStorage.get<Record<string, number>>(KEY_EXPORTED_UPDATE_TIMES)
+    if (stored && typeof stored === 'object') return stored
+    return {}
+}
+
+/** Persist the last-exported update_time for conversations that were actually exported successfully. */
+function markExported(conversations: { id: string; update_time?: number | string }[]): void {
+    if (conversations.length === 0) return
+    const map = getExportedUpdateTimes()
+    for (const c of conversations) {
+        const ms = toMs(c.update_time)
+        if (ms > (map[c.id] ?? 0)) map[c.id] = ms
+    }
+    ScriptStorage.set(KEY_EXPORTED_UPDATE_TIMES, map)
 }
 
 /** Text search supporting * and ? wildcards. Falls back to substring. */
@@ -162,6 +181,20 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
 
     const allFilteredSelected = filtered.length > 0 && filtered.every(c => selected.some(x => x.id === c.id))
 
+    const selectByExportStatus = useCallback((status: 'all' | 'not_exported' | 'updated') => {
+        lastClickedIndex.current = -1
+        const exportedMap = getExportedUpdateTimes()
+        if (status === 'all') {
+            setSelected(filtered)
+        }
+        else if (status === 'not_exported') {
+            setSelected(filtered.filter(c => !(c.id in exportedMap)))
+        }
+        else {
+            setSelected(filtered.filter(c => c.id in exportedMap && exportedMap[c.id] < toMs(c.update_time)))
+        }
+    }, [filtered, setSelected])
+
     return (
         <>
             {/* ── Search input ── */}
@@ -203,6 +236,22 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
                     >
                         {t('Last 100')}
                     </button>
+                    <select
+                        className="Select"
+                        style={{ fontSize: '0.75rem', padding: '2px 5px' }}
+                        disabled={disabled || filtered.length === 0}
+                        value=""
+                        title="Select conversations by export status"
+                        onChange={(e) => {
+                            const val = e.currentTarget.value
+                            if (val) selectByExportStatus(val as 'all' | 'not_exported' | 'updated')
+                        }}
+                    >
+                        <option value="" disabled>{t('Select...')}</option>
+                        <option value="all">{t('Select All')}</option>
+                        <option value="not_exported">{t('Select Not Exported')}</option>
+                        <option value="updated">{t('Select Updated')}</option>
+                    </select>
                     {/* Resume control: select the next 100 starting at a given offset */}
                     <input
                         type="number"
@@ -480,6 +529,8 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
             const callback = exportAllOptions.find(o => o.label === exportType)?.callback
             if (callback && results.length > 0) {
                 await callback(format, results, metaList, selectedProject?.display.name, partIndex, totalBatches)
+                // Only conversations that were actually exported successfully get recorded
+                markExported(results)
             }
             if (partIndex < totalBatches) {
                 await sleep(400)
@@ -550,6 +601,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
         setProcessing(true)
         for (let i = 0; i < chunks.length; i++) {
             await callback(format, chunks[i], metaList, selectedProject?.display.name, i + 1, chunks.length)
+            markExported(chunks[i])
             if (i < chunks.length - 1) await sleep(400)
         }
         setProcessing(false)
