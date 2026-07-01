@@ -54,6 +54,37 @@ html {
     filter: brightness(0.5);
 }
 
+.ce-nav-trigger {
+    min-width: 0;
+    border: 0;
+    color: var(--ce-text-primary);
+}
+
+.ce-nav-trigger .ce-menu-item-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ce-nav-trigger-collapsed {
+    width: 32px;
+    height: 32px;
+    margin: 0 auto 0.5rem;
+    padding: 0;
+    justify-content: center;
+    gap: 0;
+    border-radius: 8px;
+    color: var(--text-secondary, var(--ce-text-primary));
+}
+
+.ce-nav-trigger-collapsed:hover {
+    background-color: var(--sidebar-surface-secondary, rgba(255, 255, 255, 0.1));
+}
+
+.ce-nav-trigger-collapsed .ce-menu-item-text {
+    display: none;
+}
+
 .ce-card {
     border-radius: 1rem;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
