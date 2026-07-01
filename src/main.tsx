@@ -29,7 +29,7 @@ function main() {
 
             const container = getMenuContainer()
             injectionMap.set(target, container)
-            target.before(container)
+            getNavMenuInsertionTarget(target).before(container)
         }
 
         const selector = '[data-testid="accounts-profile-button"]'
@@ -98,4 +98,11 @@ function getMenuContainer() {
     container.style.zIndex = '99'
     render(<Menu container={container} />, container)
     return container
+}
+
+function getNavMenuInsertionTarget(target: Element) {
+    const wrapper = target.parentElement
+    if (!wrapper || wrapper.children.length !== 1) return target
+
+    return wrapper
 }

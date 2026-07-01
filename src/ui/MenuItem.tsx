@@ -10,11 +10,12 @@ export interface MenuItemProps {
     successText?: string
     disabled?: boolean
     title?: string
+    ariaLabel?: string
     className?: string
     onClick?: (() => boolean) | (() => Promise<boolean>)
 }
 
-export const MenuItem: FC<MenuItemProps> = ({ text, successText, disabled = false, title, icon: Icon, onClick, className }) => {
+export const MenuItem: FC<MenuItemProps> = ({ text, successText, disabled = false, title, ariaLabel, icon: Icon, onClick, className }) => {
     const [loading, setLoading] = useState(false)
     const [succeed, setSucceed] = useState(false)
 
@@ -52,6 +53,7 @@ export const MenuItem: FC<MenuItemProps> = ({ text, successText, disabled = fals
             onClick={handleClick}
             onTouchStart={handleClick}
             disabled={disabled}
+            aria-label={ariaLabel}
             title={title}
         >
             {loading
@@ -63,7 +65,9 @@ export const MenuItem: FC<MenuItemProps> = ({ text, successText, disabled = fals
                 : (
                     <>
                         {Icon && <Icon />}
-                        {(succeed && successText) ? successText : text}
+                        <span className="ce-menu-item-text">
+                            {(succeed && successText) ? successText : text}
+                        </span>
                     </>
                     )}
         </div>
