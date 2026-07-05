@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.32.3](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.32.2...userscript-v2.32.3) (2026-07-05)
+
+
+### Bug Fixes
+
+* export answer source lists ([5b56f35](https://github.com/pionxzh/chatgpt-exporter/commit/5b56f354c7fa49d814928cbd0b4f1d48b9ec21e2)), closes [#361](https://github.com/pionxzh/chatgpt-exporter/issues/361)
+* improve collapsed sidebar exporter UX ([6b36cbb](https://github.com/pionxzh/chatgpt-exporter/commit/6b36cbb90ae8117647e74cea49356054ec835a6e))
+* retire access to __NEXT_DATA__ and __remixContext ([f5ef7fe](https://github.com/pionxzh/chatgpt-exporter/commit/f5ef7fe30152dc92ffd4c119a954f8e900dd9e97)), closes [#362](https://github.com/pionxzh/chatgpt-exporter/issues/362)
+
 ## [2.32.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.32.1...userscript-v2.32.2) (2026-05-28)
 
 
