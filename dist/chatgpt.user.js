@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.32.2
+// @version            2.32.3
 // @author             pionxzh
 // @description        Export ChatGPT conversations with one click — backup & share effortlessly!
 // @description:zh-CN  一键导出 ChatGPT 对话，轻松备份与分享
@@ -140,6 +140,37 @@ html {
 
 .menu-item[disabled] {
     filter: brightness(0.5);
+}
+
+.ce-nav-trigger {
+    min-width: 0;
+    border: 0;
+    color: var(--ce-text-primary);
+}
+
+.ce-nav-trigger .ce-menu-item-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ce-nav-trigger-collapsed {
+    width: 32px;
+    height: 32px;
+    margin: 0 auto 0.5rem;
+    padding: 0;
+    justify-content: center;
+    gap: 0;
+    border-radius: 8px;
+    color: var(--text-secondary, var(--ce-text-primary));
+}
+
+.ce-nav-trigger-collapsed:hover {
+    background-color: var(--sidebar-surface-secondary, rgba(255, 255, 255, 0.1));
+}
+
+.ce-nav-trigger-collapsed .ce-menu-item-text {
+    display: none;
 }
 
 .ce-card {
@@ -1228,6 +1259,7 @@ html {
   const KEY_META_ENABLED = "exporter:enable_meta";
   const KEY_META_LIST = "exporter:meta_list";
   const KEY_THINKING_ENABLED = "exporter:enable_thinking";
+  const KEY_SOURCES_ENABLED = "exporter:enable_sources";
   const KEY_EXPORT_ALL_LIMIT = "exporter:export_all_limit";
   const KEY_OAI_LOCALE = "oai/apps/locale";
   const EXPORT_OPERATION_BATCH = 100;
@@ -1244,19 +1276,6 @@ html {
     ctx.drawImage(el, 0, 0);
     return canvas.toDataURL("image/png");
   }
-  async function getBase64FromImageUrl(url) {
-    const img = await loadImage(url);
-    return getBase64FromImg(img);
-  }
-  function loadImage(url) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.src = url;
-      img.crossOrigin = "anonymous";
-      img.onload = () => resolve(img);
-      img.onerror = reject;
-    });
-  }
   function blobToDataURL(blob) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -1264,16 +1283,6 @@ html {
       reader.onload = () => resolve(reader.result);
       reader.readAsDataURL(blob);
     });
-  }
-  function getPageAccessToken() {
-    var _a, _b, _c, _d, _e, _f;
-    return ((_f = (_e = (_d = (_c = (_b = (_a = _unsafeWindow == null ? void 0 : _unsafeWindow.__remixContext) == null ? void 0 : _a.state) == null ? void 0 : _b.loaderData) == null ? void 0 : _c.root) == null ? void 0 : _d.clientBootstrap) == null ? void 0 : _e.session) == null ? void 0 : _f.accessToken) ?? null;
-  }
-  function getUserProfile() {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i;
-    const user = ((_c = (_b = (_a = _unsafeWindow == null ? void 0 : _unsafeWindow.__NEXT_DATA__) == null ? void 0 : _a.props) == null ? void 0 : _b.pageProps) == null ? void 0 : _c.user) ?? ((_i = (_h = (_g = (_f = (_e = (_d = _unsafeWindow == null ? void 0 : _unsafeWindow.__remixContext) == null ? void 0 : _d.state) == null ? void 0 : _e.loaderData) == null ? void 0 : _f.root) == null ? void 0 : _g.clientBootstrap) == null ? void 0 : _h.session) == null ? void 0 : _i.user);
-    if (!user) throw new Error("No user found.");
-    return user;
   }
   function getChatIdFromUrl() {
     const match = location.pathname.match(/^\/(?:share|c|g\/[a-z0-9-]+\/c)\/([a-z0-9-]+)/i);
@@ -1284,26 +1293,17 @@ html {
     return location.pathname.startsWith("/share") && !location.pathname.endsWith("/continue");
   }
   function getConversationFromSharePage() {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i;
-    if ((_d = (_c = (_b = (_a = window.__NEXT_DATA__) == null ? void 0 : _a.props) == null ? void 0 : _b.pageProps) == null ? void 0 : _c.serverResponse) == null ? void 0 : _d.data) {
-      return JSON.parse(JSON.stringify(window.__NEXT_DATA__.props.pageProps.serverResponse.data));
-    }
-    if ((_i = (_h = (_g = (_f = (_e = window.__remixContext) == null ? void 0 : _e.state) == null ? void 0 : _f.loaderData) == null ? void 0 : _g["routes/share.$shareId.($action)"]) == null ? void 0 : _h.serverResponse) == null ? void 0 : _i.data) {
-      return JSON.parse(JSON.stringify(window.__remixContext.state.loaderData["routes/share.$shareId.($action)"].serverResponse.data));
+    var _a, _b, _c, _d, _e;
+    if ((_e = (_d = (_c = (_b = (_a = _unsafeWindow.__reactRouterContext) == null ? void 0 : _a.state) == null ? void 0 : _b.loaderData) == null ? void 0 : _c["routes/share.$shareId.($action)"]) == null ? void 0 : _d.serverResponse) == null ? void 0 : _e.data) {
+      return JSON.parse(JSON.stringify(_unsafeWindow.__reactRouterContext.state.loaderData["routes/share.$shareId.($action)"].serverResponse.data));
     }
     return null;
   }
   const defaultAvatar = "data:image/svg+xml,%3Csvg%20stroke%3D%22currentColor%22%20fill%3D%22none%22%20stroke-width%3D%221.5%22%20viewBox%3D%22-6%20-6%2036%2036%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20style%3D%22color%3A%20white%3B%20background%3A%20%23ab68ff%3B%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M20%2021v-2a4%204%200%200%200-4-4H8a4%204%200%200%200-4%204v2%22%3E%3C%2Fpath%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%227%22%20r%3D%224%22%3E%3C%2Fcircle%3E%3C%2Fsvg%3E";
   async function getUserAvatar() {
     try {
-      const { picture } = getUserProfile();
-      if (picture) return await getBase64FromImageUrl(picture);
-    } catch (e2) {
-      console.error(e2);
-    }
-    try {
       const avatars = Array.from(document.querySelectorAll("img[alt]:not([aria-hidden])"));
-      const avatar = avatars.find((avatar2) => !avatar2.src.startsWith("data:"));
+      const avatar = avatars.find((avatar2) => avatar2.src.startsWith("https://cdn.auth0.com/avatars/"));
       if (avatar) return getBase64FromImg(avatar);
     } catch (e2) {
       console.error(e2);
@@ -1582,8 +1582,6 @@ html {
   }
   const fetchSession = memorize(_fetchSession);
   async function getAccessToken() {
-    const pageAccessToken = getPageAccessToken();
-    if (pageAccessToken) return pageAccessToken;
     const session = await fetchSession();
     return session.accessToken;
   }
@@ -8438,6 +8436,7 @@ html {
   const Export$8 = "Export";
   const Loading$8 = "Loading";
   const Preview$8 = "Preview";
+  const Sources$8 = "Sources";
   const Search$8 = "Search";
   const en_US = {
     title: title$8,
@@ -8476,6 +8475,9 @@ html {
     "Export Metadata Description": "Add metadata to exported Markdown and HTML files.",
     "Export Thinking Process": "Export Thinking Process",
     "Export Thinking Process Description": "Include the model's thinking/reasoning process in exported Markdown and HTML files.",
+    "Export Sources": "Export Sources",
+    "Export Sources Description": "Include the source list shown at the end of each answer in exported Markdown and HTML files.",
+    Sources: Sources$8,
     "OpenAI Official Format": "OpenAI Official Format",
     "Conversation Archive Alert": "Are you sure you want to archive all selected conversations?",
     "Conversation Archived Message": "All selected conversations have been archived. Please refresh the page to see the changes.",
@@ -8523,6 +8525,7 @@ html {
   const Export$7 = "Exportar";
   const Loading$7 = "Cargando";
   const Preview$7 = "Previsualizar";
+  const Sources$7 = "Fuentes";
   const Search$7 = "Buscar";
   const es = {
     title: title$7,
@@ -8561,6 +8564,9 @@ html {
     "Export Metadata Description": "Añadir Metadatos a los archivos Markdown y HTML exportados.",
     "Export Thinking Process": "Exportar Proceso de Pensamiento",
     "Export Thinking Process Description": "Incluir el proceso de pensamiento/razonamiento del modelo en los archivos Markdown y HTML exportados.",
+    "Export Sources": "Exportar fuentes",
+    "Export Sources Description": "Incluir la lista de fuentes que se muestra al final de cada respuesta en los archivos Markdown y HTML exportados.",
+    Sources: Sources$7,
     "OpenAI Official Format": "Formato Oficial de OpenAI",
     "Conversation Archive Alert": "¿Estás seguro que quieres archivar todas las conversaciones seleccionadas?",
     "Conversation Archived Message": "Todos las conversaciones seleccionadas se han archivado. Por favor refresca la página para ver los cambios.",
@@ -8589,6 +8595,7 @@ html {
   const Export$6 = "Exporter";
   const Loading$6 = "Chargement";
   const Preview$6 = "Aperçu";
+  const Sources$6 = "Sources";
   const Search$6 = "Rechercher";
   const fr = {
     title: title$6,
@@ -8627,6 +8634,9 @@ html {
     "Export Metadata Description": "Ajouter des métadonnées aux fichiers Markdown et HTML exportés.",
     "Export Thinking Process": "Exporter le processus de réflexion",
     "Export Thinking Process Description": "Inclure le processus de réflexion/raisonnement du modèle dans les fichiers Markdown et HTML exportés.",
+    "Export Sources": "Exporter les sources",
+    "Export Sources Description": "Inclure la liste des sources affichée à la fin de chaque réponse dans les fichiers Markdown et HTML exportés.",
+    Sources: Sources$6,
     "OpenAI Official Format": "Format officiel OpenAI",
     "Conversation Archive Alert": "Êtes-vous sûr de vouloir archiver toutes les conversations sélectionnées ?",
     "Conversation Archived Message": "Toutes les conversations sélectionnées ont été archivées. Veuillez actualiser la page pour voir les changements.",
@@ -8655,6 +8665,7 @@ html {
   const Export$5 = "Ekspor";
   const Loading$5 = "Memuat";
   const Preview$5 = "Pratinjau";
+  const Sources$5 = "Sumber";
   const Search$5 = "Cari";
   const id_ID = {
     title: title$5,
@@ -8693,6 +8704,9 @@ html {
     "Export Metadata Description": "Tambahkan metadata ke file Markdown dan HTML yang diekspor.",
     "Export Thinking Process": "Ekspor Proses Berpikir",
     "Export Thinking Process Description": "Sertakan proses berpikir/penalaran model dalam file Markdown dan HTML yang diekspor.",
+    "Export Sources": "Ekspor Sumber",
+    "Export Sources Description": "Sertakan daftar sumber yang ditampilkan di akhir setiap jawaban dalam file Markdown dan HTML yang diekspor.",
+    Sources: Sources$5,
     "OpenAI Official Format": "Format Resmi OpenAI",
     "Conversation Archive Alert": "Apakah Anda yakin ingin mengarsipkan semua percakapan yang dipilih?",
     "Conversation Archived Message": "Semua percakapan yang dipilih telah diarsipkan. Harap segarkan halaman untuk melihat perubahan.",
@@ -8721,6 +8735,7 @@ html {
   const Export$4 = "エクスポート";
   const Loading$4 = "読み込み中";
   const Preview$4 = "プレビュー";
+  const Sources$4 = "出典";
   const Search$4 = "検索";
   const ja_JP = {
     title: title$4,
@@ -8759,6 +8774,9 @@ html {
     "Export Metadata Description": "エクスポートされたMarkdownおよびHTMLファイルにメタデータを追加します。",
     "Export Thinking Process": "思考プロセスをエクスポート",
     "Export Thinking Process Description": "エクスポートされたMarkdownおよびHTMLファイルにモデルの思考・推論プロセスを含めます。",
+    "Export Sources": "ソースをエクスポート",
+    "Export Sources Description": "各回答の末尾に表示されるソース一覧を、エクスポートされた Markdown および HTML ファイルに含めます。",
+    Sources: Sources$4,
     "OpenAI Official Format": "OpenAI公式フォーマット",
     "Conversation Archive Alert": "選択したすべての会話をアーカイブしてもよろしいですか？",
     "Conversation Archived Message": "選択したすべての会話がアーカイブされました。変更を表示するには、ページを更新してください。",
@@ -8787,6 +8805,7 @@ html {
   const Export$3 = "Экспорт";
   const Loading$3 = "Загрузка";
   const Preview$3 = "Предпросмотр";
+  const Sources$3 = "Источники";
   const Search$3 = "Поиск";
   const ru = {
     title: title$3,
@@ -8825,6 +8844,9 @@ html {
     "Export Metadata Description": "Добавляйте метаданные в экспортированные файлы Markdown и HTML.",
     "Export Thinking Process": "Экспорт процесса мышления",
     "Export Thinking Process Description": "Включить процесс мышления/рассуждения модели в экспортированные файлы Markdown и HTML.",
+    "Export Sources": "Экспорт источников",
+    "Export Sources Description": "Включить список источников, показанный в конце каждого ответа, в экспортированные файлы Markdown и HTML.",
+    Sources: Sources$3,
     "OpenAI Official Format": "Официальный формат OpenAI",
     "Conversation Archive Alert": "Вы уверены, что хотите архивировать все выбранные разговоры?",
     "Conversation Archived Message": "Все выбранные разговоры были заархивированы. Пожалуйста, обновите страницу, чтобы увидеть изменения.",
@@ -8853,6 +8875,7 @@ html {
   const Export$2 = "Dışa Aktar";
   const Loading$2 = "Yükleniyor";
   const Preview$2 = "Önizleme";
+  const Sources$2 = "Kaynaklar";
   const Search$2 = "Ara";
   const tr_TR = {
     title: title$2,
@@ -8891,6 +8914,9 @@ html {
     "Export Metadata Description": "Dışa aktarılan Markdown ve HTML dosyalarına üst veri ekle",
     "Export Thinking Process": "Düşünme Sürecini Dışa Aktar",
     "Export Thinking Process Description": "Dışa aktarılan Markdown ve HTML dosyalarına modelin düşünme/akıl yürütme sürecini dahil et.",
+    "Export Sources": "Kaynakları Dışa Aktar",
+    "Export Sources Description": "Her yanıtın sonunda gösterilen kaynak listesini dışa aktarılan Markdown ve HTML dosyalarına dahil et.",
+    Sources: Sources$2,
     "OpenAI Official Format": "OpenAI Resmi Format",
     "Conversation Archive Alert": "Seçilen tüm konuşmaları arşivlemek istediğinizden emin misiniz?",
     "Conversation Archived Message": "Seçilen tüm konuşmalar arşivlendi. Değişiklikleri görmek için sayfayı yenileyin.",
@@ -8919,6 +8945,7 @@ html {
   const Export$1 = "导出";
   const Loading$1 = "加载中";
   const Preview$1 = "预览";
+  const Sources$1 = "来源";
   const Search$1 = "搜索";
   const zh_Hans = {
     title: title$1,
@@ -8957,6 +8984,9 @@ html {
     "Export Metadata Description": "会添加至 Markdown 以及 HTML 导出。",
     "Export Thinking Process": "导出思考过程",
     "Export Thinking Process Description": "在导出的 Markdown 和 HTML 文件中包含模型的思考/推理过程。",
+    "Export Sources": "导出来源",
+    "Export Sources Description": "在导出的 Markdown 和 HTML 文件中包含每个回答末尾显示的来源列表。",
+    Sources: Sources$1,
     "OpenAI Official Format": "OpenAI 官方格式",
     "Conversation Archive Alert": "确定要归档所有选取的对话？",
     "Conversation Archived Message": "所有所选的对话已归档。请刷新页面。",
@@ -8985,6 +9015,7 @@ html {
   const Export = "匯出";
   const Loading = "載入中";
   const Preview = "預覽";
+  const Sources = "來源";
   const Search = "搜尋";
   const zh_Hant = {
     title,
@@ -9023,6 +9054,9 @@ html {
     "Export Metadata Description": "會添加至 Markdown 以及 HTML 匯出。",
     "Export Thinking Process": "匯出思考過程",
     "Export Thinking Process Description": "在匯出的 Markdown 和 HTML 檔案中包含模型的思考/推理過程。",
+    "Export Sources": "匯出來源",
+    "Export Sources Description": "在匯出的 Markdown 和 HTML 檔案中包含每個回答末尾顯示的來源列表。",
+    Sources,
     "OpenAI Official Format": "OpenAI 官方格式",
     "Conversation Archive Alert": "確定要封存所有選取的對話？",
     "Conversation Archived Message": "所有選取的對話已封存。請重新整理頁面。",
@@ -9937,6 +9971,118 @@ html {
 
 </html>
 `;
+  const CitationMarkerRegex = /\uE200cite(?:\uE202[^\uE200\uE201]*)+\uE201/gu;
+  function normalizeCitationText(input) {
+    return input.replaceAll(/[\u00A0\u202F\u2007\u2060]/gu, " ").replaceAll(/[\u2010-\u2015\u2212]/gu, "-").replaceAll(/[\uE203\uE204]/gu, "");
+  }
+  function transformContentReferences(input, metadata, options = {}) {
+    const outputType = options.output ?? "markdown";
+    const inlineReferenceMode = options.inlineReferenceMode ?? "expanded";
+    const contentRefs = (metadata == null ? void 0 : metadata.content_references) ?? [];
+    let output2 = normalizeCitationText(input);
+    const sortedRefs = [...contentRefs].filter((ref) => ref.type !== "sources_footnote").sort((a2, b2) => {
+      var _a, _b;
+      return (((_a = b2.matched_text) == null ? void 0 : _a.length) || 0) - (((_b = a2.matched_text) == null ? void 0 : _b.length) || 0);
+    });
+    for (const ref of sortedRefs) {
+      if (!ref.matched_text) continue;
+      const matchedText = normalizeCitationText(ref.matched_text);
+      if (!matchedText) continue;
+      const replacement = formatInlineReference(ref, outputType, inlineReferenceMode);
+      output2 = output2.replaceAll(matchedText, replacement);
+    }
+    output2 = output2.replace(CitationMarkerRegex, "");
+    if (options.includeSourceList !== false) {
+      const sources = getSourcesFootnoteSources(contentRefs);
+      if (sources.length > 0) {
+        output2 = appendSourcesSection(output2, sources, outputType, options.sourceListLabel ?? "Sources");
+      }
+    }
+    return output2;
+  }
+  function formatCitationSource(source, output2) {
+    var _a;
+    const label = getSourceLabel(source);
+    const url = (_a = source.url) == null ? void 0 : _a.trim();
+    if (!url) return output2 === "markdown" ? escapeMarkdownText(label) : label;
+    if (output2 === "text") {
+      return `${label}: ${url}`;
+    }
+    return `[${escapeMarkdownText(label)}](<${escapeMarkdownUrl(url)}>)`;
+  }
+  function formatInlineReference(ref, output2, mode) {
+    if (mode === "alt") return ref.alt || "";
+    const sources = getInlineSources(ref);
+    if (sources.length > 0) {
+      const separator = output2 === "markdown" ? ", " : "; ";
+      return `(${sources.map((source) => formatCitationSource(source, output2)).join(separator)})`;
+    }
+    if (ref.alt) return ref.alt;
+    return "";
+  }
+  function getInlineSources(ref) {
+    var _a;
+    const sources = [];
+    for (const item of ref.items ?? []) {
+      sources.push(item);
+      sources.push(...item.supporting_websites ?? []);
+    }
+    sources.push(...ref.fallback_items ?? []);
+    if (sources.length === 0 && (ref.url || ref.title || ref.attribution)) {
+      sources.push(ref);
+    }
+    if (sources.length === 0 && ((_a = ref.safe_urls) == null ? void 0 : _a.length)) {
+      sources.push(...ref.safe_urls.map((url) => ({ title: url, url })));
+    }
+    return dedupeSources(sources);
+  }
+  function getSourcesFootnoteSources(contentRefs) {
+    const sources = contentRefs.filter((ref) => ref.type === "sources_footnote").flatMap((ref) => {
+      var _a, _b, _c, _d;
+      if ((_a = ref.sources) == null ? void 0 : _a.length) return ref.sources;
+      if ((_b = ref.items) == null ? void 0 : _b.length) return ref.items;
+      if ((_c = ref.fallback_items) == null ? void 0 : _c.length) return ref.fallback_items;
+      if ((_d = ref.safe_urls) == null ? void 0 : _d.length) return ref.safe_urls.map((url) => ({ title: url, url }));
+      return [];
+    });
+    return dedupeSources(sources);
+  }
+  function appendSourcesSection(input, sources, output2, label) {
+    const trimmed = input.trimEnd();
+    const sourceList = output2 === "markdown" ? [
+      `**${escapeMarkdownText(label)}:**`,
+      "",
+      ...sources.map((source) => `- ${formatCitationSource(source, output2)}`)
+    ].join("\n") : [
+      `${label}:`,
+      ...sources.map((source, index2) => `${index2 + 1}. ${formatCitationSource(source, output2)}`)
+    ].join("\n");
+    return trimmed ? `${trimmed}
+
+${sourceList}` : sourceList;
+  }
+  function dedupeSources(sources) {
+    var _a;
+    const seen = /* @__PURE__ */ new Set();
+    const result = [];
+    for (const source of sources) {
+      const key2 = ((_a = source.url) == null ? void 0 : _a.trim()) || getSourceLabel(source);
+      if (!key2 || seen.has(key2)) continue;
+      seen.add(key2);
+      result.push(source);
+    }
+    return result;
+  }
+  function getSourceLabel(source) {
+    var _a, _b, _c;
+    return ((_a = source.attribution) == null ? void 0 : _a.trim()) || ((_b = source.title) == null ? void 0 : _b.trim()) || ((_c = source.url) == null ? void 0 : _c.trim()) || "Source";
+  }
+  function escapeMarkdownText(input) {
+    return input.replaceAll("\\", "\\\\").replaceAll("[", "\\[").replaceAll("]", "\\]").replaceAll("\n", " ");
+  }
+  function escapeMarkdownUrl(input) {
+    return input.replaceAll("<", "%3C").replaceAll(">", "%3E").replaceAll("\n", "");
+  }
   function isHighSurrogate$1(codePoint) {
     return codePoint >= 55296 && codePoint <= 56319;
   }
@@ -21296,6 +21442,7 @@ html {
     const enableTimestamp = ScriptStorage.get(KEY_TIMESTAMP_ENABLED) ?? false;
     const timeStampHtml = ScriptStorage.get(KEY_TIMESTAMP_HTML) ?? false;
     const timeStamp24H = ScriptStorage.get(KEY_TIMESTAMP_24H) ?? false;
+    const enableSources = ScriptStorage.get(KEY_SOURCES_ENABLED) ?? true;
     const LatexRegex2 = /(\s\$\$.+?\$\$\s|\s\$.+?\$\s|\\\[.+?\\\]|\\\(.+?\\\))|(^\$$[\S\s]+?^\$$)|(^\$\$[\S\s]+?^\$\$\$)/gm;
     const conversationHtml = conversationNodes.map(({ message, thinking }) => {
       var _a;
@@ -21308,7 +21455,10 @@ html {
       let postSteps = [];
       if (message.author.role === "assistant") {
         postSteps.push((input) => transformFootNotes$2(input, message.metadata));
-        postSteps.push((input) => transformContentReferences$2(input, message.metadata));
+        postSteps.push((input) => transformContentReferences(input, message.metadata, {
+          includeSourceList: enableSources,
+          sourceListLabel: instance.t("Sources")
+        }));
         postSteps.push((input) => {
           const matches = input.match(LatexRegex2);
           const isCodeBlock = /```/.test(input);
@@ -21398,42 +21548,6 @@ html {
       if (citation) return "";
       return match;
     });
-  }
-  function transformContentReferences$2(input, metadata) {
-    var _a;
-    const contentRefs = metadata == null ? void 0 : metadata.content_references;
-    if (!contentRefs || contentRefs.length === 0) return input;
-    const sortedRefs = [...contentRefs].sort((a2, b2) => {
-      var _a2, _b;
-      return (((_a2 = b2.matched_text) == null ? void 0 : _a2.length) || 0) - (((_b = a2.matched_text) == null ? void 0 : _b.length) || 0);
-    });
-    const normalize2 = (s2) => s2.replaceAll(/[\u00A0\u202F\u2007\u2060]/gu, " ").replaceAll(/[\u2010-\u2015\u2212]/gu, "-");
-    let output2 = normalize2(input);
-    for (const ref of sortedRefs) {
-      if (!ref.matched_text) continue;
-      const matchedText = normalize2(ref.matched_text);
-      switch (ref.type) {
-        case "sources_footnote":
-          break;
-        case "grouped_webpages": {
-          const item = (_a = ref.items) == null ? void 0 : _a[0];
-          if (item) {
-            const links = [];
-            links.push(`[${item.attribution || item.title}](${item.url})`);
-            for (const sw of item.supporting_websites || []) {
-              links.push(`[${sw.attribution || sw.title}](${sw.url})`);
-            }
-            output2 = output2.replaceAll(matchedText, `(${links.join(", ")})`);
-          } else {
-            output2 = output2.replaceAll(matchedText, ref.alt || "");
-          }
-          break;
-        }
-        default:
-          output2 = output2.replaceAll(matchedText, ref.alt || "");
-      }
-    }
-    return output2;
   }
   function transformContent$2(content2, metadata, postProcess) {
     var _a, _b, _c, _d;
@@ -21860,6 +21974,7 @@ ${_metaList.join("\n")}
     const enableTimestamp = ScriptStorage.get(KEY_TIMESTAMP_ENABLED) ?? false;
     const timeStampMarkdown = ScriptStorage.get(KEY_TIMESTAMP_MARKDOWN) ?? false;
     const timeStamp24H = ScriptStorage.get(KEY_TIMESTAMP_24H) ?? false;
+    const enableSources = ScriptStorage.get(KEY_SOURCES_ENABLED) ?? true;
     const content2 = conversationNodes.map(({ message, thinking }) => {
       if (!message || !message.content) return null;
       if (shouldSkipMessageInExport(message)) return null;
@@ -21877,7 +21992,10 @@ ${_metaList.join("\n")}
       const thinkingBlock = thinking ? formatThinkingMarkdown(thinking) : "";
       const postSteps = [];
       if (message.author.role === "assistant") {
-        postSteps.push((input) => transformContentReferences$1(input, message.metadata));
+        postSteps.push((input) => transformContentReferences(input, message.metadata, {
+          includeSourceList: enableSources,
+          sourceListLabel: instance.t("Sources")
+        }));
         postSteps.push((input) => transformFootNotes$1(input, message.metadata));
       }
       if (message.author.role === "assistant") {
@@ -21946,42 +22064,6 @@ ${content2}`;
     return `${output2}
 
 ${citationText}`;
-  }
-  function transformContentReferences$1(input, metadata) {
-    var _a;
-    const contentRefs = metadata == null ? void 0 : metadata.content_references;
-    if (!contentRefs || contentRefs.length === 0) return input;
-    const sortedRefs = [...contentRefs].sort((a2, b2) => {
-      var _a2, _b;
-      return (((_a2 = b2.matched_text) == null ? void 0 : _a2.length) || 0) - (((_b = a2.matched_text) == null ? void 0 : _b.length) || 0);
-    });
-    const normalize2 = (s2) => s2.replaceAll(/[\u00A0\u202F\u2007\u2060]/gu, " ").replaceAll(/[\u2010-\u2015\u2212]/gu, "-");
-    let output2 = normalize2(input);
-    for (const ref of sortedRefs) {
-      if (!ref.matched_text) continue;
-      const matchedText = normalize2(ref.matched_text);
-      switch (ref.type) {
-        case "sources_footnote":
-          break;
-        case "grouped_webpages": {
-          const item = (_a = ref.items) == null ? void 0 : _a[0];
-          if (item) {
-            const links = [];
-            links.push(`[${item.attribution || item.title}](${item.url})`);
-            for (const sw of item.supporting_websites || []) {
-              links.push(`[${sw.attribution || sw.title}](${sw.url})`);
-            }
-            output2 = output2.replaceAll(matchedText, `(${links.join(", ")})`);
-          } else {
-            output2 = output2.replaceAll(matchedText, ref.alt || "");
-          }
-          break;
-        }
-        default:
-          output2 = output2.replaceAll(matchedText, ref.alt || "");
-      }
-    }
-    return output2;
   }
   function transformContent$1(content2, metadata, postProcess) {
     var _a, _b, _c, _d;
@@ -22085,7 +22167,11 @@ ${body2}
       });
     }
     if (message.author.role === "assistant") {
-      content2 = transformContentReferences(content2, message.metadata);
+      content2 = transformContentReferences(content2, message.metadata, {
+        output: "text",
+        inlineReferenceMode: "alt",
+        includeSourceList: false
+      });
       content2 = transformFootNotes(content2, message.metadata);
     }
     if (message.author.role === "assistant" && content2) {
@@ -22161,27 +22247,6 @@ ${content2}`;
       default:
         return author.role;
     }
-  }
-  function transformContentReferences(input, metadata) {
-    const contentRefs = metadata == null ? void 0 : metadata.content_references;
-    if (!contentRefs || contentRefs.length === 0) return input;
-    const sortedRefs = [...contentRefs].sort((a2, b2) => {
-      var _a, _b;
-      return (((_a = b2.matched_text) == null ? void 0 : _a.length) || 0) - (((_b = a2.matched_text) == null ? void 0 : _b.length) || 0);
-    });
-    const normalize2 = (s2) => s2.replaceAll(/[\u00A0\u202F\u2007\u2060]/gu, " ").replaceAll(/[\u2010-\u2015\u2212]/gu, "-");
-    let output2 = normalize2(input);
-    for (const ref of sortedRefs) {
-      if (!ref.matched_text) continue;
-      const matchedText = normalize2(ref.matched_text);
-      switch (ref.type) {
-        case "sources_footnote":
-          break;
-        default:
-          output2 = output2.replaceAll(matchedText, ref.alt || "");
-      }
-    }
-    return output2;
   }
   function transformFootNotes(input, metadata) {
     const footNoteMarkRegex = /【(\d+)†\((.+?)\)】/g;
@@ -22506,6 +22571,9 @@ ${content2}`;
     enableThinking: false,
     setEnableThinking: (_24) => {
     },
+    enableSources: true,
+    setEnableSources: (_24) => {
+    },
     exportAllLimit: defaultExportAllLimit,
     setExportAllLimit: (_24) => {
     },
@@ -22521,6 +22589,7 @@ ${content2}`;
     const [enableMeta, setEnableMeta] = useGMStorage(KEY_META_ENABLED, false);
     const [exportMetaList, setExportMetaList] = useGMStorage(KEY_META_LIST, defaultExportMetaList);
     const [enableThinking, setEnableThinking] = useGMStorage(KEY_THINKING_ENABLED, false);
+    const [enableSources, setEnableSources] = useGMStorage(KEY_SOURCES_ENABLED, true);
     const [exportAllLimit, setExportAllLimit] = useGMStorage(KEY_EXPORT_ALL_LIMIT, defaultExportAllLimit);
     const resetDefault = T$4(() => {
       setFormat(defaultFormat);
@@ -22528,6 +22597,7 @@ ${content2}`;
       setEnableMeta(false);
       setExportMetaList(defaultExportMetaList);
       setEnableThinking(false);
+      setEnableSources(true);
       setExportAllLimit(defaultExportAllLimit);
     }, [
       setFormat,
@@ -22535,6 +22605,7 @@ ${content2}`;
       setEnableMeta,
       setExportMetaList,
       setEnableThinking,
+      setEnableSources,
       setExportAllLimit
     ]);
     return /* @__PURE__ */ o$8(
@@ -22557,6 +22628,8 @@ ${content2}`;
           setExportMetaList,
           enableThinking,
           setEnableThinking,
+          enableSources,
+          setEnableSources,
           exportAllLimit,
           setExportAllLimit,
           resetDefault
@@ -23301,7 +23374,7 @@ ${content2}`;
     );
   };
   const TIMEOUT = 2500;
-  const MenuItem = ({ text: text2, successText, disabled = false, title: title2, icon: Icon, onClick, className }) => {
+  const MenuItem = ({ text: text2, successText, disabled = false, title: title2, ariaLabel, icon: Icon, onClick, className }) => {
     const [loading, setLoading] = h$4(false);
     const [succeed, setSucceed] = h$4(false);
     const handleClick = typeof onClick === "function" ? async (e2) => {
@@ -23333,10 +23406,11 @@ ${content2}`;
         onClick: handleClick,
         onTouchStart: handleClick,
         disabled,
+        "aria-label": ariaLabel,
         title: title2,
         children: loading ? /* @__PURE__ */ o$8("div", { className: "flex justify-center items-center w-full h-full", children: /* @__PURE__ */ o$8(IconLoading, { className: "w-4 h-4" }) }) : /* @__PURE__ */ o$8(k$3, { children: [
           Icon && /* @__PURE__ */ o$8(Icon, {}),
-          succeed && successText ? successText : text2
+          /* @__PURE__ */ o$8("span", { className: "ce-menu-item-text", children: succeed && successText ? successText : text2 })
         ] })
       }
     );
@@ -23735,6 +23809,8 @@ ${content2}`;
       setExportMetaList,
       enableThinking,
       setEnableThinking,
+      enableSources,
+      setEnableSources,
       exportAllLimit,
       setExportAllLimit
       /* eslint-enable pionxzh/consistent-list-newline */
@@ -23814,6 +23890,13 @@ ${content2}`;
                       /* @__PURE__ */ o$8("dd", { className: "text-sm text-gray-700 dark:text-gray-300", children: t2("Export Thinking Process Description") })
                     ] }),
                     /* @__PURE__ */ o$8("div", { className: "absolute right-4", children: /* @__PURE__ */ o$8(Toggle, { label: "", checked: enableThinking, onCheckedUpdate: setEnableThinking }) })
+                  ] }),
+                  /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: [
+                    /* @__PURE__ */ o$8("div", { children: [
+                      /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: t2("Export Sources") }),
+                      /* @__PURE__ */ o$8("dd", { className: "text-sm text-gray-700 dark:text-gray-300", children: t2("Export Sources Description") })
+                    ] }),
+                    /* @__PURE__ */ o$8("div", { className: "absolute right-4", children: /* @__PURE__ */ o$8(Toggle, { label: "", checked: enableSources, onCheckedUpdate: setEnableSources }) })
                   ] }),
                   /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: /* @__PURE__ */ o$8("div", { children: [
                     /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: [
@@ -23974,6 +24057,50 @@ ${content2}`;
       }
     );
   };
+  function useCollapsedSidebar(container, isMobile) {
+    const [isCollapsed, setIsCollapsed] = h$4(false);
+    p$6(() => {
+      if (isMobile) {
+        setIsCollapsed(false);
+        return;
+      }
+      let frame = 0;
+      const observed = /* @__PURE__ */ new Set();
+      const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(update);
+      function sidebarElement() {
+        return container.closest('nav, aside, [aria-label="Sidebar"], [data-testid="sidebar"]') ?? container.parentElement;
+      }
+      function observe(element2) {
+        if (!observer || !element2 || observed.has(element2)) return;
+        observer.observe(element2);
+        observed.add(element2);
+      }
+      function update() {
+        cancelAnimationFrame(frame);
+        frame = requestAnimationFrame(() => {
+          var _a, _b;
+          const parentWidth = ((_a = container.parentElement) == null ? void 0 : _a.getBoundingClientRect().width) ?? 0;
+          const sidebarWidth = ((_b = sidebarElement()) == null ? void 0 : _b.getBoundingClientRect().width) ?? parentWidth;
+          const nextCollapsed = parentWidth > 0 && parentWidth < 96 || sidebarWidth > 0 && sidebarWidth < 96;
+          setIsCollapsed(nextCollapsed);
+          container.toggleAttribute("data-ce-sidebar-collapsed", nextCollapsed);
+          observe(container.parentElement);
+          observe(sidebarElement());
+        });
+      }
+      observe(container.parentElement);
+      observe(sidebarElement());
+      update();
+      window.addEventListener("resize", update);
+      return () => {
+        cancelAnimationFrame(frame);
+        window.removeEventListener("resize", update);
+        observer == null ? void 0 : observer.disconnect();
+        container.removeAttribute("data-ce-sidebar-collapsed");
+      };
+    }, [container, isMobile]);
+    return isCollapsed;
+  }
   function MenuInner({ container }) {
     const { t: t2 } = useTranslation();
     const [open, setOpen] = h$4(false);
@@ -24008,6 +24135,7 @@ ${content2}`;
     const onClickOoba = T$4(() => exportToOoba(format), [format]);
     const width = useWindowResize(() => window.innerWidth);
     const isMobile = width < 768;
+    const isCollapsedSidebar = useCollapsedSidebar(container, isMobile);
     const Portal = isMobile ? "div" : $cef8881cdc69808e$export$602eac185826482c;
     return /* @__PURE__ */ o$8(k$3, { children: [
       isMobile && open && /* @__PURE__ */ o$8(
@@ -24028,8 +24156,9 @@ ${content2}`;
             /* @__PURE__ */ o$8($cef8881cdc69808e$export$41fb9f06171c75f4, { children: /* @__PURE__ */ o$8(
               MenuItem,
               {
-                className: "border-0 ms-2 me-1.5 mb-2",
+                className: isCollapsedSidebar ? "ce-nav-trigger ce-nav-trigger-collapsed" : "ce-nav-trigger border-0 ms-2 me-1.5 mb-2",
                 text: t2("ExportHelper"),
+                ariaLabel: t2("ExportHelper"),
                 icon: IconArrowRightFromBracket,
                 onClick: () => {
                   setOpen(true);
@@ -24194,7 +24323,7 @@ ${content2}`;
           ]
         }
       ),
-      /* @__PURE__ */ o$8(Divider, {})
+      !isCollapsedSidebar && /* @__PURE__ */ o$8(Divider, {})
     ] });
   }
   function Menu({ container }) {
@@ -24213,7 +24342,7 @@ ${content2}`;
         console.log("[Exporter] Injecting nav", target);
         const container = getMenuContainer();
         injectionMap.set(target, container);
-        target.before(container);
+        getNavMenuInsertionTarget(target).before(container);
       };
       const selector = '[data-testid="accounts-profile-button"]';
       sentinel.on("selector", injectNavMenu);
@@ -24267,6 +24396,11 @@ ${content2}`;
     container.style.zIndex = "99";
     D$4(/* @__PURE__ */ o$8(Menu, { container }), container);
     return container;
+  }
+  function getNavMenuInsertionTarget(target) {
+    const wrapper = target.parentElement;
+    if (!wrapper || wrapper.children.length !== 1) return target;
+    return wrapper;
   }
 
 })(JSZip, html2canvas);
