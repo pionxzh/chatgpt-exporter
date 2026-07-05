@@ -1,6 +1,7 @@
 import { fetchConversation, getCurrentChatId, processConversation, shouldSkipMessageInExport } from '../api'
 import i18n from '../i18n'
 import { checkIfConversationStarted } from '../page'
+import { transformContentReferences } from '../utils/citations'
 import { copyToClipboard } from '../utils/clipboard'
 import { flatMap, fromMarkdown, toMarkdown } from '../utils/markdown'
 import { standardizeLineBreaks } from '../utils/text'
@@ -49,7 +50,11 @@ function transformMessage(message?: ConversationNodeMessage) {
     }
 
     if (message.author.role === 'assistant') {
-        content = transformContentReferences(content, message.metadata)
+        content = transformContentReferences(content, message.metadata, {
+            output: 'text',
+            inlineReferenceMode: 'alt',
+            includeSourceList: false,
+        })
         content = transformFootNotes(content, message.metadata)
     }
 
@@ -150,38 +155,6 @@ function transformAuthor(author: ConversationNodeMessage['author']): string {
     }
 }
 
-function transformContentReferences(
-    input: string,
-    metadata: ConversationNodeMessage['metadata'],
-) {
-    const contentRefs = metadata?.content_references
-    if (!contentRefs || contentRefs.length === 0) return input
-
-    const sortedRefs = [...contentRefs].sort((a, b) => (b.matched_text?.length || 0) - (a.matched_text?.length || 0))
-
-    // Normalize unicode variants (non-breaking spaces, non-breaking hyphens) to regular ASCII
-    const normalize = (s: string) => s
-        .replaceAll(/[\u00A0\u202F\u2007\u2060]/gu, ' ')
-        .replaceAll(/[\u2010-\u2015\u2212]/gu, '-')
-
-    let output = normalize(input)
-
-    for (const ref of sortedRefs) {
-        if (!ref.matched_text) continue
-
-        const matchedText = normalize(ref.matched_text)
-
-        switch (ref.type) {
-            case 'sources_footnote':
-                break
-            default:
-                // Use ref.alt which contains display text (links won't render in plain text)
-                output = output.replaceAll(matchedText, ref.alt || '')
-        }
-    }
-    return output
-}
-
 /**
  * Transform foot notes in assistant's message
  */
@@ -193,7 +166,6 @@ function transformFootNotes(
     const footNoteMarkRegex = /【(\d+)†\((.+?)\)】/g
     return input.replace(footNoteMarkRegex, (match, citeIndex, _evidenceText) => {
         const citation = metadata?.citations?.find(cite => cite.metadata?.extra?.cited_message_idx === +citeIndex)
-        // We simply remove the foot note mark in text output
         if (citation) return ''
 
         return match

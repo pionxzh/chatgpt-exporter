@@ -1,9 +1,10 @@
 import JSZip from 'jszip'
 import { fetchConversation, getCurrentChatId, processConversation, shouldSkipMessageInExport } from '../api'
-import { KEY_THINKING_ENABLED, KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_HTML, baseUrl } from '../constants'
+import { KEY_SOURCES_ENABLED, KEY_THINKING_ENABLED, KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_HTML, baseUrl } from '../constants'
 import i18n from '../i18n'
 import { checkIfConversationStarted, getUserAvatar } from '../page'
 import templateHtml from '../template.html?raw'
+import { transformContentReferences } from '../utils/citations'
 import { buildZipFileName, downloadFile, getFileNameWithFormat } from '../utils/download'
 import { fromMarkdown, toHtml } from '../utils/markdown'
 import { ScriptStorage } from '../utils/storage'
@@ -80,6 +81,7 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
     const enableTimestamp = ScriptStorage.get<boolean>(KEY_TIMESTAMP_ENABLED) ?? false
     const timeStampHtml = ScriptStorage.get<boolean>(KEY_TIMESTAMP_HTML) ?? false
     const timeStamp24H = ScriptStorage.get<boolean>(KEY_TIMESTAMP_24H) ?? false
+    const enableSources = ScriptStorage.get<boolean>(KEY_SOURCES_ENABLED) ?? true
 
     const LatexRegex = /(\s\$\$.+?\$\$\s|\s\$.+?\$\s|\\\[.+?\\\]|\\\(.+?\\\))|(^\$$[\S\s]+?^\$$)|(^\$\$[\S\s]+?^\$\$\$)/gm
 
@@ -100,7 +102,10 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
             // Handle old-style footnotes (【11†(PrintWiki)】 format)
             postSteps.push(input => transformFootNotes(input, message.metadata))
             // Handle new-style content references (web search citations with Unicode markers)
-            postSteps.push(input => transformContentReferences(input, message.metadata))
+            postSteps.push(input => transformContentReferences(input, message.metadata, {
+                includeSourceList: enableSources,
+                sourceListLabel: i18n.t('Sources'),
+            }))
 
             postSteps.push((input) => {
                 const matches = input.match(LatexRegex)
@@ -241,58 +246,6 @@ function transformFootNotes(
 
         return match
     })
-}
-
-function transformContentReferences(
-    input: string,
-    metadata: ConversationNodeMessage['metadata'],
-) {
-    const contentRefs = metadata?.content_references
-    if (!contentRefs || contentRefs.length === 0) return input
-
-    const sortedRefs = [...contentRefs].sort((a, b) => (b.matched_text?.length || 0) - (a.matched_text?.length || 0))
-
-    // Normalize unicode variants (non-breaking spaces, non-breaking hyphens) to regular ASCII
-    const normalize = (s: string) => s
-        .replaceAll(/[\u00A0\u202F\u2007\u2060]/gu, ' ')
-        .replaceAll(/[\u2010-\u2015\u2212]/gu, '-')
-
-    let output = normalize(input)
-
-    for (const ref of sortedRefs) {
-        if (!ref.matched_text) continue
-
-        const matchedText = normalize(ref.matched_text)
-
-        switch (ref.type) {
-            case 'sources_footnote':
-                break
-            case 'grouped_webpages': {
-                // For citations, build links from items including supporting_websites
-                const item = ref.items?.[0]
-                if (item) {
-                    const links: string[] = []
-                    // Primary source
-                    links.push(`[${item.attribution || item.title}](${item.url})`)
-                    // Supporting sources
-                    for (const sw of item.supporting_websites || []) {
-                        links.push(`[${sw.attribution || sw.title}](${sw.url})`)
-                    }
-                    // Markdown links will be converted to HTML by the subsequent toHtml step
-                    output = output.replaceAll(matchedText, `(${links.join(', ')})`)
-                }
-                else {
-                    output = output.replaceAll(matchedText, ref.alt || '')
-                }
-                break
-            }
-            default:
-                // Use ref.alt which contains display text or pre-formatted markdown link
-                // Markdown links will be converted to HTML by the subsequent toHtml step
-                output = output.replaceAll(matchedText, ref.alt || '')
-        }
-    }
-    return output
 }
 
 /**

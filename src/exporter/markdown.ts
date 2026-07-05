@@ -1,8 +1,9 @@
 import JSZip from 'jszip'
 import { fetchConversation, getCurrentChatId, processConversation, shouldSkipMessageInExport } from '../api'
-import { KEY_THINKING_ENABLED, KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_MARKDOWN, baseUrl } from '../constants'
+import { KEY_SOURCES_ENABLED, KEY_THINKING_ENABLED, KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_MARKDOWN, baseUrl } from '../constants'
 import i18n from '../i18n'
 import { checkIfConversationStarted } from '../page'
+import { transformContentReferences } from '../utils/citations'
 import { buildZipFileName, downloadFile, getFileNameWithFormat } from '../utils/download'
 import { fromMarkdown, toMarkdown } from '../utils/markdown'
 import { ScriptStorage } from '../utils/storage'
@@ -98,6 +99,7 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
     const enableTimestamp = ScriptStorage.get<boolean>(KEY_TIMESTAMP_ENABLED) ?? false
     const timeStampMarkdown = ScriptStorage.get<boolean>(KEY_TIMESTAMP_MARKDOWN) ?? false
     const timeStamp24H = ScriptStorage.get<boolean>(KEY_TIMESTAMP_24H) ?? false
+    const enableSources = ScriptStorage.get<boolean>(KEY_SOURCES_ENABLED) ?? true
 
     const content = conversationNodes.map(({ message, thinking }) => {
         if (!message || !message.content) return null
@@ -120,7 +122,10 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
         const postSteps: Array<(input: string) => string> = []
         if (message.author.role === 'assistant') {
             // Handle new-style content references (web search citations with Unicode markers)
-            postSteps.push(input => transformContentReferences(input, message.metadata))
+            postSteps.push(input => transformContentReferences(input, message.metadata, {
+                includeSourceList: enableSources,
+                sourceListLabel: i18n.t('Sources'),
+            }))
             // Handle old-style footnotes (【11†(PrintWiki)】 format)
             postSteps.push(input => transformFootNotes(input, message.metadata))
         }
@@ -202,6 +207,7 @@ function transformFootNotes(
 
         return match
     })
+
     const citationText = citationList.map((citation) => {
         const citeIndex = citation.metadata?.extra?.cited_message_idx ?? 1
         const citeTitle = citation.metadata?.title ?? 'No title'
@@ -210,64 +216,6 @@ function transformFootNotes(
 
     // Foot notes are placed at the end of the conversation node, not the end of the whole document
     return `${output}\n\n${citationText}`
-}
-
-/**
- * Transform new-style content references (web search citations) in assistant's message.
- * Citations appear as plain text like "citeturn1search1" or "citeturn0search2turn1search8".
- * The metadata.content_references array contains the URL and title for each citation.
- */
-function transformContentReferences(
-    input: string,
-    metadata: ConversationNodeMessage['metadata'],
-): string {
-    const contentRefs = metadata?.content_references
-    if (!contentRefs || contentRefs.length === 0) return input
-
-    // Sort by matched_text length descending to match longer patterns first
-    // (e.g., "citeturn0search2turn1search8" before "citeturn0search2")
-    const sortedRefs = [...contentRefs].sort((a, b) => (b.matched_text?.length || 0) - (a.matched_text?.length || 0))
-
-    // Normalize unicode variants (non-breaking spaces, non-breaking hyphens) to regular ASCII
-    const normalize = (s: string) => s
-        .replaceAll(/[\u00A0\u202F\u2007\u2060]/gu, ' ')
-        .replaceAll(/[\u2010-\u2015\u2212]/gu, '-')
-
-    let output = normalize(input)
-
-    for (const ref of sortedRefs) {
-        if (!ref.matched_text) continue
-
-        const matchedText = normalize(ref.matched_text)
-
-        switch (ref.type) {
-            case 'sources_footnote':
-                break
-            case 'grouped_webpages': {
-                // For citations, build links from items including supporting_websites
-                const item = ref.items?.[0]
-                if (item) {
-                    const links: string[] = []
-                    // Primary source
-                    links.push(`[${item.attribution || item.title}](${item.url})`)
-                    // Supporting sources
-                    for (const sw of item.supporting_websites || []) {
-                        links.push(`[${sw.attribution || sw.title}](${sw.url})`)
-                    }
-                    output = output.replaceAll(matchedText, `(${links.join(', ')})`)
-                }
-                else {
-                    output = output.replaceAll(matchedText, ref.alt || '')
-                }
-                break
-            }
-            default:
-                // Use ref.alt which contains display text or pre-formatted markdown link
-                output = output.replaceAll(matchedText, ref.alt || '')
-        }
-    }
-
-    return output
 }
 
 /**

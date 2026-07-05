@@ -53,8 +53,15 @@ export interface Citation {
     }
 }
 
+export interface ContentReferenceSource {
+    title?: string
+    url?: string
+    attribution?: string
+    supporting_websites?: ContentReferenceSource[]
+}
+
 export interface ContentReference {
-    type: 'grouped_webpages' | 'sources_footnote' | 'nav_list' | 'alt_text' & (string & {})
+    type: 'grouped_webpages' | 'sources_footnote' | 'nav_list' | 'alt_text' | 'webpage' | (string & {})
     /** The text that was matched in the content, e.g., "citeturn0search3" */
     matched_text?: string
     start_idx: number
@@ -62,20 +69,16 @@ export interface ContentReference {
     /** Pre-formatted markdown link, e.g., "([Title](url))" */
     alt?: string
     /** Array of actual reference items with URL and title */
-    items?: Array<{
-        title: string
-        url: string
-        attribution?: string
-        /** Additional sources for multi-citations */
-        supporting_websites?: Array<{
-            title: string
-            url: string
-            attribution?: string
-        }>
-    }>
+    items?: ContentReferenceSource[]
+    /** Sources shown in ChatGPT's end-of-answer source list */
+    sources?: ContentReferenceSource[]
+    fallback_items?: ContentReferenceSource[]
+    safe_urls?: string[]
+    refs?: string[]
     // Legacy fields (may still be present in some responses)
     url?: string
     title?: string
+    attribution?: string
 }
 
 interface CiteMetadata {

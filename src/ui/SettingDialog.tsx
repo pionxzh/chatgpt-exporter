@@ -36,6 +36,7 @@ export const SettingDialog: FC<SettingDialogProps> = ({
         enableMeta, setEnableMeta,
         exportMetaList, setExportMetaList,
         enableThinking, setEnableThinking,
+        enableSources, setEnableSources,
         exportAllLimit, setExportAllLimit,
         /* eslint-enable pionxzh/consistent-list-newline */
     } = useSettingContext()
@@ -123,6 +124,19 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                                 </div>
                                 <div className="absolute right-4">
                                     <Toggle label="" checked={enableThinking} onCheckedUpdate={setEnableThinking} />
+                                </div>
+                            </div>
+                            <div className="relative flex bg-white dark:bg-white/5 rounded p-4">
+                                <div>
+                                    <dt className="text-md font-medium text-gray-800 dark:text-white">
+                                        {t('Export Sources')}
+                                    </dt>
+                                    <dd className="text-sm text-gray-700 dark:text-gray-300">
+                                        {t('Export Sources Description')}
+                                    </dd>
+                                </div>
+                                <div className="absolute right-4">
+                                    <Toggle label="" checked={enableSources} onCheckedUpdate={setEnableSources} />
                                 </div>
                             </div>
                             <div className="relative flex bg-white dark:bg-white/5 rounded p-4">

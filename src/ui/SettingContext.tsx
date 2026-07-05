@@ -5,6 +5,7 @@ import {
     KEY_FILENAME_FORMAT,
     KEY_META_ENABLED,
     KEY_META_LIST,
+    KEY_SOURCES_ENABLED,
     KEY_THINKING_ENABLED,
     KEY_TIMESTAMP_24H,
     KEY_TIMESTAMP_ENABLED,
@@ -46,6 +47,8 @@ const SettingContext = createContext({
     setExportMetaList: (_: ExportMeta[]) => {},
     enableThinking: false,
     setEnableThinking: (_: boolean) => {},
+    enableSources: true,
+    setEnableSources: (_: boolean) => {},
     exportAllLimit: defaultExportAllLimit,
     setExportAllLimit: (_: number) => {},
     resetDefault: () => {},
@@ -63,6 +66,7 @@ export const SettingProvider: FC = ({ children }) => {
 
     const [exportMetaList, setExportMetaList] = useGMStorage(KEY_META_LIST, defaultExportMetaList)
     const [enableThinking, setEnableThinking] = useGMStorage(KEY_THINKING_ENABLED, false)
+    const [enableSources, setEnableSources] = useGMStorage(KEY_SOURCES_ENABLED, true)
     const [exportAllLimit, setExportAllLimit] = useGMStorage(KEY_EXPORT_ALL_LIMIT, defaultExportAllLimit)
 
     const resetDefault = useCallback(() => {
@@ -71,6 +75,7 @@ export const SettingProvider: FC = ({ children }) => {
         setEnableMeta(false)
         setExportMetaList(defaultExportMetaList)
         setEnableThinking(false)
+        setEnableSources(true)
         setExportAllLimit(defaultExportAllLimit)
     }, [
         setFormat,
@@ -78,6 +83,7 @@ export const SettingProvider: FC = ({ children }) => {
         setEnableMeta,
         setExportMetaList,
         setEnableThinking,
+        setEnableSources,
         setExportAllLimit,
     ])
 
@@ -103,6 +109,8 @@ export const SettingProvider: FC = ({ children }) => {
 
                 enableThinking,
                 setEnableThinking,
+                enableSources,
+                setEnableSources,
 
                 exportAllLimit,
                 setExportAllLimit,
