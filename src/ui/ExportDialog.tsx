@@ -478,7 +478,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
             const totalBatches = totalBatchesRef.current
             const partIndex = batchIdx + 1
             const callback = exportAllOptions.find(o => o.label === exportType)?.callback
-            if (callback) {
+            if (callback && results.length > 0) {
                 await callback(format, results, metaList, selectedProject?.display.name, partIndex, totalBatches)
             }
             if (partIndex < totalBatches) {
