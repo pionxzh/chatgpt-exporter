@@ -42,6 +42,8 @@
 [Install-2-image]: https://img.shields.io/badge/-Install-blue
 [Install-2-url]: https://raw.githubusercontent.com/pionxzh/chatgpt-exporter/master/dist/chatgpt.user.js
 
+> Tampermonkey를 사용하는 경우 브라우저 설정에서 [`Allow User Scripts`가 활성화되어 있는지](https://www.tampermonkey.net/faq.php?q=Q209) 확인하세요.
+
 #
 
 [📚 지원하는 형식](#-지원하는-형식) &nbsp;&nbsp;|&nbsp;&nbsp; [💡 예제](#-예제) &nbsp;&nbsp;|&nbsp;&nbsp; [📤 여러 대화 내보내기](#-여러-대화-내보내기) &nbsp;&nbsp;|&nbsp;&nbsp; [🤝 기여하기](#-기여하기) &nbsp;&nbsp;|&nbsp;&nbsp;[⭐ 별 기록](#-별-기록)

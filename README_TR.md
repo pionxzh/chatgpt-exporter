@@ -42,6 +42,8 @@
 [Install-2-image]: https://img.shields.io/badge/-Install-blue
 [Install-2-url]: https://raw.githubusercontent.com/pionxzh/chatgpt-exporter/master/dist/chatgpt.user.js
 
+> Tampermonkey için tarayıcı ayarlarınızda [`Allow User Scripts` seçeneğinin etkin olduğundan](https://www.tampermonkey.net/faq.php?q=Q209) emin olun.
+
 #
 
 [📚 Desteklenen Formatlar](#-desteklenen-formatlar) &nbsp;&nbsp;|&nbsp;&nbsp; [💡 Örnek](#-örnek) &nbsp;&nbsp;|&nbsp;&nbsp; [📤 Birden Fazla Sohbeti Dışa Aktar](#-birden-fazla-sohbeti-dışa-aktar) &nbsp;&nbsp;|&nbsp;&nbsp; [🤝 Katılım](#-katılım) &nbsp;&nbsp;|&nbsp;&nbsp; [⭐ Yıldız Geçmişi](#-y%C4%B1ld%C4%B1z-ge%C3%A7mi%C5%9Fi)
