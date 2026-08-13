@@ -257,6 +257,6 @@ Sol alt köşedeki açılır menüden dışa aktarma formatınızı seçin. Aşa
 
 <div align="center">
 
-<img src="https://api.star-history.com/svg?repos=pionxzh/chatgpt-exporter&type=Date" width="600" height="400" alt="Yıldız Geçmişi Grafiği" valign="middle">
+<img src="https://star-history.dera.page/svg?repos=pionxzh/chatgpt-exporter&type=Date" width="600" height="400" alt="Yıldız Geçmişi Grafiği" valign="middle">
 
 </div>

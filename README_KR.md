@@ -259,6 +259,6 @@ API `https://chat.openai.com/backend-api/conversation/[id]` 에서 얻은 원시
 
 <div align="center">
 
-<img src="https://api.star-history.com/svg?repos=pionxzh/chatgpt-exporter&type=Date" width="600" height="400" alt="별 기록 차트" valign="middle">
+<img src="https://star-history.dera.page/svg?repos=pionxzh/chatgpt-exporter&type=Date" width="600" height="400" alt="별 기록 차트" valign="middle">
 
 </div>
