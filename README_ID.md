@@ -257,6 +257,10 @@ Klik tombol untuk melakukan tindakan yang diinginkan.
 - **Hapus** - Menghapus percakapan yang dipilih.
 - **Ekspor** - Mengekspor percakapan yang dipilih dalam format yang dipilih menggunakan pemilih format.
 
+## 💬 Menggunakan DeepSeek juga?
+
+Lihat [**DeepSeek Exporter**](https://github.com/pionxzh/deepseek-exporter) — proyek saudara yang menghadirkan ekspor sekali klik yang sama untuk [DeepSeek](https://chat.deepseek.com/), termasuk proses penalaran DeepThink dan sumber pencarian web.
+
 ## 🤝 Kontribusi
 
 Lihat [CONTRIBUTING.md](./CONTRIBUTING.md)

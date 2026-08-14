@@ -251,6 +251,10 @@ API `https://chat.openai.com/backend-api/conversation/[id]` 에서 얻은 원시
 - **삭제** - 선택한 대화를 삭제합니다.
 - **내보내기** - 선택한 대화를 선택한 형식으로 내보냅니다.
 
+## 💬 DeepSeek도 사용하시나요?
+
+[**DeepSeek Exporter**](https://github.com/pionxzh/deepseek-exporter)를 확인해 보세요 — [DeepSeek](https://chat.deepseek.com/)에서 동일한 원클릭 내보내기를 제공하는 자매 프로젝트입니다. DeepThink 추론 과정과 웹 검색 출처도 함께 내보낼 수 있습니다.
+
 ## 🤝 기여하기
 
 [CONTRIBUTING.md](./CONTRIBUTING.md) 를 참조하세요

@@ -248,6 +248,10 @@ Cliquez sur le bouton pour effectuer l'action souhaitée.
 - **Supprimer** - Supprime les conversations sélectionnées.
 - **Exporter** - Exporte les conversations sélectionnées dans le format choisi à l'aide du sélecteur de format.
 
+## 💬 Vous utilisez aussi DeepSeek ?
+
+Découvrez [**DeepSeek Exporter**](https://github.com/pionxzh/deepseek-exporter) — le projet frère qui apporte le même export en un clic à [DeepSeek](https://chat.deepseek.com/), y compris le raisonnement DeepThink et les sources de recherche web.
+
 ## 🤝 Contribution
 
 Voir [CONTRIBUTING.md](./CONTRIBUTING.md)

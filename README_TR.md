@@ -249,6 +249,10 @@ Sol alt köşedeki açılır menüden dışa aktarma formatınızı seçin. Aşa
 - **Sil** - Seçilen sohbetleri siler.
 - **Dışa Aktar** - Seçilen sohbetleri, format seçicisinden seçilen formatta dışa aktarır.
 
+## 💬 DeepSeek de mi kullanıyorsunuz?
+
+[**DeepSeek Exporter**](https://github.com/pionxzh/deepseek-exporter) projesine göz atın — aynı tek tıkla dışa aktarmayı [DeepSeek](https://chat.deepseek.com/)'e getiren kardeş proje; DeepThink akıl yürütme süreci ve web arama kaynakları dahil.
+
 ## 🤝 Katılım
 
 [CONTRIBUTING.md](./CONTRIBUTING.md) dosyasına bakın
