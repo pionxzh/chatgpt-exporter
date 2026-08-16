@@ -1,6 +1,6 @@
 import urlcat from 'urlcat'
 import { apiUrl, baseUrl } from './constants'
-import { getChatIdFromUrl, getConversationFromSharePage, isSharePage } from './page'
+import { getChatIdFromUrl, getConversationFromPage, getConversationFromSharePage, isSharePage, isTemporaryChat } from './page'
 import { blobToDataURL } from './utils/dom'
 import { memorize } from './utils/memorize'
 
@@ -295,6 +295,8 @@ export interface ApiConversation {
     moderation_results: unknown[]
     title: string
     is_archived: boolean
+    /** True when the conversation was captured from the temporary-chat page. */
+    is_temporary_chat?: boolean
     update_time: number
     safe_urls?: string[]
 }
@@ -446,6 +448,11 @@ export async function getCurrentChatId(): Promise<string> {
     const chatId = getChatIdFromUrl()
     if (chatId) return chatId
 
+    // Temporary chats are not included in the history endpoint. When they
+    // stay on the root route, use a local marker so the exporter does not
+    // accidentally export the most recent regular conversation instead.
+    if (isTemporaryChat()) return '__temporary__current'
+
     const conversations = await fetchConversations()
     if (conversations && conversations.items.length > 0) {
         return conversations.items[0].id
@@ -532,16 +539,69 @@ export async function fetchConversation(chatId: string, shouldReplaceAssets: boo
         }
     }
 
-    const url = conversationApi(chatId)
-    const conversation = await fetchApi<ApiConversation>(url)
+    const currentChatId = getChatIdFromUrl()
+    const temporary = chatId.startsWith('__temporary__')
+        || (isTemporaryChat() && currentChatId === chatId)
+    let lastError: unknown
 
-    if (shouldReplaceAssets) {
-        await replaceImageAssets(conversation)
+    // Temporary chats are rendered in the page but are deliberately absent
+    // from the normal conversation API. Try the API for temporary URLs that
+    // still have a conversationId, then fall back to ChatGPT's in-page data.
+    if (temporary && !chatId.startsWith('__temporary__')) {
+        try {
+            const conversation = await fetchApi<ApiConversation>(conversationApi(chatId))
+            if (shouldReplaceAssets) await replaceImageAssets(conversation)
+            return { id: chatId, ...conversation }
+        }
+        catch (error) {
+            lastError = error
+            console.warn('[Exporter] Temporary chat API request failed; using page data', error)
+        }
     }
 
-    return {
-        id: chatId,
-        ...conversation,
+    if (temporary) {
+        const pageConversation = getConversationFromPage(chatId)
+        if (pageConversation) {
+            if (shouldReplaceAssets) await replaceImageAssets(pageConversation)
+            return {
+                id: chatId,
+                ...pageConversation,
+            }
+        }
+
+        if (lastError) throw lastError
+        throw new Error('Temporary chat data is not available on the page.')
+    }
+
+    const url = conversationApi(chatId)
+    try {
+        const conversation = await fetchApi<ApiConversation>(url)
+
+        if (shouldReplaceAssets) {
+            await replaceImageAssets(conversation)
+        }
+
+        return {
+            id: chatId,
+            ...conversation,
+        }
+    }
+    catch (error) {
+        // A temporary chat can briefly look like /c/:id after its first
+        // message, even though that id is not persisted by the API. Only use
+        // the DOM fallback when this is the chat currently open in the tab;
+        // batch exports must never substitute the visible chat for another ID.
+        if (getChatIdFromUrl() === chatId) {
+            const pageConversation = getConversationFromPage(chatId)
+            if (pageConversation) {
+                if (shouldReplaceAssets) await replaceImageAssets(pageConversation)
+                return {
+                    id: chatId,
+                    ...pageConversation,
+                }
+            }
+        }
+        throw error
     }
 }
 

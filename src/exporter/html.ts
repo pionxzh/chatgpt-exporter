@@ -82,6 +82,7 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
     const timeStampHtml = ScriptStorage.get<boolean>(KEY_TIMESTAMP_HTML) ?? false
     const timeStamp24H = ScriptStorage.get<boolean>(KEY_TIMESTAMP_24H) ?? false
     const enableSources = ScriptStorage.get<boolean>(KEY_SOURCES_ENABLED) ?? true
+    const enableThinking = ScriptStorage.get<boolean>(KEY_THINKING_ENABLED) ?? false
 
     const LatexRegex = /(\s\$\$.+?\$\$\s|\s\$.+?\$\s|\\\[.+?\\\]|\\\(.+?\\\))|(^\$$[\S\s]+?^\$$)|(^\$\$[\S\s]+?^\$\$\$)/gm
 
@@ -156,7 +157,7 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
             timestampHtml = `<time class="time" datetime="${date.toISOString()}" title="${date.toLocaleString()}">${conversationTime}</time>`
         }
 
-        const thinkingBlock = thinking ? formatThinkingHtml(thinking) : ''
+        const thinkingBlock = enableThinking && thinking ? formatThinkingHtml(thinking) : ''
 
         return `
 <div class="conversation-item">
