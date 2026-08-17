@@ -100,7 +100,6 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
     const timeStampMarkdown = ScriptStorage.get<boolean>(KEY_TIMESTAMP_MARKDOWN) ?? false
     const timeStamp24H = ScriptStorage.get<boolean>(KEY_TIMESTAMP_24H) ?? false
     const enableSources = ScriptStorage.get<boolean>(KEY_SOURCES_ENABLED) ?? true
-    const enableThinking = ScriptStorage.get<boolean>(KEY_THINKING_ENABLED) ?? false
 
     const content = conversationNodes.map(({ message, thinking }) => {
         if (!message || !message.content) return null
@@ -118,7 +117,7 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
         }
 
         const author = transformAuthor(message.author)
-        const thinkingBlock = enableThinking && thinking ? formatThinkingMarkdown(thinking) : ''
+        const thinkingBlock = thinking ? formatThinkingMarkdown(thinking) : ''
 
         const postSteps: Array<(input: string) => string> = []
         if (message.author.role === 'assistant') {

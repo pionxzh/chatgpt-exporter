@@ -1,13 +1,11 @@
 import { fetchConversation, getCurrentChatId, processConversation, shouldSkipMessageInExport } from '../api'
-import { KEY_SOURCES_ENABLED, KEY_THINKING_ENABLED } from '../constants'
 import i18n from '../i18n'
 import { checkIfConversationStarted } from '../page'
 import { transformContentReferences } from '../utils/citations'
 import { copyToClipboard } from '../utils/clipboard'
 import { flatMap, fromMarkdown, toMarkdown } from '../utils/markdown'
-import { ScriptStorage } from '../utils/storage'
 import { standardizeLineBreaks } from '../utils/text'
-import type { ConversationNodeMessage, ThinkingContent } from '../api'
+import type { ConversationNodeMessage } from '../api'
 import type { Emphasis, Strong } from 'mdast'
 
 export async function exportToText() {
@@ -20,11 +18,10 @@ export async function exportToText() {
     // All image in text output will be replaced with `[image]`
     // So we don't need to waste time to download them
     const rawConversation = await fetchConversation(chatId, false)
-    const enableThinking = ScriptStorage.get<boolean>(KEY_THINKING_ENABLED) ?? false
 
-    const { conversationNodes } = processConversation(rawConversation, { enableThinking })
+    const { conversationNodes } = processConversation(rawConversation)
     const text = conversationNodes
-        .map(({ message, thinking }) => transformMessage(message, enableThinking ? thinking : undefined))
+        .map(({ message }) => transformMessage(message))
         .filter(Boolean)
         .join('\n\n')
 
@@ -35,7 +32,7 @@ export async function exportToText() {
 
 const LatexRegex = /(\s\$\$.+\$\$\s|\s\$.+\$\s|\\\[.+\\\]|\\\(.+\\\))|(^\$$[\S\s]+^\$$)|(^\$\$[\S\s]+^\$\$$)/gm
 
-function transformMessage(message?: ConversationNodeMessage, thinking?: ThinkingContent) {
+function transformMessage(message?: ConversationNodeMessage) {
     if (!message || !message.content) return null
 
     if (shouldSkipMessageInExport(message)) return null
@@ -56,7 +53,7 @@ function transformMessage(message?: ConversationNodeMessage, thinking?: Thinking
         content = transformContentReferences(content, message.metadata, {
             output: 'text',
             inlineReferenceMode: 'alt',
-            includeSourceList: ScriptStorage.get<boolean>(KEY_SOURCES_ENABLED) ?? true,
+            includeSourceList: false,
         })
         content = transformFootNotes(content, message.metadata)
     }
@@ -73,23 +70,7 @@ function transformMessage(message?: ConversationNodeMessage, thinking?: Thinking
         })
     }
 
-    const thinkingText = message.author.role === 'assistant' && thinking
-        ? formatThinkingText(thinking)
-        : ''
-
-    return `${author}:\n${[thinkingText, content].filter(Boolean).join('\n\n')}`
-}
-
-function formatThinkingText(thinking: ThinkingContent): string {
-    const duration = thinking.durationSeconds != null
-        ? `Thought for ${thinking.durationSeconds} seconds`
-        : 'Thinking'
-    const details = [
-        ...(thinking.activities ?? []),
-        ...thinking.thoughts.map(thought => thought.content || thought.summary),
-    ].filter(Boolean)
-
-    return [`${duration}:`, ...details.map(detail => `- ${detail}`)].join('\n')
+    return `${author}:\n${content}`
 }
 
 /**

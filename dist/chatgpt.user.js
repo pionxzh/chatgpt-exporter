@@ -1284,311 +1284,20 @@ html {
       reader.readAsDataURL(blob);
     });
   }
-  function isConversationLike(value) {
-    if (!value || typeof value !== "object") return false;
-    const candidate = value;
-    return typeof candidate.current_node === "string" && !!candidate.mapping && typeof candidate.mapping === "object";
-  }
-  function cloneConversation(value) {
-    return JSON.parse(JSON.stringify(value));
-  }
-  function findConversation(value, chatId, seen, depth = 0) {
-    if (!value || typeof value !== "object" || seen.has(value)) return null;
-    seen.add(value);
-    if (isConversationLike(value)) {
-      const candidate = value;
-      const candidateId = candidate.id ?? candidate.conversation_id;
-      if (!chatId || chatId.startsWith("__temporary__") || !candidateId || candidateId === chatId) {
-        return candidate;
-      }
-    }
-    if (depth >= 8) return null;
-    if (Array.isArray(value)) {
-      for (const item of value) {
-        const result = findConversation(item, chatId, seen, depth + 1);
-        if (result) return result;
-      }
-      return null;
-    }
-    for (const child of Object.values(value)) {
-      const result = findConversation(child, chatId, seen, depth + 1);
-      if (result) return result;
-    }
-    return null;
-  }
-  function getConversationFromRouter(chatId) {
-    var _a;
-    const contexts = [_unsafeWindow.__reactRouterContext, _unsafeWindow.__reactRouterDataRouter];
-    const seen = /* @__PURE__ */ new Set();
-    for (const context of contexts) {
-      const loaderData = (_a = context == null ? void 0 : context.state) == null ? void 0 : _a.loaderData;
-      const conversation = findConversation(loaderData, chatId, seen);
-      if (conversation) {
-        try {
-          return cloneConversation(conversation);
-        } catch (error2) {
-          console.error("[Exporter] Failed to copy temporary chat data", error2);
-        }
-      }
-    }
-    return null;
-  }
-  function mergePageConversationData(routerConversation, domConversation, chatId) {
-    var _a, _b, _c;
-    const merged = cloneConversation(routerConversation);
-    const domNodesById = new Map(Object.values(domConversation.mapping).map((node2) => [node2.id, node2]));
-    const domNodesByRole = {
-      user: [],
-      assistant: []
-    };
-    for (const node2 of Object.values(domConversation.mapping)) {
-      const role = (_a = node2.message) == null ? void 0 : _a.author.role;
-      if (role === "user" || role === "assistant") {
-        domNodesByRole[role].push(node2);
-      }
-    }
-    const roleIndexes = { user: 0, assistant: 0 };
-    for (const node2 of Object.values(merged.mapping)) {
-      const message = node2.message;
-      const role = message == null ? void 0 : message.author.role;
-      if (!message || role !== "user" && role !== "assistant") continue;
-      const roleNodes = domNodesByRole[role];
-      const roleIndex = roleIndexes[role]++;
-      const domNode = domNodesById.get(node2.id) ?? roleNodes[roleIndex];
-      if (!(domNode == null ? void 0 : domNode.message) || domNode.message.author.role !== role) continue;
-      const domReferences = (_b = domNode.message.metadata) == null ? void 0 : _b.content_references;
-      if (domReferences == null ? void 0 : domReferences.length) {
-        message.metadata = {
-          ...message.metadata ?? {},
-          content_references: [
-            ...((_c = message.metadata) == null ? void 0 : _c.content_references) ?? [],
-            ...domReferences
-          ]
-        };
-      }
-      if (!node2.thinking && domNode.thinking) node2.thinking = domNode.thinking;
-    }
-    if (isTemporaryChat() || (chatId == null ? void 0 : chatId.startsWith("__temporary__"))) {
-      merged.is_temporary_chat = true;
-    }
-    return merged;
-  }
-  function getElementText(element2) {
-    const copy2 = element2.cloneNode(true);
-    copy2.querySelectorAll('button, [role="button"], svg, time, textarea, input').forEach((child) => child.remove());
-    return (copy2.innerText || copy2.textContent || "").replace(/\u00A0/g, " ").replace(/\n{3,}/g, "\n\n").trim();
-  }
-  function isFaviconUrl(value) {
-    try {
-      const url = new URL(value, location.href);
-      return url.hostname === "www.google.com" && url.pathname === "/s2/favicons";
-    } catch {
-      return false;
-    }
-  }
-  function getFaviconSource(value) {
-    var _a;
-    try {
-      const iconUrl = new URL(value, location.href);
-      if (!isFaviconUrl(iconUrl.href)) return null;
-      const domain2 = (_a = iconUrl.searchParams.get("domain")) == null ? void 0 : _a.trim();
-      if (!domain2) return null;
-      const sourceUrl = new URL(/^https?:\/\//i.test(domain2) ? domain2 : `https://${domain2}`);
-      if (!["http:", "https:"].includes(sourceUrl.protocol)) return null;
-      return { title: sourceUrl.hostname, url: sourceUrl.origin };
-    } catch {
-      return null;
-    }
-  }
-  function getSourceLinks(element2) {
-    var _a, _b;
-    const sources = [];
-    const seen = /* @__PURE__ */ new Set();
-    const sourceHosts = /* @__PURE__ */ new Set();
-    for (const anchor of Array.from(element2.querySelectorAll("a[href]"))) {
-      let url;
-      try {
-        url = new URL(anchor.href, location.href);
-      } catch {
-        continue;
-      }
-      if (!["http:", "https:"].includes(url.protocol)) continue;
-      if (isFaviconUrl(url.href)) continue;
-      if (url.origin === location.origin) continue;
-      if (/(^|\.)chatgpt\.com$/i.test(url.hostname) || /(^|\.)chat\.openai\.com$/i.test(url.hostname)) continue;
-      if (seen.has(url.href)) continue;
-      seen.add(url.href);
-      sourceHosts.add(url.hostname);
-      const title2 = ((_a = anchor.getAttribute("aria-label")) == null ? void 0 : _a.trim()) || ((_b = anchor.getAttribute("title")) == null ? void 0 : _b.trim()) || getElementText(anchor).replace(/\s+/g, " ") || url.hostname;
-      sources.push({ title: title2, url: url.href });
-    }
-    for (const image2 of Array.from(element2.querySelectorAll("img"))) {
-      const source = getFaviconSource(image2.currentSrc || image2.src);
-      if (!source || !source.url) continue;
-      const hostname = new URL(source.url).hostname;
-      if (sourceHosts.has(hostname) || seen.has(source.url)) continue;
-      seen.add(source.url);
-      sourceHosts.add(hostname);
-      sources.push(source);
-    }
-    return sources;
-  }
-  function getThinkingCandidateText(element2) {
-    const copy2 = element2.cloneNode(true);
-    if (copy2.matches(".markdown")) return "";
-    copy2.querySelectorAll(".markdown, [data-message-author-role], svg, textarea, input").forEach((child) => child.remove());
-    return (copy2.innerText || copy2.textContent || "").replace(/\u00A0/g, " ").replace(/\n{3,}/g, "\n\n").trim();
-  }
-  function parseThinkingDuration(text2) {
-    const minuteMatch = text2.match(/(?:thought|thinking|reasoning).*?(\d+(?:\.\d+)?)\s*m(?:in(?:ute)?s?)?(?:\s*(\d+(?:\.\d+)?)\s*s(?:ec(?:ond)?s?)?)?/i);
-    if (minuteMatch) {
-      return Number(minuteMatch[1]) * 60 + (minuteMatch[2] ? Number(minuteMatch[2]) : 0);
-    }
-    const secondMatch = text2.match(/(?:thought|thinking|reasoning).*?(\d+(?:\.\d+)?)\s*(?:s|sec(?:ond)?s?)\b/i);
-    if (secondMatch) return Number(secondMatch[1]);
-    return void 0;
-  }
-  function getVisibleThinking(element2) {
-    const candidates = [
-      ...element2.matches('details, [data-testid*="thought" i], [data-testid*="thinking" i], [data-testid*="reasoning" i], [aria-label*="thought" i], [aria-label*="thinking" i], [aria-label*="reasoning" i], [class*="thought" i], [class*="thinking" i], [class*="reasoning" i]') ? [element2] : [],
-      ...Array.from(element2.querySelectorAll('details, [data-testid*="thought" i], [data-testid*="thinking" i], [data-testid*="reasoning" i], [aria-label*="thought" i], [aria-label*="thinking" i], [aria-label*="reasoning" i], [class*="thought" i], [class*="thinking" i], [class*="reasoning" i]'))
-    ];
-    const visibleCandidates = candidates.filter((candidate2) => candidate2.getAttribute("aria-hidden") !== "true" && !candidate2.hidden && !candidate2.closest(".markdown")).map((candidate2) => {
-      var _a, _b;
-      const text2 = getThinkingCandidateText(candidate2);
-      const label = ((_a = candidate2.getAttribute("aria-label")) == null ? void 0 : _a.trim()) || ((_b = candidate2.getAttribute("title")) == null ? void 0 : _b.trim()) || "";
-      return { candidate: candidate2, label, text: text2 };
-    }).filter(({ text: text2, label }) => /\b(?:thought|thinking|reasoning)\b/i.test(`${label} ${text2}`)).sort((a2, b2) => b2.text.length - a2.text.length);
-    const candidate = visibleCandidates[0];
-    if (!candidate) return void 0;
-    const combinedText = [candidate.label, candidate.text].filter(Boolean).join("\n").trim();
-    const durationSeconds = parseThinkingDuration(combinedText);
-    const body2 = candidate.text.replace(/thought\s+for\s+\d+(?:\.\d+)?\s*(?:s|sec(?:ond)?s?|m(?:in(?:ute)?s?)?)(?:\s*\d+(?:\.\d+)?\s*(?:s|sec(?:ond)?s?))?/ig, "").replace(/\n{3,}/g, "\n\n").trim();
-    const summary = candidate.label || candidate.text.split("\n")[0] || "Thinking";
-    return {
-      thoughts: [{ summary, content: body2 || summary }],
-      ...durationSeconds != null ? { durationSeconds } : {}
-    };
-  }
-  function getMessageTimestamp(element2, fallback) {
-    var _a, _b;
-    const timestamp2 = ((_a = element2.closest("[data-message-id]")) == null ? void 0 : _a.getAttribute("data-created-at")) ?? element2.getAttribute("data-created-at") ?? ((_b = element2.querySelector("time[datetime]")) == null ? void 0 : _b.getAttribute("datetime"));
-    if (!timestamp2) return fallback;
-    const numericTimestamp = Number(timestamp2);
-    if (Number.isFinite(numericTimestamp)) {
-      return numericTimestamp > 1e12 ? numericTimestamp / 1e3 : numericTimestamp;
-    }
-    const dateTimestamp = new Date(timestamp2).getTime();
-    return Number.isFinite(dateTimestamp) ? dateTimestamp / 1e3 : fallback;
-  }
-  function getConversationFromDom(chatId) {
-    var _a, _b;
-    const turns = Array.from(document.querySelectorAll('main [data-testid^="conversation-turn-"]'));
-    const messages = [];
-    const usedIds = /* @__PURE__ */ new Set();
-    const fallbackTime = Date.now() / 1e3;
-    turns.forEach((turn, index2) => {
-      const candidates = turn.matches("[data-message-author-role]") ? [turn] : Array.from(turn.querySelectorAll("[data-message-author-role]"));
-      const messageElement = candidates.find((candidate) => {
-        const role2 = candidate.getAttribute("data-message-author-role");
-        return role2 === "user" || role2 === "assistant";
-      });
-      if (!messageElement) return;
-      const role = messageElement.getAttribute("data-message-author-role");
-      const contentElement = messageElement.querySelector(role === "assistant" ? ".markdown" : ".whitespace-pre-wrap") ?? messageElement;
-      let text2 = getElementText(contentElement);
-      const images = Array.from(contentElement.querySelectorAll("img")).map((image2) => {
-        const src = image2.currentSrc || image2.src;
-        if (!src || isFaviconUrl(src)) return "";
-        const alt = image2.alt || "image";
-        return `![${alt}](${src})`;
-      }).filter(Boolean);
-      if (images.length > 0) text2 = [text2, ...images].filter(Boolean).join("\n\n");
-      if (!text2) return;
-      const messageIdElement = messageElement.matches("[data-message-id]") ? messageElement : messageElement.closest("[data-message-id]") ?? messageElement.querySelector("[data-message-id]");
-      const baseId = (messageIdElement == null ? void 0 : messageIdElement.getAttribute("data-message-id")) || `temporary-message-${index2 + 1}`;
-      let messageId = baseId;
-      let duplicateIndex = 2;
-      while (usedIds.has(messageId)) messageId = `${baseId}-${duplicateIndex++}`;
-      usedIds.add(messageId);
-      messages.push({
-        role,
-        text: text2,
-        id: messageId,
-        createTime: getMessageTimestamp(messageElement, fallbackTime + index2 / 1e3),
-        sources: role === "assistant" ? getSourceLinks(turn) : [],
-        thinking: role === "assistant" ? getVisibleThinking(messageElement) : void 0
-      });
-    });
-    if (messages.length === 0) return null;
-    const rootId = "temporary-chat-root";
-    const mapping = {
-      [rootId]: { id: rootId, children: [] }
-    };
-    let parent = rootId;
-    for (const { role, text: text2, id: id2, createTime, sources, thinking } of messages) {
-      const contentReferences = sources.length > 0 ? [{
-        type: "sources_footnote",
-        start_idx: 0,
-        end_idx: 0,
-        sources
-      }] : void 0;
-      mapping[id2] = {
-        id: id2,
-        parent,
-        children: [],
-        ...thinking ? { thinking } : {},
-        message: {
-          author: { role, metadata: {} },
-          content: { content_type: "text", parts: [text2] },
-          create_time: createTime,
-          id: id2,
-          metadata: contentReferences ? { content_references: contentReferences } : {},
-          recipient: "all",
-          status: "finished_successfully",
-          weight: 1
-        }
-      };
-      mapping[parent].children.push(id2);
-      parent = id2;
-    }
-    const firstUserMessage = messages.find((message) => message.role === "user");
-    const title2 = ((_b = (_a = document.querySelector("main h1")) == null ? void 0 : _a.textContent) == null ? void 0 : _b.trim()) || (firstUserMessage == null ? void 0 : firstUserMessage.text.split("\n")[0].slice(0, 80)) || "Temporary Chat";
-    const id = chatId || `__temporary__${messages[0].id}`;
-    return {
-      conversation_id: id,
-      create_time: messages[0].createTime,
-      current_node: messages[messages.length - 1].id,
-      mapping,
-      moderation_results: [],
-      title: title2,
-      is_archived: false,
-      ...isTemporaryChat() || id.startsWith("__temporary__") ? { is_temporary_chat: true } : {},
-      update_time: messages[messages.length - 1].createTime
-    };
-  }
   function getChatIdFromUrl() {
     const match = location.pathname.match(/^\/(?:share|c|g\/[a-z0-9-]+\/c)\/([a-z0-9-]+)/i);
     if (match) return match[1];
-    const conversationId = new URLSearchParams(location.search).get("conversationId");
-    if (conversationId) return conversationId;
     return null;
-  }
-  function isTemporaryChat() {
-    return new URLSearchParams(location.search).get("temporary-chat") === "true";
-  }
-  function getConversationFromPage(chatId) {
-    const routerConversation = getConversationFromRouter(chatId);
-    const domConversation = getConversationFromDom(chatId);
-    if (!routerConversation) return domConversation;
-    if (!domConversation) return routerConversation;
-    return mergePageConversationData(routerConversation, domConversation, chatId);
   }
   function isSharePage() {
     return location.pathname.startsWith("/share") && !location.pathname.endsWith("/continue");
   }
   function getConversationFromSharePage() {
-    return getConversationFromRouter();
+    var _a, _b, _c, _d, _e;
+    if ((_e = (_d = (_c = (_b = (_a = _unsafeWindow.__reactRouterContext) == null ? void 0 : _a.state) == null ? void 0 : _b.loaderData) == null ? void 0 : _c["routes/share.$shareId.($action)"]) == null ? void 0 : _d.serverResponse) == null ? void 0 : _e.data) {
+      return JSON.parse(JSON.stringify(_unsafeWindow.__reactRouterContext.state.loaderData["routes/share.$shareId.($action)"].serverResponse.data));
+    }
+    return null;
   }
   const defaultAvatar = "data:image/svg+xml,%3Csvg%20stroke%3D%22currentColor%22%20fill%3D%22none%22%20stroke-width%3D%221.5%22%20viewBox%3D%22-6%20-6%2036%2036%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20style%3D%22color%3A%20white%3B%20background%3A%20%23ab68ff%3B%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M20%2021v-2a4%204%200%200%200-4-4H8a4%204%200%200%200-4%204v2%22%3E%3C%2Fpath%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%227%22%20r%3D%224%22%3E%3C%2Fcircle%3E%3C%2Fsvg%3E";
   async function getUserAvatar() {
@@ -1631,7 +1340,6 @@ html {
     }
     const chatId = getChatIdFromUrl();
     if (chatId) return chatId;
-    if (isTemporaryChat()) return "__temporary__current";
     const conversations = await fetchConversations();
     if (conversations && conversations.items.length > 0) {
       return conversations.items[0].id;
@@ -1695,54 +1403,15 @@ html {
         ...shareConversation
       };
     }
-    const currentChatId = getChatIdFromUrl();
-    const temporary = chatId.startsWith("__temporary__") || isTemporaryChat() && currentChatId === chatId;
-    let lastError;
-    if (temporary && !chatId.startsWith("__temporary__")) {
-      try {
-        const conversation = await fetchApi(conversationApi(chatId));
-        if (shouldReplaceAssets) await replaceImageAssets(conversation);
-        return { id: chatId, ...conversation };
-      } catch (error2) {
-        lastError = error2;
-        console.warn("[Exporter] Temporary chat API request failed; using page data", error2);
-      }
-    }
-    if (temporary) {
-      const pageConversation = getConversationFromPage(chatId);
-      if (pageConversation) {
-        if (shouldReplaceAssets) await replaceImageAssets(pageConversation);
-        return {
-          id: chatId,
-          ...pageConversation
-        };
-      }
-      if (lastError) throw lastError;
-      throw new Error("Temporary chat data is not available on the page.");
-    }
     const url = conversationApi(chatId);
-    try {
-      const conversation = await fetchApi(url);
-      if (shouldReplaceAssets) {
-        await replaceImageAssets(conversation);
-      }
-      return {
-        id: chatId,
-        ...conversation
-      };
-    } catch (error2) {
-      if (getChatIdFromUrl() === chatId) {
-        const pageConversation = getConversationFromPage(chatId);
-        if (pageConversation) {
-          if (shouldReplaceAssets) await replaceImageAssets(pageConversation);
-          return {
-            id: chatId,
-            ...pageConversation
-          };
-        }
-      }
-      throw error2;
+    const conversation = await fetchApi(url);
+    if (shouldReplaceAssets) {
+      await replaceImageAssets(conversation);
     }
+    return {
+      id: chatId,
+      ...conversation
+    };
   }
   async function fetchProjects() {
     let cursor = null;
@@ -21774,7 +21443,6 @@ ${sourceList}` : sourceList;
     const timeStampHtml = ScriptStorage.get(KEY_TIMESTAMP_HTML) ?? false;
     const timeStamp24H = ScriptStorage.get(KEY_TIMESTAMP_24H) ?? false;
     const enableSources = ScriptStorage.get(KEY_SOURCES_ENABLED) ?? true;
-    const enableThinking = ScriptStorage.get(KEY_THINKING_ENABLED) ?? false;
     const LatexRegex2 = /(\s\$\$.+?\$\$\s|\s\$.+?\$\s|\\\[.+?\\\]|\\\(.+?\\\))|(^\$$[\S\s]+?^\$$)|(^\$\$[\S\s]+?^\$\$\$)/gm;
     const conversationHtml = conversationNodes.map(({ message, thinking }) => {
       var _a;
@@ -21824,7 +21492,7 @@ ${sourceList}` : sourceList;
         conversationTime = date2.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: !timeStamp24H });
         timestampHtml = `<time class="time" datetime="${date2.toISOString()}" title="${date2.toLocaleString()}">${conversationTime}</time>`;
       }
-      const thinkingBlock = enableThinking && thinking ? formatThinkingHtml(thinking) : "";
+      const thinkingBlock = thinking ? formatThinkingHtml(thinking) : "";
       return `
 <div class="conversation-item">
     <div class="author ${authorType}">
@@ -22307,7 +21975,6 @@ ${_metaList.join("\n")}
     const timeStampMarkdown = ScriptStorage.get(KEY_TIMESTAMP_MARKDOWN) ?? false;
     const timeStamp24H = ScriptStorage.get(KEY_TIMESTAMP_24H) ?? false;
     const enableSources = ScriptStorage.get(KEY_SOURCES_ENABLED) ?? true;
-    const enableThinking = ScriptStorage.get(KEY_THINKING_ENABLED) ?? false;
     const content2 = conversationNodes.map(({ message, thinking }) => {
       if (!message || !message.content) return null;
       if (shouldSkipMessageInExport(message)) return null;
@@ -22322,7 +21989,7 @@ ${_metaList.join("\n")}
 `;
       }
       const author = transformAuthor$1(message.author);
-      const thinkingBlock = enableThinking && thinking ? formatThinkingMarkdown(thinking) : "";
+      const thinkingBlock = thinking ? formatThinkingMarkdown(thinking) : "";
       const postSteps = [];
       if (message.author.role === "assistant") {
         postSteps.push((input) => transformContentReferences(input, message.metadata, {
@@ -22481,14 +22148,13 @@ ${body2}
     }
     const chatId = await getCurrentChatId();
     const rawConversation = await fetchConversation(chatId, false);
-    const enableThinking = ScriptStorage.get(KEY_THINKING_ENABLED) ?? false;
-    const { conversationNodes } = processConversation(rawConversation, { enableThinking });
-    const text2 = conversationNodes.map(({ message, thinking }) => transformMessage(message, enableThinking ? thinking : void 0)).filter(Boolean).join("\n\n");
+    const { conversationNodes } = processConversation(rawConversation);
+    const text2 = conversationNodes.map(({ message }) => transformMessage(message)).filter(Boolean).join("\n\n");
     copyToClipboard(standardizeLineBreaks(text2));
     return true;
   }
   const LatexRegex = /(\s\$\$.+\$\$\s|\s\$.+\$\s|\\\[.+\\\]|\\\(.+\\\))|(^\$$[\S\s]+^\$$)|(^\$\$[\S\s]+^\$\$$)/gm;
-  function transformMessage(message, thinking) {
+  function transformMessage(message) {
     if (!message || !message.content) return null;
     if (shouldSkipMessageInExport(message)) return null;
     const author = transformAuthor(message.author);
@@ -22504,7 +22170,7 @@ ${body2}
       content2 = transformContentReferences(content2, message.metadata, {
         output: "text",
         inlineReferenceMode: "alt",
-        includeSourceList: ScriptStorage.get(KEY_SOURCES_ENABLED) ?? true
+        includeSourceList: false
       });
       content2 = transformFootNotes(content2, message.metadata);
     }
@@ -22516,17 +22182,8 @@ ${body2}
         return matches[+index2];
       });
     }
-    const thinkingText = message.author.role === "assistant" && thinking ? formatThinkingText(thinking) : "";
     return `${author}:
-${[thinkingText, content2].filter(Boolean).join("\n\n")}`;
-  }
-  function formatThinkingText(thinking) {
-    const duration = thinking.durationSeconds != null ? `Thought for ${thinking.durationSeconds} seconds` : "Thinking";
-    const details = [
-      ...thinking.activities ?? [],
-      ...thinking.thoughts.map((thought) => thought.content || thought.summary)
-    ].filter(Boolean);
-    return [`${duration}:`, ...details.map((detail) => `- ${detail}`)].join("\n");
+${content2}`;
   }
   function transformContent(content2, metadata) {
     var _a, _b, _c, _d;
