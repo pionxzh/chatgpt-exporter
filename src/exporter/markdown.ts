@@ -2,7 +2,8 @@ import JSZip from 'jszip'
 import { fetchConversation, getCurrentChatId, processConversation, shouldSkipMessageInExport } from '../api'
 import { KEY_SOURCES_ENABLED, KEY_THINKING_ENABLED, KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_MARKDOWN, baseUrl } from '../constants'
 import i18n from '../i18n'
-import { checkIfConversationStarted, isTemporaryChat } from '../page'
+import { checkIfConversationStarted } from '../page'
+import { checkIfTemporaryChatIsExportable } from '../temporaryChat'
 import { transformContentReferences } from '../utils/citations'
 import { buildZipFileName, downloadFile, getFileNameWithFormat } from '../utils/download'
 import { fromMarkdown, toMarkdown } from '../utils/markdown'
@@ -19,8 +20,8 @@ export async function exportToMarkdown(fileNameFormat: string, metaList: ExportM
         return false
     }
 
-    if (isTemporaryChat()) {
-        alert(i18n.t('Temporary chats cannot be exported'))
+    if (!checkIfTemporaryChatIsExportable()) {
+        alert(i18n.t('Temporary chat could not be captured'))
         return false
     }
 

@@ -1,6 +1,7 @@
 import { fetchConversation, getCurrentChatId, processConversation, shouldSkipMessageInExport } from '../api'
 import i18n from '../i18n'
-import { checkIfConversationStarted, isTemporaryChat } from '../page'
+import { checkIfConversationStarted } from '../page'
+import { checkIfTemporaryChatIsExportable } from '../temporaryChat'
 import { transformContentReferences } from '../utils/citations'
 import { copyToClipboard } from '../utils/clipboard'
 import { flatMap, fromMarkdown, toMarkdown } from '../utils/markdown'
@@ -14,8 +15,8 @@ export async function exportToText() {
         return false
     }
 
-    if (isTemporaryChat()) {
-        alert(i18n.t('Temporary chats cannot be exported'))
+    if (!checkIfTemporaryChatIsExportable()) {
+        alert(i18n.t('Temporary chat could not be captured'))
         return false
     }
 

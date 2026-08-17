@@ -1,7 +1,8 @@
 import JSZip from 'jszip'
 import { fetchConversation, getCurrentChatId, processConversation } from '../api'
 import i18n from '../i18n'
-import { checkIfConversationStarted, isTemporaryChat } from '../page'
+import { checkIfConversationStarted } from '../page'
+import { checkIfTemporaryChatIsExportable } from '../temporaryChat'
 import { convertToOoba, convertToTavern } from '../utils/conversion'
 import { buildJsonBatchFileName, buildZipFileName, downloadFile, getFileNameWithFormat } from '../utils/download'
 import type { ApiConversationWithId } from '../api'
@@ -14,8 +15,8 @@ export async function exportToJson(fileNameFormat: string) {
         return false
     }
 
-    if (isTemporaryChat()) {
-        alert(i18n.t('Temporary chats cannot be exported'))
+    if (!checkIfTemporaryChatIsExportable()) {
+        alert(i18n.t('Temporary chat could not be captured'))
         return false
     }
 
@@ -39,8 +40,8 @@ export async function exportToTavern(fileNameFormat: string) {
         return false
     }
 
-    if (isTemporaryChat()) {
-        alert(i18n.t('Temporary chats cannot be exported'))
+    if (!checkIfTemporaryChatIsExportable()) {
+        alert(i18n.t('Temporary chat could not be captured'))
         return false
     }
 
@@ -61,8 +62,8 @@ export async function exportToOoba(fileNameFormat: string) {
         return false
     }
 
-    if (isTemporaryChat()) {
-        alert(i18n.t('Temporary chats cannot be exported'))
+    if (!checkIfTemporaryChatIsExportable()) {
+        alert(i18n.t('Temporary chat could not be captured'))
         return false
     }
 
