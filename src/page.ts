@@ -49,6 +49,16 @@ export function getChatIdFromUrl() {
     return null
 }
 
+/**
+ * Temporary chats are never persisted by ChatGPT, so they are absent from both
+ * the conversation API and the router's loader data. Without this check the
+ * exporter falls through to the most recent conversation in the history and
+ * silently exports the wrong chat.
+ */
+export function isTemporaryChat() {
+    return new URLSearchParams(location.search).get('temporary-chat') === 'true'
+}
+
 export function isSharePage() {
     return location.pathname.startsWith('/share')
         && !location.pathname.endsWith('/continue')

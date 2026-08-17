@@ -1,6 +1,6 @@
 import { fetchConversation, getCurrentChatId, processConversation, shouldSkipMessageInExport } from '../api'
 import i18n from '../i18n'
-import { checkIfConversationStarted } from '../page'
+import { checkIfConversationStarted, isTemporaryChat } from '../page'
 import { transformContentReferences } from '../utils/citations'
 import { copyToClipboard } from '../utils/clipboard'
 import { flatMap, fromMarkdown, toMarkdown } from '../utils/markdown'
@@ -11,6 +11,11 @@ import type { Emphasis, Strong } from 'mdast'
 export async function exportToText() {
     if (!checkIfConversationStarted()) {
         alert(i18n.t('Please start a conversation first'))
+        return false
+    }
+
+    if (isTemporaryChat()) {
+        alert(i18n.t('Temporary chats cannot be exported'))
         return false
     }
 
