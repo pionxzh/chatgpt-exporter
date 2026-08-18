@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.32.3
+// @version            2.33.0
 // @author             pionxzh
 // @description        Export ChatGPT conversations with one click — backup & share effortlessly!
 // @description:zh-CN  一键导出 ChatGPT 对话，轻松备份与分享
@@ -1289,6 +1289,9 @@ html {
     if (match) return match[1];
     return null;
   }
+  function isTemporaryChat() {
+    return new URLSearchParams(location.search).get("temporary-chat") === "true";
+  }
   function isSharePage() {
     return location.pathname.startsWith("/share") && !location.pathname.endsWith("/continue");
   }
@@ -1312,6 +1315,69 @@ html {
   }
   function checkIfConversationStarted() {
     return !!document.querySelector('[data-testid^="conversation-turn-"]');
+  }
+  const CONVERSATION_STREAM_PATH = "/backend-api/f/conversation";
+  const DATA_PREFIX = "data:";
+  const MAX_SCAN_LENGTH = 2e5;
+  let temporaryChatId = null;
+  function getTemporaryChatId() {
+    return temporaryChatId;
+  }
+  function checkIfTemporaryChatIsExportable() {
+    return !isTemporaryChat() || temporaryChatId !== null;
+  }
+  function watchTemporaryChatId() {
+    const originalFetch = _unsafeWindow.fetch;
+    _unsafeWindow.fetch = async (input, init2) => {
+      const response = await originalFetch.call(_unsafeWindow, input, init2);
+      if (!isTemporaryChat() || !response.body) return response;
+      const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+      if (!url.includes(CONVERSATION_STREAM_PATH)) return response;
+      readConversationId(response.clone());
+      return response;
+    };
+  }
+  async function readConversationId(response) {
+    var _a;
+    const reader = (_a = response.body) == null ? void 0 : _a.getReader();
+    if (!reader) return;
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let scanned = 0;
+    try {
+      while (scanned < MAX_SCAN_LENGTH) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        scanned += chunk.length;
+        buffer += chunk;
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+        const conversationId = findConversationId(lines);
+        if (conversationId) {
+          temporaryChatId = conversationId;
+          break;
+        }
+      }
+    } catch (error2) {
+      console.error("[Exporter] Failed to read the temporary chat id", error2);
+    } finally {
+      reader.cancel().catch(() => {
+      });
+    }
+  }
+  function findConversationId(lines) {
+    for (const line of lines) {
+      if (!line.startsWith(DATA_PREFIX)) continue;
+      const payload = line.slice(DATA_PREFIX.length).trim();
+      if (!payload || payload === "[DONE]") continue;
+      try {
+        const { conversation_id: conversationId } = JSON.parse(payload);
+        if (typeof conversationId === "string") return conversationId;
+      } catch {
+      }
+    }
+    return null;
   }
   const generateKey = (args) => JSON.stringify(args);
   function memorize(fn2) {
@@ -1337,6 +1403,11 @@ html {
   async function getCurrentChatId() {
     if (isSharePage()) {
       return `__share__${getChatIdFromUrl()}`;
+    }
+    if (isTemporaryChat()) {
+      const temporaryChatId2 = getTemporaryChatId();
+      if (!temporaryChatId2) throw new Error("No temporary chat id found.");
+      return temporaryChatId2;
     }
     const chatId = getChatIdFromUrl();
     if (chatId) return chatId;
@@ -8484,6 +8555,7 @@ html {
     "Conversation Delete Alert": "Are you sure you want to delete all selected conversations?",
     "Conversation Deleted Message": "All selected conversations have been deleted. Please refresh the page to see the changes.",
     "Please start a conversation first": "Please start a conversation first.",
+    "Temporary chat could not be captured": "This temporary chat could not be read. It may have started before the exporter was loaded. You can still export it as a PNG screenshot.",
     "Select Project": "Select Project",
     "(no project)": "(no project)",
     "Export All Limit": "Export All Limit",
@@ -8573,6 +8645,7 @@ html {
     "Conversation Delete Alert": "¿Estás seguro que quieres borrar todas las conversaciones seleccionadas?",
     "Conversation Deleted Message": "Todos las conversaciones seleccionadas se han borrado. Por favor refresca la página para ver los cambios.",
     "Please start a conversation first": "Por favor empieza una conversación antes.",
+    "Temporary chat could not be captured": "No se pudo leer este chat temporal. Es posible que haya comenzado antes de que se cargara el exportador. Aún puedes exportarlo como una captura de pantalla PNG.",
     "Select Project": "Seleccionar proyecto",
     "(no project)": "(sin proyecto)",
     "Export All Limit": "Límite de Exportar Todos",
@@ -8643,6 +8716,7 @@ html {
     "Conversation Delete Alert": "Êtes-vous sûr de vouloir supprimer toutes les conversations sélectionnées ?",
     "Conversation Deleted Message": "Toutes les conversations sélectionnées ont été supprimées. Veuillez actualiser la page pour voir les changements.",
     "Please start a conversation first": "Veuillez commencer une conversation d'abord.",
+    "Temporary chat could not be captured": "Ce chat éphémère n'a pas pu être lu. Il a peut-être commencé avant le chargement de l'exportateur. Vous pouvez toujours l'exporter en capture d'écran PNG.",
     "Select Project": "Sélectionner un projet",
     "(no project)": "(aucun projet)",
     "Export All Limit": "Limite d'Exportation Multiple",
@@ -8713,6 +8787,7 @@ html {
     "Conversation Delete Alert": "Apakah Anda yakin ingin menghapus semua percakapan yang dipilih?",
     "Conversation Deleted Message": "Semua percakapan yang dipilih telah dihapus. Harap segarkan halaman untuk melihat perubahan.",
     "Please start a conversation first": "Harap mulai percakapan terlebih dahulu.",
+    "Temporary chat could not be captured": "Obrolan sementara ini tidak dapat dibaca. Mungkin obrolan dimulai sebelum pengekspor dimuat. Anda masih dapat mengekspornya sebagai tangkapan layar PNG.",
     "Select Project": "Pilih Proyek",
     "(no project)": "(tidak ada proyek)",
     "Export All Limit": "Batas Ekspor Semua",
@@ -8783,6 +8858,7 @@ html {
     "Conversation Delete Alert": "選択したすべての会話を削除してもよろしいですか？",
     "Conversation Deleted Message": "選択したすべての会話が削除されました。変更を表示するには、ページを更新してください。",
     "Please start a conversation first": "まず会話を開始してください。",
+    "Temporary chat could not be captured": "この一時チャットを読み取れませんでした。エクスポーターが読み込まれる前に開始された可能性があります。PNG スクリーンショットとしてエクスポートすることは可能です。",
     "Select Project": "プロジェクトを選択",
     "(no project)": "（プロジェクトなし）",
     "Export All Limit": "すべてエクスポートの上限",
@@ -8853,6 +8929,7 @@ html {
     "Conversation Delete Alert": "Вы уверены, что хотите удалить все выбранные разговоры?",
     "Conversation Deleted Message": "Все выбранные разговоры были удалены. Пожалуйста, обновите страницу, чтобы увидеть изменения.",
     "Please start a conversation first": "Пожалуйста, начните разговор первым.",
+    "Temporary chat could not be captured": "Не удалось прочитать этот временный чат. Возможно, он был начат до загрузки экспортёра. Вы всё ещё можете экспортировать его как PNG-скриншот.",
     "Select Project": "Выберите проект",
     "(no project)": "(нет проекта)",
     "Export All Limit": "Лимит экспорта всех",
@@ -8923,6 +9000,7 @@ html {
     "Conversation Delete Alert": "Seçilen tüm konuşmaları silmek istediğinizden emin misiniz?",
     "Conversation Deleted Message": "Seçilen tüm konuşmalar silindi. Değişiklikleri görmek için sayfayı yenileyin.",
     "Please start a conversation first": "Lütfen önce bir konuşma başlatın.",
+    "Temporary chat could not be captured": "Bu geçici sohbet okunamadı. Dışa aktarıcı yüklenmeden önce başlamış olabilir. Yine de PNG ekran görüntüsü olarak dışa aktarabilirsiniz.",
     "Select Project": "Proje Seç",
     "(no project)": "(proje yok)",
     "Export All Limit": "Tümünü Dışa Aktarma Limiti",
@@ -8993,6 +9071,7 @@ html {
     "Conversation Delete Alert": "确定要删除所有选取的对话？",
     "Conversation Deleted Message": "所有所选的对话已删除。请刷新页面。",
     "Please start a conversation first": "请先开始对话。",
+    "Temporary chat could not be captured": "无法读取此临时聊天，它可能在导出工具加载前就已开始。你仍可以将其导出为 PNG 截图。",
     "Select Project": "选择项目",
     "(no project)": "（无项目）",
     "Export All Limit": "批量导出上限",
@@ -9063,6 +9142,7 @@ html {
     "Conversation Delete Alert": "確定要刪除所有選取的對話？",
     "Conversation Deleted Message": "所有選取的對話已刪除。請重新整理頁面。",
     "Please start a conversation first": "請先開始對話。",
+    "Temporary chat could not be captured": "無法讀取此暫存對話，它可能在匯出工具載入前就已開始。你仍可以將其匯出為 PNG 截圖。",
     "Select Project": "選擇專案",
     "(no project)": "（無專案）",
     "Export All Limit": "批量匯出上限",
@@ -21393,6 +21473,10 @@ ${sourceList}` : sourceList;
       alert(instance.t("Please start a conversation first"));
       return false;
     }
+    if (!checkIfTemporaryChatIsExportable()) {
+      alert(instance.t("Temporary chat could not be captured"));
+      return false;
+    }
     const userAvatar = await getUserAvatar();
     const chatId = await getCurrentChatId();
     const rawConversation = await fetchConversation(chatId, true);
@@ -21833,6 +21917,10 @@ ${content2.text}
       alert(instance.t("Please start a conversation first"));
       return false;
     }
+    if (!checkIfTemporaryChatIsExportable()) {
+      alert(instance.t("Temporary chat could not be captured"));
+      return false;
+    }
     const chatId = await getCurrentChatId();
     const rawConversation = await fetchConversation(chatId, false);
     const conversation = processConversation(rawConversation);
@@ -21846,6 +21934,10 @@ ${content2.text}
       alert(instance.t("Please start a conversation first"));
       return false;
     }
+    if (!checkIfTemporaryChatIsExportable()) {
+      alert(instance.t("Temporary chat could not be captured"));
+      return false;
+    }
     const chatId = await getCurrentChatId();
     const rawConversation = await fetchConversation(chatId, false);
     const conversation = processConversation(rawConversation);
@@ -21857,6 +21949,10 @@ ${content2.text}
   async function exportToOoba(fileNameFormat) {
     if (!checkIfConversationStarted()) {
       alert(instance.t("Please start a conversation first"));
+      return false;
+    }
+    if (!checkIfTemporaryChatIsExportable()) {
+      alert(instance.t("Temporary chat could not be captured"));
       return false;
     }
     const chatId = await getCurrentChatId();
@@ -21914,6 +22010,10 @@ ${content2.text}
   async function exportToMarkdown(fileNameFormat, metaList) {
     if (!checkIfConversationStarted()) {
       alert(instance.t("Please start a conversation first"));
+      return false;
+    }
+    if (!checkIfTemporaryChatIsExportable()) {
+      alert(instance.t("Temporary chat could not be captured"));
       return false;
     }
     const chatId = await getCurrentChatId();
@@ -22146,6 +22246,10 @@ ${body2}
       alert(instance.t("Please start a conversation first"));
       return false;
     }
+    if (!checkIfTemporaryChatIsExportable()) {
+      alert(instance.t("Temporary chat could not be captured"));
+      return false;
+    }
     const chatId = await getCurrentChatId();
     const rawConversation = await fetchConversation(chatId, false);
     const { conversationNodes } = processConversation(rawConversation);
@@ -22285,8 +22389,8 @@ ${content2}`;
     } };
   }
   const MAX_RETRIES = 5;
-  const MAX_GLOBAL_PAUSES = 5;
   const DEFAULT_429_PAUSE_MS = 6e4;
+  const MAX_429_PAUSE_MS = 5 * 6e4;
   class RequestQueue {
     constructor(minBackoff, maxBackoff) {
       __publicField(this, "eventEmitter", EventEmitter());
@@ -22303,8 +22407,19 @@ ${content2}`;
        * waits out the remainder before making the next request.
        */
       __publicField(this, "pauseUntil", 0);
-      /** How many global rate-limit pauses have been applied so far */
-      __publicField(this, "globalPauses", 0);
+      /**
+       * Number of 429 pauses taken so far in this batch.
+       * Drives the exponential backoff formula. Reset to 0 by clear() at the
+       * start of each new batch so every batch gets a fresh backoff curve.
+       */
+      __publicField(this, "batchPauses", 0);
+      /**
+       * Identity of the current queue run. stop() and clear() bump it so a
+       * process() call that was suspended in an awaited sleep or request when
+       * the run was cancelled can tell, once it resumes, that it is stale and
+       * must not touch the queue state again.
+       */
+      __publicField(this, "runId", 0);
       this.minBackoff = minBackoff;
       this.maxBackoff = maxBackoff;
       this.backoff = minBackoff;
@@ -22319,16 +22434,18 @@ ${content2}`;
       }
     }
     stop() {
+      this.runId++;
       this.status = "STOPPED";
       this.eventEmitter.emit("done", this.results);
     }
     clear() {
+      this.runId++;
       this.queue = [];
       this.results = [];
       this.status = "IDLE";
       this.backoff = this.minBackoff;
       this.pauseUntil = 0;
-      this.globalPauses = 0;
+      this.batchPauses = 0;
       this.total = 0;
       this.completed = 0;
     }
@@ -22344,11 +22461,13 @@ ${content2}`;
         this.done();
         return;
       }
+      const runId = this.runId;
       const remaining = this.pauseUntil - Date.now();
       if (remaining > 0) {
         const waitSecs = Math.ceil(remaining / 1e3);
         this.progress(this.queue[0].name, "rate_limited", waitSecs);
         await sleep(remaining);
+        if (runId !== this.runId) return;
         this.pauseUntil = 0;
       }
       this.status = "IN_PROGRESS";
@@ -22358,26 +22477,21 @@ ${content2}`;
       try {
         this.progress(name, "processing");
         const result = await request();
+        if (runId !== this.runId) return;
         this.results.push(result);
         this.completed++;
         this.progress(name, "processing");
         this.backoff = this.minBackoff;
         requestObject.retries = 0;
       } catch (error2) {
+        if (runId !== this.runId) return;
         if (error2 instanceof RateLimitError) {
-          this.globalPauses++;
-          if (this.globalPauses > MAX_GLOBAL_PAUSES) {
-            console.warn("[Exporter] Queue stopped: API rate limit did not clear after", MAX_GLOBAL_PAUSES, "pauses");
-            this.stop();
-            return;
-          }
-          const pauseMs = Math.max(
-            error2.retryAfterMs,
-            DEFAULT_429_PAUSE_MS * this.globalPauses
-          );
+          this.batchPauses++;
+          const backoffMs = DEFAULT_429_PAUSE_MS * 2 ** (this.batchPauses - 1);
+          const pauseMs = Math.max(error2.retryAfterMs, Math.min(MAX_429_PAUSE_MS, backoffMs));
           this.pauseUntil = Date.now() + pauseMs;
           this.progress(name, "rate_limited", Math.round(pauseMs / 1e3));
-          console.warn(`[Exporter] Rate limited (429). Pausing queue for ${Math.round(pauseMs / 1e3)}s (pause #${this.globalPauses})`);
+          console.warn(`[Exporter] Rate limited (429). Pausing ${Math.round(pauseMs / 1e3)}s (pause #${this.batchPauses} this batch)`);
           this.queue.unshift(requestObject);
           waitMs = 0;
         } else {
@@ -22395,6 +22509,7 @@ ${content2}`;
         }
       }
       await sleep(waitMs);
+      if (runId !== this.runId) return;
       this.process();
     }
     progress(name, status, rateLimitWaitSecs) {
@@ -23050,7 +23165,7 @@ ${content2}`;
         const totalBatches2 = totalBatchesRef.current;
         const partIndex = batchIdx + 1;
         const callback = (_a = exportAllOptions.find((o3) => o3.label === exportType)) == null ? void 0 : _a.callback;
-        if (callback) {
+        if (callback && results.length > 0) {
           await callback(format, results, metaList, selectedProject == null ? void 0 : selectedProject.display.name, partIndex, totalBatches2);
         }
         if (partIndex < totalBatches2) {
@@ -24331,6 +24446,7 @@ ${content2}`;
   }
   main();
   function main() {
+    watchTemporaryChatId();
     onloadSafe(() => {
       console.log("[Exporter] Loaded");
       const styleEl = document.createElement("style");
