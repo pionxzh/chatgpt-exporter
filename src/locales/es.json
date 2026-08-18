@@ -44,6 +44,7 @@
   "Conversation Delete Alert": "¿Estás seguro que quieres borrar todas las conversaciones seleccionadas?",
   "Conversation Deleted Message": "Todos las conversaciones seleccionadas se han borrado. Por favor refresca la página para ver los cambios.",
   "Please start a conversation first": "Por favor empieza una conversación antes.",
+  "Temporary chat could not be captured": "No se pudo leer este chat temporal. Es posible que haya comenzado antes de que se cargara el exportador. Aún puedes exportarlo como una captura de pantalla PNG.",
   "Select Project": "Seleccionar proyecto",
   "(no project)": "(sin proyecto)",
   "Export All Limit": "Límite de Exportar Todos",

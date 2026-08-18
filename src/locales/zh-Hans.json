@@ -44,6 +44,7 @@
   "Conversation Delete Alert": "确定要删除所有选取的对话？",
   "Conversation Deleted Message": "所有所选的对话已删除。请刷新页面。",
   "Please start a conversation first": "请先开始对话。",
+  "Temporary chat could not be captured": "无法读取此临时聊天，它可能在导出工具加载前就已开始。你仍可以将其导出为 PNG 截图。",
   "Select Project": "选择项目",
   "(no project)": "（无项目）",
   "Export All Limit": "批量导出上限",

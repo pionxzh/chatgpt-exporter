@@ -49,6 +49,17 @@ export function getChatIdFromUrl() {
     return null
 }
 
+/**
+ * Temporary chats are hidden from the history list and their id never reaches
+ * the URL, although the conversation API still serves them once the id is
+ * known (see temporaryChat.ts). Without this check the exporter falls through
+ * to the most recent conversation in the history and silently exports the
+ * wrong chat.
+ */
+export function isTemporaryChat() {
+    return new URLSearchParams(location.search).get('temporary-chat') === 'true'
+}
+
 export function isSharePage() {
     return location.pathname.startsWith('/share')
         && !location.pathname.endsWith('/continue')

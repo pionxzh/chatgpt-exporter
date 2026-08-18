@@ -2,6 +2,7 @@ import { render } from 'preact'
 import sentinel from 'sentinel-js'
 import { fetchConversation, processConversation } from './api'
 import { getChatIdFromUrl, isSharePage } from './page'
+import { watchTemporaryChatId } from './temporaryChat'
 import { Menu } from './ui/Menu'
 import { onloadSafe } from './utils/utils'
 
@@ -11,6 +12,10 @@ import './styles/missing-tailwind.css'
 main()
 
 function main() {
+    // Installed before the page is ready so it is in place by the time the
+    // user can send the first message of a temporary chat.
+    watchTemporaryChatId()
+
     onloadSafe(() => {
         // eslint-disable-next-line no-console
         console.log('[Exporter] Loaded')

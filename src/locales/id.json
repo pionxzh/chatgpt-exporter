@@ -44,6 +44,7 @@
   "Conversation Delete Alert": "Apakah Anda yakin ingin menghapus semua percakapan yang dipilih?",
   "Conversation Deleted Message": "Semua percakapan yang dipilih telah dihapus. Harap segarkan halaman untuk melihat perubahan.",
   "Please start a conversation first": "Harap mulai percakapan terlebih dahulu.",
+  "Temporary chat could not be captured": "Obrolan sementara ini tidak dapat dibaca. Mungkin obrolan dimulai sebelum pengekspor dimuat. Anda masih dapat mengekspornya sebagai tangkapan layar PNG.",
   "Select Project": "Pilih Proyek",
   "(no project)": "(tidak ada proyek)",
   "Export All Limit": "Batas Ekspor Semua",

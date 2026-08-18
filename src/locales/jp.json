@@ -44,6 +44,7 @@
   "Conversation Delete Alert": "選択したすべての会話を削除してもよろしいですか？",
   "Conversation Deleted Message": "選択したすべての会話が削除されました。変更を表示するには、ページを更新してください。",
   "Please start a conversation first": "まず会話を開始してください。",
+  "Temporary chat could not be captured": "この一時チャットを読み取れませんでした。エクスポーターが読み込まれる前に開始された可能性があります。PNG スクリーンショットとしてエクスポートすることは可能です。",
   "Select Project": "プロジェクトを選択",
   "(no project)": "（プロジェクトなし）",
   "Export All Limit": "すべてエクスポートの上限",

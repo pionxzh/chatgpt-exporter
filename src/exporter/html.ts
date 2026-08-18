@@ -4,6 +4,7 @@ import { KEY_SOURCES_ENABLED, KEY_THINKING_ENABLED, KEY_TIMESTAMP_24H, KEY_TIMES
 import i18n from '../i18n'
 import { checkIfConversationStarted, getUserAvatar } from '../page'
 import templateHtml from '../template.html?raw'
+import { checkIfTemporaryChatIsExportable } from '../temporaryChat'
 import { transformContentReferences } from '../utils/citations'
 import { buildZipFileName, downloadFile, getFileNameWithFormat } from '../utils/download'
 import { fromMarkdown, toHtml } from '../utils/markdown'
@@ -17,6 +18,11 @@ import type { PartInfo } from '../utils/download'
 export async function exportToHtml(fileNameFormat: string, metaList: ExportMeta[]) {
     if (!checkIfConversationStarted()) {
         alert(i18n.t('Please start a conversation first'))
+        return false
+    }
+
+    if (!checkIfTemporaryChatIsExportable()) {
+        alert(i18n.t('Temporary chat could not be captured'))
         return false
     }
 

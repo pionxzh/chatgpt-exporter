@@ -1,6 +1,7 @@
 import urlcat from 'urlcat'
 import { apiUrl, baseUrl } from './constants'
-import { getChatIdFromUrl, getConversationFromSharePage, isSharePage } from './page'
+import { getChatIdFromUrl, getConversationFromSharePage, isSharePage, isTemporaryChat } from './page'
+import { getTemporaryChatId } from './temporaryChat'
 import { blobToDataURL } from './utils/dom'
 import { memorize } from './utils/memorize'
 
@@ -441,6 +442,16 @@ const accountsCheckApi = urlcat(apiUrl, '/accounts/check/v4-2023-04-27')
 export async function getCurrentChatId(): Promise<string> {
     if (isSharePage()) {
         return `__share__${getChatIdFromUrl()}`
+    }
+
+    // A temporary chat is absent from the history list and never puts its id in
+    // the URL, so without this the lookup below would fall through to the most
+    // recent conversation and export the wrong chat. Guarded by
+    // `checkIfTemporaryChatIsExportable` at every export entry point.
+    if (isTemporaryChat()) {
+        const temporaryChatId = getTemporaryChatId()
+        if (!temporaryChatId) throw new Error('No temporary chat id found.')
+        return temporaryChatId
     }
 
     const chatId = getChatIdFromUrl()
