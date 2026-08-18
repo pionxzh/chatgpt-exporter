@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.33.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.32.3...userscript-v2.33.0) (2026-08-18)
+
+
+### Features
+
+* export currently open temporary chats ([#375](https://github.com/pionxzh/chatgpt-exporter/issues/375)) ([c397f0d](https://github.com/pionxzh/chatgpt-exporter/commit/c397f0df530ed3ad30c7939c0febd683fc5242dd))
+
+
+### Bug Fixes
+
+* use capped exponential backoff on 429s instead of aborting mid-batch ([#367](https://github.com/pionxzh/chatgpt-exporter/issues/367)) ([544b85d](https://github.com/pionxzh/chatgpt-exporter/commit/544b85d58a51038164d6c2e6cb12714d6a343440))
+
 ## [2.32.3](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.32.2...userscript-v2.32.3) (2026-07-05)
 
 
