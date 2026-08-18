@@ -44,6 +44,7 @@
   "Conversation Delete Alert": "Êtes-vous sûr de vouloir supprimer toutes les conversations sélectionnées ?",
   "Conversation Deleted Message": "Toutes les conversations sélectionnées ont été supprimées. Veuillez actualiser la page pour voir les changements.",
   "Please start a conversation first": "Veuillez commencer une conversation d'abord.",
+  "Temporary chat could not be captured": "Ce chat éphémère n'a pas pu être lu. Il a peut-être commencé avant le chargement de l'exportateur. Vous pouvez toujours l'exporter en capture d'écran PNG.",
   "Select Project": "Sélectionner un projet",
   "(no project)": "(aucun projet)",
   "Export All Limit": "Limite d'Exportation Multiple",
