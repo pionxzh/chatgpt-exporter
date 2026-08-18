@@ -44,7 +44,7 @@
   "Conversation Delete Alert": "確定要刪除所有選取的對話？",
   "Conversation Deleted Message": "所有選取的對話已刪除。請重新整理頁面。",
   "Please start a conversation first": "請先開始對話。",
-  "Temporary chat could not be captured": "無法讀取此暫時交談，它可能在匯出工具載入前就已開始。你仍可以將其匯出為 PNG 截圖。",
+  "Temporary chat could not be captured": "無法讀取此暫存對話，它可能在匯出工具載入前就已開始。你仍可以將其匯出為 PNG 截圖。",
   "Select Project": "選擇專案",
   "(no project)": "（無專案）",
   "Export All Limit": "批量匯出上限",
