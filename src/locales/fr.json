@@ -16,6 +16,7 @@
   "Select...": "Sélection…",
   "Select Not Exported": "Sélectionner les conversations non exportées",
   "Select Updated": "Sélectionner les conversations mises à jour",
+  "Shift Select Hint": "Astuce : Maj+clic pour sélectionner une plage",
   "Export": "Exporter",
   "Error": "Erreur",
   "Loading": "Chargement",
@@ -54,6 +55,5 @@
   "Export All Limit Description": "Définit le nombre maximal de conversations à charger dans la boîte de dialogue 'Tout exporter'.",
   "Select a source to load conversations": "Sélectionnez un projet ci-dessus pour charger les conversations.",
   "Search": "Rechercher",
-  "Last 100": "100 dernières",
   "No results": "Aucun résultat"
 }

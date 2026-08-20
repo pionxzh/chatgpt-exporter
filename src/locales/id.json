@@ -16,6 +16,7 @@
   "Select...": "Pilih massal…",
   "Select Not Exported": "Pilih percakapan yang belum diekspor",
   "Select Updated": "Pilih percakapan yang diperbarui",
+  "Shift Select Hint": "Tips: Shift+klik untuk memilih rentang",
   "Export": "Ekspor",
   "Error": "Kesalahan",
   "Loading": "Memuat",
@@ -54,6 +55,5 @@
   "Export All Limit Description": "Atur jumlah maksimum percakapan yang akan dimuat dalam dialog 'Ekspor Semua'.",
   "Select a source to load conversations": "Pilih proyek di atas untuk memuat percakapan.",
   "Search": "Cari",
-  "Last 100": "100 Terakhir",
   "No results": "Tidak ada hasil"
 }

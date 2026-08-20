@@ -16,6 +16,7 @@
   "Select...": "Selección…",
   "Select Not Exported": "Seleccionar conversaciones no exportadas",
   "Select Updated": "Seleccionar conversaciones actualizadas",
+  "Shift Select Hint": "Consejo: Shift+clic para seleccionar un rango",
   "Export": "Exportar",
   "Error": "Error",
   "Loading": "Cargando",
@@ -54,6 +55,5 @@
   "Export All Limit Description": "Establece el número máximo de conversaciones a cargar en el diálogo 'Exportar Todos'.",
   "Select a source to load conversations": "Selecciona un proyecto arriba para cargar conversaciones.",
   "Search": "Buscar",
-  "Last 100": "Últimas 100",
   "No results": "Sin resultados"
 }
