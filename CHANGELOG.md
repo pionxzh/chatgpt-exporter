@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.34.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.33.0...userscript-v2.34.0) (2026-08-20)
+
+
+### Features
+
+* **export:** select not-exported or updated conversations ([68eee3a](https://github.com/pionxzh/chatgpt-exporter/commit/68eee3a91c53a0bad818c219efe3494d342ab804))
+* replace Last 100 and offset-resume controls with a shift-select hint ([43fb9f7](https://github.com/pionxzh/chatgpt-exporter/commit/43fb9f741e3f3f56e3a52173d479c19d6e08f240))
+
+
+### Bug Fixes
+
+* add missing translations and drop unused locale keys ([a476616](https://github.com/pionxzh/chatgpt-exporter/commit/a476616ffcf3064a0e0375157e49de8cb0f710ed))
+* keep the select toolbar on one line at any width ([cc04675](https://github.com/pionxzh/chatgpt-exporter/commit/cc04675365cdd81473e021ae0ceef4c4cac59dad))
+* natural translations for the batch-select options ([25358f8](https://github.com/pionxzh/chatgpt-exporter/commit/25358f8ea9ac8c2654aaa972cba2a7ef9c37f661))
+* shorten Screenshot menu label in es/fr/id so it fits on one line ([2b7ad45](https://github.com/pionxzh/chatgpt-exporter/commit/2b7ad4511ed3b541d84c98e406eee6443e0be4da))
+* show the real selected total in the export progress instead of batches x 100 ([918e3a3](https://github.com/pionxzh/chatgpt-exporter/commit/918e3a35e108bf88ea9276fd0200f2adff2390e2))
+* stop idle queues silently on cancel and translate the Cancel button ([6136a9b](https://github.com/pionxzh/chatgpt-exporter/commit/6136a9b0a1a997ab6fa30ce2692aa017797a4c23))
+
 ## [2.33.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.32.3...userscript-v2.33.0) (2026-08-18)
 
 
