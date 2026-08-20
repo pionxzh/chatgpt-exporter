@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.34.0
+// @version            2.34.1
 // @author             pionxzh
 // @description        Export ChatGPT conversations with one click — backup & share effortlessly!
 // @description:zh-CN  一键导出 ChatGPT 对话，轻松备份与分享
@@ -126,6 +126,12 @@ html {
     --ce-border-light: var(--border-default, rgba(255, 255, 255, .15));
 }
 
+/* Define our own background in both themes \u2014 this used to lean on
+   ChatGPT's bg-menu utility class, which no longer paints one */
+.bg-menu {
+    background-color: var(--ce-menu-primary);
+}
+
 .dark .bg-menu {
     background-color: var(--ce-menu-primary);
 }
@@ -176,6 +182,14 @@ html {
 .ce-card {
     border-radius: 1rem;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* ChatGPT's main column carries its own z-index, which beats the menu's
+   portalled Radix popper wrapper (position: fixed, z-index: auto). Raise
+   only OUR wrapper \u2014 :has keeps ChatGPT's own Radix poppers untouched \u2014
+   and stay below the dialogs at 1000/1001. */
+[data-radix-popper-content-wrapper]:has(.ce-card) {
+    z-index: 999 !important;
 }
 
 .dark .ce-card {
@@ -24036,219 +24050,217 @@ ${content2}`;
             /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$c6fdb837b070b4ff, { className: "DialogOverlay" }),
             /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$7c6e2c02157bb7d2, { className: "DialogContent", children: [
               /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$f99233281efd08a0, { className: "DialogTitle", children: t2("Exporter Settings") }),
-              /* @__PURE__ */ o$8("div", { className: "DialogBody", children: [
-                /* @__PURE__ */ o$8("dl", { className: "space-y-6", children: [
-                  /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: /* @__PURE__ */ o$8("div", { children: [
-                    /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: `${t2("Language")} 🌐` }),
-                    /* @__PURE__ */ o$8("dd", { children: /* @__PURE__ */ o$8(
-                      "select",
-                      {
-                        className: "Select mt-3",
-                        value: i18n.language,
-                        onChange: (e2) => i18n.changeLanguage(e2.currentTarget.value),
-                        children: LOCALES.map(({ name, code: code2 }) => /* @__PURE__ */ o$8("option", { value: code2, children: name }, code2))
-                      }
-                    ) })
-                  ] }) }),
-                  /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: /* @__PURE__ */ o$8("div", { children: [
-                    /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: t2("File Name") }),
-                    /* @__PURE__ */ o$8("dd", { children: [
-                      /* @__PURE__ */ o$8("p", { className: "text-sm text-gray-700 dark:text-gray-300", children: [
-                        t2("Available variables"),
-                        ":",
-                        " ",
-                        /* @__PURE__ */ o$8(Variable, { name: "{title}", title: title2 }),
-                        ",",
-                        " ",
-                        /* @__PURE__ */ o$8(Variable, { name: "{date}", title: date }),
-                        ",",
-                        " ",
-                        /* @__PURE__ */ o$8(Variable, { name: "{timestamp}", title: timestamp$1 }),
-                        ",",
-                        " ",
-                        /* @__PURE__ */ o$8(Variable, { name: "{chat_id}", title: chatId }),
-                        ",",
-                        " ",
-                        /* @__PURE__ */ o$8(Variable, { name: "{create_time}", title: unixTimestampToISOString(createTime) }),
-                        ",",
-                        " ",
-                        /* @__PURE__ */ o$8(Variable, { name: "{update_time}", title: unixTimestampToISOString(updateTime) })
-                      ] }),
-                      /* @__PURE__ */ o$8("input", { className: "Input mt-4", id: "filename", value: format, onChange: (e2) => setFormat(e2.currentTarget.value) }),
-                      /* @__PURE__ */ o$8("p", { className: "mt-1 text-sm text-gray-700 dark:text-gray-300", children: [
-                        t2("Preview"),
-                        ":",
-                        " ",
-                        /* @__PURE__ */ o$8("span", { className: "select-all", style: { "text-decoration": "underline", "text-underline-offset": 4 }, children: preview })
-                      ] })
-                    ] })
-                  ] }) }),
-                  /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: [
-                    /* @__PURE__ */ o$8("div", { children: [
-                      /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: t2("Export Thinking Process") }),
-                      /* @__PURE__ */ o$8("dd", { className: "text-sm text-gray-700 dark:text-gray-300", children: t2("Export Thinking Process Description") })
-                    ] }),
-                    /* @__PURE__ */ o$8("div", { className: "absolute right-4", children: /* @__PURE__ */ o$8(Toggle, { label: "", checked: enableThinking, onCheckedUpdate: setEnableThinking }) })
-                  ] }),
-                  /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: [
-                    /* @__PURE__ */ o$8("div", { children: [
-                      /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: t2("Export Sources") }),
-                      /* @__PURE__ */ o$8("dd", { className: "text-sm text-gray-700 dark:text-gray-300", children: t2("Export Sources Description") })
-                    ] }),
-                    /* @__PURE__ */ o$8("div", { className: "absolute right-4", children: /* @__PURE__ */ o$8(Toggle, { label: "", checked: enableSources, onCheckedUpdate: setEnableSources }) })
-                  ] }),
-                  /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: /* @__PURE__ */ o$8("div", { children: [
-                    /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: [
-                      t2("Export All Limit"),
-                      " "
-                    ] }),
-                    /* @__PURE__ */ o$8("dd", { className: "text-sm text-gray-700 dark:text-gray-300 mt-2", children: [
-                      t2("Export All Limit Description"),
+              /* @__PURE__ */ o$8("div", { className: "DialogBody", children: /* @__PURE__ */ o$8("dl", { className: "space-y-6", children: [
+                /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: /* @__PURE__ */ o$8("div", { children: [
+                  /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: `${t2("Language")} 🌐` }),
+                  /* @__PURE__ */ o$8("dd", { children: /* @__PURE__ */ o$8(
+                    "select",
+                    {
+                      className: "Select mt-3",
+                      value: i18n.language,
+                      onChange: (e2) => i18n.changeLanguage(e2.currentTarget.value),
+                      children: LOCALES.map(({ name, code: code2 }) => /* @__PURE__ */ o$8("option", { value: code2, children: name }, code2))
+                    }
+                  ) })
+                ] }) }),
+                /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: /* @__PURE__ */ o$8("div", { children: [
+                  /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: t2("File Name") }),
+                  /* @__PURE__ */ o$8("dd", { children: [
+                    /* @__PURE__ */ o$8("p", { className: "text-sm text-gray-700 dark:text-gray-300", children: [
+                      t2("Available variables"),
+                      ":",
                       " ",
-                      /* @__PURE__ */ o$8("div", { className: "flex items-center gap-4 mt-3", children: [
-                        /* @__PURE__ */ o$8(
-                          "input",
+                      /* @__PURE__ */ o$8(Variable, { name: "{title}", title: title2 }),
+                      ",",
+                      " ",
+                      /* @__PURE__ */ o$8(Variable, { name: "{date}", title: date }),
+                      ",",
+                      " ",
+                      /* @__PURE__ */ o$8(Variable, { name: "{timestamp}", title: timestamp$1 }),
+                      ",",
+                      " ",
+                      /* @__PURE__ */ o$8(Variable, { name: "{chat_id}", title: chatId }),
+                      ",",
+                      " ",
+                      /* @__PURE__ */ o$8(Variable, { name: "{create_time}", title: unixTimestampToISOString(createTime) }),
+                      ",",
+                      " ",
+                      /* @__PURE__ */ o$8(Variable, { name: "{update_time}", title: unixTimestampToISOString(updateTime) })
+                    ] }),
+                    /* @__PURE__ */ o$8("input", { className: "Input mt-4", id: "filename", value: format, onChange: (e2) => setFormat(e2.currentTarget.value) }),
+                    /* @__PURE__ */ o$8("p", { className: "mt-1 text-sm text-gray-700 dark:text-gray-300", children: [
+                      t2("Preview"),
+                      ":",
+                      " ",
+                      /* @__PURE__ */ o$8("span", { className: "select-all", style: { "text-decoration": "underline", "text-underline-offset": 4 }, children: preview })
+                    ] })
+                  ] })
+                ] }) }),
+                /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: [
+                  /* @__PURE__ */ o$8("div", { children: [
+                    /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: t2("Export Thinking Process") }),
+                    /* @__PURE__ */ o$8("dd", { className: "text-sm text-gray-700 dark:text-gray-300", children: t2("Export Thinking Process Description") })
+                  ] }),
+                  /* @__PURE__ */ o$8("div", { className: "absolute right-4", children: /* @__PURE__ */ o$8(Toggle, { label: "", checked: enableThinking, onCheckedUpdate: setEnableThinking }) })
+                ] }),
+                /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: [
+                  /* @__PURE__ */ o$8("div", { children: [
+                    /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: t2("Export Sources") }),
+                    /* @__PURE__ */ o$8("dd", { className: "text-sm text-gray-700 dark:text-gray-300", children: t2("Export Sources Description") })
+                  ] }),
+                  /* @__PURE__ */ o$8("div", { className: "absolute right-4", children: /* @__PURE__ */ o$8(Toggle, { label: "", checked: enableSources, onCheckedUpdate: setEnableSources }) })
+                ] }),
+                /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: /* @__PURE__ */ o$8("div", { children: [
+                  /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: [
+                    t2("Export All Limit"),
+                    " "
+                  ] }),
+                  /* @__PURE__ */ o$8("dd", { className: "text-sm text-gray-700 dark:text-gray-300 mt-2", children: [
+                    t2("Export All Limit Description"),
+                    " ",
+                    /* @__PURE__ */ o$8("div", { className: "flex items-center gap-4 mt-3", children: [
+                      /* @__PURE__ */ o$8(
+                        "input",
+                        {
+                          type: "range",
+                          min: "100",
+                          max: "20000",
+                          step: "100",
+                          value: exportAllLimit,
+                          onChange: (e2) => setExportAllLimit(
+                            Number.parseInt(
+                              e2.currentTarget.value,
+                              10
+                            )
+                          ),
+                          className: "flex-grow h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700",
+                          id: "exportAllLimitSlider"
+                        }
+                      ),
+                      /* @__PURE__ */ o$8("span", { className: "font-medium text-gray-900 dark:text-gray-300 w-12 text-right", children: exportAllLimit })
+                    ] })
+                  ] })
+                ] }) }),
+                /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: [
+                  /* @__PURE__ */ o$8("div", { children: [
+                    /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: t2("Conversation Timestamp") }),
+                    /* @__PURE__ */ o$8("dd", { className: "text-sm text-gray-700 dark:text-gray-300", children: [
+                      t2("Conversation Timestamp Description"),
+                      enableTimestamp && /* @__PURE__ */ o$8(k$3, { children: [
+                        /* @__PURE__ */ o$8("div", { className: "mt-2", children: /* @__PURE__ */ o$8(
+                          Toggle,
                           {
-                            type: "range",
-                            min: "100",
-                            max: "20000",
-                            step: "100",
-                            value: exportAllLimit,
-                            onChange: (e2) => setExportAllLimit(
-                              Number.parseInt(
-                                e2.currentTarget.value,
-                                10
-                              )
-                            ),
-                            className: "flex-grow h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700",
-                            id: "exportAllLimitSlider"
+                            label: t2("Use 24-hour format"),
+                            checked: timeStamp24H,
+                            onCheckedUpdate: setTimeStamp24H
                           }
-                        ),
-                        /* @__PURE__ */ o$8("span", { className: "font-medium text-gray-900 dark:text-gray-300 w-12 text-right", children: exportAllLimit })
+                        ) }),
+                        /* @__PURE__ */ o$8("div", { className: "mt-2", children: /* @__PURE__ */ o$8(
+                          Toggle,
+                          {
+                            label: t2("Enable on HTML"),
+                            checked: enableTimestampHTML,
+                            onCheckedUpdate: setEnableTimestampHTML
+                          }
+                        ) }),
+                        /* @__PURE__ */ o$8("div", { className: "mt-2", children: /* @__PURE__ */ o$8(
+                          Toggle,
+                          {
+                            label: t2("Enable on Markdown"),
+                            checked: enableTimestampMarkdown,
+                            onCheckedUpdate: setEnableTimestampMarkdown
+                          }
+                        ) })
                       ] })
                     ] })
-                  ] }) }),
-                  /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: [
-                    /* @__PURE__ */ o$8("div", { children: [
-                      /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: t2("Conversation Timestamp") }),
-                      /* @__PURE__ */ o$8("dd", { className: "text-sm text-gray-700 dark:text-gray-300", children: [
-                        t2("Conversation Timestamp Description"),
-                        enableTimestamp && /* @__PURE__ */ o$8(k$3, { children: [
-                          /* @__PURE__ */ o$8("div", { className: "mt-2", children: /* @__PURE__ */ o$8(
-                            Toggle,
-                            {
-                              label: t2("Use 24-hour format"),
-                              checked: timeStamp24H,
-                              onCheckedUpdate: setTimeStamp24H
-                            }
-                          ) }),
-                          /* @__PURE__ */ o$8("div", { className: "mt-2", children: /* @__PURE__ */ o$8(
-                            Toggle,
-                            {
-                              label: t2("Enable on HTML"),
-                              checked: enableTimestampHTML,
-                              onCheckedUpdate: setEnableTimestampHTML
-                            }
-                          ) }),
-                          /* @__PURE__ */ o$8("div", { className: "mt-2", children: /* @__PURE__ */ o$8(
-                            Toggle,
-                            {
-                              label: t2("Enable on Markdown"),
-                              checked: enableTimestampMarkdown,
-                              onCheckedUpdate: setEnableTimestampMarkdown
-                            }
-                          ) })
-                        ] })
-                      ] })
-                    ] }),
-                    /* @__PURE__ */ o$8("div", { className: "absolute right-4", children: /* @__PURE__ */ o$8(Toggle, { label: "", checked: enableTimestamp, onCheckedUpdate: setEnableTimestamp }) })
                   ] }),
-                  /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: [
-                    /* @__PURE__ */ o$8("div", { children: [
-                      /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: t2("Export Metadata") }),
-                      /* @__PURE__ */ o$8("dd", { className: "text-sm text-gray-700 dark:text-gray-300", children: [
-                        t2("Export Metadata Description"),
-                        enableMeta && /* @__PURE__ */ o$8(k$3, { children: [
-                          /* @__PURE__ */ o$8("p", { className: "mt-2 text-sm text-gray-700 dark:text-gray-300", children: [
-                            t2("Available variables"),
-                            ":",
-                            " ",
-                            /* @__PURE__ */ o$8(Variable, { name: "{title}", title: title2 }),
-                            ",",
-                            " ",
-                            /* @__PURE__ */ o$8(Variable, { name: "{date}", title: date }),
-                            ",",
-                            " ",
-                            /* @__PURE__ */ o$8(Variable, { name: "{timestamp}", title: timestamp$1 }),
-                            ",",
-                            " ",
-                            /* @__PURE__ */ o$8(Variable, { name: "{source}", title: source }),
-                            ",",
-                            " ",
-                            /* @__PURE__ */ o$8(Variable, { name: "{model}", title: "ChatGPT-3.5" }),
-                            ",",
-                            " ",
-                            /* @__PURE__ */ o$8(Variable, { name: "{model_name}", title: "text-davinci-002-render-sha" }),
-                            ",",
-                            " ",
-                            /* @__PURE__ */ o$8(Variable, { name: "{create_time}", title: "2023-04-10T21:45:35.027Z" }),
-                            ",",
-                            " ",
-                            /* @__PURE__ */ o$8(Variable, { name: "{update_time}", title: "2023-04-10T21:45:35.027Z" })
-                          ] }),
-                          exportMetaList.map((meta, i2) => /* @__PURE__ */ o$8("div", { className: "flex items-center mt-2", children: [
-                            /* @__PURE__ */ o$8(
-                              "input",
-                              {
-                                className: "Input",
-                                value: meta.name,
-                                onChange: (e2) => {
-                                  const list2 = [...exportMetaList];
-                                  list2[i2] = { ...list2[i2], name: e2.currentTarget.value };
-                                  setExportMetaList(list2);
-                                }
+                  /* @__PURE__ */ o$8("div", { className: "absolute right-4", children: /* @__PURE__ */ o$8(Toggle, { label: "", checked: enableTimestamp, onCheckedUpdate: setEnableTimestamp }) })
+                ] }),
+                /* @__PURE__ */ o$8("div", { className: "relative flex bg-white dark:bg-white/5 rounded p-4", children: [
+                  /* @__PURE__ */ o$8("div", { children: [
+                    /* @__PURE__ */ o$8("dt", { className: "text-md font-medium text-gray-800 dark:text-white", children: t2("Export Metadata") }),
+                    /* @__PURE__ */ o$8("dd", { className: "text-sm text-gray-700 dark:text-gray-300", children: [
+                      t2("Export Metadata Description"),
+                      enableMeta && /* @__PURE__ */ o$8(k$3, { children: [
+                        /* @__PURE__ */ o$8("p", { className: "mt-2 text-sm text-gray-700 dark:text-gray-300", children: [
+                          t2("Available variables"),
+                          ":",
+                          " ",
+                          /* @__PURE__ */ o$8(Variable, { name: "{title}", title: title2 }),
+                          ",",
+                          " ",
+                          /* @__PURE__ */ o$8(Variable, { name: "{date}", title: date }),
+                          ",",
+                          " ",
+                          /* @__PURE__ */ o$8(Variable, { name: "{timestamp}", title: timestamp$1 }),
+                          ",",
+                          " ",
+                          /* @__PURE__ */ o$8(Variable, { name: "{source}", title: source }),
+                          ",",
+                          " ",
+                          /* @__PURE__ */ o$8(Variable, { name: "{model}", title: "ChatGPT-3.5" }),
+                          ",",
+                          " ",
+                          /* @__PURE__ */ o$8(Variable, { name: "{model_name}", title: "text-davinci-002-render-sha" }),
+                          ",",
+                          " ",
+                          /* @__PURE__ */ o$8(Variable, { name: "{create_time}", title: "2023-04-10T21:45:35.027Z" }),
+                          ",",
+                          " ",
+                          /* @__PURE__ */ o$8(Variable, { name: "{update_time}", title: "2023-04-10T21:45:35.027Z" })
+                        ] }),
+                        exportMetaList.map((meta, i2) => /* @__PURE__ */ o$8("div", { className: "flex items-center mt-2", children: [
+                          /* @__PURE__ */ o$8(
+                            "input",
+                            {
+                              className: "Input",
+                              value: meta.name,
+                              onChange: (e2) => {
+                                const list2 = [...exportMetaList];
+                                list2[i2] = { ...list2[i2], name: e2.currentTarget.value };
+                                setExportMetaList(list2);
                               }
-                            ),
-                            /* @__PURE__ */ o$8("span", { className: "mx-2", children: "→" }),
-                            /* @__PURE__ */ o$8(
-                              "input",
-                              {
-                                className: "Input",
-                                value: meta.value,
-                                onChange: (e2) => {
-                                  const list2 = [...exportMetaList];
-                                  list2[i2] = { ...list2[i2], value: e2.currentTarget.value };
-                                  setExportMetaList(list2);
-                                }
+                            }
+                          ),
+                          /* @__PURE__ */ o$8("span", { className: "mx-2", children: "→" }),
+                          /* @__PURE__ */ o$8(
+                            "input",
+                            {
+                              className: "Input",
+                              value: meta.value,
+                              onChange: (e2) => {
+                                const list2 = [...exportMetaList];
+                                list2[i2] = { ...list2[i2], value: e2.currentTarget.value };
+                                setExportMetaList(list2);
                               }
-                            ),
-                            /* @__PURE__ */ o$8(
-                              "button",
-                              {
-                                className: "ml-2 rounded-full p-1 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition ease-in-out duration-150",
-                                "aria-label": "Remove",
-                                onClick: () => setExportMetaList(exportMetaList.filter((_24, j2) => j2 !== i2)),
-                                children: /* @__PURE__ */ o$8(IconTrash, { className: "w-4 h-4" })
-                              }
-                            )
-                          ] }, i2)),
-                          /* @__PURE__ */ o$8("div", { className: "flex justify-center items-center mt-2 pr-8", children: /* @__PURE__ */ o$8(
+                            }
+                          ),
+                          /* @__PURE__ */ o$8(
                             "button",
                             {
-                              className: "w-full border border-[#6f6e77] dark:border-gray-[#86858d] rounded-md py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition ease-in-out duration-150",
-                              "aria-label": "Add",
-                              onClick: () => setExportMetaList([...exportMetaList, { name: "", value: "" }]),
-                              children: "+"
+                              className: "ml-2 rounded-full p-1 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition ease-in-out duration-150",
+                              "aria-label": "Remove",
+                              onClick: () => setExportMetaList(exportMetaList.filter((_24, j2) => j2 !== i2)),
+                              children: /* @__PURE__ */ o$8(IconTrash, { className: "w-4 h-4" })
                             }
-                          ) })
-                        ] })
+                          )
+                        ] }, i2)),
+                        /* @__PURE__ */ o$8("div", { className: "flex justify-center items-center mt-2 pr-8", children: /* @__PURE__ */ o$8(
+                          "button",
+                          {
+                            className: "w-full border border-[#6f6e77] dark:border-gray-[#86858d] rounded-md py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition ease-in-out duration-150",
+                            "aria-label": "Add",
+                            onClick: () => setExportMetaList([...exportMetaList, { name: "", value: "" }]),
+                            children: "+"
+                          }
+                        ) })
                       ] })
-                    ] }),
-                    /* @__PURE__ */ o$8("div", { className: "absolute right-4", children: /* @__PURE__ */ o$8(Toggle, { label: "", checked: enableMeta, onCheckedUpdate: setEnableMeta }) })
-                  ] })
-                ] }),
-                /* @__PURE__ */ o$8("div", { className: "flex mt-6", style: { justifyContent: "flex-end" }, children: /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$f39c2d165cd861fe, { asChild: true, children: /* @__PURE__ */ o$8("button", { className: "Button green font-bold", children: t2("Save") }) }) })
-              ] }),
+                    ] })
+                  ] }),
+                  /* @__PURE__ */ o$8("div", { className: "absolute right-4", children: /* @__PURE__ */ o$8(Toggle, { label: "", checked: enableMeta, onCheckedUpdate: setEnableMeta }) })
+                ] })
+              ] }) }),
+              /* @__PURE__ */ o$8("div", { className: "flex shrink-0 pt-4", style: { justifyContent: "flex-end" }, children: /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$f39c2d165cd861fe, { asChild: true, children: /* @__PURE__ */ o$8("button", { className: "Button green font-bold", children: t2("Save") }) }) }),
               /* @__PURE__ */ o$8($5d3850c4d0b4e6c7$export$f39c2d165cd861fe, { asChild: true, children: /* @__PURE__ */ o$8("button", { className: "IconButton CloseButton", "aria-label": "Close", children: /* @__PURE__ */ o$8(IconCross, {}) }) })
             ] })
           ] })
