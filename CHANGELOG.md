@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.34.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.34.0...userscript-v2.34.1) (2026-08-20)
+
+
+### Bug Fixes
+
+* paint the menu background in light mode ([1388cdf](https://github.com/pionxzh/chatgpt-exporter/commit/1388cdf31aea0bfd7dbd37e57af890cff262a384))
+* pin the settings Save button below the scrollable body ([25264ad](https://github.com/pionxzh/chatgpt-exporter/commit/25264ad249315d18ddbd16d94f2cc0dc9485f174))
+* raise the export menu above ChatGPT's main column ([20e6b2e](https://github.com/pionxzh/chatgpt-exporter/commit/20e6b2ebc5f35abe5dd3719c7dbec57a9154a0cc))
+
 ## [2.34.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.33.0...userscript-v2.34.0) (2026-08-20)
 
 
