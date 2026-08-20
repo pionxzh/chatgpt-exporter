@@ -834,7 +834,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                             title="Stop the export — any batches already downloaded are kept"
                             onClick={cancelExport}
                         >
-                            Cancel
+                            {t('Cancel')}
                         </button>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">

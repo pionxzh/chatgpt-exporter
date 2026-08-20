@@ -97,8 +97,12 @@ export class RequestQueue<T> {
 
     stop() {
         this.runId++
+        const wasRunning = this.status === 'IN_PROGRESS'
         this.status = 'STOPPED'
-        this.eventEmitter.emit('done', this.results)
+        // Only a queue that was actually running reports back — an idle
+        // queue emitting 'done' makes its listeners announce work (archive/
+        // delete alerts) that never happened
+        if (wasRunning) this.eventEmitter.emit('done', this.results)
     }
 
     clear() {
