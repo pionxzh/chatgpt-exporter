@@ -90,6 +90,14 @@ html {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
+/* ChatGPT's main column carries its own z-index, which beats the menu's
+   portalled Radix popper wrapper (position: fixed, z-index: auto). Raise
+   only OUR wrapper — :has keeps ChatGPT's own Radix poppers untouched —
+   and stay below the dialogs at 1000/1001. */
+[data-radix-popper-content-wrapper]:has(.ce-card) {
+    z-index: 999 !important;
+}
+
 .dark .ce-card {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
 }
