@@ -287,11 +287,12 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                                 </div>
                             </div>
                         </dl>
-                        <div className="flex mt-6" style={{ justifyContent: 'flex-end' }}>
-                            <Dialog.Close asChild>
-                                <button className="Button green font-bold">{t('Save')}</button>
-                            </Dialog.Close>
-                        </div>
+                    </div>
+                    {/* Outside DialogBody so it stays pinned while the settings scroll */}
+                    <div className="flex shrink-0 pt-4" style={{ justifyContent: 'flex-end' }}>
+                        <Dialog.Close asChild>
+                            <button className="Button green font-bold">{t('Save')}</button>
+                        </Dialog.Close>
                     </div>
                     <Dialog.Close asChild>
                         <button className="IconButton CloseButton" aria-label="Close">
