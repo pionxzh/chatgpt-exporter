@@ -205,10 +205,19 @@
 .SelectToolbar {
     display: flex;
     align-items: center;
+    /* Minimum breathing room between the select-all label and the right
+       group once the ml-auto margin collapses under pressure */
+    gap: 12px;
     padding: 12px 16px;
     border-radius: 0;
     border: 1px solid #6f6e77;
     border-bottom: none;
+    flex-shrink: 0;
+}
+
+/* CJK labels wrap per-character when the row is squeezed — never shrink it */
+.SelectToolbar .CheckBoxLabel {
+    white-space: nowrap;
     flex-shrink: 0;
 }
 

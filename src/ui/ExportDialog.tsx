@@ -221,16 +221,22 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
                         setSelected(checked ? filtered : [])
                     }}
                 />
-                <div className="flex items-center gap-2 ml-auto flex-wrap">
+                {/* min-w-0 lets the shrinkable items (hint first, then the loading
+                    indicator) truncate instead of the whole row wrapping */}
+                <div className="flex items-center gap-2 ml-auto min-w-0">
                     {loading && conversations.length > 0 && (
-                        <span className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+                        <span className="flex items-center gap-1 truncate min-w-0 text-sm text-gray-500 dark:text-gray-400">
                             <IconLoading className="w-3 h-3" />
                             {t('Loading')}... ({conversations.length})
                         </span>
                     )}
                     <select
-                        className="Select"
-                        style={{ fontSize: '0.75rem', padding: '2px 5px' }}
+                        className="Select shrink-0"
+                        // Fixed width: only the placeholder is ever shown collapsed, and
+                        // without it the control sizes itself to the longest option,
+                        // which overflows the toolbar in verbose locales. The 2rem right
+                        // padding keeps the placeholder off the dropdown chevron.
+                        style={{ fontSize: '0.75rem', padding: '2px 2rem 2px 0.5rem', width: '8.5rem', textOverflow: 'ellipsis' }}
                         disabled={disabled || filtered.length === 0}
                         value=""
                         title="Select conversations by export status"
@@ -244,10 +250,12 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
                         <option value="not_exported">{t('Select Not Exported')}</option>
                         <option value="updated">{t('Select Updated')}</option>
                     </select>
-                    <span className="text-xs text-gray-400 dark:text-gray-500">
+                    {/* Highest shrink factor: the hint collapses before the
+                        loading indicator starts truncating */}
+                    <span className="truncate min-w-0 text-xs text-gray-400 dark:text-gray-500" style={{ flexShrink: 99 }}>
                         {t('Shift Select Hint')}
                     </span>
-                    <span className="text-sm font-medium tabular-nums text-gray-500 dark:text-gray-400">
+                    <span className="whitespace-nowrap shrink-0 text-sm font-medium tabular-nums text-gray-500 dark:text-gray-400">
                         {selected.length} / {filtered.length}
                     </span>
                 </div>
