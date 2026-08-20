@@ -38,6 +38,12 @@ html {
     --ce-border-light: var(--border-default, rgba(255, 255, 255, .15));
 }
 
+/* Define our own background in both themes — this used to lean on
+   ChatGPT's bg-menu utility class, which no longer paints one */
+.bg-menu {
+    background-color: var(--ce-menu-primary);
+}
+
 .dark .bg-menu {
     background-color: var(--ce-menu-primary);
 }
