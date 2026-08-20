@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.33.0
+// @version            2.34.0
 // @author             pionxzh
 // @description        Export ChatGPT conversations with one click — backup & share effortlessly!
 // @description:zh-CN  一键导出 ChatGPT 对话，轻松备份与分享
@@ -476,10 +476,19 @@ html {
 .SelectToolbar {
     display: flex;
     align-items: center;
+    /* Minimum breathing room between the select-all label and the right
+       group once the ml-auto margin collapses under pressure */
+    gap: 12px;
     padding: 12px 16px;
     border-radius: 0;
     border: 1px solid #6f6e77;
     border-bottom: none;
+    flex-shrink: 0;
+}
+
+/* CJK labels wrap per-character when the row is squeezed \u2014 never shrink it */
+.SelectToolbar .CheckBoxLabel {
+    white-space: nowrap;
     flex-shrink: 0;
 }
 
@@ -595,8 +604,6 @@ html {
     .DialogContent { max-height: 90vh; }
     .SelectListHeaderCell:last-child { display: none; }
     .SelectItemMeta:last-child { display: none; }
-    .SelectToolbar .Button.neutral,
-    .SelectToolbar input[type="number"] { display: none; }
     .ActionBar { justify-content: flex-end; }
     .ActionBar > .Select { width: 100%; }
     .ActionBar > .flex-grow { display: none; }
@@ -706,6 +713,10 @@ html {
 
 .shrink-0 {
     flex-shrink: 0;
+}
+
+.min-w-0 {
+    min-width: 0;
 }
 
 .space-y-6>:not([hidden])~:not([hidden]) {
@@ -1261,6 +1272,7 @@ html {
   const KEY_THINKING_ENABLED = "exporter:enable_thinking";
   const KEY_SOURCES_ENABLED = "exporter:enable_sources";
   const KEY_EXPORT_ALL_LIMIT = "exporter:export_all_limit";
+  const KEY_EXPORTED_UPDATE_TIMES = "exporter:exported_update_times";
   const KEY_OAI_LOCALE = "oai/apps/locale";
   const EXPORT_OPERATION_BATCH = 100;
   var _GM_deleteValue = /* @__PURE__ */ (() => typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0)();
@@ -8504,6 +8516,7 @@ html {
   const Archive$8 = "Archive";
   const Save$8 = "Save";
   const Delete$8 = "Delete";
+  const Cancel$8 = "Cancel";
   const Export$8 = "Export";
   const Loading$8 = "Loading";
   const Preview$8 = "Preview";
@@ -8523,7 +8536,12 @@ html {
     Archive: Archive$8,
     Save: Save$8,
     Delete: Delete$8,
+    Cancel: Cancel$8,
     "Select All": "Select All",
+    "Select...": "Select...",
+    "Select Not Exported": "Select Not Exported",
+    "Select Updated": "Select Updated",
+    "Shift Select Hint": "Tip: Shift+click to select a range",
     Export: Export$8,
     "Error": "Error",
     Loading: Loading$8,
@@ -8562,23 +8580,7 @@ html {
     "Export All Limit Description": "Set the maximum number of conversations to load. Exports run in waves of 100 conversations to stay within API rate limits.",
     "Select a source to load conversations": "Select a project above to load conversations.",
     Search: Search$8,
-    "Last 100": "Last 100",
     "No results": "No results",
-    "Date From": "From",
-    "Date To": "To",
-    "Date Filter Label": "Date",
-    "Date Filter Hint": "Filters by the chosen timestamp field. Leave blank for no date restriction.",
-    "Date Filter Field Created": "Created",
-    "Date Filter Field Updated": "Updated",
-    "Date Preset 7d": "7d",
-    "Date Preset 30d": "30d",
-    "Date Preset 90d": "90d",
-    "Date Preset Year": "This year",
-    "Clear filter": "Clear",
-    "Selected count": "{{count}} selected",
-    "Export batch info": "Exports in batches of 100 per download",
-    "Exporting batch": "Exporting batch {{current}} of {{total}}",
-    "Export batches button": "Export ({{n}} downloads)",
     "Batch progress": "Batch {{current}}/{{total}}",
     "All conversations": "All conversations",
     "Load more conversations": "Load {{n}} more",
@@ -8588,12 +8590,13 @@ html {
   const ExportHelper$7 = "Exportar";
   const Setting$7 = "Ajustes";
   const Language$7 = "Idioma";
-  const Screenshot$7 = "Captura De Pantalla";
+  const Screenshot$7 = "Captura";
   const Markdown$7 = "Markdown";
   const HTML$7 = "HTML";
   const Archive$7 = "Archivo";
   const Save$7 = "Guardar";
   const Delete$7 = "Borrar";
+  const Cancel$7 = "Cancelar";
   const Export$7 = "Exportar";
   const Loading$7 = "Cargando";
   const Preview$7 = "Previsualizar";
@@ -8613,7 +8616,12 @@ html {
     Archive: Archive$7,
     Save: Save$7,
     Delete: Delete$7,
+    Cancel: Cancel$7,
     "Select All": "Seleccionar Todos",
+    "Select...": "Selección…",
+    "Select Not Exported": "Seleccionar conversaciones no exportadas",
+    "Select Updated": "Seleccionar conversaciones actualizadas",
+    "Shift Select Hint": "Consejo: Shift+clic para seleccionar un rango",
     Export: Export$7,
     "Error": "Error",
     Loading: Loading$7,
@@ -8652,19 +8660,23 @@ html {
     "Export All Limit Description": "Establece el número máximo de conversaciones a cargar en el diálogo 'Exportar Todos'.",
     "Select a source to load conversations": "Selecciona un proyecto arriba para cargar conversaciones.",
     Search: Search$7,
-    "Last 100": "Últimas 100",
-    "No results": "Sin resultados"
+    "No results": "Sin resultados",
+    "Batch progress": "Lote {{current}}/{{total}}",
+    "All conversations": "Todas las conversaciones",
+    "Load more conversations": "Cargar {{n}} más",
+    "Load more conversations remaining": "Cargar {{n}} más · quedan {{remaining}}"
   };
   const title$6 = "Exportateur ChatGPT";
   const ExportHelper$6 = "Exporter";
   const Setting$6 = "Paramètre";
   const Language$6 = "Langue";
-  const Screenshot$6 = "Capture d'écran";
+  const Screenshot$6 = "Capture";
   const Markdown$6 = "Markdown";
   const HTML$6 = "HTML";
   const Archive$6 = "Archiver";
   const Save$6 = "Enregistrer";
   const Delete$6 = "Supprimer";
+  const Cancel$6 = "Annuler";
   const Export$6 = "Exporter";
   const Loading$6 = "Chargement";
   const Preview$6 = "Aperçu";
@@ -8684,7 +8696,12 @@ html {
     Archive: Archive$6,
     Save: Save$6,
     Delete: Delete$6,
+    Cancel: Cancel$6,
     "Select All": "Tout sélectionner",
+    "Select...": "Sélection…",
+    "Select Not Exported": "Sélectionner les conversations non exportées",
+    "Select Updated": "Sélectionner les conversations mises à jour",
+    "Shift Select Hint": "Astuce : Maj+clic pour sélectionner une plage",
     Export: Export$6,
     "Error": "Erreur",
     Loading: Loading$6,
@@ -8723,19 +8740,23 @@ html {
     "Export All Limit Description": "Définit le nombre maximal de conversations à charger dans la boîte de dialogue 'Tout exporter'.",
     "Select a source to load conversations": "Sélectionnez un projet ci-dessus pour charger les conversations.",
     Search: Search$6,
-    "Last 100": "100 dernières",
-    "No results": "Aucun résultat"
+    "No results": "Aucun résultat",
+    "Batch progress": "Lot {{current}}/{{total}}",
+    "All conversations": "Toutes les conversations",
+    "Load more conversations": "Charger {{n}} de plus",
+    "Load more conversations remaining": "Charger {{n}} de plus · {{remaining}} restantes"
   };
   const title$5 = "ChatGPT Exporter";
   const ExportHelper$5 = "Ekspor";
   const Setting$5 = "Pengaturan";
   const Language$5 = "Bahasa";
-  const Screenshot$5 = "Tangkapan Layar";
+  const Screenshot$5 = "Screenshot";
   const Markdown$5 = "Markdown";
   const HTML$5 = "HTML";
   const Archive$5 = "Arsip";
   const Save$5 = "Simpan";
   const Delete$5 = "Hapus";
+  const Cancel$5 = "Batal";
   const Export$5 = "Ekspor";
   const Loading$5 = "Memuat";
   const Preview$5 = "Pratinjau";
@@ -8755,7 +8776,12 @@ html {
     Archive: Archive$5,
     Save: Save$5,
     Delete: Delete$5,
+    Cancel: Cancel$5,
     "Select All": "Pilih Semua",
+    "Select...": "Pilih massal…",
+    "Select Not Exported": "Pilih percakapan yang belum diekspor",
+    "Select Updated": "Pilih percakapan yang diperbarui",
+    "Shift Select Hint": "Tips: Shift+klik untuk memilih rentang",
     Export: Export$5,
     "Error": "Kesalahan",
     Loading: Loading$5,
@@ -8794,8 +8820,11 @@ html {
     "Export All Limit Description": "Atur jumlah maksimum percakapan yang akan dimuat dalam dialog 'Ekspor Semua'.",
     "Select a source to load conversations": "Pilih proyek di atas untuk memuat percakapan.",
     Search: Search$5,
-    "Last 100": "100 Terakhir",
-    "No results": "Tidak ada hasil"
+    "No results": "Tidak ada hasil",
+    "Batch progress": "Kelompok {{current}}/{{total}}",
+    "All conversations": "Semua percakapan",
+    "Load more conversations": "Muat {{n}} lagi",
+    "Load more conversations remaining": "Muat {{n}} lagi · tersisa {{remaining}}"
   };
   const title$4 = "ChatGPTエクスポーター";
   const ExportHelper$4 = "エクスポート";
@@ -8807,6 +8836,7 @@ html {
   const Archive$4 = "アーカイブ";
   const Save$4 = "保存";
   const Delete$4 = "削除";
+  const Cancel$4 = "キャンセル";
   const Export$4 = "エクスポート";
   const Loading$4 = "読み込み中";
   const Preview$4 = "プレビュー";
@@ -8826,7 +8856,12 @@ html {
     Archive: Archive$4,
     Save: Save$4,
     Delete: Delete$4,
+    Cancel: Cancel$4,
     "Select All": "すべて選択",
+    "Select...": "一括選択…",
+    "Select Not Exported": "未エクスポートの会話を選択",
+    "Select Updated": "更新された会話を選択",
+    "Shift Select Hint": "ヒント: Shift+クリックで範囲選択",
     Export: Export$4,
     "Error": "エラー",
     Loading: Loading$4,
@@ -8865,8 +8900,11 @@ html {
     "Export All Limit Description": "「すべてエクスポート」ダイアログで読み込む会話の最大数を設定します。",
     "Select a source to load conversations": "上からプロジェクトを選択して会話を読み込んでください。",
     Search: Search$4,
-    "Last 100": "最新100件",
-    "No results": "結果なし"
+    "No results": "結果なし",
+    "Batch progress": "バッチ {{current}}/{{total}}",
+    "All conversations": "すべての会話",
+    "Load more conversations": "さらに {{n}} 件読み込む",
+    "Load more conversations remaining": "さらに {{n}} 件読み込む · 残り {{remaining}} 件"
   };
   const title$3 = "ChatGPT Exporter";
   const ExportHelper$3 = "Export";
@@ -8878,6 +8916,7 @@ html {
   const Archive$3 = "Архивировать";
   const Save$3 = "Сохранить";
   const Delete$3 = "Удалить";
+  const Cancel$3 = "Отмена";
   const Export$3 = "Экспорт";
   const Loading$3 = "Загрузка";
   const Preview$3 = "Предпросмотр";
@@ -8897,7 +8936,12 @@ html {
     Archive: Archive$3,
     Save: Save$3,
     Delete: Delete$3,
+    Cancel: Cancel$3,
     "Select All": "Выбрать все",
+    "Select...": "Выбрать…",
+    "Select Not Exported": "Выбрать неэкспортированные разговоры",
+    "Select Updated": "Выбрать обновлённые разговоры",
+    "Shift Select Hint": "Совет: Shift+клик выбирает диапазон",
     Export: Export$3,
     "Error": "Ошибка",
     Loading: Loading$3,
@@ -8936,8 +8980,11 @@ html {
     "Export All Limit Description": "Установите максимальное количество бесед для загрузки в диалоге 'Экспортировать все'.",
     "Select a source to load conversations": "Выберите проект выше, чтобы загрузить беседы.",
     Search: Search$3,
-    "Last 100": "Последние 100",
-    "No results": "Нет результатов"
+    "No results": "Нет результатов",
+    "Batch progress": "Партия {{current}}/{{total}}",
+    "All conversations": "Все разговоры",
+    "Load more conversations": "Загрузить ещё {{n}}",
+    "Load more conversations remaining": "Загрузить ещё {{n}} · осталось {{remaining}}"
   };
   const title$2 = "ChatGPT Exporter";
   const ExportHelper$2 = "Dışa Aktar";
@@ -8949,6 +8996,7 @@ html {
   const Archive$2 = "Arşiv";
   const Save$2 = "Kaydet";
   const Delete$2 = "Sil";
+  const Cancel$2 = "İptal";
   const Export$2 = "Dışa Aktar";
   const Loading$2 = "Yükleniyor";
   const Preview$2 = "Önizleme";
@@ -8968,7 +9016,12 @@ html {
     Archive: Archive$2,
     Save: Save$2,
     Delete: Delete$2,
+    Cancel: Cancel$2,
     "Select All": "Tümünü Seç",
+    "Select...": "Toplu seçim…",
+    "Select Not Exported": "Dışa aktarılmamış konuşmaları seç",
+    "Select Updated": "Güncellenen konuşmaları seç",
+    "Shift Select Hint": "İpucu: Aralık seçmek için Shift+tık",
     Export: Export$2,
     "Error": "Hata",
     Loading: Loading$2,
@@ -9007,8 +9060,11 @@ html {
     "Export All Limit Description": "'Tümünü Dışa Aktar' iletişim kutusunda yüklenecek maksimum konuşma sayısını ayarlayın.",
     "Select a source to load conversations": "Konuşmaları yüklemek için yukarıdan bir proje seçin.",
     Search: Search$2,
-    "Last 100": "Son 100",
-    "No results": "Sonuç yok"
+    "No results": "Sonuç yok",
+    "Batch progress": "Grup {{current}}/{{total}}",
+    "All conversations": "Tüm konuşmalar",
+    "Load more conversations": "{{n}} tane daha yükle",
+    "Load more conversations remaining": "{{n}} tane daha yükle · {{remaining}} kaldı"
   };
   const title$1 = "ChatGPT Exporter";
   const ExportHelper$1 = "导出助手";
@@ -9020,6 +9076,7 @@ html {
   const Archive$1 = "归档";
   const Save$1 = "保存";
   const Delete$1 = "删除";
+  const Cancel$1 = "取消";
   const Export$1 = "导出";
   const Loading$1 = "加载中";
   const Preview$1 = "预览";
@@ -9039,7 +9096,12 @@ html {
     Archive: Archive$1,
     Save: Save$1,
     Delete: Delete$1,
+    Cancel: Cancel$1,
     "Select All": "全选",
+    "Select...": "批量选择…",
+    "Select Not Exported": "选择未导出的对话",
+    "Select Updated": "选择有更新的对话",
+    "Shift Select Hint": "提示：Shift+点击可选择范围",
     Export: Export$1,
     "Error": "错误",
     Loading: Loading$1,
@@ -9078,8 +9140,11 @@ html {
     "Export All Limit Description": "设置“批量导出”对话框中加载的最大对话数量。",
     "Select a source to load conversations": "请在上方选择一个项目以加载对话。",
     Search: Search$1,
-    "Last 100": "最新 100 条",
-    "No results": "无结果"
+    "No results": "无结果",
+    "Batch progress": "第 {{current}}/{{total}} 批",
+    "All conversations": "全部对话",
+    "Load more conversations": "再加载 {{n}} 条",
+    "Load more conversations remaining": "再加载 {{n}} 条 · 剩余 {{remaining}} 条"
   };
   const title = "ChatGPT Exporter";
   const ExportHelper = "Export";
@@ -9091,6 +9156,7 @@ html {
   const Archive = "封存";
   const Save = "保存";
   const Delete = "刪除";
+  const Cancel = "取消";
   const Export = "匯出";
   const Loading = "載入中";
   const Preview = "預覽";
@@ -9110,7 +9176,12 @@ html {
     Archive,
     Save,
     Delete,
+    Cancel,
     "Select All": "全選",
+    "Select...": "批次選取…",
+    "Select Not Exported": "選取未匯出的對話",
+    "Select Updated": "選取有更新的對話",
+    "Shift Select Hint": "提示：Shift+點擊可選取範圍",
     Export,
     "Error": "錯誤",
     Loading,
@@ -9149,8 +9220,11 @@ html {
     "Export All Limit Description": "設定「批量匯出」對話方塊中載入的最大對話數量。",
     "Select a source to load conversations": "請在上方選擇一個專案以載入對話。",
     Search,
-    "Last 100": "最新 100 條",
-    "No results": "無結果"
+    "No results": "無結果",
+    "Batch progress": "第 {{current}}/{{total}} 批",
+    "All conversations": "全部對話",
+    "Load more conversations": "再載入 {{n}} 筆",
+    "Load more conversations remaining": "再載入 {{n}} 筆 · 剩餘 {{remaining}} 筆"
   };
   class GMStorage {
     static get(key2) {
@@ -22435,8 +22509,9 @@ ${content2}`;
     }
     stop() {
       this.runId++;
+      const wasRunning = this.status === "IN_PROGRESS";
       this.status = "STOPPED";
-      this.eventEmitter.emit("done", this.results);
+      if (wasRunning) this.eventEmitter.emit("done", this.results);
     }
     clear() {
       this.runId++;
@@ -22777,6 +22852,20 @@ ${content2}`;
     if (diffDays === 1) return "Yesterday";
     return d2.toLocaleDateString(void 0, { year: "numeric", month: "short", day: "numeric" });
   }
+  function getExportedUpdateTimes() {
+    const stored = ScriptStorage.get(KEY_EXPORTED_UPDATE_TIMES);
+    if (stored && typeof stored === "object") return stored;
+    return {};
+  }
+  function markExported(conversations) {
+    if (conversations.length === 0) return;
+    const map2 = getExportedUpdateTimes();
+    for (const c2 of conversations) {
+      const ms = toMs(c2.update_time);
+      if (ms > (map2[c2.id] ?? 0)) map2[c2.id] = ms;
+    }
+    ScriptStorage.set(KEY_EXPORTED_UPDATE_TIMES, map2);
+  }
   function textSearch(title2, query2) {
     const q2 = query2.trim();
     if (!q2) return true;
@@ -22827,7 +22916,6 @@ ${content2}`;
     const { t: t2 } = useTranslation();
     const [query2, setQuery] = h$4("");
     const lastClickedIndex = _(-1);
-    const [skipFirst, setSkipFirst] = h$4(0);
     const [sortField, setSortField] = h$4("create_time");
     const [sortDir, setSortDir] = h$4("desc");
     const filtered = F$1(() => {
@@ -22845,6 +22933,17 @@ ${content2}`;
       });
     }, [conversations, query2, sortField, sortDir]);
     const allFilteredSelected = filtered.length > 0 && filtered.every((c2) => selected.some((x2) => x2.id === c2.id));
+    const selectByExportStatus = T$4((status) => {
+      lastClickedIndex.current = -1;
+      const exportedMap = getExportedUpdateTimes();
+      if (status === "all") {
+        setSelected(filtered);
+      } else if (status === "not_exported") {
+        setSelected(filtered.filter((c2) => !(c2.id in exportedMap)));
+      } else {
+        setSelected(filtered.filter((c2) => c2.id in exportedMap && exportedMap[c2.id] < toMs(c2.update_time)));
+      }
+    }, [filtered, setSelected]);
     return /* @__PURE__ */ o$8(k$3, { children: [
       /* @__PURE__ */ o$8(
         "input",
@@ -22874,8 +22973,8 @@ ${content2}`;
             }
           }
         ),
-        /* @__PURE__ */ o$8("div", { className: "flex items-center gap-2 ml-auto flex-wrap", children: [
-          loading && conversations.length > 0 && /* @__PURE__ */ o$8("span", { className: "flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400", children: [
+        /* @__PURE__ */ o$8("div", { className: "flex items-center gap-2 ml-auto min-w-0", children: [
+          loading && conversations.length > 0 && /* @__PURE__ */ o$8("span", { className: "flex items-center gap-1 truncate min-w-0 text-sm text-gray-500 dark:text-gray-400", children: [
             /* @__PURE__ */ o$8(IconLoading, { className: "w-3 h-3" }),
             t2("Loading"),
             "... (",
@@ -22883,46 +22982,27 @@ ${content2}`;
             ")"
           ] }),
           /* @__PURE__ */ o$8(
-            "button",
+            "select",
             {
-              className: "Button neutral",
-              disabled: disabled || conversations.length === 0,
-              onClick: () => setSelected(filtered.slice(0, EXPORT_OPERATION_BATCH)),
-              children: t2("Last 100")
+              className: "Select shrink-0",
+              style: { fontSize: "0.75rem", padding: "2px 2rem 2px 0.5rem", width: "8.5rem", textOverflow: "ellipsis" },
+              disabled: disabled || filtered.length === 0,
+              value: "",
+              title: "Select conversations by export status",
+              onChange: (e2) => {
+                const val = e2.currentTarget.value;
+                if (val) selectByExportStatus(val);
+              },
+              children: [
+                /* @__PURE__ */ o$8("option", { value: "", disabled: true, children: t2("Select...") }),
+                /* @__PURE__ */ o$8("option", { value: "all", children: t2("Select All") }),
+                /* @__PURE__ */ o$8("option", { value: "not_exported", children: t2("Select Not Exported") }),
+                /* @__PURE__ */ o$8("option", { value: "updated", children: t2("Select Updated") })
+              ]
             }
           ),
-          /* @__PURE__ */ o$8(
-            "input",
-            {
-              type: "number",
-              min: "0",
-              step: "100",
-              value: skipFirst,
-              title: "Starting position for next batch (e.g. 200 to resume after 2 batches)",
-              disabled: disabled || conversations.length === 0,
-              onChange: (e2) => setSkipFirst(Math.max(0, Math.floor(Number(e2.currentTarget.value)))),
-              style: {
-                width: "4rem",
-                fontSize: "0.75rem",
-                padding: "2px 5px",
-                border: "1px solid #9ca3af",
-                borderRadius: "3px",
-                background: "transparent",
-                color: "inherit"
-              }
-            }
-          ),
-          /* @__PURE__ */ o$8(
-            "button",
-            {
-              className: "Button neutral",
-              title: `Select 100 conversations starting at position #${skipFirst + 1}`,
-              disabled: disabled || conversations.length === 0 || skipFirst >= filtered.length,
-              onClick: () => setSelected(filtered.slice(skipFirst, skipFirst + EXPORT_OPERATION_BATCH)),
-              children: "→ 100"
-            }
-          ),
-          /* @__PURE__ */ o$8("span", { className: "text-sm font-medium tabular-nums text-gray-500 dark:text-gray-400", children: [
+          /* @__PURE__ */ o$8("span", { className: "truncate min-w-0 text-xs text-gray-400 dark:text-gray-500", style: { flexShrink: 99 }, children: t2("Shift Select Hint") }),
+          /* @__PURE__ */ o$8("span", { className: "whitespace-nowrap shrink-0 text-sm font-medium tabular-nums text-gray-500 dark:text-gray-400", children: [
             selected.length,
             " / ",
             filtered.length
@@ -23133,7 +23213,9 @@ ${content2}`;
           batchIndex: batchIndexRef.current,
           totalBatches: totalBatchesRef.current,
           completed: batchIndexRef.current * EXPORT_OPERATION_BATCH + prog.completed,
-          total: totalBatchesRef.current * EXPORT_OPERATION_BATCH
+          // Every batch except the last is full, so sum the real sizes
+          // instead of assuming totalBatches * 100
+          total: pendingBatchesRef.current.reduce((n2, batch) => n2 + batch.length, 0)
         });
       });
       return () => off();
@@ -23167,6 +23249,7 @@ ${content2}`;
         const callback = (_a = exportAllOptions.find((o3) => o3.label === exportType)) == null ? void 0 : _a.callback;
         if (callback && results.length > 0) {
           await callback(format, results, metaList, selectedProject == null ? void 0 : selectedProject.display.name, partIndex, totalBatches2);
+          markExported(results);
         }
         if (partIndex < totalBatches2) {
           await sleep(400);
@@ -23232,6 +23315,7 @@ ${content2}`;
       setProcessing(true);
       for (let i2 = 0; i2 < chunks.length; i2++) {
         await callback(format, chunks[i2], metaList, selectedProject == null ? void 0 : selectedProject.display.name, i2 + 1, chunks.length);
+        markExported(chunks[i2]);
         if (i2 < chunks.length - 1) await sleep(400);
       }
       setProcessing(false);
@@ -23434,7 +23518,7 @@ ${content2}`;
               style: { fontSize: "0.75rem", padding: "3px 10px", height: "auto" },
               title: "Stop the export — any batches already downloaded are kept",
               onClick: cancelExport,
-              children: "Cancel"
+              children: t2("Cancel")
             }
           )
         ] }),
