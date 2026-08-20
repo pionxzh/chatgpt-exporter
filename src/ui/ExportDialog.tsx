@@ -468,7 +468,9 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                 batchIndex: batchIndexRef.current,
                 totalBatches: totalBatchesRef.current,
                 completed: batchIndexRef.current * EXPORT_OPERATION_BATCH + prog.completed,
-                total: totalBatchesRef.current * EXPORT_OPERATION_BATCH,
+                // Every batch except the last is full, so sum the real sizes
+                // instead of assuming totalBatches * 100
+                total: pendingBatchesRef.current.reduce((n, batch) => n + batch.length, 0),
             })
         })
         return () => off()
