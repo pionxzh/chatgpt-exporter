@@ -16,6 +16,7 @@
   "Select...": "Toplu seçim…",
   "Select Not Exported": "Dışa aktarılmamış konuşmaları seç",
   "Select Updated": "Güncellenen konuşmaları seç",
+  "Shift Select Hint": "İpucu: Aralık seçmek için Shift+tık",
   "Export": "Dışa Aktar",
   "Error": "Hata",
   "Loading": "Yükleniyor",
@@ -54,6 +55,5 @@
   "Export All Limit Description": "'Tümünü Dışa Aktar' iletişim kutusunda yüklenecek maksimum konuşma sayısını ayarlayın.",
   "Select a source to load conversations": "Konuşmaları yüklemek için yukarıdan bir proje seçin.",
   "Search": "Ara",
-  "Last 100": "Son 100",
   "No results": "Sonuç yok"
 }

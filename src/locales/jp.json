@@ -16,6 +16,7 @@
   "Select...": "一括選択…",
   "Select Not Exported": "未エクスポートの会話を選択",
   "Select Updated": "更新された会話を選択",
+  "Shift Select Hint": "ヒント: Shift+クリックで範囲選択",
   "Export": "エクスポート",
   "Error": "エラー",
   "Loading": "読み込み中",
@@ -54,6 +55,5 @@
   "Export All Limit Description": "「すべてエクスポート」ダイアログで読み込む会話の最大数を設定します。",
   "Select a source to load conversations": "上からプロジェクトを選択して会話を読み込んでください。",
   "Search": "検索",
-  "Last 100": "最新100件",
   "No results": "結果なし"
 }
