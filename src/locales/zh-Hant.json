@@ -55,5 +55,9 @@
   "Export All Limit Description": "設定「批量匯出」對話方塊中載入的最大對話數量。",
   "Select a source to load conversations": "請在上方選擇一個專案以載入對話。",
   "Search": "搜尋",
-  "No results": "無結果"
+  "No results": "無結果",
+  "Batch progress": "第 {{current}}/{{total}} 批",
+  "All conversations": "全部對話",
+  "Load more conversations": "再載入 {{n}} 筆",
+  "Load more conversations remaining": "再載入 {{n}} 筆 · 剩餘 {{remaining}} 筆"
 }

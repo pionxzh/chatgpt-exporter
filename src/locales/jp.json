@@ -55,5 +55,9 @@
   "Export All Limit Description": "「すべてエクスポート」ダイアログで読み込む会話の最大数を設定します。",
   "Select a source to load conversations": "上からプロジェクトを選択して会話を読み込んでください。",
   "Search": "検索",
-  "No results": "結果なし"
+  "No results": "結果なし",
+  "Batch progress": "バッチ {{current}}/{{total}}",
+  "All conversations": "すべての会話",
+  "Load more conversations": "さらに {{n}} 件読み込む",
+  "Load more conversations remaining": "さらに {{n}} 件読み込む · 残り {{remaining}} 件"
 }

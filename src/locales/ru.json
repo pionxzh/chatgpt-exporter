@@ -55,5 +55,9 @@
   "Export All Limit Description": "Установите максимальное количество бесед для загрузки в диалоге 'Экспортировать все'.",
   "Select a source to load conversations": "Выберите проект выше, чтобы загрузить беседы.",
   "Search": "Поиск",
-  "No results": "Нет результатов"
+  "No results": "Нет результатов",
+  "Batch progress": "Партия {{current}}/{{total}}",
+  "All conversations": "Все разговоры",
+  "Load more conversations": "Загрузить ещё {{n}}",
+  "Load more conversations remaining": "Загрузить ещё {{n}} · осталось {{remaining}}"
 }

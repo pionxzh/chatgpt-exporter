@@ -55,5 +55,9 @@
   "Export All Limit Description": "'Tümünü Dışa Aktar' iletişim kutusunda yüklenecek maksimum konuşma sayısını ayarlayın.",
   "Select a source to load conversations": "Konuşmaları yüklemek için yukarıdan bir proje seçin.",
   "Search": "Ara",
-  "No results": "Sonuç yok"
+  "No results": "Sonuç yok",
+  "Batch progress": "Grup {{current}}/{{total}}",
+  "All conversations": "Tüm konuşmalar",
+  "Load more conversations": "{{n}} tane daha yükle",
+  "Load more conversations remaining": "{{n}} tane daha yükle · {{remaining}} kaldı"
 }

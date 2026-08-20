@@ -55,5 +55,9 @@
   "Export All Limit Description": "Définit le nombre maximal de conversations à charger dans la boîte de dialogue 'Tout exporter'.",
   "Select a source to load conversations": "Sélectionnez un projet ci-dessus pour charger les conversations.",
   "Search": "Rechercher",
-  "No results": "Aucun résultat"
+  "No results": "Aucun résultat",
+  "Batch progress": "Lot {{current}}/{{total}}",
+  "All conversations": "Toutes les conversations",
+  "Load more conversations": "Charger {{n}} de plus",
+  "Load more conversations remaining": "Charger {{n}} de plus · {{remaining}} restantes"
 }

@@ -55,5 +55,9 @@
   "Export All Limit Description": "Atur jumlah maksimum percakapan yang akan dimuat dalam dialog 'Ekspor Semua'.",
   "Select a source to load conversations": "Pilih proyek di atas untuk memuat percakapan.",
   "Search": "Cari",
-  "No results": "Tidak ada hasil"
+  "No results": "Tidak ada hasil",
+  "Batch progress": "Kelompok {{current}}/{{total}}",
+  "All conversations": "Semua percakapan",
+  "Load more conversations": "Muat {{n}} lagi",
+  "Load more conversations remaining": "Muat {{n}} lagi · tersisa {{remaining}}"
 }
