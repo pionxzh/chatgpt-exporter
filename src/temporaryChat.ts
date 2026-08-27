@@ -21,6 +21,8 @@ export function checkIfTemporaryChatIsExportable() {
     return !isTemporaryChat() || temporaryChatId !== null
 }
 
+declare const exportFunction: (func: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>, context: any) => (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
+
 /**
  * Temporary chats are hidden from the conversation list and their id never
  * reaches the URL, so there is no way to ask for one by name. They are served
@@ -31,21 +33,32 @@ export function checkIfTemporaryChatIsExportable() {
 export function watchTemporaryChatId() {
     const originalFetch = unsafeWindow.fetch
 
-    unsafeWindow.fetch = async (input, init) => {
+    const patchedFetch = (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
         // `fetch` needs its original receiver, or Chrome throws on invocation.
-        const response = await originalFetch.call(unsafeWindow, input, init)
-        if (!isTemporaryChat() || !response.body) return response
+        const response = originalFetch.call(unsafeWindow, input, init)
 
-        const url = typeof input === 'string'
-            ? input
-            : input instanceof URL ? input.href : input.url
-        if (!url.includes(CONVERSATION_STREAM_PATH)) return response
+        if (isTemporaryChat()) {
+            response.then((response) => {
+                if (!response.body) return response
+                const url = typeof input === 'string'
+                    ? input
+                    : input instanceof URL ? input.href : input.url
+                if (!url.includes(CONVERSATION_STREAM_PATH)) return response
 
-        // Read a copy so the page still receives the untouched stream.
-        readConversationId(response.clone())
+                // Read a copy so the page still receives the untouched stream.
+                readConversationId(response.clone())
+
+                return response
+            })
+        }
 
         return response
     }
+
+    // Workaround for Firefox sandboxing breaking ChatGPT's native fetch calls
+    unsafeWindow.fetch = typeof exportFunction === 'function'
+        ? exportFunction(patchedFetch, unsafeWindow)
+        : patchedFetch
 }
 
 async function readConversationId(response: Response) {
