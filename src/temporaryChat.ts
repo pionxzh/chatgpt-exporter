@@ -21,7 +21,7 @@ export function checkIfTemporaryChatIsExportable() {
     return !isTemporaryChat() || temporaryChatId !== null
 }
 
-declare const exportFunction: (func: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>, context: any) => (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
+declare const exportFunction: <T extends (...args: never[]) => unknown>(func: T, context: object) => T
 
 /**
  * Temporary chats are hidden from the conversation list and their id never
@@ -33,23 +33,50 @@ declare const exportFunction: (func: (input: RequestInfo | URL, init?: RequestIn
 export function watchTemporaryChatId() {
     const originalFetch = unsafeWindow.fetch
 
+    const logObserverError = (error: unknown) => {
+        console.error('[Exporter] Failed to observe the temporary chat response', error)
+    }
+
+    const observeResponse = (response: Response) => {
+        try {
+            if (!response.body) return
+
+            readConversationId(response.clone()).catch(logObserverError)
+        }
+        catch (error) {
+            logObserverError(error)
+        }
+    }
+
+    const ignoreFetchFailure = () => {}
+    const canExportToPage = typeof exportFunction === 'function'
+    const pageResponseObserver = canExportToPage
+        ? exportFunction(observeResponse, unsafeWindow)
+        : observeResponse
+    const pageFetchFailureHandler = canExportToPage
+        ? exportFunction(ignoreFetchFailure, unsafeWindow)
+        : ignoreFetchFailure
+
     const patchedFetch = (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
         // `fetch` needs its original receiver, or Chrome throws on invocation.
         const response = originalFetch.call(unsafeWindow, input, init)
 
         if (isTemporaryChat()) {
-            response.then((response) => {
-                if (!response.body) return response
+            try {
                 const url = typeof input === 'string'
                     ? input
                     : input instanceof URL ? input.href : input.url
-                if (!url.includes(CONVERSATION_STREAM_PATH)) return response
-
-                // Read a copy so the page still receives the untouched stream.
-                readConversationId(response.clone())
-
-                return response
-            })
+                if (url.includes(CONVERSATION_STREAM_PATH)) {
+                    // Both callbacks must be callable from the page's Promise
+                    // realm. Handling rejection also prevents this observer
+                    // branch from creating an unhandled rejection.
+                    response.then(pageResponseObserver, pageFetchFailureHandler)
+                }
+            }
+            catch (error) {
+                // Observing a response must never affect ChatGPT's fetch call.
+                logObserverError(error)
+            }
         }
 
         return response
