@@ -10,6 +10,7 @@ export function downloadFile(filename: string, type: string, content: string | B
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
 
 export function downloadUrl(filename: string, url: string) {

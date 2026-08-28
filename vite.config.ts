@@ -62,7 +62,8 @@ export default defineConfig({
                 fileName: 'chatgpt.user.js',
                 externalGlobals: [
                     ['jszip', cdn.jsdelivr('JSZip', 'dist/jszip.min.js')],
-                    ['html2canvas', cdn.jsdelivr('html2canvas', 'dist/html2canvas.min.js')],
+                    // SnapDOM's IIFE exposes its named export as window.snapdom.
+                    ['@zumer/snapdom', cdn.jsdelivr('window', 'dist/snapdom.js')],
                 ],
                 cssSideEffects() {
                     return (e) => {
