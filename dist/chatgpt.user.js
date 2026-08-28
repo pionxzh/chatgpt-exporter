@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.34.1
+// @version            2.35.0
 // @author             pionxzh
 // @description        Export ChatGPT conversations with one click — backup & share effortlessly!
 // @description:zh-CN  一键导出 ChatGPT 对话，轻松备份与分享
@@ -27,7 +27,7 @@
 // @match              https://chatgpt.com/share/*
 // @match              https://chatgpt.com/share/*/continue
 // @require            https://cdn.jsdelivr.net/npm/jszip@3.9.1/dist/jszip.min.js
-// @require            https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js
+// @require            https://cdn.jsdelivr.net/npm/@zumer/snapdom@2.24.10/dist/snapdom.js
 // @grant              GM_deleteValue
 // @grant              GM_getValue
 // @grant              GM_setValue
@@ -820,7 +820,7 @@ html {
     color: rgb(71 85 105);
 } `);
 
-(function (JSZip, html2canvas) {
+(function (JSZip, snapdom) {
   'use strict';
 
   var __defProp = Object.defineProperty;
@@ -1354,14 +1354,37 @@ html {
   }
   function watchTemporaryChatId() {
     const originalFetch = _unsafeWindow.fetch;
-    _unsafeWindow.fetch = async (input, init2) => {
-      const response = await originalFetch.call(_unsafeWindow, input, init2);
-      if (!isTemporaryChat() || !response.body) return response;
-      const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
-      if (!url.includes(CONVERSATION_STREAM_PATH)) return response;
-      readConversationId(response.clone());
+    const logObserverError = (error2) => {
+      console.error("[Exporter] Failed to observe the temporary chat response", error2);
+    };
+    const observeResponse = (response) => {
+      try {
+        if (!response.body) return;
+        readConversationId(response.clone()).catch(logObserverError);
+      } catch (error2) {
+        logObserverError(error2);
+      }
+    };
+    const ignoreFetchFailure = () => {
+    };
+    const canExportToPage = typeof exportFunction === "function";
+    const pageResponseObserver = canExportToPage ? exportFunction(observeResponse, _unsafeWindow) : observeResponse;
+    const pageFetchFailureHandler = canExportToPage ? exportFunction(ignoreFetchFailure, _unsafeWindow) : ignoreFetchFailure;
+    const patchedFetch = (input, init2) => {
+      const response = originalFetch.call(_unsafeWindow, input, init2);
+      if (isTemporaryChat()) {
+        try {
+          const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+          if (url.includes(CONVERSATION_STREAM_PATH)) {
+            response.then(pageResponseObserver, pageFetchFailureHandler);
+          }
+        } catch (error2) {
+          logObserverError(error2);
+        }
+      }
       return response;
     };
+    _unsafeWindow.fetch = typeof exportFunction === "function" ? exportFunction(patchedFetch, _unsafeWindow) : patchedFetch;
   }
   async function readConversationId(response) {
     var _a;
@@ -10422,14 +10445,7 @@ ${sourceList}` : sourceList;
     document.body.appendChild(a2);
     a2.click();
     document.body.removeChild(a2);
-  }
-  function downloadUrl(filename, url) {
-    const a2 = document.createElement("a");
-    a2.href = url;
-    a2.download = filename;
-    document.body.appendChild(a2);
-    a2.click();
-    document.body.removeChild(a2);
+    setTimeout(() => URL.revokeObjectURL(url), 1e3);
   }
   function normalizeProjectName(projectName) {
     return projectName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
@@ -21821,8 +21837,123 @@ ${content2.text}
       this._isDisposed = true;
     }
   }
-  function fnIgnoreElements(el) {
-    return typeof el.shadowRoot === "object" && el.shadowRoot !== null;
+  const PNG_SIGNATURE = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
+  const PNG_TYPE_IHDR = new Uint8Array([73, 72, 68, 82]);
+  const PNG_TYPE_IDAT = new Uint8Array([73, 68, 65, 84]);
+  const PNG_TYPE_IEND = new Uint8Array([73, 69, 78, 68]);
+  const ROW_CHUNK_BYTES = 256 * 1024;
+  const crcTable = new Uint32Array(256);
+  for (let index2 = 0; index2 < crcTable.length; index2++) {
+    let value = index2;
+    for (let bit = 0; bit < 8; bit++) {
+      value = value & 1 ? 3988292384 ^ value >>> 1 : value >>> 1;
+    }
+    crcTable[index2] = value >>> 0;
+  }
+  function writeUint32(target, offset, value) {
+    target[offset] = value >>> 24;
+    target[offset + 1] = value >>> 16;
+    target[offset + 2] = value >>> 8;
+    target[offset + 3] = value;
+  }
+  function pngChunk(type, data = new Uint8Array()) {
+    const chunk = new Uint8Array(12 + data.length);
+    writeUint32(chunk, 0, data.length);
+    chunk.set(type, 4);
+    chunk.set(data, 8);
+    let crc = 4294967295;
+    for (let index2 = 4; index2 < 8 + data.length; index2++) {
+      crc = crcTable[(crc ^ chunk[index2]) & 255] ^ crc >>> 8;
+    }
+    writeUint32(chunk, 8 + data.length, (crc ^ 4294967295) >>> 0);
+    return chunk;
+  }
+  function pngHeader(width, height) {
+    const data = new Uint8Array(13);
+    writeUint32(data, 0, width);
+    writeUint32(data, 4, height);
+    data[8] = 8;
+    data[9] = 6;
+    return pngChunk(PNG_TYPE_IHDR, data);
+  }
+  async function encodePng(width, renderRows) {
+    if (!Number.isInteger(width) || width <= 0) {
+      throw new RangeError("PNG width must be a positive integer");
+    }
+    if (typeof CompressionStream === "undefined") {
+      throw new TypeError("CompressionStream is not supported by this browser");
+    }
+    const compression = new CompressionStream("deflate");
+    const writer = compression.writable.getWriter();
+    const idatChunks = [];
+    const readCompressedData = (async () => {
+      const reader = compression.readable.getReader();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        idatChunks.push(pngChunk(PNG_TYPE_IDAT, value));
+      }
+    })();
+    let writtenRows = 0;
+    try {
+      await renderRows(async ({ data, width: rowWidth, height: rowCount }) => {
+        if (rowWidth !== width || data.length !== rowWidth * rowCount * 4) {
+          throw new RangeError("Invalid RGBA rows supplied to PNG encoder");
+        }
+        const rgbaStride = width * 4;
+        const pngStride = rgbaStride + 1;
+        const rowsPerWrite = Math.max(1, Math.floor(ROW_CHUNK_BYTES / pngStride));
+        for (let startRow = 0; startRow < rowCount; startRow += rowsPerWrite) {
+          const rowsInWrite = Math.min(rowsPerWrite, rowCount - startRow);
+          const filteredRows = new Uint8Array(pngStride * rowsInWrite);
+          for (let row = 0; row < rowsInWrite; row++) {
+            const sourceOffset = (startRow + row) * rgbaStride;
+            const targetOffset = row * pngStride;
+            filteredRows[targetOffset] = 0;
+            filteredRows.set(data.subarray(sourceOffset, sourceOffset + rgbaStride), targetOffset + 1);
+          }
+          await writer.write(filteredRows);
+        }
+        writtenRows += rowCount;
+      });
+      if (writtenRows === 0) throw new RangeError("PNG must contain at least one row");
+      await writer.close();
+      await readCompressedData;
+    } catch (error2) {
+      await writer.abort(error2).catch(() => {
+      });
+      await readCompressedData.catch(() => {
+      });
+      throw error2;
+    }
+    return new Blob([
+      PNG_SIGNATURE,
+      pngHeader(width, writtenRows),
+      ...idatChunks,
+      pngChunk(PNG_TYPE_IEND)
+    ], { type: "image/png" });
+  }
+  const MAX_SCREENSHOT_DIMENSION = 16e3;
+  const MAX_TILE_PIXELS = 16e6;
+  function scrollElementWithinRoot(scrollRoot, target, block) {
+    const scrollRect = scrollRoot.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    const offset = targetRect.top - scrollRect.top;
+    const alignment = block === "center" ? (scrollRoot.clientHeight - targetRect.height) / 2 : 0;
+    const requestedScrollTop = Math.max(0, Math.min(
+      scrollRoot.scrollHeight - scrollRoot.clientHeight,
+      scrollRoot.scrollTop + offset - alignment
+    ));
+    scrollRoot.scrollTop = requestedScrollTop;
+    scrollRoot.dispatchEvent(new Event("scroll", { bubbles: true }));
+  }
+  function findCommonAncestor(elements) {
+    var _a;
+    let ancestor = (_a = elements[0]) == null ? void 0 : _a.parentElement;
+    while (ancestor && !elements.every((element2) => ancestor.contains(element2))) {
+      ancestor = ancestor.parentElement;
+    }
+    return ancestor;
   }
   async function exportToPng(fileNameFormat) {
     if (!checkIfConversationStarted()) {
@@ -21830,16 +21961,21 @@ ${content2.text}
       return false;
     }
     const effect = new Effect();
-    const thread = document.querySelector('#thread div:has(> [data-testid="conversation-turn-1"]');
+    const conversationTurns = Array.from(document.querySelectorAll('#thread [data-testid^="conversation-turn-"]'));
+    const thread = findCommonAncestor(conversationTurns);
     if (!thread || thread.children.length === 0 || thread.scrollHeight < 50) {
       alert(instance.t("Failed to export to PNG. Failed to find the element node."));
       return false;
     }
     const isDarkMode = document.documentElement.classList.contains("dark");
+    const threadEl = thread;
+    const turnContainers = Array.from(threadEl.querySelectorAll("[data-turn-id-container][data-is-intersecting]")).filter((element2) => !!element2.querySelector('[data-testid^="conversation-turn-"]') || element2.offsetHeight > 0 || !!element2.style.getPropertyValue("--last-known-height"));
+    const turnContainerIds = turnContainers.map((element2) => element2.dataset.turnIdContainer).filter((id) => !!id && id !== "client-created-root");
     effect.add(() => {
+      threadEl.setAttribute("data-chatgpt-exporter-screenshot-root", "");
       const style = document.createElement("style");
       style.textContent = `
-            #thread div:has(> [data-testid="conversation-turn-1"]),
+            [data-chatgpt-exporter-screenshot-root],
             #thread [data-testid^="conversation-turn-"] {
                 color: ${isDarkMode ? "#ececec" : "#0d0d0d"};
                 background-color: ${isDarkMode ? "#212121" : "#fff"};
@@ -21861,8 +21997,10 @@ ${content2.text}
 
             #page-header,
             #thread-bottom-container,
+            /* date separators such as "Yesterday 10:08 AM" */
+            [data-chatgpt-exporter-screenshot-root] [role="separator"],
             /* any other elements that are not conversation turns */
-            #thread div:has(> [data-testid="conversation-turn-1"]) > :not([data-testid^="conversation-turn-"]),
+            [data-chatgpt-exporter-screenshot-root] > :not([data-turn-id-container]):not([data-testid^="conversation-turn-"]):not(:has([data-testid^="conversation-turn-"])),
             /* hide back to top button */
             button.absolute,
             /* question button */
@@ -21870,57 +22008,203 @@ ${content2.text}
                 display: none;
             }
 
-            /* conversation action bar */
-            .group\\/conversation-turn > div > div.absolute,
+            /* Preserve the action row's spacing while hiding its toolbar. */
+            [data-testid^="conversation-turn-"] [role="group"]:has([data-testid="copy-turn-action-button"]),
             /* code block buttons */
             #thread pre button {
                 visibility: hidden;
             }
+
+            /* Later user turns currently have much larger top padding than the first one. */
+            [data-testid^="conversation-turn-"][data-turn="user"] > h4 + div {
+                padding-top: 0 !important;
+            }
             `;
-      thread.appendChild(style);
-      return () => style.remove();
+      threadEl.appendChild(style);
+      return () => {
+        style.remove();
+        threadEl.removeAttribute("data-chatgpt-exporter-screenshot-root");
+      };
     });
-    const threadEl = thread;
+    const scrollRoot = threadEl.closest("[data-scroll-root]");
+    if (scrollRoot) {
+      effect.add(() => {
+        const scrollTop = scrollRoot.scrollTop;
+        const scrollLeft = scrollRoot.scrollLeft;
+        const overflowAnchor = scrollRoot.style.overflowAnchor;
+        scrollRoot.style.overflowAnchor = "none";
+        return () => {
+          scrollRoot.style.overflowAnchor = overflowAnchor;
+          scrollRoot.scrollTop = scrollTop;
+          scrollRoot.scrollLeft = scrollLeft;
+        };
+      });
+    }
     effect.run();
-    await sleep(100);
-    const passLimit = 10;
-    const takeScreenshot = async (width, height, additionalScale = 1, currentPass = 1) => {
-      const ratio = window.devicePixelRatio || 1;
-      const scale = ratio * 2 * additionalScale;
-      let canvas = null;
+    const turnSnapshots = /* @__PURE__ */ new Map();
+    if (scrollRoot && turnContainerIds.length > 0) {
+      for (const turnContainerId of turnContainerIds) {
+        for (let pass = 0; pass < 10; pass++) {
+          const container = Array.from(threadEl.querySelectorAll("[data-turn-id-container][data-is-intersecting]")).find((element2) => element2.dataset.turnIdContainer === turnContainerId);
+          if (!container) break;
+          const renderedTurn = container.querySelector('[data-testid^="conversation-turn-"]');
+          if (renderedTurn) {
+            turnSnapshots.set(turnContainerId, container.cloneNode(true));
+            break;
+          }
+          scrollElementWithinRoot(scrollRoot, container, "center");
+          await sleep(250);
+        }
+        if (!turnSnapshots.has(turnContainerId)) {
+          const placeholder = Array.from(threadEl.querySelectorAll("[data-turn-id-container][data-is-intersecting]")).find((element2) => element2.dataset.turnIdContainer === turnContainerId);
+          if (placeholder) turnSnapshots.set(turnContainerId, placeholder.cloneNode(true));
+        }
+      }
+    } else if (scrollRoot && conversationTurns[0]) {
+      scrollElementWithinRoot(scrollRoot, conversationTurns[0], "start");
+      await sleep(250);
+    }
+    await sleep(500);
+    let screenshotEl = threadEl;
+    if (turnSnapshots.size > 0) {
+      const staticThread = threadEl.cloneNode(false);
+      staticThread.setAttribute("data-chatgpt-exporter-screenshot-root", "");
+      staticThread.style.position = "absolute";
+      staticThread.style.left = "-100000px";
+      staticThread.style.top = "0";
+      staticThread.style.width = `${threadEl.offsetWidth}px`;
+      staticThread.style.height = "auto";
+      staticThread.style.minHeight = "0";
+      staticThread.style.maxHeight = "none";
+      staticThread.style.overflow = "visible";
+      staticThread.style.pointerEvents = "none";
+      for (const turnContainerId of turnContainerIds) {
+        const snapshot = turnSnapshots.get(turnContainerId);
+        if (snapshot) staticThread.appendChild(snapshot);
+      }
+      effect.add(() => {
+        document.body.appendChild(staticThread);
+        return () => staticThread.remove();
+      });
+      effect.run();
+      screenshotEl = staticThread;
+      await sleep(100);
+    }
+    effect.add(() => {
+      const minHeight = screenshotEl.style.minHeight;
+      screenshotEl.style.minHeight = `${screenshotEl.scrollHeight}px`;
+      return () => {
+        screenshotEl.style.minHeight = minHeight;
+      };
+    });
+    effect.run();
+    await sleep(0);
+    const backgroundColor = isDarkMode ? "#212121" : "#fff";
+    const width = Math.max(screenshotEl.offsetWidth, screenshotEl.scrollWidth);
+    const height = Math.max(screenshotEl.offsetHeight, screenshotEl.scrollHeight);
+    let capture = null;
+    try {
+      capture = await snapdom.snapdom(screenshotEl, {
+        embedFonts: true,
+        backgroundColor
+      });
+    } catch (error2) {
+      console.error("Failed to capture screenshot DOM", error2);
+    }
+    const sourceWidth = (capture == null ? void 0 : capture.meta.vbW) || width;
+    const sourceHeight = (capture == null ? void 0 : capture.meta.vbH) || height;
+    const requestedScale = Math.min(2, MAX_SCREENSHOT_DIMENSION / sourceWidth);
+    const desiredWidth = Math.max(1, Math.floor(sourceWidth * requestedScale));
+    const desiredScale = desiredWidth / sourceWidth;
+    const desiredHeight = Math.max(1, Math.floor(sourceHeight * desiredScale));
+    const takeTiledScreenshot = async () => {
+      if (!capture) {
+        console.warn("[ChatGPT Exporter:screenshot] tiled capture unavailable");
+        return null;
+      }
+      if (typeof CompressionStream === "undefined") {
+        console.warn("[ChatGPT Exporter:screenshot] CompressionStream unavailable; using downscaled fallback");
+        return null;
+      }
+      const tileHeight = Math.max(1, Math.min(
+        MAX_SCREENSHOT_DIMENSION,
+        Math.floor(MAX_TILE_PIXELS / desiredWidth)
+      ));
       try {
-        canvas = await html2canvas(threadEl, {
-          scale,
-          useCORS: true,
-          scrollX: -window.scrollX,
-          scrollY: -window.scrollY,
-          windowWidth: width,
-          windowHeight: height,
-          ignoreElements: fnIgnoreElements
+        return await encodePng(desiredWidth, async (appendRows) => {
+          for (let targetY = 0; targetY < desiredHeight; targetY += tileHeight) {
+            const targetTileHeight = Math.min(tileHeight, desiredHeight - targetY);
+            const sourceY = sourceHeight * targetY / desiredHeight;
+            const sourceBottom = sourceHeight * (targetY + targetTileHeight) / desiredHeight;
+            const canvas = await capture.toCanvas({
+              crop: {
+                x: 0,
+                y: sourceY,
+                width: sourceWidth,
+                height: sourceBottom - sourceY
+              },
+              scale: desiredScale,
+              dpr: 1,
+              backgroundColor
+            });
+            if (canvas.width !== desiredWidth) {
+              throw new Error(`Unexpected screenshot tile width: ${canvas.width}`);
+            }
+            const context = canvas.getContext("2d", { willReadFrequently: true });
+            if (!context) throw new Error("Failed to read screenshot tile");
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+            await appendRows(imageData);
+            canvas.width = 1;
+            canvas.height = 1;
+          }
         });
       } catch (error2) {
-        console.log(`ChatGPT Exporter:takeScreenshot with height=${height} width=${width} scale=${scale}`);
+        console.error("Failed to encode tiled screenshot", error2);
+        return null;
+      }
+    };
+    const passLimit = 10;
+    const takeDownscaledScreenshot = async (additionalScale = 1, currentPass = 1) => {
+      if (!capture) return null;
+      const scale = Math.min(
+        requestedScale,
+        MAX_SCREENSHOT_DIMENSION / sourceWidth,
+        MAX_SCREENSHOT_DIMENSION / sourceHeight
+      ) * additionalScale;
+      const targetWidth = Math.max(1, Math.floor(sourceWidth * scale));
+      const targetHeight = Math.max(1, Math.floor(sourceHeight * scale));
+      let canvas = null;
+      try {
+        canvas = await capture.toCanvas({
+          scale,
+          dpr: 1,
+          backgroundColor
+        });
+        const context = canvas.getContext("2d");
+        if (context) context.imageSmoothingEnabled = false;
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png", 1));
+        if (blob) return blob;
+      } catch (error2) {
         console.error("Failed to take screenshot", error2);
       }
-      const context = canvas == null ? void 0 : canvas.getContext("2d");
-      if (context) context.imageSmoothingEnabled = false;
-      const dataUrl2 = canvas == null ? void 0 : canvas.toDataURL("image/png", 1).replace(/^data:image\/[^;]/, "data:application/octet-stream");
-      if (!canvas || !dataUrl2 || dataUrl2 === "data:,") {
-        if (currentPass > passLimit) return null;
-        return takeScreenshot(width, height, additionalScale / 1.4, currentPass + 1);
-      }
-      return dataUrl2;
+      console.log(`ChatGPT Exporter:takeScreenshot with height=${height} width=${width} targetHeight=${targetHeight} targetWidth=${targetWidth}`);
+      if (currentPass > passLimit) return null;
+      return takeDownscaledScreenshot(additionalScale / 1.4, currentPass + 1);
     };
-    const dataUrl = await takeScreenshot(thread.scrollWidth, thread.scrollHeight);
+    const shouldTile = desiredHeight > MAX_SCREENSHOT_DIMENSION || desiredWidth * desiredHeight > MAX_SCREENSHOT_DIMENSION * MAX_SCREENSHOT_DIMENSION;
+    let png = shouldTile ? await takeTiledScreenshot() : await takeDownscaledScreenshot();
+    if (!png && shouldTile) {
+      console.warn("[ChatGPT Exporter:screenshot] tiled export failed; using downscaled fallback");
+      png = await takeDownscaledScreenshot();
+    }
     effect.dispose();
-    if (!dataUrl) {
+    if (!png) {
       alert("Failed to export to PNG. This might be caused by the size of the conversation. Please try to export a smaller conversation.");
       return false;
     }
     const chatId = getChatIdFromUrl() || void 0;
     const fileName = getFileNameWithFormat(fileNameFormat, "png", { chatId });
-    downloadUrl(fileName, dataUrl);
-    window.URL.revokeObjectURL(dataUrl);
+    downloadFile(fileName, "image/png", png);
     return true;
   }
   function convertMessageToTavern(node2) {
@@ -24615,4 +24899,4 @@ ${content2}`;
     return wrapper;
   }
 
-})(JSZip, html2canvas);
+})(JSZip, window);
