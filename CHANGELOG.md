@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.35.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.34.1...userscript-v2.35.0) (2026-08-28)
+
+
+### Features
+
+* replace screenshot renderer with SnapDOM ([f6c38b2](https://github.com/pionxzh/chatgpt-exporter/commit/f6c38b2bb09052ad6a205df88b3e1ab04cd172a2))
+
+
+### Bug Fixes
+
+* export temporary chat response callbacks on Firefox ([66aeac8](https://github.com/pionxzh/chatgpt-exporter/commit/66aeac8008dd8b5d66c0fb3be21657c2a71d3bc8))
+* permission denied on Firefox ([87dbdf0](https://github.com/pionxzh/chatgpt-exporter/commit/87dbdf0c59c30027f959c3dc2d080efc5f21bc94))
+
 ## [2.34.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.34.0...userscript-v2.34.1) (2026-08-20)
 
 
