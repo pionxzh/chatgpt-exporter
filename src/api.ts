@@ -1,6 +1,7 @@
 import urlcat from 'urlcat'
 import { apiUrl, baseUrl } from './constants'
 import { getChatIdFromUrl, getConversationFromSharePage, isSharePage, isTemporaryChat } from './page'
+import { loadShareConversation } from './share'
 import { getTemporaryChatId } from './temporaryChat'
 import { blobToDataURL } from './utils/dom'
 import { memorize } from './utils/memorize'
@@ -433,6 +434,7 @@ const enum ChatGPTCookie {
 
 const sessionApi = urlcat(baseUrl, '/api/auth/session')
 const conversationApi = (id: string) => urlcat(apiUrl, '/conversation/:id', { id })
+const shareConversationApi = (id: string) => urlcat(apiUrl, '/share/:id', { id })
 const conversationsApi = (offset: number, limit: number) => urlcat(apiUrl, '/conversations', { offset, limit })
 const fileDownloadApi = (id: string) => urlcat(apiUrl, '/files/download/:id', { id, post_id: '', inline: false })
 const projectsApi = (cursor: number | null) => urlcat(apiUrl, '/gizmos/snorlax/sidebar', { conversations_per_gizmo: 0, cursor })
@@ -536,7 +538,10 @@ async function replaceImageAssets(conversation: ApiConversation): Promise<void> 
 export async function fetchConversation(chatId: string, shouldReplaceAssets: boolean): Promise<ApiConversationWithId> {
     if (chatId.startsWith('__share__')) {
         const id = chatId.replace('__share__', '')
-        const shareConversation = getConversationFromSharePage() as ApiConversation
+        const shareConversation = await loadShareConversation(
+            getConversationFromSharePage(),
+            () => fetchApi<ApiConversation>(shareConversationApi(id)),
+        )
         await replaceImageAssets(shareConversation)
 
         return {
