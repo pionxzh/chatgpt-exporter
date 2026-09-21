@@ -441,7 +441,9 @@ const accountsCheckApi = urlcat(apiUrl, '/accounts/check/v4-2023-04-27')
 
 export async function getCurrentChatId(): Promise<string> {
     if (isSharePage()) {
-        return `__share__${getChatIdFromUrl()}`
+        const shareId = getChatIdFromUrl()
+        if (!shareId) throw new Error('No share id found.')
+        return `__share__${shareId}`
     }
 
     // A temporary chat is absent from the history list and never puts its id in
