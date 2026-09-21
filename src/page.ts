@@ -42,9 +42,10 @@ declare global {
 
 export function getChatIdFromUrl() {
     // /share/1e5sf-asdf-1234
+    // /share/e/1e5sf-asdf-1234
     // /c/1e5sf-asdf-1234
     // /g/1e5sf-asdf-1234/c/1e5sf-asdf-1234
-    const match = location.pathname.match(/^\/(?:share|c|g\/[a-z0-9-]+\/c)\/([a-z0-9-]+)/i)
+    const match = location.pathname.match(/^\/(?:share(?:\/[a-z]+)?|c|g\/[a-z0-9-]+\/c)\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i)
     if (match) return match[1]
     return null
 }
