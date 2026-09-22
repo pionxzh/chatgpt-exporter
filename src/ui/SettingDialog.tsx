@@ -239,6 +239,8 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                                                     <Variable name="{update_time}" title="2023-04-10T21:45:35.027Z" />
                                                 </p>
                                                 {exportMetaList.map((meta, i) => (
+                                                    // Rows have no stable id; keying by index keeps the input focused while typing.
+                                                    // eslint-disable-next-line react/no-array-index-key
                                                     <div className="flex items-center mt-2" key={i}>
                                                         <input
                                                             className="Input"
