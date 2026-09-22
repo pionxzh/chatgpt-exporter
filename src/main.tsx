@@ -77,6 +77,10 @@ function main() {
         /** Insert timestamp to the bottom right of each message */
         let chatId = ''
         sentinel.on('[role="presentation"]', async () => {
+            // Share pages carry a share id, not a conversation id, so the
+            // conversation API below would 404 on them.
+            if (isSharePage()) return
+
             const currentChatId = getChatIdFromUrl()
             if (!currentChatId || currentChatId === chatId) return
             chatId = currentChatId
