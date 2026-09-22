@@ -194,7 +194,7 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
                 .replace('{timestamp}', timestamp())
                 .replace('{source}', source)
                 .replace('{model}', model)
-                .replace('{mode_name}', modelSlug)
+                .replace('{model_name}', modelSlug)
                 .replace('{create_time}', unixTimestampToISOString(createTime))
                 .replace('{update_time}', unixTimestampToISOString(updateTime))
 
