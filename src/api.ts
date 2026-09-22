@@ -542,7 +542,7 @@ export async function fetchConversation(chatId: string, shouldReplaceAssets: boo
             getConversationFromSharePage(),
             () => fetchApi<ApiConversation>(shareConversationApi(id)),
         )
-        await replaceImageAssets(shareConversation)
+        if (shouldReplaceAssets) await replaceImageAssets(shareConversation)
 
         return {
             id,
