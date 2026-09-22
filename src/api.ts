@@ -130,6 +130,8 @@ interface MessageMeta {
     content_references?: ContentReference[]
     /** Whether this message is hidden in the UI (e.g., internal system prompts) */
     is_visually_hidden_from_conversation?: boolean
+    /** Whether this assistant message is a transient thinking preamble hidden from the final conversation */
+    is_thinking_preamble_message?: boolean
     /** Duration of reasoning in seconds (from reasoning_recap messages) */
     finished_duration_sec?: number
     /** Reasoning activity title shown in the thinking panel */
@@ -873,6 +875,9 @@ export function shouldSkipMessageInExport(message?: ConversationNodeMessage): bo
 
     // Skip messages marked as visually hidden (e.g., internal system prompts)
     if (message.metadata?.is_visually_hidden_from_conversation) return true
+
+    // Skip transient assistant preambles shown while a thinking response is being prepared.
+    if (message.metadata?.is_thinking_preamble_message) return true
 
     // Skip tool's intermediate message.
     if (message.author.role === 'tool') {
