@@ -1,14 +1,10 @@
 import preact from '@preact/preset-vite'
 import { defineConfig } from 'vite'
 import monkey, { cdn } from 'vite-plugin-monkey'
-import packageJson from './package.json'
+import packageJson from './package.json' with { type: 'json' }
 
 // https://vitejs.dev/config/
 export default defineConfig({
-    // https://github.com/lisonge/vite-plugin-monkey/issues/10#issuecomment-1207264978
-    esbuild: {
-        charset: 'utf8',
-    },
     plugins: [
         preact({
             devToolsEnabled: false,
@@ -65,16 +61,15 @@ export default defineConfig({
                     // SnapDOM's IIFE exposes its named export as window.snapdom.
                     ['@zumer/snapdom', cdn.jsdelivr('window', 'dist/snapdom.js')],
                 ],
-                cssSideEffects() {
-                    return (e) => {
-                        const o = document.createElement('style')
-                        o.textContent = e
+                // Serialized into the bundle and run in the page, so it must be self-contained.
+                cssSideEffects: (css: string) => {
+                    const o = document.createElement('style')
+                    o.textContent = css
+                    document.head.append(o)
+                    setInterval(() => {
+                        if (o.isConnected) return
                         document.head.append(o)
-                        setInterval(() => {
-                            if (o.isConnected) return
-                            document.head.append(o)
-                        }, 300)
-                    }
+                    }, 300)
                 },
             },
             server: {

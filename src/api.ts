@@ -1,10 +1,17 @@
-import urlcat from 'urlcat'
+import urlcatImport from 'urlcat'
 import { apiUrl, baseUrl } from './constants'
 import { getChatIdFromUrl, getConversationFromSharePage, isSharePage, isTemporaryChat } from './page'
 import { loadShareConversation } from './share'
 import { getTemporaryChatId } from './temporaryChat'
 import { blobToDataURL } from './utils/dom'
 import { memorize } from './utils/memorize'
+
+// urlcat ships CommonJS with `exports.default`. Because this package is
+// `"type": "module"`, vite 8 (rolldown) applies Node's interop and hands the
+// default import the whole `module.exports` object, so unwrap either shape.
+const urlcat: typeof urlcatImport = typeof urlcatImport === 'function'
+    ? urlcatImport
+    : (urlcatImport as unknown as { default: typeof urlcatImport }).default
 
 interface ApiSession {
     accessToken: string
