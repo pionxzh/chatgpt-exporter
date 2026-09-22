@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.35.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.35.0...userscript-v2.35.1) (2026-09-22)
+
+
+### Bug Fixes
+
+* export chats from nested share URLs ([c1dddad](https://github.com/pionxzh/chatgpt-exporter/commit/c1dddadf06a788a4c9581cd33bbe800671f0dd6c))
+* honor shouldReplaceAssets for shared conversations ([62963b8](https://github.com/pionxzh/chatgpt-exporter/commit/62963b83c73af501d77f9f6194cde8a58197bbed))
+* skip timestamp injection on share pages ([39dc8bd](https://github.com/pionxzh/chatgpt-exporter/commit/39dc8bdf6551ece62fc0ca3a843ca8d1478c2d5a))
+* support new ChatGPT sidebar layout ([e7f25fc](https://github.com/pionxzh/chatgpt-exporter/commit/e7f25fc4b0a87d667cf0c5562dc992299cc95f56))
+* throw instead of exporting __share__null when share id is missing ([f0c0ffb](https://github.com/pionxzh/chatgpt-exporter/commit/f0c0ffb78c1dd13e359fcd2a78809ea1c050906e))
+
 ## [2.35.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.34.1...userscript-v2.35.0) (2026-08-28)
 
 
