@@ -1,6 +1,7 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import { useTranslation } from 'react-i18next'
+import type { ChangeEvent } from 'preact/compat'
 import { archiveConversation, deleteConversation, fetchAllConversations, fetchConversation, fetchConversationsPage, fetchProjects, probeApi } from '../api'
 import { EXPORT_OPERATION_BATCH, KEY_EXPORTED_UPDATE_TIMES } from '../constants'
 import { exportAllToHtml } from '../exporter/html'
@@ -9,12 +10,11 @@ import { exportAllToMarkdown } from '../exporter/markdown'
 import { RequestQueue } from '../utils/queue'
 import { ScriptStorage } from '../utils/storage'
 import { sleep } from '../utils/utils'
+import type { ApiConversationItem, ApiConversationWithId, ApiProjectInfo } from '../api'
+import type { FC } from '../type'
 import { CheckBox } from './CheckBox'
 import { IconCross, IconLoading, IconUpload } from './Icons'
 import { useSettingContext } from './SettingContext'
-import type { ApiConversationItem, ApiConversationWithId, ApiProjectInfo } from '../api'
-import type { FC } from '../type'
-import type { ChangeEvent } from 'preact/compat'
 
 /**
  * Module-level flag shared between ExportDialog (parent) and DialogContent (child).
@@ -65,7 +65,7 @@ function getExportedUpdateTimes(): Record<string, number> {
 }
 
 /** Persist the last-exported update_time for conversations that were actually exported successfully. */
-function markExported(conversations: { id: string; update_time?: number | string }[]): void {
+function markExported(conversations: { id: string, update_time?: number | string }[]): void {
     if (conversations.length === 0) return
     const map = getExportedUpdateTimes()
     for (const c of conversations) {
@@ -847,21 +847,21 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
             )}
             {processing
                 ? (
-                    <button
-                        className="IconButton CloseButton"
-                        aria-label="Export in progress"
-                        title="Click Cancel to stop the export"
-                        style={{ cursor: 'not-allowed', opacity: 0.25 }}
-                    >
-                        <IconCross />
-                    </button>
-                    )
-                : (
-                    <Dialog.Close asChild>
-                        <button className="IconButton CloseButton" aria-label="Close">
+                        <button
+                            className="IconButton CloseButton"
+                            aria-label="Export in progress"
+                            title="Click Cancel to stop the export"
+                            style={{ cursor: 'not-allowed', opacity: 0.25 }}
+                        >
                             <IconCross />
                         </button>
-                    </Dialog.Close>
+                    )
+                : (
+                        <Dialog.Close asChild>
+                            <button className="IconButton CloseButton" aria-label="Close">
+                                <IconCross />
+                            </button>
+                        </Dialog.Close>
                     )}
         </>
     )

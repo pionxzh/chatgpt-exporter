@@ -1,5 +1,6 @@
 import { createContext, useContext } from 'preact/compat'
 import { useCallback } from 'preact/hooks'
+import type { FC } from 'preact/compat'
 import {
     KEY_EXPORT_ALL_LIMIT,
     KEY_FILENAME_FORMAT,
@@ -13,7 +14,6 @@ import {
     KEY_TIMESTAMP_MARKDOWN,
 } from '../constants'
 import { useGMStorage } from '../hooks/useGMStorage'
-import type { FC } from 'preact/compat'
 
 const defaultFormat = 'ChatGPT-{title}'
 const defaultExportAllLimit = 1000

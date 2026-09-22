@@ -200,7 +200,7 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
 
             return [name, val] as const
         })
-    ?? []
+        ?? []
     const detailsHtml = _metaList.length > 0
         ? `<details>
     <summary>Metadata</summary>

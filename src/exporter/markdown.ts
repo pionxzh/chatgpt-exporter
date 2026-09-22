@@ -97,7 +97,7 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
 
             return `${name}: ${val}`
         })
-    ?? []
+        ?? []
     const frontMatter = _metaList.length > 0
         ? `---\n${_metaList.join('\n')}\n---\n\n`
         : ''

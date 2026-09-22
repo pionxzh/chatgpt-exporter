@@ -76,7 +76,7 @@ export function IconZip() {
 }
 
 // source: mui
-export function IconLoading({ className, style }: { className?: string; style?: React.CSSProperties }) {
+export function IconLoading({ className, style }: { className?: string, style?: React.CSSProperties }) {
     return (
         <span style={{ animation: '1.4s linear 0s infinite normal none running rotate' }}>
             <svg
@@ -120,7 +120,7 @@ export function IconCheckBoxChecked({ className }: { className?: string }) {
     )
 }
 
-export function IconTrash({ className, style }: { className?: string; style?: React.CSSProperties }) {
+export function IconTrash({ className, style }: { className?: string, style?: React.CSSProperties }) {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className} style={style} fill="none" stroke-linecap="round" stroke-linejoin="round">
             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -130,7 +130,7 @@ export function IconTrash({ className, style }: { className?: string; style?: Re
     )
 }
 
-export function IconUpload({ className, style }: { className?: string; style?: React.CSSProperties }) {
+export function IconUpload({ className, style }: { className?: string, style?: React.CSSProperties }) {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className} style={style} fill="none" stroke-linecap="round" stroke-linejoin="round">
             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
