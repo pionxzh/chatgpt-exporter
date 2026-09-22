@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.35.0
+// @version            2.35.1
 // @author             pionxzh
 // @description        Export ChatGPT conversations with one click — backup & share effortlessly!
 // @description:zh-CN  一键导出 ChatGPT 对话，轻松备份与分享
@@ -1311,7 +1311,7 @@ html {
     });
   }
   function getChatIdFromUrl() {
-    const match = location.pathname.match(/^\/(?:share|c|g\/[a-z0-9-]+\/c)\/([a-z0-9-]+)/i);
+    const match = location.pathname.match(/^\/(?:share(?:\/[a-z]+)?|c|g\/[a-z0-9-]+\/c)\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i);
     if (match) return match[1];
     return null;
   }
@@ -1341,6 +1341,16 @@ html {
   }
   function checkIfConversationStarted() {
     return !!document.querySelector('[data-testid^="conversation-turn-"]');
+  }
+  function isCompleteConversation(conversation) {
+    return !!(conversation == null ? void 0 : conversation.mapping) && !!conversation.current_node;
+  }
+  async function loadShareConversation(embedded, fetchFallback) {
+    const conversation = isCompleteConversation(embedded) ? embedded : await fetchFallback();
+    if (!isCompleteConversation(conversation)) {
+      throw new Error("Failed to load shared conversation data.");
+    }
+    return conversation;
   }
   const CONVERSATION_STREAM_PATH = "/backend-api/f/conversation";
   const DATA_PREFIX = "data:";
@@ -1444,6 +1454,7 @@ html {
   }
   const sessionApi = _default(baseUrl, "/api/auth/session");
   const conversationApi = (id) => _default(apiUrl, "/conversation/:id", { id });
+  const shareConversationApi = (id) => _default(apiUrl, "/share/:id", { id });
   const conversationsApi = (offset, limit) => _default(apiUrl, "/conversations", { offset, limit });
   const fileDownloadApi = (id) => _default(apiUrl, "/files/download/:id", { id, post_id: "", inline: false });
   const projectsApi = (cursor) => _default(apiUrl, "/gizmos/snorlax/sidebar", { conversations_per_gizmo: 0, cursor });
@@ -1451,7 +1462,9 @@ html {
   const accountsCheckApi = _default(apiUrl, "/accounts/check/v4-2023-04-27");
   async function getCurrentChatId() {
     if (isSharePage()) {
-      return `__share__${getChatIdFromUrl()}`;
+      const shareId = getChatIdFromUrl();
+      if (!shareId) throw new Error("No share id found.");
+      return `__share__${shareId}`;
     }
     if (isTemporaryChat()) {
       const temporaryChatId2 = getTemporaryChatId();
@@ -1516,8 +1529,11 @@ html {
   async function fetchConversation(chatId, shouldReplaceAssets) {
     if (chatId.startsWith("__share__")) {
       const id = chatId.replace("__share__", "");
-      const shareConversation = getConversationFromSharePage();
-      await replaceImageAssets(shareConversation);
+      const shareConversation = await loadShareConversation(
+        getConversationFromSharePage(),
+        () => fetchApi(shareConversationApi(id))
+      );
+      if (shouldReplaceAssets) await replaceImageAssets(shareConversation);
       return {
         id,
         ...shareConversation
@@ -23022,10 +23038,10 @@ ${content2}`;
   };
   function useGMStorage(key2, initialValue) {
     const [storedValue, setStoredValue] = h$4(() => ScriptStorage.get(key2) ?? initialValue);
-    const setValue = (value) => {
+    const setValue = T$4((value) => {
       setStoredValue(value);
       ScriptStorage.set(key2, value);
-    };
+    }, [key2]);
     return [storedValue, setValue];
   }
   const defaultFormat = "ChatGPT-{title}";
@@ -23096,35 +23112,52 @@ ${content2}`;
       setEnableSources,
       setExportAllLimit
     ]);
-    return /* @__PURE__ */ o$8(
-      SettingContext.Provider,
-      {
-        value: {
-          format,
-          setFormat,
-          enableTimestamp,
-          setEnableTimestamp,
-          timeStamp24H,
-          setTimeStamp24H,
-          enableTimestampHTML,
-          setEnableTimestampHTML,
-          enableTimestampMarkdown,
-          setEnableTimestampMarkdown,
-          enableMeta,
-          setEnableMeta,
-          exportMetaList,
-          setExportMetaList,
-          enableThinking,
-          setEnableThinking,
-          enableSources,
-          setEnableSources,
-          exportAllLimit,
-          setExportAllLimit,
-          resetDefault
-        },
-        children
-      }
-    );
+    const value = F$1(() => ({
+      format,
+      setFormat,
+      enableTimestamp,
+      setEnableTimestamp,
+      timeStamp24H,
+      setTimeStamp24H,
+      enableTimestampHTML,
+      setEnableTimestampHTML,
+      enableTimestampMarkdown,
+      setEnableTimestampMarkdown,
+      enableMeta,
+      setEnableMeta,
+      exportMetaList,
+      setExportMetaList,
+      enableThinking,
+      setEnableThinking,
+      enableSources,
+      setEnableSources,
+      exportAllLimit,
+      setExportAllLimit,
+      resetDefault
+    }), [
+      format,
+      setFormat,
+      enableTimestamp,
+      setEnableTimestamp,
+      timeStamp24H,
+      setTimeStamp24H,
+      enableTimestampHTML,
+      setEnableTimestampHTML,
+      enableTimestampMarkdown,
+      setEnableTimestampMarkdown,
+      enableMeta,
+      setEnableMeta,
+      exportMetaList,
+      setExportMetaList,
+      enableThinking,
+      setEnableThinking,
+      enableSources,
+      setEnableSources,
+      exportAllLimit,
+      setExportAllLimit,
+      resetDefault
+    ]);
+    return /* @__PURE__ */ o$8(SettingContext.Provider, { value, children });
   };
   const useSettingContext = () => q$1(SettingContext);
   const exportingRef = { current: false };
@@ -24289,7 +24322,7 @@ ${content2}`;
     children
   }) => {
     const {
-      /* eslint-disable pionxzh/consistent-list-newline */
+      /* eslint-disable antfu/consistent-list-newline */
       format,
       setFormat,
       enableTimestamp,
@@ -24310,7 +24343,7 @@ ${content2}`;
       setEnableSources,
       exportAllLimit,
       setExportAllLimit
-      /* eslint-enable pionxzh/consistent-list-newline */
+      /* eslint-enable antfu/consistent-list-newline */
     } = useSettingContext();
     const { t: t2, i18n } = useTranslation();
     const _title = useTitle();
@@ -24493,42 +24526,46 @@ ${content2}`;
                           " ",
                           /* @__PURE__ */ o$8(Variable, { name: "{update_time}", title: "2023-04-10T21:45:35.027Z" })
                         ] }),
-                        exportMetaList.map((meta, i2) => /* @__PURE__ */ o$8("div", { className: "flex items-center mt-2", children: [
-                          /* @__PURE__ */ o$8(
-                            "input",
-                            {
-                              className: "Input",
-                              value: meta.name,
-                              onChange: (e2) => {
-                                const list2 = [...exportMetaList];
-                                list2[i2] = { ...list2[i2], name: e2.currentTarget.value };
-                                setExportMetaList(list2);
+                        exportMetaList.map((meta, i2) => (
+                          // Rows have no stable id; keying by index keeps the input focused while typing.
+                          // eslint-disable-next-line react/no-array-index-key
+                          /* @__PURE__ */ o$8("div", { className: "flex items-center mt-2", children: [
+                            /* @__PURE__ */ o$8(
+                              "input",
+                              {
+                                className: "Input",
+                                value: meta.name,
+                                onChange: (e2) => {
+                                  const list2 = [...exportMetaList];
+                                  list2[i2] = { ...list2[i2], name: e2.currentTarget.value };
+                                  setExportMetaList(list2);
+                                }
                               }
-                            }
-                          ),
-                          /* @__PURE__ */ o$8("span", { className: "mx-2", children: "→" }),
-                          /* @__PURE__ */ o$8(
-                            "input",
-                            {
-                              className: "Input",
-                              value: meta.value,
-                              onChange: (e2) => {
-                                const list2 = [...exportMetaList];
-                                list2[i2] = { ...list2[i2], value: e2.currentTarget.value };
-                                setExportMetaList(list2);
+                            ),
+                            /* @__PURE__ */ o$8("span", { className: "mx-2", children: "→" }),
+                            /* @__PURE__ */ o$8(
+                              "input",
+                              {
+                                className: "Input",
+                                value: meta.value,
+                                onChange: (e2) => {
+                                  const list2 = [...exportMetaList];
+                                  list2[i2] = { ...list2[i2], value: e2.currentTarget.value };
+                                  setExportMetaList(list2);
+                                }
                               }
-                            }
-                          ),
-                          /* @__PURE__ */ o$8(
-                            "button",
-                            {
-                              className: "ml-2 rounded-full p-1 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition ease-in-out duration-150",
-                              "aria-label": "Remove",
-                              onClick: () => setExportMetaList(exportMetaList.filter((_24, j2) => j2 !== i2)),
-                              children: /* @__PURE__ */ o$8(IconTrash, { className: "w-4 h-4" })
-                            }
-                          )
-                        ] }, i2)),
+                            ),
+                            /* @__PURE__ */ o$8(
+                              "button",
+                              {
+                                className: "ml-2 rounded-full p-1 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition ease-in-out duration-150",
+                                "aria-label": "Remove",
+                                onClick: () => setExportMetaList(exportMetaList.filter((_24, j2) => j2 !== i2)),
+                                children: /* @__PURE__ */ o$8(IconTrash, { className: "w-4 h-4" })
+                              }
+                            )
+                          ] }, i2)
+                        )),
                         /* @__PURE__ */ o$8("div", { className: "flex justify-center items-center mt-2 pr-8", children: /* @__PURE__ */ o$8(
                           "button",
                           {
@@ -24824,6 +24861,9 @@ ${content2}`;
   function Menu({ container }) {
     return /* @__PURE__ */ o$8(SettingProvider, { children: /* @__PURE__ */ o$8(MenuInner, { container }) });
   }
+  const PROFILE_BUTTON_SELECTOR = '[data-testid="accounts-profile-button"]';
+  const SIDEBAR_SCROLL_SELECTOR = "[data-app-action-sidebar-scroll]";
+  const AUTOMATIONS_SELECTOR = '[data-sidebar-destination="builtin:automations"]';
   main();
   function main() {
     watchTemporaryChatId();
@@ -24833,25 +24873,29 @@ ${content2}`;
       styleEl.id = "sentinel-css";
       document.head.append(styleEl);
       const injectionMap = /* @__PURE__ */ new Map();
-      const injectNavMenu = (target) => {
+      const injectNavMenu = ({ target, insert }) => {
         if (injectionMap.has(target)) return;
         console.log("[Exporter] Injecting nav", target);
         const container = getMenuContainer();
         injectionMap.set(target, container);
-        getNavMenuInsertionTarget(target).before(container);
+        insert(container);
       };
-      const selector = '[data-testid="accounts-profile-button"]';
-      sentinel.on("selector", injectNavMenu);
-      setInterval(() => {
+      const syncNavMenu = () => {
+        const mounts = getNavMenuMounts();
+        const activeTargets = new Set(mounts.map(({ target }) => target));
         injectionMap.forEach((container, target) => {
-          if (!target.isConnected) {
+          if (!target.isConnected || !container.isConnected || !activeTargets.has(target)) {
             container.remove();
             injectionMap.delete(target);
           }
         });
-        const targets = Array.from(document.querySelectorAll(selector)).filter((target) => !injectionMap.has(target));
-        targets.forEach(injectNavMenu);
-      }, 1e3);
+        mounts.forEach(injectNavMenu);
+      };
+      for (const selector of [PROFILE_BUTTON_SELECTOR, SIDEBAR_SCROLL_SELECTOR, AUTOMATIONS_SELECTOR]) {
+        sentinel.on(selector, syncNavMenu);
+      }
+      syncNavMenu();
+      setInterval(syncNavMenu, 1e3);
       if (isSharePage()) {
         sentinel.on(`div[role="presentation"] > .w-full > div >.flex.w-full`, (target) => {
           target.prepend(getMenuContainer());
@@ -24859,6 +24903,7 @@ ${content2}`;
       }
       let chatId = "";
       sentinel.on('[role="presentation"]', async () => {
+        if (isSharePage()) return;
         const currentChatId = getChatIdFromUrl();
         if (!currentChatId || currentChatId === chatId) return;
         chatId = currentChatId;
@@ -24897,6 +24942,26 @@ ${content2}`;
     const wrapper = target.parentElement;
     if (!wrapper || wrapper.children.length !== 1) return target;
     return wrapper;
+  }
+  function getNavMenuMounts() {
+    const profileButtons = Array.from(document.querySelectorAll(PROFILE_BUTTON_SELECTOR));
+    if (profileButtons.length > 0) {
+      return profileButtons.map((target) => ({
+        target,
+        insert: (container) => getNavMenuInsertionTarget(target).before(container)
+      }));
+    }
+    const profileFooters = Array.from(document.querySelectorAll(SIDEBAR_SCROLL_SELECTOR)).map((scrollRoot) => scrollRoot.nextElementSibling).filter((footer2) => !!(footer2 == null ? void 0 : footer2.querySelector('button[aria-haspopup="menu"]')));
+    if (profileFooters.length > 0) {
+      return profileFooters.map((target) => ({
+        target,
+        insert: (container) => target.prepend(container)
+      }));
+    }
+    return Array.from(document.querySelectorAll(AUTOMATIONS_SELECTOR)).map((target) => ({
+      target,
+      insert: (container) => getNavMenuInsertionTarget(target).before(container)
+    }));
   }
 
 })(JSZip, window);
