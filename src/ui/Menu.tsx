@@ -123,7 +123,8 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                 <div
                     className="dropdown-backdrop animate-fadeIn"
                     onClick={() => setOpen(false)}
-                ></div>
+                >
+                </div>
             )}
 
             <HoverCard.Root
@@ -158,8 +159,8 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                         transition-opacity duration-200
                         gap-1 py-2 px-1
                         ${isMobile
-                            ? 'animate-slideUp'
-                            : 'animate-fadeIn'}`}
+            ? 'animate-slideUp'
+            : 'animate-fadeIn'}`}
                         style={{
                             width: isMobile ? 316 : 268,
                             left: -6,

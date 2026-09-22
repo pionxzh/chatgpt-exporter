@@ -274,7 +274,7 @@ export interface ConversationNodeMessage {
 }
 
 export interface ThinkingContent {
-    thoughts: Array<{ summary: string; content: string }>
+    thoughts: Array<{ summary: string, content: string }>
     activities?: string[]
     durationSeconds?: number
 }
@@ -348,7 +348,7 @@ export interface ApiGizmo {
 export interface ApiProjectInfo {
     id: string
     organization_id: string
-    display: { name: string; description: string }
+    display: { name: string, description: string }
     // todo: support exporting project context
 }
 
@@ -488,12 +488,12 @@ async function fetchImageFromPointer(uri: string) {
 async function replaceImageAssets(conversation: ApiConversation): Promise<void> {
     const isMultiModalInputImage = (part: any): part is MultiModalInputImage => {
         return typeof part === 'object'
-        && part !== null
-        && 'content_type' in part
-        && part.content_type === 'image_asset_pointer'
-        && 'asset_pointer' in part
-        && typeof part.asset_pointer === 'string'
-        && part.asset_pointer.startsWith('sediment://')
+            && part !== null
+            && 'content_type' in part
+            && part.content_type === 'image_asset_pointer'
+            && 'asset_pointer' in part
+            && typeof part.asset_pointer === 'string'
+            && part.asset_pointer.startsWith('sediment://')
     }
 
     const imageAssets = Object.values(conversation.mapping).flatMap((node) => {
@@ -568,7 +568,7 @@ export async function fetchProjects(): Promise<ApiProjectInfo[]> {
     const allItems: ApiGizmo[] = []
     while (true) {
         const url = projectsApi(cursor)
-        const { items, cursor: nextCursor = null } = await fetchApi<{ cursor: number | null; items: ApiGizmo[] }>(url)
+        const { items, cursor: nextCursor = null } = await fetchApi<{ cursor: number | null, items: ApiGizmo[] }>(url)
         cursor = nextCursor
         allItems.push(...items)
         if (nextCursor === null) break
@@ -587,7 +587,7 @@ async function fetchConversations(offset = 0, limit = 20, project: string | null
 
 async function fetchProjectConversations(project: string, cursor: string | number = 0, limit = 20): Promise<ApiConversations> {
     const url = projectConversationsApi(project, cursor, limit)
-    const { items, cursor: nextCursor } = await fetchApi<{ items: ApiConversationItem[]; cursor: string | null }>(url)
+    const { items, cursor: nextCursor } = await fetchApi<{ items: ApiConversationItem[], cursor: string | null }>(url)
     return {
         has_missing_conversations: false,
         items,
@@ -1009,8 +1009,8 @@ function mergeContinuationNodes(nodes: ConversationNode[]): ConversationNode[] {
         const prevNode = result[result.length - 1]
         if (
             prevNode?.message?.author.role === 'assistant' && node.message?.author.role === 'assistant'
-         && prevNode.message.recipient === 'all' && node.message.recipient === 'all'
-         && prevNode.message.content.content_type === 'text' && node.message.content.content_type === 'text'
+            && prevNode.message.recipient === 'all' && node.message.recipient === 'all'
+            && prevNode.message.content.content_type === 'text' && node.message.content.content_type === 'text'
         ) {
             const separator = prevNode.message.channel !== node.message.channel ? '\n\n' : ''
             prevNode.message.content.parts[prevNode.message.content.parts.length - 1] += separator + node.message.content.parts[0]

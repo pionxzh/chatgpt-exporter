@@ -7,12 +7,12 @@ import { LOCALES } from '../i18n'
 import { getChatIdFromUrl } from '../page'
 import { getFileNameWithFormat } from '../utils/download'
 import { timestamp as _timestamp, dateStr, unixTimestampToISOString } from '../utils/utils'
+import type { FC } from '../type'
 import { IconCross, IconTrash } from './Icons'
 import { useSettingContext } from './SettingContext'
 import { Toggle } from './Toggle'
-import type { FC } from '../type'
 
-function Variable({ name, title }: { name: string; title: string }) {
+function Variable({ name, title }: { name: string, title: string }) {
     return <strong className="cursor-help select-all whitespace-nowrap" title={title}>{name}</strong>
 }
 
@@ -27,7 +27,7 @@ export const SettingDialog: FC<SettingDialogProps> = ({
     children,
 }) => {
     const {
-        /* eslint-disable pionxzh/consistent-list-newline */
+        /* eslint-disable antfu/consistent-list-newline */
         format, setFormat,
         enableTimestamp, setEnableTimestamp,
         timeStamp24H, setTimeStamp24H,
@@ -38,7 +38,7 @@ export const SettingDialog: FC<SettingDialogProps> = ({
         enableThinking, setEnableThinking,
         enableSources, setEnableSources,
         exportAllLimit, setExportAllLimit,
-        /* eslint-enable pionxzh/consistent-list-newline */
+        /* eslint-enable antfu/consistent-list-newline */
     } = useSettingContext()
     const { t, i18n } = useTranslation()
     const _title = useTitle()
@@ -238,8 +238,9 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                                                     ,{' '}
                                                     <Variable name="{update_time}" title="2023-04-10T21:45:35.027Z" />
                                                 </p>
-                                                {/* eslint-disable-next-line pionxzh/consistent-list-newline */}
                                                 {exportMetaList.map((meta, i) => (
+                                                    // Rows have no stable id; keying by index keeps the input focused while typing.
+                                                    // eslint-disable-next-line react/no-array-index-key
                                                     <div className="flex items-center mt-2" key={i}>
                                                         <input
                                                             className="Input"

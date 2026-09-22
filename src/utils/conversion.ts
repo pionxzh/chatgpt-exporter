@@ -1,6 +1,6 @@
 import { shouldSkipMessageInExport } from '../api'
-import { jsonlStringify, nonNullable } from './utils'
 import type { ConversationNode, ConversationResult } from '../api'
+import { jsonlStringify, nonNullable } from './utils'
 
 interface NameMessage {
     user_name: string

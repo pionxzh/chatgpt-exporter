@@ -1,5 +1,6 @@
 import { createContext, useContext } from 'preact/compat'
-import { useCallback } from 'preact/hooks'
+import { useCallback, useMemo } from 'preact/hooks'
+import type { FC } from 'preact/compat'
 import {
     KEY_EXPORT_ALL_LIMIT,
     KEY_FILENAME_FORMAT,
@@ -13,7 +14,6 @@ import {
     KEY_TIMESTAMP_MARKDOWN,
 } from '../constants'
 import { useGMStorage } from '../hooks/useGMStorage'
-import type { FC } from 'preact/compat'
 
 const defaultFormat = 'ChatGPT-{title}'
 const defaultExportAllLimit = 1000
@@ -87,37 +87,59 @@ export const SettingProvider: FC = ({ children }) => {
         setExportAllLimit,
     ])
 
+    const value = useMemo(() => ({
+        format,
+        setFormat,
+
+        enableTimestamp,
+        setEnableTimestamp,
+        timeStamp24H,
+        setTimeStamp24H,
+        enableTimestampHTML,
+        setEnableTimestampHTML,
+        enableTimestampMarkdown,
+        setEnableTimestampMarkdown,
+
+        enableMeta,
+        setEnableMeta,
+        exportMetaList,
+        setExportMetaList,
+
+        enableThinking,
+        setEnableThinking,
+        enableSources,
+        setEnableSources,
+
+        exportAllLimit,
+        setExportAllLimit,
+
+        resetDefault,
+    }), [
+        format,
+        setFormat,
+        enableTimestamp,
+        setEnableTimestamp,
+        timeStamp24H,
+        setTimeStamp24H,
+        enableTimestampHTML,
+        setEnableTimestampHTML,
+        enableTimestampMarkdown,
+        setEnableTimestampMarkdown,
+        enableMeta,
+        setEnableMeta,
+        exportMetaList,
+        setExportMetaList,
+        enableThinking,
+        setEnableThinking,
+        enableSources,
+        setEnableSources,
+        exportAllLimit,
+        setExportAllLimit,
+        resetDefault,
+    ])
+
     return (
-        <SettingContext.Provider
-            value={{
-                format,
-                setFormat,
-
-                enableTimestamp,
-                setEnableTimestamp,
-                timeStamp24H,
-                setTimeStamp24H,
-                enableTimestampHTML,
-                setEnableTimestampHTML,
-                enableTimestampMarkdown,
-                setEnableTimestampMarkdown,
-
-                enableMeta,
-                setEnableMeta,
-                exportMetaList,
-                setExportMetaList,
-
-                enableThinking,
-                setEnableThinking,
-                enableSources,
-                setEnableSources,
-
-                exportAllLimit,
-                setExportAllLimit,
-
-                resetDefault,
-            }}
-        >
+        <SettingContext.Provider value={value}>
             {children}
         </SettingContext.Provider>
     )

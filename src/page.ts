@@ -8,7 +8,7 @@ declare global {
             future: {}
             state: {
                 loaderData: {
-                    root: {
+                    'root': {
                         clientBootstrap: {
                             accountStatus: null
                             session: {

@@ -20,7 +20,7 @@ function writeUint32(target: Uint8Array, offset: number, value: number) {
     target[offset + 3] = value
 }
 
-function pngChunk(type: Uint8Array, data = new Uint8Array()): Uint8Array {
+function pngChunk(type: Uint8Array, data: Uint8Array = new Uint8Array()): Uint8Array<ArrayBuffer> {
     const chunk = new Uint8Array(12 + data.length)
     writeUint32(chunk, 0, data.length)
     chunk.set(type, 4)
@@ -34,7 +34,7 @@ function pngChunk(type: Uint8Array, data = new Uint8Array()): Uint8Array {
     return chunk
 }
 
-function pngHeader(width: number, height: number): Uint8Array {
+function pngHeader(width: number, height: number): Uint8Array<ArrayBuffer> {
     const data = new Uint8Array(13)
     writeUint32(data, 0, width)
     writeUint32(data, 4, height)
@@ -62,7 +62,7 @@ export async function encodePng(
 
     const compression = new CompressionStream('deflate')
     const writer = compression.writable.getWriter()
-    const idatChunks: Uint8Array[] = []
+    const idatChunks: Uint8Array<ArrayBuffer>[] = []
     const readCompressedData = (async () => {
         const reader = compression.readable.getReader()
         while (true) {
