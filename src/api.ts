@@ -875,6 +875,13 @@ export function shouldSkipMessageInExport(message?: ConversationNodeMessage): bo
     // Skip transient assistant preambles shown while a thinking response is being prepared.
     if (message.metadata?.is_thinking_preamble_message) return true
 
+    // Skip empty replies, such as the answer after an image generation.
+    if (
+        message.author.role === 'assistant'
+        && message.content.content_type === 'text'
+        && !message.content.parts.join('').trim()
+    ) return true
+
     // Skip tool's intermediate message.
     if (message.author.role === 'tool') {
         if (message.author.name === 'file_search') return true

@@ -1,0 +1,619 @@
+{
+  "id": "fixture",
+  "title": "Fixture",
+  "create_time": 1,
+  "update_time": 2,
+  "current_node": "n24",
+  "mapping": {
+    "n0": {
+      "id": "n0",
+      "children": [
+        "n1"
+      ]
+    },
+    "n1": {
+      "id": "n1",
+      "children": [
+        "n2"
+      ],
+      "parent": "n0",
+      "message": {
+        "id": "m-n1",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "multimodal_text",
+          "parts": [
+            {
+              "content_type": "image_asset_pointer",
+              "asset_pointer": "sediment://file_1",
+              "width": 1254,
+              "height": 1254
+            },
+            "question 1"
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-thinking",
+          "is_visually_hidden_from_conversation": false
+        }
+      }
+    },
+    "n2": {
+      "id": "n2",
+      "children": [
+        "n3"
+      ],
+      "parent": "n1",
+      "message": {
+        "id": "m-n2",
+        "author": {
+          "role": "tool",
+          "name": "internal_tool"
+        },
+        "content": {
+          "content_type": "multimodal_text",
+          "parts": [
+            {
+              "content_type": "image_asset_pointer",
+              "asset_pointer": "sediment://file_2",
+              "width": 1254,
+              "height": 1254
+            }
+          ]
+        },
+        "recipient": "all",
+        "channel": "final"
+      }
+    },
+    "n3": {
+      "id": "n3",
+      "children": [
+        "n4"
+      ],
+      "parent": "n2",
+      "message": {
+        "id": "m-n3",
+        "author": {
+          "role": "tool",
+          "name": "internal_tool"
+        },
+        "content": {
+          "content_type": "multimodal_text",
+          "parts": [
+            {
+              "content_type": "image_asset_pointer",
+              "asset_pointer": "sediment://file_2",
+              "width": 1254,
+              "height": 1254
+            },
+            "tool text 1"
+          ]
+        },
+        "recipient": "all",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "gpt-5-4-thinking",
+          "is_visually_hidden_from_conversation": true
+        }
+      }
+    },
+    "n4": {
+      "id": "n4",
+      "children": [
+        "n5"
+      ],
+      "parent": "n3",
+      "message": {
+        "id": "m-n4",
+        "author": {
+          "role": "tool",
+          "name": "internal_tool"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "tool text 2"
+          ]
+        },
+        "recipient": "all",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "gpt-5-4-thinking",
+          "is_visually_hidden_from_conversation": true
+        }
+      }
+    },
+    "n5": {
+      "id": "n5",
+      "children": [
+        "n6",
+        "n7"
+      ],
+      "parent": "n4",
+      "message": {
+        "id": "m-n5",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 47s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-4-auto-thinking",
+          "finished_duration_sec": 47
+        }
+      }
+    },
+    "n6": {
+      "id": "n6",
+      "children": [],
+      "parent": "n5",
+      "message": {
+        "id": "m-n6",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "gpt-5-4-thinking",
+          "is_visually_hidden_from_conversation": true
+        }
+      }
+    },
+    "n7": {
+      "id": "n7",
+      "children": [
+        "n8"
+      ],
+      "parent": "n5",
+      "message": {
+        "id": "m-n7",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 2"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n8": {
+      "id": "n8",
+      "children": [
+        "n9"
+      ],
+      "parent": "n7",
+      "message": {
+        "id": "m-n8",
+        "author": {
+          "role": "tool",
+          "name": "internal_tool"
+        },
+        "content": {
+          "content_type": "multimodal_text",
+          "parts": [
+            {
+              "content_type": "image_asset_pointer",
+              "asset_pointer": "sediment://file_3",
+              "width": 1254,
+              "height": 1254
+            }
+          ]
+        },
+        "recipient": "all",
+        "channel": "final"
+      }
+    },
+    "n9": {
+      "id": "n9",
+      "children": [
+        "n10"
+      ],
+      "parent": "n8",
+      "message": {
+        "id": "m-n9",
+        "author": {
+          "role": "tool",
+          "name": "internal_tool"
+        },
+        "content": {
+          "content_type": "multimodal_text",
+          "parts": [
+            {
+              "content_type": "image_asset_pointer",
+              "asset_pointer": "sediment://file_3",
+              "width": 1254,
+              "height": 1254
+            },
+            "tool text 3"
+          ]
+        },
+        "recipient": "all",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "gpt-5-4-thinking",
+          "is_visually_hidden_from_conversation": true
+        }
+      }
+    },
+    "n10": {
+      "id": "n10",
+      "children": [
+        "n11"
+      ],
+      "parent": "n9",
+      "message": {
+        "id": "m-n10",
+        "author": {
+          "role": "tool",
+          "name": "internal_tool"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "tool text 4"
+          ]
+        },
+        "recipient": "all",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "gpt-5-4-thinking",
+          "is_visually_hidden_from_conversation": true
+        }
+      }
+    },
+    "n11": {
+      "id": "n11",
+      "children": [
+        "n12",
+        "n13"
+      ],
+      "parent": "n10",
+      "message": {
+        "id": "m-n11",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 47s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-4-auto-thinking",
+          "finished_duration_sec": 47
+        }
+      }
+    },
+    "n12": {
+      "id": "n12",
+      "children": [],
+      "parent": "n11",
+      "message": {
+        "id": "m-n12",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "gpt-5-4-thinking",
+          "is_visually_hidden_from_conversation": true
+        }
+      }
+    },
+    "n13": {
+      "id": "n13",
+      "children": [
+        "n14"
+      ],
+      "parent": "n11",
+      "message": {
+        "id": "m-n13",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 3"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n14": {
+      "id": "n14",
+      "children": [
+        "n15"
+      ],
+      "parent": "n13",
+      "message": {
+        "id": "m-n14",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "code",
+          "language": "json",
+          "text": "code 1"
+        },
+        "recipient": "internal_tool",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "gpt-5-6-thinking"
+        }
+      }
+    },
+    "n15": {
+      "id": "n15",
+      "children": [
+        "n16"
+      ],
+      "parent": "n14",
+      "message": {
+        "id": "m-n15",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "code",
+          "language": "json",
+          "text": "code 2"
+        },
+        "recipient": "internal_tool",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "gpt-5-6-thinking"
+        }
+      }
+    },
+    "n16": {
+      "id": "n16",
+      "children": [
+        "n17"
+      ],
+      "parent": "n15",
+      "message": {
+        "id": "m-n16",
+        "author": {
+          "role": "tool",
+          "name": "internal_tool"
+        },
+        "content": {
+          "content_type": "multimodal_text",
+          "parts": [
+            {
+              "content_type": "image_asset_pointer",
+              "asset_pointer": "sediment://file_4",
+              "width": 1254,
+              "height": 1254
+            }
+          ]
+        },
+        "recipient": "all",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "gpt-5-6-thinking"
+        }
+      }
+    },
+    "n17": {
+      "id": "n17",
+      "children": [
+        "n18"
+      ],
+      "parent": "n16",
+      "message": {
+        "id": "m-n17",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 33s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-thinking",
+          "finished_duration_sec": 33
+        }
+      }
+    },
+    "n18": {
+      "id": "n18",
+      "children": [
+        "n19"
+      ],
+      "parent": "n17",
+      "message": {
+        "id": "m-n18",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "gpt-5-6-thinking"
+        }
+      }
+    },
+    "n19": {
+      "id": "n19",
+      "children": [
+        "n20"
+      ],
+      "parent": "n18",
+      "message": {
+        "id": "m-n19",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 4"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n20": {
+      "id": "n20",
+      "children": [
+        "n21"
+      ],
+      "parent": "n19",
+      "message": {
+        "id": "m-n20",
+        "author": {
+          "role": "tool",
+          "name": "internal_tool"
+        },
+        "content": {
+          "content_type": "multimodal_text",
+          "parts": [
+            {
+              "content_type": "image_asset_pointer",
+              "asset_pointer": "sediment://file_5",
+              "width": 1254,
+              "height": 1254
+            }
+          ]
+        },
+        "recipient": "all",
+        "channel": "final"
+      }
+    },
+    "n21": {
+      "id": "n21",
+      "children": [
+        "n22"
+      ],
+      "parent": "n20",
+      "message": {
+        "id": "m-n21",
+        "author": {
+          "role": "tool",
+          "name": "internal_tool"
+        },
+        "content": {
+          "content_type": "multimodal_text",
+          "parts": [
+            {
+              "content_type": "image_asset_pointer",
+              "asset_pointer": "sediment://file_5",
+              "width": 1254,
+              "height": 1254
+            },
+            "tool text 5"
+          ]
+        },
+        "recipient": "all",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "gpt-5-4-thinking",
+          "is_visually_hidden_from_conversation": true
+        }
+      }
+    },
+    "n22": {
+      "id": "n22",
+      "children": [
+        "n23"
+      ],
+      "parent": "n21",
+      "message": {
+        "id": "m-n22",
+        "author": {
+          "role": "tool",
+          "name": "internal_tool"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "tool text 6"
+          ]
+        },
+        "recipient": "all",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "gpt-5-4-thinking",
+          "is_visually_hidden_from_conversation": true
+        }
+      }
+    },
+    "n23": {
+      "id": "n23",
+      "children": [
+        "n24"
+      ],
+      "parent": "n22",
+      "message": {
+        "id": "m-n23",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 38s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-4-auto-thinking",
+          "finished_duration_sec": 38
+        }
+      }
+    },
+    "n24": {
+      "id": "n24",
+      "children": [],
+      "parent": "n23",
+      "message": {
+        "id": "m-n24",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "gpt-5-4-thinking",
+          "is_visually_hidden_from_conversation": true
+        }
+      }
+    }
+  }
+}
