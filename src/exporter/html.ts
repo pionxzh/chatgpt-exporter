@@ -97,8 +97,7 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
         if (shouldSkipMessageInExport(message)) return null
 
         const author = transformAuthor(message.author)
-        const model = message?.metadata?.model_slug === 'gpt-4' ? 'GPT-4' : 'GPT-3'
-        const authorType = message.author.role === 'user' ? 'user' : model
+        const authorType = message.author.role === 'user' ? 'user' : 'assistant'
         const avatarEl = message.author.role === 'user'
             ? `<img alt="${author}" />`
             : '<svg width="41" height="41"><use xlink:href="#chatgpt" /></svg>'
