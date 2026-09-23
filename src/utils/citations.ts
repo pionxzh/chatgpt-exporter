@@ -32,6 +32,7 @@ export function transformContentReferences(
         .filter(ref => ref.type !== 'sources_footnote')
         .sort((a, b) => (b.matched_text?.length || 0) - (a.matched_text?.length || 0))
 
+    const fileReplacements = new Set<string>()
     for (const ref of sortedRefs) {
         if (!ref.matched_text) continue
 
@@ -39,7 +40,14 @@ export function transformContentReferences(
         if (!matchedText) continue
 
         const replacement = formatInlineReference(ref, outputType, inlineReferenceMode)
-        output = output.replaceAll(matchedText, replacement)
+        output = output.replaceAll(matchedText, () => replacement)
+        if (ref.type === 'file' && replacement) fileReplacements.add(replacement)
+    }
+
+    // Citations of different lines in the same file would repeat its name
+    for (const replacement of fileReplacements) {
+        const escaped = escapeRegExp(replacement)
+        output = output.replaceAll(new RegExp(`${escaped}(?:\\s*${escaped})+`, 'g'), () => replacement)
     }
 
     output = output.replace(CitationMarkerRegex, '')
@@ -97,6 +105,11 @@ function getInlineSources(ref: ContentReference): ContentReferenceSource[] {
     }
 
     sources.push(...(ref.fallback_items ?? []))
+
+    // Uploaded files have no URL, show their name as ChatGPT does
+    if (sources.length === 0 && ref.type === 'file' && ref.name) {
+        sources.push({ title: ref.name })
+    }
 
     if (sources.length === 0 && (ref.url || ref.title || ref.attribution)) {
         sources.push(ref)
@@ -175,4 +188,8 @@ function escapeMarkdownUrl(input: string): string {
         .replaceAll('<', '%3C')
         .replaceAll('>', '%3E')
         .replaceAll('\n', '')
+}
+
+function escapeRegExp(input: string): string {
+    return input.replaceAll(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }

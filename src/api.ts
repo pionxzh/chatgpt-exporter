@@ -73,6 +73,8 @@ export interface ContentReference {
     fallback_items?: ContentReferenceSource[]
     safe_urls?: string[]
     refs?: string[]
+    /** File name of an uploaded file, on `file` references */
+    name?: string
     // Legacy fields (may still be present in some responses)
     url?: string
     title?: string
