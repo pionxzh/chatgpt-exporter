@@ -1,0 +1,1852 @@
+{
+  "id": "fixture",
+  "title": "Fixture",
+  "create_time": 1,
+  "update_time": 2,
+  "current_node": "n76",
+  "mapping": {
+    "n0": {
+      "id": "n0",
+      "children": [
+        "n1"
+      ]
+    },
+    "n1": {
+      "id": "n1",
+      "children": [
+        "n2"
+      ],
+      "parent": "n0",
+      "message": {
+        "id": "m-n1",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 1"
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro",
+          "is_visually_hidden_from_conversation": false
+        }
+      }
+    },
+    "n2": {
+      "id": "n2",
+      "children": [
+        "n3"
+      ],
+      "parent": "n1",
+      "message": {
+        "id": "m-n2",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro",
+          "reasoning_title": "activity 1"
+        }
+      }
+    },
+    "n3": {
+      "id": "n3",
+      "children": [
+        "n4"
+      ],
+      "parent": "n2",
+      "message": {
+        "id": "m-n3",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web.run",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n4": {
+      "id": "n4",
+      "children": [
+        "n5"
+      ],
+      "parent": "n3",
+      "message": {
+        "id": "m-n4",
+        "author": {
+          "role": "tool",
+          "name": "web.run"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n5": {
+      "id": "n5",
+      "children": [
+        "n6"
+      ],
+      "parent": "n4",
+      "message": {
+        "id": "m-n5",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 1",
+              "content": ""
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n6": {
+      "id": "n6",
+      "children": [
+        "n7"
+      ],
+      "parent": "n5",
+      "message": {
+        "id": "m-n6",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 2s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro",
+          "finished_duration_sec": 2
+        }
+      }
+    },
+    "n7": {
+      "id": "n7",
+      "children": [
+        "n8"
+      ],
+      "parent": "n6",
+      "message": {
+        "id": "m-n7",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 1"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n8": {
+      "id": "n8",
+      "children": [
+        "n9",
+        "n10"
+      ],
+      "parent": "n7",
+      "message": {
+        "id": "m-n8",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 2"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n9": {
+      "id": "n9",
+      "children": [],
+      "parent": "n8",
+      "message": {
+        "id": "m-n9",
+        "author": {
+          "role": "tool",
+          "name": "internal_tool"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro",
+          "finished_duration_sec": 282
+        }
+      }
+    },
+    "n10": {
+      "id": "n10",
+      "children": [
+        "n11"
+      ],
+      "parent": "n8",
+      "message": {
+        "id": "m-n10",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "preamble 1"
+          ]
+        },
+        "recipient": "all",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro",
+          "is_thinking_preamble_message": true
+        }
+      }
+    },
+    "n11": {
+      "id": "n11",
+      "children": [
+        "n12"
+      ],
+      "parent": "n10",
+      "message": {
+        "id": "m-n11",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web.run",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro",
+          "reasoning_title": "activity 2"
+        }
+      }
+    },
+    "n12": {
+      "id": "n12",
+      "children": [
+        "n13"
+      ],
+      "parent": "n11",
+      "message": {
+        "id": "m-n12",
+        "author": {
+          "role": "tool",
+          "name": "web.run"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro",
+          "reasoning_title": "activity 3"
+        }
+      }
+    },
+    "n13": {
+      "id": "n13",
+      "children": [
+        "n14"
+      ],
+      "parent": "n12",
+      "message": {
+        "id": "m-n13",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web.run",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n14": {
+      "id": "n14",
+      "children": [
+        "n15"
+      ],
+      "parent": "n13",
+      "message": {
+        "id": "m-n14",
+        "author": {
+          "role": "tool",
+          "name": "web.run"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n15": {
+      "id": "n15",
+      "children": [
+        "n16"
+      ],
+      "parent": "n14",
+      "message": {
+        "id": "m-n15",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web.run",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n16": {
+      "id": "n16",
+      "children": [
+        "n17"
+      ],
+      "parent": "n15",
+      "message": {
+        "id": "m-n16",
+        "author": {
+          "role": "tool",
+          "name": "web.run"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n17": {
+      "id": "n17",
+      "children": [
+        "n18"
+      ],
+      "parent": "n16",
+      "message": {
+        "id": "m-n17",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web.run",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n18": {
+      "id": "n18",
+      "children": [
+        "n19"
+      ],
+      "parent": "n17",
+      "message": {
+        "id": "m-n18",
+        "author": {
+          "role": "tool",
+          "name": "web.run"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n19": {
+      "id": "n19",
+      "children": [
+        "n20"
+      ],
+      "parent": "n18",
+      "message": {
+        "id": "m-n19",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web.run",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n20": {
+      "id": "n20",
+      "children": [
+        "n21"
+      ],
+      "parent": "n19",
+      "message": {
+        "id": "m-n20",
+        "author": {
+          "role": "tool",
+          "name": "web.run"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n21": {
+      "id": "n21",
+      "children": [
+        "n22"
+      ],
+      "parent": "n20",
+      "message": {
+        "id": "m-n21",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 2",
+              "content": "thought 1"
+            },
+            {
+              "summary": "summary 2",
+              "content": ""
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n22": {
+      "id": "n22",
+      "children": [
+        "n23"
+      ],
+      "parent": "n21",
+      "message": {
+        "id": "m-n22",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web.run",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro",
+          "reasoning_title": "activity 4"
+        }
+      }
+    },
+    "n23": {
+      "id": "n23",
+      "children": [
+        "n24"
+      ],
+      "parent": "n22",
+      "message": {
+        "id": "m-n23",
+        "author": {
+          "role": "tool",
+          "name": "web.run"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n24": {
+      "id": "n24",
+      "children": [
+        "n25"
+      ],
+      "parent": "n23",
+      "message": {
+        "id": "m-n24",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 3",
+              "content": "thought 2"
+            },
+            {
+              "summary": "summary 4",
+              "content": "thought 3"
+            },
+            {
+              "summary": "summary 5",
+              "content": ""
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n25": {
+      "id": "n25",
+      "children": [
+        "n26"
+      ],
+      "parent": "n24",
+      "message": {
+        "id": "m-n25",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web.run",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro",
+          "reasoning_title": "activity 4"
+        }
+      }
+    },
+    "n26": {
+      "id": "n26",
+      "children": [
+        "n27"
+      ],
+      "parent": "n25",
+      "message": {
+        "id": "m-n26",
+        "author": {
+          "role": "tool",
+          "name": "web.run"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n27": {
+      "id": "n27",
+      "children": [
+        "n28"
+      ],
+      "parent": "n26",
+      "message": {
+        "id": "m-n27",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 6",
+              "content": "thought 4"
+            },
+            {
+              "summary": "summary 6",
+              "content": ""
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n28": {
+      "id": "n28",
+      "children": [
+        "n29"
+      ],
+      "parent": "n27",
+      "message": {
+        "id": "m-n28",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web.run",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro",
+          "reasoning_title": "activity 4"
+        }
+      }
+    },
+    "n29": {
+      "id": "n29",
+      "children": [
+        "n30"
+      ],
+      "parent": "n28",
+      "message": {
+        "id": "m-n29",
+        "author": {
+          "role": "tool",
+          "name": "web.run"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n30": {
+      "id": "n30",
+      "children": [
+        "n31"
+      ],
+      "parent": "n29",
+      "message": {
+        "id": "m-n30",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web.run",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n31": {
+      "id": "n31",
+      "children": [
+        "n32"
+      ],
+      "parent": "n30",
+      "message": {
+        "id": "m-n31",
+        "author": {
+          "role": "tool",
+          "name": "web.run"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n32": {
+      "id": "n32",
+      "children": [
+        "n33"
+      ],
+      "parent": "n31",
+      "message": {
+        "id": "m-n32",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web.run",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n33": {
+      "id": "n33",
+      "children": [
+        "n34"
+      ],
+      "parent": "n32",
+      "message": {
+        "id": "m-n33",
+        "author": {
+          "role": "tool",
+          "name": "web.run"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n34": {
+      "id": "n34",
+      "children": [
+        "n35"
+      ],
+      "parent": "n33",
+      "message": {
+        "id": "m-n34",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web.run",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n35": {
+      "id": "n35",
+      "children": [
+        "n36"
+      ],
+      "parent": "n34",
+      "message": {
+        "id": "m-n35",
+        "author": {
+          "role": "tool",
+          "name": "web.run"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n36": {
+      "id": "n36",
+      "children": [
+        "n37"
+      ],
+      "parent": "n35",
+      "message": {
+        "id": "m-n36",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 7",
+              "content": ""
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n37": {
+      "id": "n37",
+      "children": [
+        "n38"
+      ],
+      "parent": "n36",
+      "message": {
+        "id": "m-n37",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 282s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "finished_duration_sec": 282
+        }
+      }
+    },
+    "n38": {
+      "id": "n38",
+      "children": [
+        "n39"
+      ],
+      "parent": "n37",
+      "message": {
+        "id": "m-n38",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 2"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n39": {
+      "id": "n39",
+      "children": [
+        "n40"
+      ],
+      "parent": "n38",
+      "message": {
+        "id": "m-n39",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 3"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n40": {
+      "id": "n40",
+      "children": [
+        "n41"
+      ],
+      "parent": "n39",
+      "message": {
+        "id": "m-n40",
+        "author": {
+          "role": "tool",
+          "name": "internal_tool"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro",
+          "finished_duration_sec": 307
+        }
+      }
+    },
+    "n41": {
+      "id": "n41",
+      "children": [
+        "n42"
+      ],
+      "parent": "n40",
+      "message": {
+        "id": "m-n41",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web.run",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro",
+          "reasoning_title": "activity 4"
+        }
+      }
+    },
+    "n42": {
+      "id": "n42",
+      "children": [
+        "n43"
+      ],
+      "parent": "n41",
+      "message": {
+        "id": "m-n42",
+        "author": {
+          "role": "tool",
+          "name": "web.run"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro",
+          "reasoning_title": "activity 5"
+        }
+      }
+    },
+    "n43": {
+      "id": "n43",
+      "children": [
+        "n44"
+      ],
+      "parent": "n42",
+      "message": {
+        "id": "m-n43",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web.run",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n44": {
+      "id": "n44",
+      "children": [
+        "n45"
+      ],
+      "parent": "n43",
+      "message": {
+        "id": "m-n44",
+        "author": {
+          "role": "tool",
+          "name": "web.run"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n45": {
+      "id": "n45",
+      "children": [
+        "n46"
+      ],
+      "parent": "n44",
+      "message": {
+        "id": "m-n45",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "preamble 2"
+          ]
+        },
+        "recipient": "all",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro",
+          "is_thinking_preamble_message": true
+        }
+      }
+    },
+    "n46": {
+      "id": "n46",
+      "children": [
+        "n47"
+      ],
+      "parent": "n45",
+      "message": {
+        "id": "m-n46",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web.run",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n47": {
+      "id": "n47",
+      "children": [
+        "n48"
+      ],
+      "parent": "n46",
+      "message": {
+        "id": "m-n47",
+        "author": {
+          "role": "tool",
+          "name": "web.run"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n48": {
+      "id": "n48",
+      "children": [
+        "n49"
+      ],
+      "parent": "n47",
+      "message": {
+        "id": "m-n48",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web.run",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n49": {
+      "id": "n49",
+      "children": [
+        "n50"
+      ],
+      "parent": "n48",
+      "message": {
+        "id": "m-n49",
+        "author": {
+          "role": "tool",
+          "name": "web.run"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n50": {
+      "id": "n50",
+      "children": [
+        "n51"
+      ],
+      "parent": "n49",
+      "message": {
+        "id": "m-n50",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web.run",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n51": {
+      "id": "n51",
+      "children": [
+        "n52"
+      ],
+      "parent": "n50",
+      "message": {
+        "id": "m-n51",
+        "author": {
+          "role": "tool",
+          "name": "web.run"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n52": {
+      "id": "n52",
+      "children": [
+        "n53"
+      ],
+      "parent": "n51",
+      "message": {
+        "id": "m-n52",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web.run",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n53": {
+      "id": "n53",
+      "children": [
+        "n54"
+      ],
+      "parent": "n52",
+      "message": {
+        "id": "m-n53",
+        "author": {
+          "role": "tool",
+          "name": "web.run"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n54": {
+      "id": "n54",
+      "children": [
+        "n55"
+      ],
+      "parent": "n53",
+      "message": {
+        "id": "m-n54",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web.run",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n55": {
+      "id": "n55",
+      "children": [
+        "n56"
+      ],
+      "parent": "n54",
+      "message": {
+        "id": "m-n55",
+        "author": {
+          "role": "tool",
+          "name": "web.run"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n56": {
+      "id": "n56",
+      "children": [
+        "n57"
+      ],
+      "parent": "n55",
+      "message": {
+        "id": "m-n56",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 8",
+              "content": ""
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n57": {
+      "id": "n57",
+      "children": [
+        "n58"
+      ],
+      "parent": "n56",
+      "message": {
+        "id": "m-n57",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web.run",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro",
+          "reasoning_title": "activity 4"
+        }
+      }
+    },
+    "n58": {
+      "id": "n58",
+      "children": [
+        "n59"
+      ],
+      "parent": "n57",
+      "message": {
+        "id": "m-n58",
+        "author": {
+          "role": "tool",
+          "name": "web.run"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro",
+          "reasoning_title": "activity 6"
+        }
+      }
+    },
+    "n59": {
+      "id": "n59",
+      "children": [
+        "n60"
+      ],
+      "parent": "n58",
+      "message": {
+        "id": "m-n59",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web.run",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n60": {
+      "id": "n60",
+      "children": [
+        "n61"
+      ],
+      "parent": "n59",
+      "message": {
+        "id": "m-n60",
+        "author": {
+          "role": "tool",
+          "name": "web.run"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n61": {
+      "id": "n61",
+      "children": [
+        "n62"
+      ],
+      "parent": "n60",
+      "message": {
+        "id": "m-n61",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web.run",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n62": {
+      "id": "n62",
+      "children": [
+        "n63"
+      ],
+      "parent": "n61",
+      "message": {
+        "id": "m-n62",
+        "author": {
+          "role": "tool",
+          "name": "web.run"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n63": {
+      "id": "n63",
+      "children": [
+        "n64"
+      ],
+      "parent": "n62",
+      "message": {
+        "id": "m-n63",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web.run",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n64": {
+      "id": "n64",
+      "children": [
+        "n65"
+      ],
+      "parent": "n63",
+      "message": {
+        "id": "m-n64",
+        "author": {
+          "role": "tool",
+          "name": "web.run"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n65": {
+      "id": "n65",
+      "children": [
+        "n66"
+      ],
+      "parent": "n64",
+      "message": {
+        "id": "m-n65",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web.run",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n66": {
+      "id": "n66",
+      "children": [
+        "n67"
+      ],
+      "parent": "n65",
+      "message": {
+        "id": "m-n66",
+        "author": {
+          "role": "tool",
+          "name": "web.run"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n67": {
+      "id": "n67",
+      "children": [
+        "n68"
+      ],
+      "parent": "n66",
+      "message": {
+        "id": "m-n67",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 9",
+              "content": "thought 5"
+            },
+            {
+              "summary": "summary 10",
+              "content": ""
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n68": {
+      "id": "n68",
+      "children": [
+        "n69"
+      ],
+      "parent": "n67",
+      "message": {
+        "id": "m-n68",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 11",
+              "content": "thought 6"
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n69": {
+      "id": "n69",
+      "children": [
+        "n70"
+      ],
+      "parent": "n68",
+      "message": {
+        "id": "m-n69",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "web.run",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro",
+          "reasoning_title": "activity 4"
+        }
+      }
+    },
+    "n70": {
+      "id": "n70",
+      "children": [
+        "n71"
+      ],
+      "parent": "n69",
+      "message": {
+        "id": "m-n70",
+        "author": {
+          "role": "tool",
+          "name": "web.run"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n71": {
+      "id": "n71",
+      "children": [
+        "n72"
+      ],
+      "parent": "n70",
+      "message": {
+        "id": "m-n71",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 12",
+              "content": "thought 7"
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n72": {
+      "id": "n72",
+      "children": [
+        "n73"
+      ],
+      "parent": "n71",
+      "message": {
+        "id": "m-n72",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 13",
+              "content": "thought 8"
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n73": {
+      "id": "n73",
+      "children": [
+        "n74"
+      ],
+      "parent": "n72",
+      "message": {
+        "id": "m-n73",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 14",
+              "content": ""
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    },
+    "n74": {
+      "id": "n74",
+      "children": [
+        "n75"
+      ],
+      "parent": "n73",
+      "message": {
+        "id": "m-n74",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "preamble 3"
+          ]
+        },
+        "recipient": "all",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro",
+          "is_thinking_preamble_message": true
+        }
+      }
+    },
+    "n75": {
+      "id": "n75",
+      "children": [
+        "n76"
+      ],
+      "parent": "n74",
+      "message": {
+        "id": "m-n75",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 307s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "finished_duration_sec": 307
+        }
+      }
+    },
+    "n76": {
+      "id": "n76",
+      "children": [],
+      "parent": "n75",
+      "message": {
+        "id": "m-n76",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 3"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "gpt-5-6-pro"
+        }
+      }
+    }
+  }
+}

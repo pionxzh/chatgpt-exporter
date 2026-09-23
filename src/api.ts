@@ -1083,21 +1083,23 @@ function attachThinkingToNodes(
                 }
             }
             else if (ct === 'thoughts') {
-                for (const thought of message.content.thoughts) {
-                    if (thought.content || thought.summary) {
-                        thinking.thoughts.unshift({
-                            summary: thought.summary,
-                            content: thought.content,
-                        })
-                    }
-                }
+                // The walk goes from leaf to root, so prepend each message's thoughts as a batch to keep their order.
+                thinking.thoughts.unshift(...message.content.thoughts
+                    .filter(thought => thought.content || thought.summary)
+                    .map(thought => ({ summary: thought.summary, content: thought.content })))
+            }
+            else if (ct === 'text' && message.metadata?.is_thinking_preamble_message) {
+                // Progress notes the model writes between reasoning steps, shown in ChatGPT's thinking panel.
+                const content = message.content.parts.join('\n')
+                if (content) thinking.thoughts.unshift({ summary: '', content })
             }
             else if (message.metadata?.reasoning_title) {
                 if (!thinking.activities) thinking.activities = []
+                // Repeated titles keep their first position, the walk sees them last.
                 const title = message.metadata.reasoning_title
-                if (!thinking.activities.includes(title)) {
-                    thinking.activities.unshift(title)
-                }
+                const index = thinking.activities.indexOf(title)
+                if (index !== -1) thinking.activities.splice(index, 1)
+                thinking.activities.unshift(title)
             }
             else if (message.author.role === 'user' && !message.metadata?.is_visually_hidden_from_conversation) {
                 if (targetNodeId && hasThinkingContent(thinking)) {

@@ -1,0 +1,125 @@
+{
+  "id": "fixture",
+  "title": "Fixture",
+  "create_time": 1,
+  "update_time": 2,
+  "current_node": "n5",
+  "mapping": {
+    "n0": {
+      "id": "n0",
+      "children": [
+        "n1"
+      ]
+    },
+    "n1": {
+      "id": "n1",
+      "children": [
+        "n2"
+      ],
+      "parent": "n0",
+      "message": {
+        "id": "m-n1",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 1"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n2": {
+      "id": "n2",
+      "children": [
+        "n3"
+      ],
+      "parent": "n1",
+      "message": {
+        "id": "m-n2",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": []
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-5-thinking"
+        }
+      }
+    },
+    "n3": {
+      "id": "n3",
+      "children": [
+        "n4"
+      ],
+      "parent": "n2",
+      "message": {
+        "id": "m-n3",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "preamble 1"
+          ]
+        },
+        "recipient": "all",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "gpt-5-5-thinking",
+          "is_thinking_preamble_message": true
+        }
+      }
+    },
+    "n4": {
+      "id": "n4",
+      "children": [
+        "n5"
+      ],
+      "parent": "n3",
+      "message": {
+        "id": "m-n4",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 16s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-5-5-thinking",
+          "finished_duration_sec": 16
+        }
+      }
+    },
+    "n5": {
+      "id": "n5",
+      "children": [],
+      "parent": "n4",
+      "message": {
+        "id": "m-n5",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 1"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "gpt-5-5-thinking"
+        }
+      }
+    }
+  }
+}
