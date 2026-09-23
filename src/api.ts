@@ -5,6 +5,7 @@ import { loadShareConversation } from './share'
 import { getTemporaryChatId } from './temporaryChat'
 import { blobToDataURL } from './utils/dom'
 import { memorize } from './utils/memorize'
+import { getModelName } from './utils/model'
 
 // urlcat ships CommonJS with `exports.default`. Because this package is
 // `"type": "module"`, vite 8 (rolldown) applies Node's interop and hands the
@@ -33,18 +34,6 @@ interface ApiSession {
         picture: string
     }
 }
-
-type ModelSlug =
-    | 'text-davinci-002-render-sha'
-    | 'text-davinci-002-render-paid'
-    | 'text-davinci-002-browse'
-    | 'gpt-4'
-    | 'gpt-4-browsing'
-    | 'gpt-4o'
-    | 'gpt-5-t-mini'
-    | 'gpt-5-1-instant'
-    | 'gpt-5-1-thinking'
-    | 'gpt-5-2'
 
 export interface Citation {
     start_ix: number
@@ -128,7 +117,7 @@ interface MessageMeta {
         type: 'stop' | 'interrupted' & (string & {})
     }
     is_complete?: boolean
-    model_slug?: ModelSlug & (string & {})
+    model_slug?: string
     parent_id?: string
     timestamp_?: 'absolute' & (string & {})
     citations?: Citation[]
@@ -902,23 +891,6 @@ export function shouldSkipMessageInExport(message?: ConversationNodeMessage): bo
     return false
 }
 
-const ModelMapping: { [key in ModelSlug]: string } & { [key: string]: string } = {
-    'text-davinci-002-render-sha': 'GPT-3.5',
-    'text-davinci-002-render-paid': 'GPT-3.5',
-    'text-davinci-002-browse': 'GPT-3.5',
-    'gpt-4-browsing': 'GPT-4 (Browser)',
-    'gpt-4o': 'GPT-4o',
-    'gpt-5-t-mini': 'GPT-5',
-    'gpt-5-1-instant': 'GPT-5.1',
-    'gpt-5-1-thinking': 'GPT-5.1',
-    'gpt-5-2': 'GPT-5.2',
-
-    // fuzzy matching
-    'gpt-4': 'GPT-4',
-    'gpt-5': 'GPT-5',
-    'text-davinci-002': 'GPT-3.5',
-}
-
 export interface ProcessConversationOptions {
     enableThinking?: boolean
 }
@@ -927,13 +899,12 @@ export function processConversation(conversation: ApiConversationWithId, options
     const title = conversation.title || 'ChatGPT Conversation'
     const createTime = conversation.create_time
     const updateTime = conversation.update_time
-    const { model, modelSlug } = extractModel(conversation.mapping)
-
     const startNodeId = conversation.current_node
         || Object.values(conversation.mapping).find(node => !node.children || node.children.length === 0)?.id
     if (!startNodeId) throw new Error('Failed to find start node.')
 
     const conversationNodes = extractConversationResult(conversation.mapping, startNodeId)
+    const { model, modelSlug } = extractModel(conversation.mapping, conversationNodes)
     const mergedConversationNodes = mergeContinuationNodes(conversationNodes)
 
     if (options?.enableThinking) {
@@ -951,24 +922,14 @@ export function processConversation(conversation: ApiConversationWithId, options
     }
 }
 
-function extractModel(conversationMapping: Record<string, ConversationNode>) {
-    let model = ''
-    const modelSlug = Object.values(conversationMapping).find(node => node.message?.metadata?.model_slug)?.message?.metadata?.model_slug || ''
-    if (modelSlug) {
-        if (ModelMapping[modelSlug]) {
-            model = ModelMapping[modelSlug]
-        }
-        else {
-            Object.keys(ModelMapping).forEach((key) => {
-                if (modelSlug.startsWith(key)) {
-                    model = key
-                }
-            })
-        }
-    }
+function extractModel(conversationMapping: Record<string, ConversationNode>, conversationNodes: ConversationNode[]) {
+    // Prefer the latest reply on the current branch, the model can change mid-conversation.
+    const node = conversationNodes.findLast(node => node.message?.metadata?.model_slug)
+        ?? Object.values(conversationMapping).find(node => node.message?.metadata?.model_slug)
+    const modelSlug = node?.message?.metadata?.model_slug ?? ''
 
     return {
-        model,
+        model: getModelName(modelSlug),
         modelSlug,
     }
 }
