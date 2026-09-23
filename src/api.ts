@@ -58,6 +58,13 @@ export interface ContentReferenceSource {
     supporting_websites?: ContentReferenceSource[]
 }
 
+export interface ImageSearchResult {
+    title?: string
+    /** Page the image comes from */
+    url?: string
+    content_url?: string
+}
+
 export interface ContentReference {
     type: 'grouped_webpages' | 'sources_footnote' | 'nav_list' | 'alt_text' | 'webpage' | (string & {})
     /** The text that was matched in the content, e.g., "citeturn0search3" */
@@ -75,6 +82,8 @@ export interface ContentReference {
     refs?: string[]
     /** File name of an uploaded file, on `file` references */
     name?: string
+    /** Image search results, wrapped in `image_result` on `image_group` references */
+    images?: Array<ImageSearchResult & { image_result?: ImageSearchResult }>
     // Legacy fields (may still be present in some responses)
     url?: string
     title?: string

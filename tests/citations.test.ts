@@ -73,3 +73,42 @@ describe('file citations', () => {
             .toBe('A. (cost$&.md) B. ')
     })
 })
+
+describe('image search results', () => {
+    const group = {
+        type: 'image_group',
+        matched_text: 'image_group{"query":["a"]}',
+        start_idx: 0,
+        end_idx: 0,
+        safe_urls: ['https://cdn.example/a.jpg', 'https://cdn.example/b.jpg'],
+        alt: '![Image](https://cdn.example/a.jpg)\n\n![Image](https://cdn.example/b.jpg)',
+        images: [
+            { image_result: { title: 'Page [A]', url: 'https://a.example/', content_url: 'https://cdn.example/a.jpg' } },
+            { image_result: { title: 'Page B', content_url: 'https://cdn.example/b.jpg' } },
+        ],
+    }
+    const single = {
+        type: 'image_v2',
+        matched_text: 'iturn0image0',
+        start_idx: 0,
+        end_idx: 0,
+        safe_urls: ['https://cdn.example/c.jpg'],
+        alt: '[![Page C](https://cdn.example/thumb.jpg)](https://c.example/)',
+        images: [{ title: 'Page C', url: 'https://c.example/', content_url: 'https://cdn.example/c.jpg' }],
+    }
+    const withoutImages = { ...group, matched_text: 'image_group{"query":["b"]}', images: [] }
+    const metadata = { content_references: [group, single, withoutImages] } as unknown as ConversationNodeMessage['metadata']
+
+    it('links each image to its page, titled by the page', () => {
+        expect(transformContentReferences(group.matched_text, metadata)).toBe(
+            '[![Page \\[A\\]](<https://cdn.example/a.jpg>)](<https://a.example/>)\n\n![Page B](<https://cdn.example/b.jpg>)',
+        )
+        expect(transformContentReferences(single.matched_text, metadata))
+            .toBe('[![Page C](<https://cdn.example/c.jpg>)](<https://c.example/>)')
+    })
+
+    it('falls back to the alt text', () => {
+        expect(transformContentReferences(withoutImages.matched_text, metadata)).toBe(group.alt)
+        expect(transformContentReferences(group.matched_text, metadata, { output: 'text', inlineReferenceMode: 'alt' })).toBe(group.alt)
+    })
+})

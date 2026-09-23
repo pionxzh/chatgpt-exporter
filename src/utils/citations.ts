@@ -78,6 +78,12 @@ export function formatCitationSource(source: ContentReferenceSource, output: Cit
 function formatInlineReference(ref: ContentReference, output: CitationOutput, mode: 'expanded' | 'alt'): string {
     if (mode === 'alt') return formatAlt(ref.alt)
 
+    if (output === 'markdown' && (ref.type === 'image_group' || ref.type === 'image_v2')) {
+        const images = formatImageResults(ref)
+        if (images) return images
+        return formatAlt(ref.alt)
+    }
+
     const sources = getInlineSources(ref)
 
     if (sources.length > 0) {
@@ -86,6 +92,25 @@ function formatInlineReference(ref: ContentReference, output: CitationOutput, mo
     }
 
     return formatAlt(ref.alt)
+}
+
+/**
+ * Image search results, shown by ChatGPT as a carousel. Link each image to
+ * the page it comes from, with the page title as alt text.
+ */
+function formatImageResults(ref: ContentReference): string {
+    return (ref.images ?? [])
+        .map((entry) => {
+            const image = entry.image_result ?? entry
+            const src = image.content_url?.trim()
+            if (!src) return ''
+
+            const markdown = `![${escapeMarkdownText(image.title?.trim() || 'Image')}](<${escapeMarkdownUrl(src)}>)`
+            const page = image.url?.trim()
+            return page ? `[${markdown}](<${escapeMarkdownUrl(page)}>)` : markdown
+        })
+        .filter(Boolean)
+        .join('\n\n')
 }
 
 /**
