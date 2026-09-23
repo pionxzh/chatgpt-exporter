@@ -68,7 +68,7 @@ export function formatCitationSource(source: ContentReferenceSource, output: Cit
 }
 
 function formatInlineReference(ref: ContentReference, output: CitationOutput, mode: 'expanded' | 'alt'): string {
-    if (mode === 'alt') return ref.alt || ''
+    if (mode === 'alt') return formatAlt(ref.alt)
 
     const sources = getInlineSources(ref)
 
@@ -77,9 +77,15 @@ function formatInlineReference(ref: ContentReference, output: CitationOutput, mo
         return `(${sources.map(source => formatCitationSource(source, output)).join(separator)})`
     }
 
-    if (ref.alt) return ref.alt
+    return formatAlt(ref.alt)
+}
 
-    return ''
+/**
+ * Product references carry links without a URL, such as `[Product name]()`.
+ * Keep their label only.
+ */
+function formatAlt(alt: string | undefined): string {
+    return alt?.replaceAll(/\[([^\]]*)\]\(\)/g, '$1') ?? ''
 }
 
 function getInlineSources(ref: ContentReference): ContentReferenceSource[] {
@@ -96,8 +102,10 @@ function getInlineSources(ref: ContentReference): ContentReferenceSource[] {
         sources.push(ref)
     }
 
-    if (sources.length === 0 && ref.safe_urls?.length) {
-        sources.push(...ref.safe_urls.map(url => ({ title: url, url })))
+    // Product references list an empty URL here
+    const safeUrls = ref.safe_urls?.filter(Boolean) ?? []
+    if (sources.length === 0 && safeUrls.length) {
+        sources.push(...safeUrls.map(url => ({ title: url, url })))
     }
 
     return dedupeSources(sources)
