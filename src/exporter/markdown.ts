@@ -9,6 +9,7 @@ import { buildZipFileName, downloadFile, getFileNameWithFormat } from '../utils/
 import { fromMarkdown, toMarkdown } from '../utils/markdown'
 import { ScriptStorage } from '../utils/storage'
 import { standardizeLineBreaks } from '../utils/text'
+import { transformAuthor } from '../utils/author'
 import type { ApiConversationWithId, Citation, ConversationNodeMessage, ConversationResult, ThinkingContent } from '../api'
 import type { ExportMeta } from '../ui/SettingContext'
 import type { PartInfo } from '../utils/download'
@@ -163,19 +164,6 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
     const markdown = `${frontMatter}# ${title}\n\n${content}`
 
     return markdown
-}
-
-function transformAuthor(author: ConversationNodeMessage['author']): string {
-    switch (author.role) {
-        case 'assistant':
-            return 'ChatGPT'
-        case 'user':
-            return 'You'
-        case 'tool':
-            return `Plugin${author.name ? ` (${author.name})` : ''}`
-        default:
-            return author.role
-    }
 }
 
 /**

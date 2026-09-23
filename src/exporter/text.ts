@@ -7,6 +7,7 @@ import { transformContentReferences } from '../utils/citations'
 import { copyToClipboard } from '../utils/clipboard'
 import { flatMap, fromMarkdown, toMarkdown } from '../utils/markdown'
 import { standardizeLineBreaks } from '../utils/text'
+import { transformAuthor } from '../utils/author'
 import type { ConversationNodeMessage } from '../api'
 
 export async function exportToText() {
@@ -146,19 +147,6 @@ function reformatContent(input: string) {
         return result.slice(1)
     }
     return result
-}
-
-function transformAuthor(author: ConversationNodeMessage['author']): string {
-    switch (author.role) {
-        case 'assistant':
-            return 'ChatGPT'
-        case 'user':
-            return 'You'
-        case 'tool':
-            return `Plugin${author.name ? ` (${author.name})` : ''}`
-        default:
-            return author.role
-    }
 }
 
 /**
