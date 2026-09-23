@@ -6,6 +6,7 @@ import { checkIfConversationStarted } from '../page'
 import { checkIfTemporaryChatIsExportable } from '../temporaryChat'
 import { transformContentReferences } from '../utils/citations'
 import { buildZipFileName, downloadFile, getFileNameWithFormat } from '../utils/download'
+import { protectMath } from '../utils/latex'
 import { fromMarkdown, toMarkdown } from '../utils/markdown'
 import { ScriptStorage } from '../utils/storage'
 import { standardizeLineBreaks } from '../utils/text'
@@ -77,8 +78,6 @@ export async function exportAllToMarkdown(fileNameFormat: string, apiConversatio
     return true
 }
 
-const LatexRegex = /(\s\$\$.+\$\$\s|\s\$.+\$\s|\\\[.+\\\]|\\\(.+\\\))|(^\$$[\S\s]+^\$$)|(^\$\$[\S\s]+^\$\$$)/gm
-
 function conversationToMarkdown(conversation: ConversationResult, metaList?: ExportMeta[]) {
     const { id, title, conversationNodes } = conversation
     const source = `${baseUrl}/c/${id}`
@@ -125,34 +124,9 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
         // Only message from assistant will be reformatted
         if (message.author.role === 'assistant') {
             postSteps.push((input) => {
-                // Replace mathematical formula annotation
-                input = input
-                    .replace(/^\\\[(.+)\\\]$/gm, '$$$$$1$$$$')
-                    .replace(/\\\[/g, '$')
-                    .replace(/\\\]/g, '$')
-                    .replace(/\\\(/g, '$')
-                    .replace(/\\\)/g, '$')
-                const matches = input.match(LatexRegex)
-                // Skip code block as the following steps can potentially break the code
-                const isCodeBlock = /```/.test(input)
-                if (!isCodeBlock && matches) {
-                    let index = 0
-                    input = input.replace(LatexRegex, () => {
-                        // Replace it with `╬${index}╬` to avoid markdown processor ruin the formula
-                        return `╬${index++}╬`
-                    })
-                }
-
-                let transformed = toMarkdown(fromMarkdown(input))
-
-                if (!isCodeBlock && matches) {
-                    // Replace `╬${index}╬` back to the original latex
-                    transformed = transformed.replace(/╬(\d+)╬/g, (_, index) => {
-                        return matches[+index]
-                    })
-                }
-
-                return transformed
+                // Keep formulas out of the markdown round trip, which would escape them
+                const { text, restore } = protectMath(input)
+                return restore(toMarkdown(fromMarkdown(text)))
             })
         }
         const postProcess = (input: string) => postSteps.reduce((acc, fn) => fn(acc), input)
