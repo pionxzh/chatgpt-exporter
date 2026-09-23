@@ -15,6 +15,7 @@ import { transformAuthor } from '../utils/author'
 import type { ApiConversationWithId, ConversationNodeMessage, ConversationResult, ThinkingContent } from '../api'
 import type { ExportMeta } from '../ui/SettingContext'
 import type { PartInfo } from '../utils/download'
+import { fillTemplate } from './htmlTemplate'
 import { getMetaVariables, resolveMetaList } from './meta'
 
 export async function exportToHtml(fileNameFormat: string, metaList: ExportMeta[]) {
@@ -196,17 +197,17 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
 </details>`
         : ''
 
-    const html = templateHtml
-        .replaceAll('{{title}}', title)
-        .replaceAll('{{date}}', date)
-        .replaceAll('{{time}}', time)
-        .replaceAll('{{source}}', source)
-        .replaceAll('{{lang}}', lang)
-        .replaceAll('{{theme}}', theme)
-        .replaceAll('{{avatar}}', avatar)
-        .replaceAll('{{details}}', detailsHtml)
-        .replaceAll('{{content}}', conversationHtml)
-    return html
+    return fillTemplate(templateHtml, {
+        title,
+        date,
+        time,
+        source,
+        lang,
+        theme,
+        avatar,
+        details: detailsHtml,
+        content: conversationHtml,
+    })
 }
 
 /**
