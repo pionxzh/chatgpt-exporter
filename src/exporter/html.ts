@@ -10,10 +10,11 @@ import { buildZipFileName, downloadFile, getFileNameWithFormat } from '../utils/
 import { fromMarkdown, toHtml } from '../utils/markdown'
 import { ScriptStorage } from '../utils/storage'
 import { standardizeLineBreaks } from '../utils/text'
-import { dateStr, getColorScheme, timestamp, unixTimestampToISOString } from '../utils/utils'
+import { dateStr, getColorScheme } from '../utils/utils'
 import type { ApiConversationWithId, ConversationNodeMessage, ConversationResult, ThinkingContent } from '../api'
 import type { ExportMeta } from '../ui/SettingContext'
 import type { PartInfo } from '../utils/download'
+import { getMetaVariables, resolveMetaList } from './meta'
 
 export async function exportToHtml(fileNameFormat: string, metaList: ExportMeta[]) {
     if (!checkIfConversationStarted()) {
@@ -82,7 +83,7 @@ export async function exportAllToHtml(fileNameFormat: string, apiConversations: 
 }
 
 function conversationToHtml(conversation: ConversationResult, avatar: string, metaList?: ExportMeta[]) {
-    const { id, title, model, modelSlug, createTime, updateTime, conversationNodes } = conversation
+    const { id, title, conversationNodes } = conversation
 
     const enableTimestamp = ScriptStorage.get<boolean>(KEY_TIMESTAMP_ENABLED) ?? false
     const timeStampHtml = ScriptStorage.get<boolean>(KEY_TIMESTAMP_HTML) ?? false
@@ -184,22 +185,7 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
     const lang = document.documentElement.lang ?? 'en'
     const theme = getColorScheme()
 
-    const _metaList = metaList
-        ?.filter(x => !!x.name)
-        .map(({ name, value }) => {
-            const val = value
-                .replace('{title}', title)
-                .replace('{date}', date)
-                .replace('{timestamp}', timestamp())
-                .replace('{source}', source)
-                .replace('{model}', model)
-                .replace('{model_name}', modelSlug)
-                .replace('{create_time}', unixTimestampToISOString(createTime))
-                .replace('{update_time}', unixTimestampToISOString(updateTime))
-
-            return [name, val] as const
-        })
-        ?? []
+    const _metaList = resolveMetaList(metaList, getMetaVariables(conversation, source, date))
     const detailsHtml = _metaList.length > 0
         ? `<details>
     <summary>Metadata</summary>

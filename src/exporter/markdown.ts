@@ -9,10 +9,10 @@ import { buildZipFileName, downloadFile, getFileNameWithFormat } from '../utils/
 import { fromMarkdown, toMarkdown } from '../utils/markdown'
 import { ScriptStorage } from '../utils/storage'
 import { standardizeLineBreaks } from '../utils/text'
-import { dateStr, timestamp, unixTimestampToISOString } from '../utils/utils'
 import type { ApiConversationWithId, Citation, ConversationNodeMessage, ConversationResult, ThinkingContent } from '../api'
 import type { ExportMeta } from '../ui/SettingContext'
 import type { PartInfo } from '../utils/download'
+import { getMetaVariables, resolveMetaList } from './meta'
 
 export async function exportToMarkdown(fileNameFormat: string, metaList: ExportMeta[]) {
     if (!checkIfConversationStarted()) {
@@ -79,25 +79,11 @@ export async function exportAllToMarkdown(fileNameFormat: string, apiConversatio
 const LatexRegex = /(\s\$\$.+\$\$\s|\s\$.+\$\s|\\\[.+\\\]|\\\(.+\\\))|(^\$$[\S\s]+^\$$)|(^\$\$[\S\s]+^\$\$$)/gm
 
 function conversationToMarkdown(conversation: ConversationResult, metaList?: ExportMeta[]) {
-    const { id, title, model, modelSlug, createTime, updateTime, conversationNodes } = conversation
+    const { id, title, conversationNodes } = conversation
     const source = `${baseUrl}/c/${id}`
 
-    const _metaList = metaList
-        ?.filter(x => !!x.name)
-        .map(({ name, value }) => {
-            const val = value
-                .replace('{title}', title)
-                .replace('{date}', dateStr())
-                .replace('{timestamp}', timestamp())
-                .replace('{source}', source)
-                .replace('{model}', model)
-                .replace('{model_name}', modelSlug)
-                .replace('{create_time}', unixTimestampToISOString(createTime))
-                .replace('{update_time}', unixTimestampToISOString(updateTime))
-
-            return `${name}: ${val}`
-        })
-        ?? []
+    const _metaList = resolveMetaList(metaList, getMetaVariables(conversation, source))
+        .map(([name, val]) => `${name}: ${val}`)
     const frontMatter = _metaList.length > 0
         ? `---\n${_metaList.join('\n')}\n---\n\n`
         : ''
