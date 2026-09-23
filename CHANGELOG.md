@@ -1,5 +1,29 @@
 # Changelog
 
+## [2.35.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.35.1...userscript-v2.35.2) (2026-09-23)
+
+
+### Bug Fixes
+
+* derive model name from the slug ([bb9ea2c](https://github.com/pionxzh/chatgpt-exporter/commit/bb9ea2cee9239625df4d7c78ea8c7aa0c60125b4))
+* escape title and metadata in HTML export ([7787cdc](https://github.com/pionxzh/chatgpt-exporter/commit/7787cdc6cb51eb5b9af3d6b9fa21445b430ddd86))
+* keep display math and `$` in HTML export ([4662547](https://github.com/pionxzh/chatgpt-exporter/commit/46625473249655894d475021d27fad26a34c8bcc))
+* keep formulas intact in text export ([6376c96](https://github.com/pionxzh/chatgpt-exporter/commit/6376c9680e02f8f1030a644292ab9077ff64781d))
+* keep product names in shopping answers ([4ffda29](https://github.com/pionxzh/chatgpt-exporter/commit/4ffda29ad3afdc9790c0efa4d0a28e78b870562e))
+* keep raw conversation intact when processing ([fc910b5](https://github.com/pionxzh/chatgpt-exporter/commit/fc910b5ef3a5750eba331f37f693aa773a1068fd))
+* keep thinking order and include preambles in thinking export ([c9877f2](https://github.com/pionxzh/chatgpt-exporter/commit/c9877f20aaa57df48d780f00f5d3340d315c2712))
+* label generated images as ChatGPT ([ba8bea2](https://github.com/pionxzh/chatgpt-exporter/commit/ba8bea204c75621f9465c5ed43c4e673025aeb8e))
+* preserve all text parts in Ooba exports ([3244bf1](https://github.com/pionxzh/chatgpt-exporter/commit/3244bf161bbc34ed5e62c945ee17b330748c7821))
+* preserve raw conversations in JSON exports ([b06d472](https://github.com/pionxzh/chatgpt-exporter/commit/b06d472352a6a8677ce9259686630ad1cde4b330))
+* replace every metadata variable occurrence ([f71c1ca](https://github.com/pionxzh/chatgpt-exporter/commit/f71c1cafece8311041809d58b2837e0e31f96887))
+* replace model_name metadata variable in HTML ([d7841a2](https://github.com/pionxzh/chatgpt-exporter/commit/d7841a22161280301770aa2648b8a838d0fcbde9))
+* show file names for citations of uploaded files ([15368f9](https://github.com/pionxzh/chatgpt-exporter/commit/15368f963792b6dd5cabad612441855df1b750a3))
+* show image search results as images ([56bb8ae](https://github.com/pionxzh/chatgpt-exporter/commit/56bb8ae67747fec4d85f950f6a9cfa3f96eac19a))
+* skip empty assistant replies in exports ([82ff6c8](https://github.com/pionxzh/chatgpt-exporter/commit/82ff6c8e2cb5b0e874accb481afd4a4ce6eb65c1))
+* skip thinking preamble messages in exports ([16fd74d](https://github.com/pionxzh/chatgpt-exporter/commit/16fd74d8ce9abd8f9798914f65ac0c027aeb78c8))
+* use one avatar style for assistant messages in HTML export ([439c727](https://github.com/pionxzh/chatgpt-exporter/commit/439c727897a4bde5f669c0036f610d2bacbe2425))
+* write display math as `$$` blocks in markdown export ([64132e6](https://github.com/pionxzh/chatgpt-exporter/commit/64132e63a7a05aa3d5888e5336df04afd12eb1e2)), closes [#281](https://github.com/pionxzh/chatgpt-exporter/issues/281)
+
 ## [2.35.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.35.0...userscript-v2.35.1) (2026-09-22)
 
 
