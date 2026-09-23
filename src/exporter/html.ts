@@ -15,7 +15,7 @@ import { transformAuthor } from '../utils/author'
 import type { ApiConversationWithId, ConversationNodeMessage, ConversationResult, ThinkingContent } from '../api'
 import type { ExportMeta } from '../ui/SettingContext'
 import type { PartInfo } from '../utils/download'
-import { fillTemplate } from './htmlTemplate'
+import { escapeHtml, fillTemplate, metaDetailsHtml } from './htmlTemplate'
 import { getMetaVariables, resolveMetaList } from './meta'
 
 export async function exportToHtml(fileNameFormat: string, metaList: ExportMeta[]) {
@@ -188,24 +188,16 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
     const theme = getColorScheme()
 
     const _metaList = resolveMetaList(metaList, getMetaVariables(conversation, source, date))
-    const detailsHtml = _metaList.length > 0
-        ? `<details>
-    <summary>Metadata</summary>
-    <div class="metadata_container">
-        ${_metaList.map(([key, value]) => `<div class="metadata_item"><div>${key}</div><div>${value}</div></div>`).join('\n')}
-    </div>
-</details>`
-        : ''
 
     return fillTemplate(templateHtml, {
-        title,
+        title: escapeHtml(title),
         date,
         time,
         source,
         lang,
         theme,
         avatar,
-        details: detailsHtml,
+        details: metaDetailsHtml(_metaList),
         content: conversationHtml,
     })
 }
@@ -302,13 +294,4 @@ function formatThinkingHtml(thinking: ThinkingContent): string {
     if (!body) return ''
 
     return `<details class="thinking"><summary>${escapeHtml(durationLabel)}</summary>${body}</details>`
-}
-
-function escapeHtml(html: string) {
-    return html
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;')
 }

@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { fillTemplate } from '../src/exporter/htmlTemplate'
+import { fillTemplate, metaDetailsHtml } from '../src/exporter/htmlTemplate'
 
 describe('fillTemplate', () => {
     it('inserts values verbatim', () => {
@@ -18,5 +18,18 @@ describe('fillTemplate', () => {
         const names = ['title', 'date', 'time', 'source', 'lang', 'theme', 'avatar', 'details', 'content']
         const html = fillTemplate(template, Object.fromEntries(names.map(name => [name, `<${name}>`])))
         expect(html).not.toMatch(/\{\{\w+\}\}/)
+    })
+})
+
+describe('metaDetailsHtml', () => {
+    it('escapes names and values', () => {
+        const html = metaDetailsHtml([['<b>title</b>', 'Fix <Draft> & "notes"'], ['source', 'https://chatgpt.com/c/1?a=1&b=2']])
+        expect(html).toContain('<div>&lt;b&gt;title&lt;/b&gt;</div><div>Fix &lt;Draft&gt; &amp; &quot;notes&quot;</div>')
+        expect(html).toContain('<div>https://chatgpt.com/c/1?a=1&amp;b=2</div>')
+        expect(html).not.toContain('<Draft>')
+    })
+
+    it('renders nothing without metadata', () => {
+        expect(metaDetailsHtml([])).toBe('')
     })
 })
