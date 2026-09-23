@@ -5,6 +5,7 @@ import { checkIfConversationStarted } from '../page'
 import { checkIfTemporaryChatIsExportable } from '../temporaryChat'
 import { transformContentReferences } from '../utils/citations'
 import { copyToClipboard } from '../utils/clipboard'
+import { protectMath } from '../utils/latex'
 import { flatMap, fromMarkdown, toMarkdown } from '../utils/markdown'
 import { standardizeLineBreaks } from '../utils/text'
 import { transformAuthor } from '../utils/author'
@@ -37,8 +38,6 @@ export async function exportToText() {
     return true
 }
 
-const LatexRegex = /(\s\$\$.+\$\$\s|\s\$.+\$\s|\\\[.+\\\]|\\\(.+\\\))|(^\$$[\S\s]+^\$$)|(^\$\$[\S\s]+^\$\$$)/gm
-
 function transformMessage(message?: ConversationNodeMessage) {
     if (!message || !message.content) return null
 
@@ -46,15 +45,6 @@ function transformMessage(message?: ConversationNodeMessage) {
 
     const author = transformAuthor(message.author)
     let content = transformContent(message.content, message.metadata)
-
-    const matches = content.match(LatexRegex)
-    if (matches) {
-        let index = 0
-        content = content.replace(LatexRegex, () => {
-            // Replace it with `╬${index}╬` to avoid markdown processor ruin the formula
-            return `╬${index++}╬`
-        })
-    }
 
     if (message.author.role === 'assistant') {
         content = transformContentReferences(content, message.metadata, {
@@ -67,14 +57,9 @@ function transformMessage(message?: ConversationNodeMessage) {
 
     // Only message from assistant will be reformatted
     if (message.author.role === 'assistant' && content) {
-        content = reformatContent(content)
-    }
-
-    if (matches) {
-        // Replace `╬${index}╬` back to the original latex
-        content = content.replace(/╬(\d+)╬/g, (_, index) => {
-            return matches[+index]
-        })
+        // Keep formulas out of the markdown round trip, as in the markdown export
+        const { text, restore } = protectMath(content)
+        content = restore(reformatContent(text))
     }
 
     return `${author}:\n${content}`
