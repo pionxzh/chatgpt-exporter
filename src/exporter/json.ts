@@ -9,10 +9,6 @@ import type { ApiConversationWithId } from '../api'
 import type { ExportMeta } from '../ui/SettingContext'
 import type { PartInfo } from '../utils/download'
 
-export function isRawJsonExport(exportType: string): boolean {
-    return exportType === 'JSON' || exportType === 'JSON (ZIP)'
-}
-
 export async function exportToJson(fileNameFormat: string) {
     if (!checkIfConversationStarted()) {
         alert(i18n.t('Please start a conversation first'))
