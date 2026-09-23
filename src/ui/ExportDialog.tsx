@@ -5,7 +5,7 @@ import type { ChangeEvent } from 'preact/compat'
 import { archiveConversation, deleteConversation, fetchAllConversations, fetchConversation, fetchConversationsPage, fetchProjects, probeApi } from '../api'
 import { EXPORT_OPERATION_BATCH, KEY_EXPORTED_UPDATE_TIMES } from '../constants'
 import { exportAllToHtml } from '../exporter/html'
-import { exportAllToJson, exportAllToOfficialJson } from '../exporter/json'
+import { exportAllToJson, exportAllToOfficialJson, isRawJsonExport } from '../exporter/json'
 import { exportAllToMarkdown } from '../exporter/markdown'
 import { RequestQueue } from '../utils/queue'
 import { ScriptStorage } from '../utils/storage'
@@ -454,7 +454,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
     const startApiBatch = useCallback((chunk: ApiConversationItem[]) => {
         requestQueue.clear()
         chunk.forEach(({ id, title }) => {
-            requestQueue.add({ name: title, request: () => fetchConversation(id, exportType !== 'JSON') })
+            requestQueue.add({ name: title, request: () => fetchConversation(id, !isRawJsonExport(exportType)) })
         })
         requestQueue.start()
     }, [requestQueue, exportType])

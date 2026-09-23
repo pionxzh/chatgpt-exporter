@@ -9,6 +9,10 @@ import type { ApiConversationWithId } from '../api'
 import type { ExportMeta } from '../ui/SettingContext'
 import type { PartInfo } from '../utils/download'
 
+export function isRawJsonExport(exportType: string): boolean {
+    return exportType === 'JSON' || exportType === 'JSON (ZIP)'
+}
+
 export async function exportToJson(fileNameFormat: string) {
     if (!checkIfConversationStarted()) {
         alert(i18n.t('Please start a conversation first'))
@@ -22,9 +26,11 @@ export async function exportToJson(fileNameFormat: string) {
 
     const chatId = await getCurrentChatId()
     const rawConversation = await fetchConversation(chatId, false)
-    const conversation = processConversation(rawConversation)
 
-    const fileName = getFileNameWithFormat(fileNameFormat, 'json', { title: conversation.title, chatId })
+    const fileName = getFileNameWithFormat(fileNameFormat, 'json', {
+        title: rawConversation.title || 'ChatGPT Conversation',
+        chatId,
+    })
     /**
      * The official format is just an array of the API response.
      */
@@ -91,16 +97,12 @@ export async function exportAllToOfficialJson(_fileNameFormat: string, apiConver
 export async function exportAllToJson(fileNameFormat: string, apiConversations: ApiConversationWithId[], _metaList?: ExportMeta[], projectName?: string, partIndex?: number, totalParts?: number) {
     const zip = new JSZip()
     const filenameMap = new Map<string, number>()
-    const conversations = apiConversations.map(x => ({
-        conversation: processConversation(x),
-        rawConversation: x,
-    }))
-    conversations.forEach(({ conversation, rawConversation }) => {
+    apiConversations.forEach((rawConversation) => {
         let fileName = getFileNameWithFormat(fileNameFormat, 'json', {
-            title: conversation.title,
-            chatId: conversation.id,
-            createTime: conversation.createTime,
-            updateTime: conversation.updateTime,
+            title: rawConversation.title || 'ChatGPT Conversation',
+            chatId: rawConversation.id,
+            createTime: rawConversation.create_time,
+            updateTime: rawConversation.update_time,
         })
         if (filenameMap.has(fileName)) {
             const count = filenameMap.get(fileName) ?? 1
