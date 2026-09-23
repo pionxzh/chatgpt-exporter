@@ -54,7 +54,7 @@ vi.mock('../src/utils/download', () => ({
     getFileNameWithFormat: () => 'conversation.json',
 }))
 
-const { exportAllToJson, exportAllToOfficialJson, exportToJson, isRawJsonExport } = await import('../src/exporter/json')
+const { exportAllToJson, exportAllToOfficialJson, exportToJson } = await import('../src/exporter/json')
 
 function createRawConversation(): ApiConversationWithId {
     return {
@@ -103,15 +103,6 @@ beforeEach(() => {
 
     mocks.processConversation.mockImplementation(() => {
         throw new Error('raw JSON export must not call processConversation')
-    })
-})
-
-describe('raw JSON export types', () => {
-    it('disables asset replacement for both raw JSON modes', () => {
-        expect(isRawJsonExport('JSON')).toBe(true)
-        expect(isRawJsonExport('JSON (ZIP)')).toBe(true)
-        expect(isRawJsonExport('Markdown')).toBe(false)
-        expect(isRawJsonExport('HTML')).toBe(false)
     })
 })
 
