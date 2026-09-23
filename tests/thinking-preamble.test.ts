@@ -43,7 +43,7 @@ function createConversation(): ApiConversationWithId {
                     content: { content_type: 'text', parts: ['Transient thinking preamble'] },
                     metadata: {
                         is_thinking_preamble_message: true,
-                        model_slug: 'gpt-5-6-thinking',
+                        model_slug: 'gpt-5-1-thinking',
                     },
                     recipient: 'all',
                     channel: 'analysis',
@@ -59,7 +59,7 @@ function createConversation(): ApiConversationWithId {
                     id: 'assistant-final-message',
                     author: { role: 'assistant', metadata: {} },
                     content: { content_type: 'text', parts: ['Final answer'] },
-                    metadata: { model_slug: 'gpt-5-6-thinking' },
+                    metadata: { model_slug: 'gpt-5-1-thinking' },
                     recipient: 'all',
                     channel: 'final',
                     status: 'finished_successfully',
