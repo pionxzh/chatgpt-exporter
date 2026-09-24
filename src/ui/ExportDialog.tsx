@@ -2,7 +2,7 @@ import * as Dialog from '@radix-ui/react-dialog'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import { useTranslation } from 'react-i18next'
 import type { ChangeEvent } from 'preact/compat'
-import { archiveConversation, deleteConversation, fetchAllConversations, fetchConversation, fetchConversationsPage, fetchProjects, probeApi } from '../api'
+import { archiveConversation, deleteConversation, fetchAllConversations, fetchConversation, fetchConversationsPage, fetchProjects, probeApi, withImageAssets } from '../api'
 import { EXPORT_OPERATION_BATCH, KEY_EXPORTED_UPDATE_TIMES } from '../constants'
 import { exportAllToHtml } from '../exporter/html'
 import { exportAllToJson, exportAllToOfficialJson } from '../exporter/json'
@@ -21,6 +21,13 @@ import { useSettingContext } from './SettingContext'
  * Lets the parent gate ESC / outside-click dismissal without lifting state.
  */
 const exportingRef = { current: false }
+
+/**
+ * Raw conversations fetched by batch exports, kept for the page lifetime so
+ * exporting the same selection again (e.g. in another format) skips the API.
+ * An entry is reused only while the list's `update_time` still matches.
+ */
+const conversationCache = new Map<string, { updateTime: ApiConversationItem['update_time'], conversation: ApiConversationWithId }>()
 
 /** Cap on how many skipped titles the end-of-export alert lists */
 const MAX_SKIPPED_SHOWN = 20
@@ -458,8 +465,21 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
 
     const startApiBatch = useCallback((chunk: ApiConversationItem[]) => {
         requestQueue.clear()
-        chunk.forEach(({ id, title }) => {
-            requestQueue.add({ name: title, request: () => fetchConversation(id, exportType !== 'JSON') })
+        chunk.forEach(({ id, title, update_time }) => {
+            const entry = conversationCache.get(id)
+            const cached = entry && entry.updateTime === update_time ? entry.conversation : undefined
+            requestQueue.add({
+                name: title,
+                cached: !!cached,
+                request: async () => {
+                    let conversation = cached
+                    if (!conversation) {
+                        conversation = await fetchConversation(id)
+                        conversationCache.set(id, { updateTime: update_time, conversation })
+                    }
+                    return exportType === 'JSON' ? conversation : withImageAssets(conversation)
+                },
+            })
         })
         requestQueue.start()
     }, [requestQueue, exportType])

@@ -85,7 +85,7 @@ function main() {
             if (!currentChatId || currentChatId === chatId) return
             chatId = currentChatId
 
-            const rawConversation = await fetchConversation(chatId, false)
+            const rawConversation = await fetchConversation(chatId)
             const { conversationNodes } = processConversation(rawConversation)
 
             const threadContents = Array.from(document.querySelectorAll('main [data-testid^="conversation-turn-"] [data-message-id]'))

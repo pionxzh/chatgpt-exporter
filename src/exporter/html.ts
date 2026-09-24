@@ -1,5 +1,5 @@
 import JSZip from 'jszip'
-import { fetchConversation, getCurrentChatId, processConversation, shouldSkipMessageInExport } from '../api'
+import { fetchConversation, getCurrentChatId, processConversation, shouldSkipMessageInExport, withImageAssets } from '../api'
 import { KEY_SOURCES_ENABLED, KEY_THINKING_ENABLED, KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_HTML, baseUrl } from '../constants'
 import i18n from '../i18n'
 import { checkIfConversationStarted, getUserAvatar } from '../page'
@@ -32,7 +32,7 @@ export async function exportToHtml(fileNameFormat: string, metaList: ExportMeta[
     const userAvatar = await getUserAvatar()
 
     const chatId = await getCurrentChatId()
-    const rawConversation = await fetchConversation(chatId, true)
+    const rawConversation = await withImageAssets(await fetchConversation(chatId))
     const enableThinking = ScriptStorage.get<boolean>(KEY_THINKING_ENABLED) ?? false
     const conversation = processConversation(rawConversation, { enableThinking })
     const html = conversationToHtml(conversation, userAvatar, metaList)

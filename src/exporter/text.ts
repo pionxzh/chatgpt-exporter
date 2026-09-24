@@ -25,7 +25,7 @@ export async function exportToText() {
     const chatId = await getCurrentChatId()
     // All image in text output will be replaced with `[image]`
     // So we don't need to waste time to download them
-    const rawConversation = await fetchConversation(chatId, false)
+    const rawConversation = await fetchConversation(chatId)
 
     const { conversationNodes } = processConversation(rawConversation)
     const text = conversationNodes

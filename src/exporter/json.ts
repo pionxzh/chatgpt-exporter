@@ -21,7 +21,7 @@ export async function exportToJson(fileNameFormat: string) {
     }
 
     const chatId = await getCurrentChatId()
-    const rawConversation = await fetchConversation(chatId, false)
+    const rawConversation = await fetchConversation(chatId)
 
     const fileName = getFileNameWithFormat(fileNameFormat, 'json', {
         title: rawConversation.title || 'ChatGPT Conversation',
@@ -48,7 +48,7 @@ export async function exportToTavern(fileNameFormat: string) {
     }
 
     const chatId = await getCurrentChatId()
-    const rawConversation = await fetchConversation(chatId, false)
+    const rawConversation = await fetchConversation(chatId)
     const conversation = processConversation(rawConversation)
 
     const fileName = getFileNameWithFormat(`${fileNameFormat}.tavern`, 'jsonl', { title: conversation.title, chatId })
@@ -70,7 +70,7 @@ export async function exportToOoba(fileNameFormat: string) {
     }
 
     const chatId = await getCurrentChatId()
-    const rawConversation = await fetchConversation(chatId, false)
+    const rawConversation = await fetchConversation(chatId)
     const conversation = processConversation(rawConversation)
 
     const fileName = getFileNameWithFormat(`${fileNameFormat}.ooba`, 'json', { title: conversation.title, chatId })

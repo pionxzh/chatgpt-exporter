@@ -4,6 +4,7 @@ import { getChatIdFromUrl, getConversationFromSharePage, isSharePage, isTemporar
 import { loadShareConversation } from './share'
 import { getTemporaryChatId } from './temporaryChat'
 import { blobToDataURL } from './utils/dom'
+import { getCachedImage, setCachedImage } from './utils/imageCache'
 import { memorize } from './utils/memorize'
 import { getModelName } from './utils/model'
 
@@ -479,6 +480,9 @@ export async function getCurrentChatId(): Promise<string> {
 }
 
 async function fetchImageFromPointer(uri: string) {
+    const cached = await getCachedImage(uri)
+    if (cached) return cached
+
     const pointer = uri.replace('sediment://', '')
     const imageDetails = await fetchApi<ApiFileDownload>(fileDownloadApi(pointer))
     if (imageDetails.status === 'error') {
@@ -489,10 +493,22 @@ async function fetchImageFromPointer(uri: string) {
     const image = await fetch(imageDetails.download_url)
     const blob = await image.blob()
     const base64 = await blobToDataURL(blob)
-    return base64.replace(/^data:.*?;/, `data:${image.headers.get('content-type')};`)
+    const dataUrl = base64.replace(/^data:.*?;/, `data:${image.headers.get('content-type')};`)
+    await setCachedImage(uri, dataUrl)
+    return dataUrl
 }
 
-/** replaces `sediment://` pointers with data uris containing the image */
+/**
+ * Returns a copy of the conversation with `sediment://` image pointers
+ * replaced by data uris. The input is left untouched so a raw conversation
+ * can be cached and reused for exports that want the original pointers.
+ */
+export async function withImageAssets<T extends ApiConversation>(conversation: T): Promise<T> {
+    const copy = structuredClone(conversation)
+    await replaceImageAssets(copy)
+    return copy
+}
+
 /** avoid errors in parsing multimodal parts we don't understand */
 async function replaceImageAssets(conversation: ApiConversation): Promise<void> {
     const isMultiModalInputImage = (part: any): part is MultiModalInputImage => {
@@ -544,14 +560,13 @@ async function replaceImageAssets(conversation: ApiConversation): Promise<void> 
     ])
 }
 
-export async function fetchConversation(chatId: string, shouldReplaceAssets: boolean): Promise<ApiConversationWithId> {
+export async function fetchConversation(chatId: string): Promise<ApiConversationWithId> {
     if (chatId.startsWith('__share__')) {
         const id = chatId.replace('__share__', '')
         const shareConversation = await loadShareConversation(
             getConversationFromSharePage(),
             () => fetchApi<ApiConversation>(shareConversationApi(id)),
         )
-        if (shouldReplaceAssets) await replaceImageAssets(shareConversation)
 
         return {
             id,
@@ -561,10 +576,6 @@ export async function fetchConversation(chatId: string, shouldReplaceAssets: boo
 
     const url = conversationApi(chatId)
     const conversation = await fetchApi<ApiConversation>(url)
-
-    if (shouldReplaceAssets) {
-        await replaceImageAssets(conversation)
-    }
 
     return {
         id: chatId,

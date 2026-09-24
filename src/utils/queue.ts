@@ -8,6 +8,8 @@ type RequestFn<T> = () => Promise<T>
 interface RequestObject<T> {
     name: string
     request: RequestFn<T>
+    /** Skip the pause after a success, for requests served from a cache */
+    cached?: boolean
 }
 
 /** Internal shape with per-item retry counters */
@@ -175,6 +177,7 @@ export class RequestQueue<T> {
             this.progress(name, 'processing')
             this.backoff = this.minBackoff // reset on success
             requestObject.retries = 0
+            if (requestObject.cached) waitMs = 0
         }
         catch (error) {
             if (runId !== this.runId) return

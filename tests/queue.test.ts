@@ -54,3 +54,14 @@ describe('requestQueue skipped requests', () => {
         expect(queue.getSkipped()).toEqual([])
     })
 })
+
+describe('requestQueue cached requests', () => {
+    it('does not pause after a cached request', async () => {
+        // A 60s backoff would time the test out if cached requests still waited
+        const queue = new RequestQueue<string>(60_000, 60_000)
+        queue.add({ name: 'a', cached: true, request: async () => 'a' })
+        queue.add({ name: 'b', cached: true, request: async () => 'b' })
+
+        expect(await run(queue)).toEqual(['a', 'b'])
+    })
+})
