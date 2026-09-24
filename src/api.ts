@@ -631,7 +631,7 @@ export async function fetchConversationsPage(
     return fetchConversations(offset, limit, project)
 }
 
-export async function fetchAllConversations(project: string | null = null, maxConversations = 1000, onBatch?: (batch: ApiConversationItem[]) => void, onHasMore?: (hasMore: boolean) => void): Promise<ApiConversationItem[]> {
+export async function fetchAllConversations(project: string | null = null, maxConversations = 1000, onBatch?: (batch: ApiConversationItem[]) => void, onHasMore?: (hasMore: boolean) => void, onError?: (error: unknown) => void): Promise<ApiConversationItem[]> {
     const conversations: ApiConversationItem[] = []
     const limit = project === null ? 100 : 50 // gizmos api uses a smaller limit
     let offset = 0
@@ -664,6 +664,7 @@ export async function fetchAllConversations(project: string | null = null, maxCo
         }
         catch (error) {
             console.error('Error fetching conversations batch:', error)
+            onError?.(error)
             break
         }
     }
