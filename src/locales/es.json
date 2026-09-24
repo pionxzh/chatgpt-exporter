@@ -60,5 +60,6 @@
   "Batch progress": "Lote {{current}}/{{total}}",
   "All conversations": "Todas las conversaciones",
   "Load more conversations": "Cargar {{n}} más",
-  "Load more conversations remaining": "Cargar {{n}} más · quedan {{remaining}}"
+  "Load more conversations remaining": "Cargar {{n}} más · quedan {{remaining}}",
+  "Export Skipped Message": "{{n}} conversaciones fallaron tras varios reintentos y no están en la exportación:"
 }

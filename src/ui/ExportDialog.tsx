@@ -22,6 +22,9 @@ import { useSettingContext } from './SettingContext'
  */
 const exportingRef = { current: false }
 
+/** Cap on how many skipped titles the end-of-export alert lists */
+const MAX_SKIPPED_SHOWN = 20
+
 // ---------------------------------------------------------------------------
 // Utilities
 // ---------------------------------------------------------------------------
@@ -431,6 +434,8 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
     const totalBatchesRef = useRef(0)
     /** Set to true when the user clicks Cancel — prevents the 'done' handler from starting the next batch */
     const cancelledRef = useRef(false)
+    /** Conversations the queue gave up on, accumulated across every batch of the current export */
+    const skippedRef = useRef<string[]>([])
     /** Incremented on each new fetch; callbacks check this to discard stale results after remount */
     const fetchGenRef = useRef(0)
 
@@ -510,6 +515,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                 // Only conversations that were actually exported successfully get recorded
                 markExported(results)
             }
+            skippedRef.current.push(...requestQueue.getSkipped())
             if (partIndex < totalBatches) {
                 await sleep(400)
                 batchIndexRef.current++
@@ -518,10 +524,16 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
             }
             else {
                 setProcessing(false)
+                const skipped = skippedRef.current
+                if (skipped.length > 0) {
+                    const shown = skipped.slice(0, MAX_SKIPPED_SHOWN).map(name => `- ${name}`)
+                    if (skipped.length > MAX_SKIPPED_SHOWN) shown.push('- …')
+                    alert(`${t('Export Skipped Message', { n: skipped.length })}\n\n${shown.join('\n')}`)
+                }
             }
         })
         return () => off()
-    }, [requestQueue, exportAllOptions, exportType, format, metaList, startApiBatch, selectedProject])
+    }, [requestQueue, exportAllOptions, exportType, format, metaList, startApiBatch, selectedProject, t])
 
     useEffect(() => {
         const off = archiveQueue.on('done', () => {
@@ -553,6 +565,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
     const exportAllFromApi = useCallback(() => {
         if (disabled) return
         cancelledRef.current = false
+        skippedRef.current = []
         const chunks = chunkArray(selected, EXPORT_OPERATION_BATCH)
         pendingBatchesRef.current = chunks
         batchIndexRef.current = 0

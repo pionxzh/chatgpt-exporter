@@ -60,5 +60,6 @@
   "Batch progress": "Grup {{current}}/{{total}}",
   "All conversations": "Tüm konuşmalar",
   "Load more conversations": "{{n}} tane daha yükle",
-  "Load more conversations remaining": "{{n}} tane daha yükle · {{remaining}} kaldı"
+  "Load more conversations remaining": "{{n}} tane daha yükle · {{remaining}} kaldı",
+  "Export Skipped Message": "{{n}} konuşma tekrar denemelere rağmen başarısız oldu ve dışa aktarımda yer almıyor:"
 }

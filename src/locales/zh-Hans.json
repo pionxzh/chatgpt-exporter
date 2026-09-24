@@ -60,5 +60,6 @@
   "Batch progress": "第 {{current}}/{{total}} 批",
   "All conversations": "全部对话",
   "Load more conversations": "再加载 {{n}} 条",
-  "Load more conversations remaining": "再加载 {{n}} 条 · 剩余 {{remaining}} 条"
+  "Load more conversations remaining": "再加载 {{n}} 条 · 剩余 {{remaining}} 条",
+  "Export Skipped Message": "有 {{n}} 个对话多次重试后仍失败，未包含在导出文件中："
 }

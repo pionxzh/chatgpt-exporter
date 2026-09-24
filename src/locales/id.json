@@ -60,5 +60,6 @@
   "Batch progress": "Kelompok {{current}}/{{total}}",
   "All conversations": "Semua percakapan",
   "Load more conversations": "Muat {{n}} lagi",
-  "Load more conversations remaining": "Muat {{n}} lagi · tersisa {{remaining}}"
+  "Load more conversations remaining": "Muat {{n}} lagi · tersisa {{remaining}}",
+  "Export Skipped Message": "{{n}} percakapan gagal setelah beberapa kali dicoba ulang dan tidak ada dalam ekspor:"
 }
