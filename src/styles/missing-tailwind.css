@@ -22,19 +22,19 @@
     cursor: help;
 }
 
-.dark .dark\:bg-white\/5 {
+:is(.dark, [data-theme="dark"]) .dark\:bg-white\/5 {
     background-color: rgb(255 255 255 / 5%);
 }
 
-.dark .dark\:text-gray-200 {
+:is(.dark, [data-theme="dark"]) .dark\:text-gray-200 {
     color: rgb(229 231 235 / 1);
 }
 
-.dark .dark\:text-gray-300 {
+:is(.dark, [data-theme="dark"]) .dark\:text-gray-300 {
     color: rgb(209 213 219 / 1);
 }
 
-.dark .dark\:border-gray-\[\#86858d\] {
+:is(.dark, [data-theme="dark"]) .dark\:border-gray-\[\#86858d\] {
     border-color: #86858d;
 }
 
@@ -140,7 +140,7 @@
     width: 32px;
 }
 
-.dark .toggle-switch {
+:is(.dark, [data-theme="dark"]) .toggle-switch {
     background-color: rgb(255 255 255 / 5%);
     border-color: rgb(255 255 255 / 1);
 }
@@ -150,7 +150,7 @@
     border-color: rgb(0 0 0);
 }
 
-.dark .toggle-switch[data-state="checked"] {
+:is(.dark, [data-theme="dark"]) .toggle-switch[data-state="checked"] {
     background-color: rgb(22 163 74);
     border-color: rgb(22 163 74);
 }
@@ -184,4 +184,3 @@
 .toggle-switch-label:hover {
     color: rgb(71 85 105);
 }
-

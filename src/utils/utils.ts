@@ -85,7 +85,15 @@ export function timestamp() {
 }
 
 export function getColorScheme(): 'light' | 'dark' {
-    return document.documentElement.style.getPropertyValue('color-scheme') as 'light' | 'dark'
+    const root = document.documentElement
+    const theme = root.getAttribute('data-theme')
+    if (theme === 'light' || theme === 'dark') return theme
+    if (root.classList.contains('dark')) return 'dark'
+    if (root.classList.contains('light')) return 'light'
+
+    const scheme = getComputedStyle(root).colorScheme
+    if (scheme === 'light' || scheme === 'dark') return scheme
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
 export function unixTimestampToISOString(timestamp: number) {

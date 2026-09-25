@@ -7,6 +7,7 @@
 }
 
 .DialogContent {
+    color: var(--ce-text-primary);
     background-color: #f3f3f3;
     border-radius: 6px;
     box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
@@ -26,7 +27,7 @@
     flex-direction: column;
 }
 
-.dark .DialogContent {
+:is(.dark, [data-theme="dark"]) .DialogContent {
     background-color: #2a2a2a;
     border-color: #40414f;
     border-width: 1px;
@@ -36,7 +37,7 @@
     background-color: #ffffff;
 }
 
-.dark .DialogContent._export {
+:is(.dark, [data-theme="dark"]) .DialogContent._export {
     background-color: #2a2a2a;
 }
 
@@ -61,7 +62,7 @@
     overflow-x: hidden;
 }
 
-.dark .DialogTitle {
+:is(.dark, [data-theme="dark"]) .DialogTitle {
     color: #fff;
 }
 
@@ -97,11 +98,11 @@
 .Button.neutral:hover {
     background-color: rgba(111, 110, 119, 0.1);
 }
-.dark .Button.neutral {
+:is(.dark, [data-theme="dark"]) .Button.neutral {
     color: #a0a0a8;
     border-color: #a0a0a8;
 }
-.dark .Button.neutral:hover {
+:is(.dark, [data-theme="dark"]) .Button.neutral:hover {
     background-color: rgba(160, 160, 168, 0.1);
 }
 .Button:disabled {
@@ -148,7 +149,7 @@
     text-align: right;
 }
 
-.dark .Label {
+:is(.dark, [data-theme="dark"]) .Label {
     color: #fff;
 }
 
@@ -169,7 +170,7 @@
     outline: none;
 }
 
-.dark .Input {
+:is(.dark, [data-theme="dark"]) .Input {
     background-color: #2f2f2f;
     color: #fff;
     box-shadow: 0 0 0 1px #6f6e77;
@@ -182,7 +183,7 @@
     margin-bottom: 4px;
 }
 
-.dark .Description {
+:is(.dark, [data-theme="dark"]) .Description {
     color: #bcbcbc;
 }
 
@@ -277,7 +278,7 @@
     color: #6b7280;
     font-weight: 600;
 }
-.dark {
+:is(.dark, [data-theme="dark"]) {
     .SelectItemMetaActive { color: #d1d5db; }
 }
 
@@ -293,7 +294,7 @@
     flex-shrink: 0;
 }
 
-.dark {
+:is(.dark, [data-theme="dark"]) {
     .SelectListHeader { background: #1f2937; }
 }
 
@@ -313,7 +314,7 @@
     text-align: right;
 }
 .SelectListHeaderCell:hover { color: #374151; }
-.dark {
+:is(.dark, [data-theme="dark"]) {
     .SelectListHeaderCell:hover { color: #e5e7eb; }
 }
 .SelectListHeaderCellTitle {
@@ -324,7 +325,7 @@
 .SelectListHeaderCellActive {
     color: #2563eb;
 }
-.dark {
+:is(.dark, [data-theme="dark"]) {
     .SelectListHeaderCellActive { color: #60a5fa; }
 }
 
