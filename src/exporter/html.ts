@@ -7,6 +7,7 @@ import templateHtml from '../template.html?raw'
 import { checkIfTemporaryChatIsExportable } from '../temporaryChat'
 import { transformContentReferences } from '../utils/citations'
 import { buildZipFileName, downloadFile, getFileNameWithFormat } from '../utils/download'
+import { protectMath } from '../utils/latex'
 import { fromMarkdown, toHtml } from '../utils/markdown'
 import { ScriptStorage } from '../utils/storage'
 import { standardizeLineBreaks } from '../utils/text'
@@ -92,8 +93,6 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
     const timeStamp24H = ScriptStorage.get<boolean>(KEY_TIMESTAMP_24H) ?? false
     const enableSources = ScriptStorage.get<boolean>(KEY_SOURCES_ENABLED) ?? true
 
-    const LatexRegex = /(\s\$\$.+?\$\$\s|\s\$.+?\$\s|\\\[.+?\\\]|\\\(.+?\\\))|(^\$$[\S\s]+?^\$$)|(^\$\$[\S\s]+?^\$\$\$)/gm
-
     const conversationHtml = conversationNodes.map(({ message, thinking }) => {
         if (!message || !message.content) return null
 
@@ -116,34 +115,9 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
             }))
 
             postSteps.push((input) => {
-                const matches = input.match(LatexRegex)
-
-                // Skip code block as the following steps can potentially break the code
-                const isCodeBlock = /```/.test(input)
-                if (!isCodeBlock && matches) {
-                    let index = 0
-                    input = input.replace(LatexRegex, () => {
-                        // Replace it with `╬${index}╬` to avoid processing from ruining the formula
-                        return `╬${index++}╬`
-                    })
-                    input = input
-                        .replace(/^\\\[(.+)\\\]$/gm, '$$$$$1$$$$')
-                        .replace(/\\\[/g, '$$')
-                        .replace(/\\\]/g, '$$')
-                        .replace(/\\\(/g, '$')
-                        .replace(/\\\)/g, '$')
-                }
-
-                let transformed = toHtml(fromMarkdown(input))
-
-                if (!isCodeBlock && matches) {
-                    // Replace `╬${index}╬` back to the original latex
-                    transformed = transformed.replace(/╬(\d+)╬/g, (_, index) => {
-                        return matches[+index]
-                    })
-                }
-
-                return transformed
+                // Keep formulas out of the markdown round trip, which would eat their backslashes
+                const { text, restore } = protectMath(input)
+                return restore(toHtml(fromMarkdown(text)), escapeHtml)
             })
         }
         else {

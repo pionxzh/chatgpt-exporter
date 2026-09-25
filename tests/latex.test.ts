@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { protectMath } from '../src/utils/latex'
-import { fromMarkdown, toMarkdown } from '../src/utils/markdown'
+import { fromMarkdown, toHtml, toMarkdown } from '../src/utils/markdown'
+import { escapeHtml } from '../src/exporter/htmlTemplate'
 
 // Same steps as the markdown exporter
 function format(input: string) {
@@ -30,5 +31,27 @@ describe('math in markdown export', () => {
     it('leaves prices alone', () => {
         expect(format('| NT$1,000 | **NT$2,500** |\n| --- | --- |\n| a | b |'))
             .toBe('| NT$1,000 | **NT$2,500** |\n| -------- | ------------ |\n| a        | b            |\n')
+    })
+})
+
+// Same steps as the HTML exporter
+function formatHtml(input: string) {
+    const { text, restore } = protectMath(input)
+    return restore(toHtml(fromMarkdown(text)), escapeHtml)
+}
+
+describe('math in HTML export', () => {
+    it('keeps multi-line display math intact (#264)', () => {
+        expect(formatHtml('Sum:\n\n\\[\n\\begin{aligned}\nS\n&= a\\,b \\\\\n=\nc\n\\end{aligned}\n\\]\n\nDone.'))
+            .toBe('<p>Sum:</p>\n<p>$$\n\\begin{aligned}\nS\n&amp;= a\\,b \\\\\n=\nc\n\\end{aligned}\n$$</p>\n<p>Done.</p>')
+    })
+
+    it('keeps math outside code in a message that has code', () => {
+        expect(formatHtml('Then \\(x_1\\):\n\n```\n\\[a\\]\n```'))
+            .toBe('<p>Then $x_1$:</p>\n<pre><code>\\[a\\]\n</code></pre>')
+    })
+
+    it('escapes HTML inside formulas', () => {
+        expect(formatHtml('\\(a<b\\)')).toBe('<p>$a&lt;b$</p>')
     })
 })
