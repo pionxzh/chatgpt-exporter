@@ -1,5 +1,5 @@
 import JSZip from 'jszip'
-import { fetchConversation, getCurrentChatId, processConversation, shouldSkipMessageInExport, withImageAssets } from '../api'
+import { fetchConversation, getCurrentChatId, getFileAttachmentNames, processConversation, shouldSkipMessageInExport, withImageAssets } from '../api'
 import { KEY_SOURCES_ENABLED, KEY_THINKING_ENABLED, KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_HTML, baseUrl } from '../constants'
 import i18n from '../i18n'
 import { checkIfConversationStarted, getUserAvatar } from '../page'
@@ -152,6 +152,10 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
         }
         const postProcess = (input: string) => postSteps.reduce((acc, fn) => fn(acc), input)
         const content = transformContent(message.content, message.metadata, postProcess)
+        const attachments = getFileAttachmentNames(message)
+        const attachmentsHtml = attachments.length
+            ? `<ul class="attachments">${attachments.map(name => `<li>📎 ${escapeHtml(name)}</li>`).join('')}</ul>`
+            : ''
 
         const timestamp = message?.create_time ?? ''
         const showTimestamp = enableTimestamp && timeStampHtml && timestamp
@@ -176,6 +180,7 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
         ${thinkingBlock}
         <div class="conversation-content">
             ${content}
+            ${attachmentsHtml}
         </div>
     </div>
     ${timestampHtml}

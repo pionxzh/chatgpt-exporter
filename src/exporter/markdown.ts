@@ -1,5 +1,5 @@
 import JSZip from 'jszip'
-import { fetchConversation, getCurrentChatId, processConversation, shouldSkipMessageInExport, withImageAssets } from '../api'
+import { fetchConversation, getCurrentChatId, getFileAttachmentNames, processConversation, shouldSkipMessageInExport, withImageAssets } from '../api'
 import { KEY_SOURCES_ENABLED, KEY_THINKING_ENABLED, KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_MARKDOWN, baseUrl } from '../constants'
 import i18n from '../i18n'
 import { checkIfConversationStarted } from '../page'
@@ -131,8 +131,10 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
         }
         const postProcess = (input: string) => postSteps.reduce((acc, fn) => fn(acc), input)
         const content = transformContent(message.content, message.metadata, postProcess)
+        const attachments = getFileAttachmentNames(message).map(name => `- 📎 ${name}`).join('\n')
+        const attachmentsBlock = attachments ? `\n\n${attachments}` : ''
 
-        return `#### ${author}:\n${timestampHtml}${thinkingBlock}${content}`
+        return `#### ${author}:\n${timestampHtml}${thinkingBlock}${content}${attachmentsBlock}`
     }).filter(Boolean).join('\n\n')
 
     const markdown = `${frontMatter}# ${title}\n\n${content}`
