@@ -228,7 +228,14 @@
             background-color: #000000;
             overflow-x: auto;
             margin: 0 0 1rem 0;
+            padding: 1rem;
             border-radius: 0.375rem;
+        }
+
+        /* The highlight.js theme pads and colors `code.hljs`, but only for languages it knows */
+        pre>code.hljs {
+            padding: 0;
+            background: none;
         }
 
         pre>code {
