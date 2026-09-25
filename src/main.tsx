@@ -12,6 +12,8 @@ import './styles/missing-tailwind.css'
 const PROFILE_BUTTON_SELECTOR = '[data-testid="accounts-profile-button"]'
 const SIDEBAR_SCROLL_SELECTOR = '[data-app-action-sidebar-scroll]'
 const AUTOMATIONS_SELECTOR = '[data-sidebar-destination="builtin:automations"]'
+// The redesigned navigation rail keeps the help and profile menus in its footer.
+const RAIL_MENU_BUTTON_SELECTOR = '[data-app-navigation-rail] button[aria-haspopup="menu"]'
 
 interface NavMenuMount {
     target: Element
@@ -61,7 +63,7 @@ function main() {
 
         // Sentinel handles new sidebar nodes immediately. Polling remains as a
         // fallback for UI variants that replace or remove injected siblings.
-        for (const selector of [PROFILE_BUTTON_SELECTOR, SIDEBAR_SCROLL_SELECTOR, AUTOMATIONS_SELECTOR]) {
+        for (const selector of [PROFILE_BUTTON_SELECTOR, SIDEBAR_SCROLL_SELECTOR, RAIL_MENU_BUTTON_SELECTOR, AUTOMATIONS_SELECTOR]) {
             sentinel.on(selector, syncNavMenu)
         }
         syncNavMenu()
@@ -147,6 +149,15 @@ function getNavMenuMounts(): NavMenuMount[] {
             target,
             insert: container => target.prepend(container),
         }))
+    }
+
+    // Place the menu above the first footer menu, which is the help menu.
+    const railMenuButton = document.querySelector(RAIL_MENU_BUTTON_SELECTOR)
+    if (railMenuButton) {
+        return [{
+            target: railMenuButton,
+            insert: container => getNavMenuInsertionTarget(railMenuButton).before(container),
+        }]
     }
 
     return Array.from(document.querySelectorAll(AUTOMATIONS_SELECTOR)).map(target => ({
