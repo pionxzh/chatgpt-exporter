@@ -41,6 +41,16 @@ export const MenuItem: FC<MenuItemProps> = ({ text, successText, disabled = fals
         }
         : undefined
 
+    // Items are divs so they fit ChatGPT's menu styles. Expose them as
+    // buttons and let Enter and Space click them, which also reaches the
+    // dialog triggers that wrap some of them.
+    const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return
+        e.preventDefault()
+        const item = e.currentTarget as HTMLElement
+        item.click()
+    }
+
     return (
         <div
             className={`
@@ -50,9 +60,14 @@ export const MenuItem: FC<MenuItemProps> = ({ text, successText, disabled = fals
             transition-colors duration-200
             cursor-pointer
             border border-menu ${className}`}
+            role="button"
+            tabIndex={disabled ? -1 : 0}
             onClick={handleClick}
             onTouchStart={handleClick}
+            onKeyDown={handleKeyDown}
             disabled={disabled}
+            aria-disabled={disabled || undefined}
+            aria-busy={loading || undefined}
             aria-label={ariaLabel}
             title={title}
         >
