@@ -29,6 +29,7 @@ html {
     --ce-menu-primary: #ffffff;
     --ce-menu-secondary: var(--sidebar-surface-secondary, #ececec);
     --ce-border-light: #0d0d0d26;
+    --ce-hover: var(--color-token-list-hover-background, rgba(0, 0, 0, .05));
 }
 
 :is(.dark, [data-theme="dark"]) {
@@ -36,6 +37,7 @@ html {
     --ce-menu-primary: #2A2A2A;
     --ce-menu-secondary: var(--sidebar-surface-secondary, #212121);
     --ce-border-light: var(--color-token-border-default, var(--border-default, rgba(255, 255, 255, .15)));
+    --ce-hover: var(--color-token-list-hover-background, rgba(255, 255, 255, .1));
 }
 
 /* Define our own background in both themes — this used to lean on
@@ -83,8 +85,10 @@ html {
     color: var(--color-text-secondary, var(--text-secondary, var(--ce-text-primary)));
 }
 
+/* ChatGPT no longer ships the `hoverable` styles these items relied on. */
+.menu-item.hoverable:not([disabled]):hover,
 .ce-nav-trigger-collapsed:hover {
-    background-color: var(--sidebar-surface-secondary, rgba(255, 255, 255, 0.1));
+    background-color: var(--ce-hover);
 }
 
 .ce-nav-trigger-collapsed .ce-menu-item-text {
