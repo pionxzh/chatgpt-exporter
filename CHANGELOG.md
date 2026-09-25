@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.36.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.36.0...userscript-v2.36.1) (2026-09-25)
+
+
+### Bug Fixes
+
+* escape non-assistant text in HTML export ([8be1e9a](https://github.com/pionxzh/chatgpt-exporter/commit/8be1e9af26dde8201a55cbcbe0faed5074adca3f))
+* keep multi-line math intact in HTML export ([#264](https://github.com/pionxzh/chatgpt-exporter/issues/264)) ([932f9ea](https://github.com/pionxzh/chatgpt-exporter/commit/932f9eab2edd8c4f301618610a9fd32b81d91a5c))
+* list uploaded files in HTML and Markdown exports ([a8682e6](https://github.com/pionxzh/chatgpt-exporter/commit/a8682e657178fae8e50cb88d736f2c3971001859))
+* match ChatGPT's math and inline code styles in HTML export ([d7552bc](https://github.com/pionxzh/chatgpt-exporter/commit/d7552bc0eb3831aacb43717cfa9ac1a45f59bd71))
+* pad code blocks in HTML export ([4c80341](https://github.com/pionxzh/chatgpt-exporter/commit/4c80341e95f39d8f06fda3a5c4fd56e5e926e0b0))
+* render code messages as code blocks in markdown export ([0325599](https://github.com/pionxzh/chatgpt-exporter/commit/032559950c015b72adbc6c4469e41b8f8f9c2714))
+* stop rendering prices as math in HTML export ([b6f9a0b](https://github.com/pionxzh/chatgpt-exporter/commit/b6f9a0b7b1fcb583f3549846d54130c63bfe71a2))
+
 ## [2.36.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.35.2...userscript-v2.36.0) (2026-09-25)
 
 
