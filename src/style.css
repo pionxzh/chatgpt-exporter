@@ -1,3 +1,7 @@
+.ce-timestamp {
+    color: var(--color-text-tertiary, var(--text-tertiary, #8f8f8f));
+}
+
 span[data-time-format] {
     display: none;
 }

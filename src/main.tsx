@@ -13,6 +13,7 @@ const PROFILE_BUTTON_SELECTOR = '[data-testid="accounts-profile-button"]'
 const SIDEBAR_SCROLL_SELECTOR = '[data-app-action-sidebar-scroll]'
 const AUTOMATIONS_SELECTOR = '[data-sidebar-destination="builtin:automations"]'
 // The redesigned navigation rail keeps the help and profile menus in its footer.
+const MESSAGE_UNIT_SELECTOR = '[data-chatgpt-conversation-selection-target] [data-chatgpt-search-message-ids]'
 const RAIL_MENU_BUTTON_SELECTOR = '[data-app-navigation-rail] button[aria-haspopup="menu"]'
 
 interface NavMenuMount {
@@ -97,24 +98,89 @@ function main() {
                 const createTime = conversationNodes[index]?.message?.create_time
                 if (!createTime) return
 
-                const date = new Date(createTime * 1000)
-
-                const timestamp = document.createElement('time')
-                timestamp.className = 'w-full text-gray-500 dark:text-gray-400 text-sm text-right'
-                timestamp.dateTime = date.toISOString()
-                timestamp.title = date.toLocaleString()
-
-                const hour12 = document.createElement('span')
-                hour12.setAttribute('data-time-format', '12')
-                hour12.textContent = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-                const hour24 = document.createElement('span')
-                hour24.setAttribute('data-time-format', '24')
-                hour24.textContent = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
-                timestamp.append(hour12, hour24)
-                thread.append(timestamp)
+                thread.append(createTimestamp(createTime))
             })
         })
+
+        watchMessageTimestamps()
     })
+}
+
+/**
+ * The redesigned thread tags each message block with the ids it renders and
+ * virtualizes off-screen turns, so stamp every block as it mounts.
+ */
+function watchMessageTimestamps() {
+    let chatId = ''
+    let createTimes: Promise<Map<string, number>> = Promise.resolve(new Map())
+    // Ids that were missing after a refetch, so they do not refetch again.
+    const missingIds = new Set<string>()
+
+    const loadCreateTimes = async (id: string) => {
+        const conversation = await fetchConversation(id)
+        const times = new Map<string, number>()
+        Object.values(conversation.mapping).forEach(({ message }) => {
+            if (message?.create_time) times.set(message.id, message.create_time)
+        })
+        return times
+    }
+
+    const findCreateTime = (times: Map<string, number>, ids: string[]) => {
+        // A block can merge several messages. Use the last one, the reply
+        // the user actually sees.
+        for (let i = ids.length - 1; i >= 0; i--) {
+            const time = times.get(ids[i])
+            if (time) return time
+        }
+        return null
+    }
+
+    sentinel.on(MESSAGE_UNIT_SELECTOR, async (unit) => {
+        if (isSharePage()) return
+        // Stamp the outermost block only.
+        if (unit.parentElement?.closest('[data-chatgpt-search-message-ids]')) return
+
+        const currentChatId = getChatIdFromUrl()
+        if (!currentChatId) return
+        if (currentChatId !== chatId) {
+            chatId = currentChatId
+            missingIds.clear()
+            createTimes = loadCreateTimes(chatId).catch(() => new Map())
+        }
+
+        const ids = unit.getAttribute('data-chatgpt-search-message-ids')?.split(/\s+/).filter(Boolean) ?? []
+        if (ids.length === 0) return
+
+        let createTime = findCreateTime(await createTimes, ids)
+        // Messages sent after the first fetch are not in it yet.
+        if (!createTime && ids.some(id => !missingIds.has(id)) && currentChatId === chatId) {
+            ids.forEach(id => missingIds.add(id))
+            createTimes = loadCreateTimes(chatId).catch(() => new Map())
+            createTime = findCreateTime(await createTimes, ids)
+        }
+
+        if (!createTime || !unit.isConnected || unit.querySelector(':scope > time[data-ce-timestamp]')) return
+        unit.append(createTimestamp(createTime))
+    })
+}
+
+function createTimestamp(createTime: number) {
+    const date = new Date(createTime * 1000)
+
+    const timestamp = document.createElement('time')
+    timestamp.className = 'ce-timestamp w-full text-sm text-right'
+    timestamp.setAttribute('data-ce-timestamp', '')
+    timestamp.dateTime = date.toISOString()
+    timestamp.title = date.toLocaleString()
+
+    const hour12 = document.createElement('span')
+    hour12.setAttribute('data-time-format', '12')
+    hour12.textContent = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+    const hour24 = document.createElement('span')
+    hour24.setAttribute('data-time-format', '24')
+    hour24.textContent = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
+    timestamp.append(hour12, hour24)
+    return timestamp
 }
 
 function getMenuContainer() {
