@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.35.2
+// @version            2.36.0
 // @author             pionxzh
 // @description        Export ChatGPT conversations with one click — backup & share effortlessly!
 // @description:zh-CN  一键导出 ChatGPT 对话，轻松备份与分享
@@ -592,7 +592,7 @@
 		return defaultAvatar;
 	}
 	function checkIfConversationStarted() {
-		return !!document.querySelector("[data-testid^=\"conversation-turn-\"]");
+		return !!document.querySelector(["[data-testid^=\"conversation-turn-\"]", "[data-chatgpt-conversation-selection-target] [data-chatgpt-search-message-ids]"].join(", "));
 	}
 	function isCompleteConversation(conversation) {
 		return !!conversation?.mapping && !!conversation.current_node;
@@ -679,6 +679,67 @@
 		}
 		return null;
 	}
+	var DB_NAME = "chatgpt-exporter";
+	var STORE_NAME = "images";
+	var EXPIRY_MS = 2592e6;
+	var dbPromise = null;
+	function promisify(request) {
+		return new Promise((resolve, reject) => {
+			request.onsuccess = () => resolve(request.result);
+			request.onerror = () => reject(request.error);
+		});
+	}
+	function openDb() {
+		dbPromise ??= new Promise((resolve) => {
+			const request = indexedDB.open(DB_NAME, 1);
+			request.onupgradeneeded = () => {
+				request.result.createObjectStore(STORE_NAME).createIndex("savedAt", "savedAt");
+			};
+			request.onsuccess = () => {
+				pruneExpired(request.result);
+				resolve(request.result);
+			};
+			request.onerror = () => resolve(null);
+		}).catch(() => null);
+		return dbPromise;
+	}
+	function pruneExpired(db) {
+		try {
+			const cursorRequest = db.transaction(STORE_NAME, "readwrite").objectStore(STORE_NAME).index("savedAt").openCursor(IDBKeyRange.upperBound(Date.now() - EXPIRY_MS));
+			cursorRequest.onsuccess = () => {
+				const cursor = cursorRequest.result;
+				if (!cursor) return;
+				cursor.delete();
+				cursor.continue();
+			};
+		} catch (error) {
+			console.warn("[Exporter] Failed to prune image cache", error);
+		}
+	}
+	async function getCachedImage(pointer) {
+		try {
+			const db = await openDb();
+			if (!db) return null;
+			const entry = await promisify(db.transaction(STORE_NAME, "readonly").objectStore(STORE_NAME).get(pointer));
+			if (!entry || Date.now() - entry.savedAt > EXPIRY_MS) return null;
+			return entry.dataUrl;
+		} catch {
+			return null;
+		}
+	}
+	async function setCachedImage(pointer, dataUrl) {
+		try {
+			const db = await openDb();
+			if (!db) return;
+			const entry = {
+				dataUrl,
+				savedAt: Date.now()
+			};
+			await promisify(db.transaction(STORE_NAME, "readwrite").objectStore(STORE_NAME).put(entry, pointer));
+		} catch (error) {
+			console.warn("[Exporter] Failed to cache image", error);
+		}
+	}
 	var generateKey = (args) => JSON.stringify(args);
 	function memorize(fn) {
 		const cache = new Map();
@@ -745,13 +806,22 @@
 		throw new Error("No chat id found.");
 	}
 	async function fetchImageFromPointer(uri) {
+		const cached = await getCachedImage(uri);
+		if (cached) return cached;
 		const imageDetails = await fetchApi(fileDownloadApi(uri.replace("sediment://", "")));
 		if (imageDetails.status === "error") {
 			console.error("Failed to fetch image asset", imageDetails.error_code, imageDetails.error_message);
 			return null;
 		}
 		const image = await fetch(imageDetails.download_url);
-		return (await blobToDataURL(await image.blob())).replace(/^data:.*?;/, `data:${image.headers.get("content-type")};`);
+		const dataUrl = (await blobToDataURL(await image.blob())).replace(/^data:.*?;/, `data:${image.headers.get("content-type")};`);
+		await setCachedImage(uri, dataUrl);
+		return dataUrl;
+	}
+	async function withImageAssets(conversation) {
+		const copy = structuredClone(conversation);
+		await replaceImageAssets(copy);
+		return copy;
 	}
 	async function replaceImageAssets(conversation) {
 		const isMultiModalInputImage = (part) => {
@@ -784,21 +854,17 @@
 			}
 		})]);
 	}
-	async function fetchConversation(chatId, shouldReplaceAssets) {
+	async function fetchConversation(chatId) {
 		if (chatId.startsWith("__share__")) {
 			const id = chatId.replace("__share__", "");
-			const shareConversation = await loadShareConversation(getConversationFromSharePage(), () => fetchApi(shareConversationApi(id)));
-			if (shouldReplaceAssets) await replaceImageAssets(shareConversation);
 			return {
 				id,
-				...shareConversation
+				...await loadShareConversation(getConversationFromSharePage(), () => fetchApi(shareConversationApi(id)))
 			};
 		}
-		const conversation = await fetchApi(conversationApi(chatId));
-		if (shouldReplaceAssets) await replaceImageAssets(conversation);
 		return {
 			id: chatId,
-			...conversation
+			...await fetchApi(conversationApi(chatId))
 		};
 	}
 	async function fetchProjects() {
@@ -830,7 +896,7 @@
 	async function fetchConversationsPage(project, offset, limit) {
 		return fetchConversations(offset, limit, project);
 	}
-	async function fetchAllConversations(project = null, maxConversations = 1e3, onBatch, onHasMore) {
+	async function fetchAllConversations(project = null, maxConversations = 1e3, onBatch, onHasMore, onError) {
 		const conversations = [];
 		const limit = project === null ? 100 : 50;
 		let offset = 0;
@@ -851,6 +917,7 @@
 			else offset += limit;
 		} catch (error) {
 			console.error("Error fetching conversations batch:", error);
+			onError?.(error);
 			break;
 		}
 		const result = conversations.slice(0, maxConversations);
@@ -7853,7 +7920,8 @@
 		"Batch progress": "Batch {{current}}/{{total}}",
 		"All conversations": "All conversations",
 		"Load more conversations": "Load {{n}} more",
-		"Load more conversations remaining": "Load {{n}} more · {{remaining}} left"
+		"Load more conversations remaining": "Load {{n}} more · {{remaining}} left",
+		"Export Skipped Message": "{{n}} conversations failed after repeated retries and are missing from the export:"
 	};
 	var es_default = {
 		title: "ChatGPT Exporter",
@@ -7917,7 +7985,8 @@
 		"Batch progress": "Lote {{current}}/{{total}}",
 		"All conversations": "Todas las conversaciones",
 		"Load more conversations": "Cargar {{n}} más",
-		"Load more conversations remaining": "Cargar {{n}} más · quedan {{remaining}}"
+		"Load more conversations remaining": "Cargar {{n}} más · quedan {{remaining}}",
+		"Export Skipped Message": "{{n}} conversaciones fallaron tras varios reintentos y no están en la exportación:"
 	};
 	var fr_default = {
 		title: "Exportateur ChatGPT",
@@ -7981,7 +8050,8 @@
 		"Batch progress": "Lot {{current}}/{{total}}",
 		"All conversations": "Toutes les conversations",
 		"Load more conversations": "Charger {{n}} de plus",
-		"Load more conversations remaining": "Charger {{n}} de plus · {{remaining}} restantes"
+		"Load more conversations remaining": "Charger {{n}} de plus · {{remaining}} restantes",
+		"Export Skipped Message": "{{n}} conversations ont échoué après plusieurs tentatives et ne figurent pas dans l'export :"
 	};
 	var id_default = {
 		title: "ChatGPT Exporter",
@@ -8045,7 +8115,8 @@
 		"Batch progress": "Kelompok {{current}}/{{total}}",
 		"All conversations": "Semua percakapan",
 		"Load more conversations": "Muat {{n}} lagi",
-		"Load more conversations remaining": "Muat {{n}} lagi · tersisa {{remaining}}"
+		"Load more conversations remaining": "Muat {{n}} lagi · tersisa {{remaining}}",
+		"Export Skipped Message": "{{n}} percakapan gagal setelah beberapa kali dicoba ulang dan tidak ada dalam ekspor:"
 	};
 	var jp_default = {
 		title: "ChatGPTエクスポーター",
@@ -8109,7 +8180,8 @@
 		"Batch progress": "バッチ {{current}}/{{total}}",
 		"All conversations": "すべての会話",
 		"Load more conversations": "さらに {{n}} 件読み込む",
-		"Load more conversations remaining": "さらに {{n}} 件読み込む · 残り {{remaining}} 件"
+		"Load more conversations remaining": "さらに {{n}} 件読み込む · 残り {{remaining}} 件",
+		"Export Skipped Message": "{{n}} 件の会話は再試行しても失敗したため、エクスポートに含まれていません："
 	};
 	var ru_default = {
 		title: "ChatGPT Exporter",
@@ -8173,7 +8245,8 @@
 		"Batch progress": "Партия {{current}}/{{total}}",
 		"All conversations": "Все разговоры",
 		"Load more conversations": "Загрузить ещё {{n}}",
-		"Load more conversations remaining": "Загрузить ещё {{n}} · осталось {{remaining}}"
+		"Load more conversations remaining": "Загрузить ещё {{n}} · осталось {{remaining}}",
+		"Export Skipped Message": "{{n}} разговоров не удалось загрузить после нескольких попыток, они отсутствуют в экспорте:"
 	};
 	var tr_default = {
 		title: "ChatGPT Exporter",
@@ -8237,7 +8310,8 @@
 		"Batch progress": "Grup {{current}}/{{total}}",
 		"All conversations": "Tüm konuşmalar",
 		"Load more conversations": "{{n}} tane daha yükle",
-		"Load more conversations remaining": "{{n}} tane daha yükle · {{remaining}} kaldı"
+		"Load more conversations remaining": "{{n}} tane daha yükle · {{remaining}} kaldı",
+		"Export Skipped Message": "{{n}} konuşma tekrar denemelere rağmen başarısız oldu ve dışa aktarımda yer almıyor:"
 	};
 	var zh_Hans_default = {
 		title: "ChatGPT Exporter",
@@ -8301,7 +8375,8 @@
 		"Batch progress": "第 {{current}}/{{total}} 批",
 		"All conversations": "全部对话",
 		"Load more conversations": "再加载 {{n}} 条",
-		"Load more conversations remaining": "再加载 {{n}} 条 · 剩余 {{remaining}} 条"
+		"Load more conversations remaining": "再加载 {{n}} 条 · 剩余 {{remaining}} 条",
+		"Export Skipped Message": "有 {{n}} 个对话多次重试后仍失败，未包含在导出文件中："
 	};
 	var zh_Hant_default = {
 		title: "ChatGPT Exporter",
@@ -8365,7 +8440,8 @@
 		"Batch progress": "第 {{current}}/{{total}} 批",
 		"All conversations": "全部對話",
 		"Load more conversations": "再載入 {{n}} 筆",
-		"Load more conversations remaining": "再載入 {{n}} 筆 · 剩餘 {{remaining}} 筆"
+		"Load more conversations remaining": "再載入 {{n}} 筆 · 剩餘 {{remaining}} 筆",
+		"Export Skipped Message": "有 {{n}} 個對話重試多次仍失敗，沒有包含在匯出檔中："
 	};
 	var GMStorage = class {
 		static supported = typeof _GM_getValue === "function" && typeof _GM_setValue === "function" && typeof _GM_deleteValue === "function";
@@ -8832,7 +8908,14 @@
 		return new Date().toISOString().replace(/:/g, "-").replace(/\..+/, "");
 	}
 	function getColorScheme() {
-		return document.documentElement.style.getPropertyValue("color-scheme");
+		const root = document.documentElement;
+		const theme = root.getAttribute("data-theme");
+		if (theme === "light" || theme === "dark") return theme;
+		if (root.classList.contains("dark")) return "dark";
+		if (root.classList.contains("light")) return "light";
+		const scheme = getComputedStyle(root).colorScheme;
+		if (scheme === "light" || scheme === "dark") return scheme;
+		return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 	}
 	function unixTimestampToISOString(timestamp) {
 		if (!timestamp) return "";
@@ -18773,7 +18856,7 @@
 		}
 		const userAvatar = await getUserAvatar();
 		const chatId = await getCurrentChatId();
-		const conversation = processConversation(await fetchConversation(chatId, true), { enableThinking: ScriptStorage.get("exporter:enable_thinking") ?? false });
+		const conversation = processConversation(await withImageAssets(await fetchConversation(chatId)), { enableThinking: ScriptStorage.get("exporter:enable_thinking") ?? false });
 		const html = conversationToHtml(conversation, userAvatar, metaList);
 		downloadFile(getFileNameWithFormat(fileNameFormat, "html", {
 			title: conversation.title,
@@ -19093,19 +19176,385 @@
 		while (ancestor && !elements.every((element) => ancestor.contains(element))) ancestor = ancestor.parentElement;
 		return ancestor;
 	}
-	async function exportToPng(fileNameFormat) {
-		if (!checkIfConversationStarted()) {
-			alert(i18n_default.t("Please start a conversation first"));
-			return false;
+	var REDESIGNED_THREAD_SELECTOR = "[data-chatgpt-conversation-selection-target]";
+	var REDESIGNED_SCROLL_ROOT_SELECTOR = "[data-app-action-timeline-scroll]";
+	var REDESIGNED_TURN_SELECTOR = "[data-turn-key]";
+	var HISTORY_SPINNER_SELECTOR = ":scope > div > [role=\"status\"]";
+	var HISTORY_LOAD_ATTEMPTS = 120;
+	function scrollRootTo(scrollRoot, scrollTop) {
+		scrollRoot.scrollTop = scrollTop;
+		scrollRoot.dispatchEvent(new Event("scroll", { bubbles: true }));
+	}
+	function createScrollPosition(scrollRoot) {
+		const initialScrollTop = scrollRoot.scrollTop;
+		scrollRoot.scrollTop = -1;
+		const reversed = initialScrollTop < 0 || scrollRoot.scrollTop < 0;
+		scrollRoot.scrollTop = initialScrollTop;
+		const max = () => Math.max(0, scrollRoot.scrollHeight - scrollRoot.clientHeight);
+		return {
+			reversed,
+			max,
+			get: () => reversed ? scrollRoot.scrollTop + max() : scrollRoot.scrollTop,
+			set: (top) => scrollRootTo(scrollRoot, reversed ? top - max() : top)
+		};
+	}
+	var IMAGE_LOAD_TIMEOUT = 5e3;
+	function waitForImages(root) {
+		const pending = Array.from(root.querySelectorAll("img")).filter((img) => !img.complete);
+		if (pending.length === 0) return Promise.resolve();
+		return Promise.race([Promise.all(pending.map((img) => new Promise((resolve) => {
+			img.addEventListener("load", resolve, { once: true });
+			img.addEventListener("error", resolve, { once: true });
+		}))), sleep(IMAGE_LOAD_TIMEOUT)]);
+	}
+	function inlineBlobImages(live, snapshot) {
+		const snapshotImages = snapshot.querySelectorAll("img");
+		live.querySelectorAll("img").forEach((img, index) => {
+			const target = snapshotImages[index];
+			if (!target || !img.currentSrc.startsWith("blob:") || !img.complete || img.naturalWidth === 0) return;
+			try {
+				const dataUrl = getBase64FromImg(img);
+				if (!dataUrl) return;
+				target.removeAttribute("srcset");
+				target.src = dataUrl;
+			} catch (error) {
+				console.warn("[ChatGPT Exporter:screenshot] failed to copy image", error);
+			}
+		});
+	}
+	var growUserBubbles = {
+		name: "chatgpt-exporter-grow-user-bubbles",
+		afterClone({ clone: root, nodeMap }) {
+			nodeMap?.forEach((source, clone) => {
+				if (!(source instanceof HTMLElement) || !(clone instanceof HTMLElement)) return;
+				if (!source.matches(".bg-user-message")) return;
+				for (let el = clone; el && el !== root; el = el.parentElement) el.style.height = "auto";
+				clone.querySelectorAll("*").forEach((child) => {
+					if (!(child instanceof HTMLImageElement)) child.style.height = "auto";
+				});
+			});
 		}
-		const effect = new Effect();
+	};
+	var CJK_FONT_FAMILY = "chatgpt-exporter-cjk";
+	var CJK_UNICODE_RANGE = "U+2E80-2FFF, U+3000-303F, U+3040-30FF, U+3100-31FF, U+3400-4DBF, U+4E00-9FFF, U+F900-FAFF, U+FE30-FE4F, U+FF00-FFEF";
+	var CJK_FONT_FACES = [
+		{
+			weight: "100 400",
+			names: ["PingFang TC", "PingFangTC-Regular"]
+		},
+		{
+			weight: "500",
+			names: ["PingFangTC-Medium"]
+		},
+		{
+			weight: "600 900",
+			names: ["PingFangTC-Semibold"]
+		}
+	].map(({ weight, names }) => `
+    @font-face {
+        font-family: "${CJK_FONT_FAMILY}";
+        src: ${names.map((name) => `local("${name}")`).join(", ")};
+        font-weight: ${weight};
+        unicode-range: ${CJK_UNICODE_RANGE};
+    }
+`).join("");
+	async function matchCjkMetrics(root) {
+		const elements = [root, ...Array.from(root.querySelectorAll("*"))];
+		const families = new Map(elements.map((el) => [el, getComputedStyle(el).fontFamily]));
+		elements.forEach((el) => {
+			const family = families.get(el);
+			if (!family || el !== root && family === families.get(el.parentElement)) return;
+			el.style.fontFamily = `"${CJK_FONT_FAMILY}", ${family}`;
+		});
+		await Promise.all([
+			"400",
+			"500",
+			"600"
+		].map((weight) => document.fonts.load(`${weight} 16px "${CJK_FONT_FAMILY}"`, "中").catch(() => [])));
+	}
+	var EMOJI_PATTERN = /[\u{1F1E6}-\u{1F1FF}]{2}|[0-9#*]️⃣|(?:\p{Emoji_Presentation}|\p{Extended_Pictographic}️)(?:[\u{1F3FB}-\u{1F3FF}]|️|‍(?:\p{Emoji_Presentation}|\p{Extended_Pictographic}️?))*/gu;
+	function pinEmojiWidths(root) {
+		const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+		const textNodes = [];
+		for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+			EMOJI_PATTERN.lastIndex = 0;
+			if (EMOJI_PATTERN.test(node.nodeValue ?? "") && !node.parentElement?.closest("style, script, svg")) textNodes.push(node);
+		}
+		const wrappers = [];
+		textNodes.forEach((node) => {
+			const text = node.nodeValue ?? "";
+			const fragment = document.createDocumentFragment();
+			let last = 0;
+			for (const match of text.matchAll(EMOJI_PATTERN)) {
+				fragment.append(text.slice(last, match.index));
+				const wrapper = document.createElement("span");
+				wrapper.textContent = match[0];
+				fragment.append(wrapper);
+				wrappers.push(wrapper);
+				last = match.index + match[0].length;
+			}
+			fragment.append(text.slice(last));
+			node.replaceWith(fragment);
+		});
+		const widths = wrappers.map((wrapper) => wrapper.getBoundingClientRect().width);
+		wrappers.forEach((wrapper, index) => {
+			Object.assign(wrapper.style, {
+				display: "inline-block",
+				width: `${widths[index]}px`,
+				textIndent: "0"
+			});
+		});
+	}
+	var TRANSPARENT_PIXEL = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+	var FAVICON_MAX_SIZE = 40;
+	function toSvgDataUrl(svg) {
+		return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+	}
+	function getFaviconHost(src) {
+		try {
+			const url = new URL(src);
+			const site = url.searchParams.get("url") || url.searchParams.get("domain");
+			return new URL(site && /^https?:/.test(site) ? site : `https://${site || url.hostname}`).hostname.replace(/^www\./, "");
+		} catch {
+			return "";
+		}
+	}
+	function createImagePlaceholder(target, src, isDarkMode) {
+		const rect = target.getBoundingClientRect();
+		const width = Math.round(rect.width);
+		const height = Math.round(rect.height);
+		if (width === 0 || height === 0) return TRANSPARENT_PIXEL;
+		const fill = isDarkMode ? "#303030" : "#ececec";
+		const ink = isDarkMode ? "#8f8f8f" : "#a3a3a3";
+		if (Math.max(width, height) <= FAVICON_MAX_SIZE) {
+			const initial = getFaviconHost(src).charAt(0).toUpperCase();
+			const size = Math.min(width, height);
+			return toSvgDataUrl(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><circle cx="${width / 2}" cy="${height / 2}" r="${size / 2}" fill="${fill}"/><text x="50%" y="50%" dy="0.35em" text-anchor="middle" font-family="system-ui, sans-serif" font-size="${size * .55}" font-weight="600" fill="${ink}">${initial}</text></svg>`);
+		}
+		const iconSize = Math.max(16, Math.min(48, Math.min(width, height) * .3));
+		const scale = iconSize / 24;
+		return toSvgDataUrl(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="${width}" height="${height}" fill="${fill}"/><g transform="translate(${(width - iconSize) / 2} ${(height - iconSize) / 2}) scale(${scale})" fill="none" stroke="${ink}" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="9.5" r="1.75"/><path d="M3.5 17.5l5-5 3.5 3.5 2.5-2.5 6 6"/></g></svg>`);
+	}
+	var EXTERNAL_IMAGE_CONCURRENCY = 6;
+	var EXTERNAL_IMAGE_SCALE = 2;
+	function loadCorsImage(url) {
+		return new Promise((resolve) => {
+			const img = new Image();
+			const timer = setTimeout(() => resolve(null), IMAGE_LOAD_TIMEOUT);
+			img.crossOrigin = "anonymous";
+			img.onload = () => {
+				clearTimeout(timer);
+				resolve(img);
+			};
+			img.onerror = () => {
+				clearTimeout(timer);
+				resolve(null);
+			};
+			img.src = url;
+		});
+	}
+	function encodeImage(source, target) {
+		const rect = target.getBoundingClientRect();
+		const ratio = rect.width > 0 && rect.height > 0 ? Math.min(1, Math.max(rect.width * EXTERNAL_IMAGE_SCALE / source.naturalWidth, rect.height * EXTERNAL_IMAGE_SCALE / source.naturalHeight)) : 1;
+		const canvas = document.createElement("canvas");
+		canvas.width = Math.max(1, Math.round(source.naturalWidth * ratio));
+		canvas.height = Math.max(1, Math.round(source.naturalHeight * ratio));
+		const context = canvas.getContext("2d");
+		if (!context) return null;
+		context.drawImage(source, 0, 0, canvas.width, canvas.height);
+		return canvas.toDataURL("image/png");
+	}
+	async function inlineExternalImages(root, isDarkMode) {
+		const imagesBySrc = new Map();
+		root.querySelectorAll("img").forEach((img) => {
+			const src = img.currentSrc || img.src;
+			try {
+				const url = new URL(src, location.href);
+				if (!url.protocol.startsWith("http") || url.origin === location.origin) return;
+			} catch {
+				return;
+			}
+			imagesBySrc.set(src, [...imagesBySrc.get(src) ?? [], img]);
+		});
+		const queue = Array.from(imagesBySrc.entries());
+		const worker = async () => {
+			for (let entry = queue.shift(); entry; entry = queue.shift()) {
+				const [src, targets] = entry;
+				const source = await loadCorsImage(src);
+				targets.forEach((target) => {
+					let dataUrl = null;
+					try {
+						dataUrl = source && encodeImage(source, target);
+					} catch {}
+					target.removeAttribute("srcset");
+					target.src = dataUrl || createImagePlaceholder(target, src, isDarkMode);
+				});
+			}
+		};
+		await Promise.all(Array.from({ length: EXTERNAL_IMAGE_CONCURRENCY }, worker));
+	}
+	function getSurfaceColor(element, fallback) {
+		for (let el = element; el; el = el.parentElement) {
+			const color = getComputedStyle(el).backgroundColor;
+			if (color && color !== "transparent" && !/^rgba\(.*,\s*0\)$/.test(color)) return color;
+		}
+		return fallback;
+	}
+	async function prepareRedesignedThread(threadEl, effect, isDarkMode) {
+		const scrollRoot = threadEl.closest(REDESIGNED_SCROLL_ROOT_SELECTOR);
+		if (!scrollRoot || !threadEl.querySelector(REDESIGNED_TURN_SELECTOR)) return null;
+		const backgroundColor = getSurfaceColor(threadEl, isDarkMode ? "#212121" : "#fff");
+		const position = createScrollPosition(scrollRoot);
+		effect.add(() => {
+			const distanceFromBottom = position.max() - position.get();
+			return () => position.set(position.max() - distanceFromBottom);
+		});
+		effect.run();
+		let previousScrollHeight = -1;
+		for (let attempt = 0; attempt < HISTORY_LOAD_ATTEMPTS && threadEl.querySelector(HISTORY_SPINNER_SELECTOR); attempt++) {
+			if (scrollRoot.scrollHeight === previousScrollHeight) {
+				position.set(scrollRoot.clientHeight * 2);
+				await sleep(100);
+			}
+			previousScrollHeight = scrollRoot.scrollHeight;
+			position.set(0);
+			await sleep(500);
+		}
+		if (threadEl.querySelector(HISTORY_SPINNER_SELECTOR)) console.warn("[ChatGPT Exporter:screenshot] history is still loading; exporting the loaded part");
+		const snapshots = new Map();
+		const getListOffset = (turn) => turn.getBoundingClientRect().top - scrollRoot.getBoundingClientRect().top + position.get();
+		const getMountedTurns = () => Array.from(threadEl.querySelectorAll(REDESIGNED_TURN_SELECTOR));
+		const captureMountedTurns = async () => {
+			const turns = getMountedTurns().filter((turn) => {
+				const key = turn.dataset.turnKey;
+				return !!key && !snapshots.has(key) && turn.offsetHeight > 0;
+			});
+			if (turns.length === 0) return;
+			turns.forEach((turn) => turn.querySelectorAll("img[loading=\"lazy\"]").forEach((img) => img.setAttribute("loading", "eager")));
+			await Promise.all(turns.map(waitForImages));
+			await sleep(100);
+			turns.forEach((turn) => {
+				const key = turn.dataset.turnKey;
+				if (snapshots.has(key) || !turn.isConnected) return;
+				const snapshot = turn.cloneNode(true);
+				snapshot.querySelectorAll("img[loading=\"lazy\"]").forEach((img) => img.setAttribute("loading", "eager"));
+				inlineBlobImages(turn, snapshot);
+				snapshots.set(key, {
+					top: getListOffset(turn),
+					snapshot
+				});
+			});
+		};
+		position.set(0);
+		await sleep(250);
+		while (true) {
+			await captureMountedTurns();
+			const previousTop = position.get();
+			if (previousTop >= position.max() - 1) break;
+			const lastTurn = getMountedTurns().at(-1);
+			const lastTurnOffset = lastTurn ? lastTurn.getBoundingClientRect().top - scrollRoot.getBoundingClientRect().top : 0;
+			position.set(lastTurnOffset > 0 ? previousTop + Math.floor(lastTurnOffset) : position.max());
+			await sleep(250);
+			if (position.get() <= previousTop) break;
+		}
+		await captureMountedTurns();
+		if (snapshots.size === 0) return null;
+		const staticThread = threadEl.cloneNode(false);
+		staticThread.removeAttribute("data-chatgpt-conversation-selection-target");
+		staticThread.removeAttribute("data-thread-find-target");
+		staticThread.setAttribute("data-chatgpt-exporter-screenshot-root", "");
+		Object.assign(staticThread.style, {
+			position: "absolute",
+			left: "-100000px",
+			top: "0",
+			width: `${threadEl.offsetWidth}px`,
+			height: "auto",
+			minHeight: "0",
+			pointerEvents: "none"
+		});
+		const style = document.createElement("style");
+		style.textContent = `${CJK_FONT_FACES}
+        [data-chatgpt-exporter-screenshot-root] {
+            color: ${isDarkMode ? "#ececec" : "#0d0d0d"};
+            background-color: ${backgroundColor};
+        }
+
+        [data-chatgpt-exporter-screenshot-root] [data-virtualized-turn-content] {
+            content-visibility: visible !important;
+        }
+
+        /* date separators such as "Yesterday 10:08 AM" */
+        [data-chatgpt-exporter-screenshot-root] [role="separator"] {
+            display: none;
+        }
+
+        /* the "Is this conversation helpful so far?" card */
+        [data-chatgpt-exporter-screenshot-root] :has(> aside) {
+            display: none;
+        }
+
+        /* image groups ChatGPT hid for lack of images, left as empty skeletons */
+        [data-chatgpt-exporter-screenshot-root] :has(> [class~="group/generated-image-preview"]):not(:has(img)) {
+            display: none;
+        }
+
+        /* Keep the spacing of the action row and code block headers. */
+        [data-chatgpt-exporter-screenshot-root] .turn-action-controls,
+        [data-chatgpt-exporter-screenshot-root] [data-markdown-copy="code-block"] button {
+            visibility: hidden;
+        }
+    `;
+		staticThread.appendChild(style);
+		Array.from(snapshots.values()).sort((a, b) => a.top - b.top).forEach(({ snapshot }) => staticThread.appendChild(snapshot));
+		if (document.documentElement.lang) staticThread.lang = document.documentElement.lang;
+		effect.add(() => {
+			threadEl.after(staticThread);
+			return () => staticThread.remove();
+		});
+		effect.run();
+		await matchCjkMetrics(staticThread);
+		pinEmojiWidths(staticThread);
+		await inlineExternalImages(staticThread, isDarkMode);
+		await sleep(100);
+		return {
+			screenshotEls: splitIntoParts(staticThread, effect),
+			backgroundColor
+		};
+	}
+	var MAX_PART_HEIGHT = 32e3;
+	function splitIntoParts(staticThread, effect) {
+		const maxHeight = MAX_PART_HEIGHT / Math.min(2, MAX_SCREENSHOT_DIMENSION / staticThread.offsetWidth) - 100;
+		if (staticThread.scrollHeight <= maxHeight) return [staticThread];
+		const style = staticThread.querySelector(":scope > style");
+		const groups = [[]];
+		let groupHeight = 0;
+		Array.from(staticThread.children).forEach((turn) => {
+			if (!(turn instanceof HTMLElement) || turn === style) return;
+			const height = turn.offsetHeight;
+			if (groups.at(-1).length > 0 && groupHeight + height > maxHeight) {
+				groups.push([]);
+				groupHeight = 0;
+			}
+			groups.at(-1).push(turn);
+			groupHeight += height;
+		});
+		const parts = groups.map((turns) => {
+			const part = staticThread.cloneNode(false);
+			if (style) part.appendChild(style.cloneNode(true));
+			part.append(...turns);
+			return part;
+		});
+		effect.add(() => {
+			staticThread.after(...parts);
+			return () => parts.forEach((part) => part.remove());
+		});
+		effect.run();
+		return parts;
+	}
+	async function prepareLegacyThread(effect, isDarkMode) {
 		const conversationTurns = Array.from(document.querySelectorAll("#thread [data-testid^=\"conversation-turn-\"]"));
 		const thread = findCommonAncestor(conversationTurns);
-		if (!thread || thread.children.length === 0 || thread.scrollHeight < 50) {
-			alert(i18n_default.t("Failed to export to PNG. Failed to find the element node."));
-			return false;
-		}
-		const isDarkMode = document.documentElement.classList.contains("dark");
+		if (!thread || thread.children.length === 0 || thread.scrollHeight < 50) return null;
 		const threadEl = thread;
 		const turnContainerIds = Array.from(threadEl.querySelectorAll("[data-turn-id-container][data-is-intersecting]")).filter((element) => !!element.querySelector("[data-testid^=\"conversation-turn-\"]") || element.offsetHeight > 0 || !!element.style.getPropertyValue("--last-known-height")).map((element) => element.dataset.turnIdContainer).filter((id) => !!id && id !== "client-created-root");
 		effect.add(() => {
@@ -19223,6 +19672,57 @@
 			screenshotEl = staticThread;
 			await sleep(100);
 		}
+		return {
+			screenshotEls: [screenshotEl],
+			backgroundColor: isDarkMode ? "#212121" : "#fff"
+		};
+	}
+	async function exportToPng(fileNameFormat) {
+		if (!checkIfConversationStarted()) {
+			alert(i18n_default.t("Please start a conversation first"));
+			return false;
+		}
+		const effect = new Effect();
+		const isDarkMode = getColorScheme() === "dark";
+		const redesignedThread = document.querySelector(REDESIGNED_THREAD_SELECTOR);
+		const source = redesignedThread ? await prepareRedesignedThread(redesignedThread, effect, isDarkMode) : await prepareLegacyThread(effect, isDarkMode);
+		if (!source) {
+			effect.dispose();
+			alert(i18n_default.t("Failed to export to PNG. Failed to find the element node."));
+			return false;
+		}
+		const { screenshotEls, backgroundColor } = source;
+		const pngs = [];
+		for (const screenshotEl of screenshotEls) {
+			const png = await renderPng(screenshotEl, effect, backgroundColor);
+			if (!png) {
+				effect.dispose();
+				alert("Failed to export to PNG. This might be caused by the size of the conversation. Please try to export a smaller conversation.");
+				return false;
+			}
+			pngs.push(png);
+		}
+		effect.dispose();
+		const chatId = getChatIdFromUrl() || void 0;
+		const fileName = getFileNameWithFormat(fileNameFormat, "png", { chatId });
+		if (pngs.length === 1) {
+			downloadFile(fileName, "image/png", pngs[0]);
+			return true;
+		}
+		const zip = new jszip.default();
+		const baseName = fileName.replace(/\.png$/, "");
+		const digits = String(pngs.length).length;
+		pngs.forEach((png, index) => {
+			zip.file(`${baseName}-${String(index + 1).padStart(digits, "0")}.png`, png);
+		});
+		const blob = await zip.generateAsync({
+			type: "blob",
+			compression: "STORE"
+		});
+		downloadFile(getFileNameWithFormat(fileNameFormat, "zip", { chatId }), "application/zip", blob);
+		return true;
+	}
+	async function renderPng(screenshotEl, effect, backgroundColor) {
 		effect.add(() => {
 			const minHeight = screenshotEl.style.minHeight;
 			screenshotEl.style.minHeight = `${screenshotEl.scrollHeight}px`;
@@ -19232,13 +19732,14 @@
 		});
 		effect.run();
 		await sleep(0);
-		const backgroundColor = isDarkMode ? "#212121" : "#fff";
 		const width = Math.max(screenshotEl.offsetWidth, screenshotEl.scrollWidth);
 		const height = Math.max(screenshotEl.offsetHeight, screenshotEl.scrollHeight);
 		let capture = null;
 		try {
 			capture = await (0, _zumer_snapdom.snapdom)(screenshotEl, {
 				embedFonts: true,
+				reconcile: true,
+				plugins: [growUserBubbles],
 				backgroundColor
 			});
 		} catch (error) {
@@ -19320,13 +19821,7 @@
 			console.warn("[ChatGPT Exporter:screenshot] tiled export failed; using downscaled fallback");
 			png = await takeDownscaledScreenshot();
 		}
-		effect.dispose();
-		if (!png) {
-			alert("Failed to export to PNG. This might be caused by the size of the conversation. Please try to export a smaller conversation.");
-			return false;
-		}
-		downloadFile(getFileNameWithFormat(fileNameFormat, "png", { chatId: getChatIdFromUrl() || void 0 }), "image/png", png);
-		return true;
+		return png;
 	}
 	function convertMessageToTavern(node) {
 		if (!node.message || shouldSkipMessageInExport(node.message) || node.message.content.content_type !== "text") return null;
@@ -19404,7 +19899,7 @@
 			return false;
 		}
 		const chatId = await getCurrentChatId();
-		const rawConversation = await fetchConversation(chatId, false);
+		const rawConversation = await fetchConversation(chatId);
 		downloadFile(getFileNameWithFormat(fileNameFormat, "json", {
 			title: rawConversation.title || "ChatGPT Conversation",
 			chatId
@@ -19421,7 +19916,7 @@
 			return false;
 		}
 		const chatId = await getCurrentChatId();
-		const conversation = processConversation(await fetchConversation(chatId, false));
+		const conversation = processConversation(await fetchConversation(chatId));
 		downloadFile(getFileNameWithFormat(`${fileNameFormat}.tavern`, "jsonl", {
 			title: conversation.title,
 			chatId
@@ -19438,7 +19933,7 @@
 			return false;
 		}
 		const chatId = await getCurrentChatId();
-		const conversation = processConversation(await fetchConversation(chatId, false));
+		const conversation = processConversation(await fetchConversation(chatId));
 		downloadFile(getFileNameWithFormat(`${fileNameFormat}.ooba`, "json", {
 			title: conversation.title,
 			chatId
@@ -19526,7 +20021,7 @@
 			return false;
 		}
 		const chatId = await getCurrentChatId();
-		const conversation = processConversation(await fetchConversation(chatId, true), { enableThinking: ScriptStorage.get("exporter:enable_thinking") ?? false });
+		const conversation = processConversation(await withImageAssets(await fetchConversation(chatId)), { enableThinking: ScriptStorage.get("exporter:enable_thinking") ?? false });
 		const markdown = conversationToMarkdown(conversation, metaList);
 		downloadFile(getFileNameWithFormat(fileNameFormat, "md", {
 			title: conversation.title,
@@ -19680,7 +20175,7 @@
 			alert(i18n_default.t("Temporary chat could not be captured"));
 			return false;
 		}
-		const { conversationNodes } = processConversation(await fetchConversation(await getCurrentChatId(), false));
+		const { conversationNodes } = processConversation(await fetchConversation(await getCurrentChatId()));
 		copyToClipboard(standardizeLineBreaks(conversationNodes.map(({ message }) => transformMessage(message)).filter(Boolean).join("\n\n")));
 		return true;
 	}
@@ -19779,6 +20274,34 @@
 		return l$5.vnode && l$5.vnode(i), i;
 	}
 	var Divider = () => o$5("div", { className: "h-px bg-token-border-light" });
+	async function refreshConversationList(cached, fetchPage, pageSize, maxItems) {
+		const known = new Map(cached.map((c) => [c.id, c.update_time]));
+		const fresh = [];
+		let total = null;
+		let offset = 0;
+		while (offset < maxItems) {
+			const page = await fetchPage(offset, pageSize);
+			const items = page.items ?? [];
+			total = page.total;
+			const firstUnchanged = items.findIndex((c) => known.has(c.id) && known.get(c.id) === c.update_time);
+			if (firstUnchanged !== -1) {
+				fresh.push(...items.slice(0, firstUnchanged));
+				break;
+			}
+			fresh.push(...items);
+			if (items.length < pageSize) break;
+			offset += pageSize;
+		}
+		return {
+			head: fresh,
+			total
+		};
+	}
+	function applyHead(head, items) {
+		if (head.length === 0) return items;
+		const headIds = new Set(head.map((c) => c.id));
+		return [...head, ...items.filter((c) => !headIds.has(c.id))];
+	}
 	function mitt_default(n) {
 		return {
 			all: n = n || new Map(),
@@ -19809,6 +20332,7 @@
 		eventEmitter = mitt_default();
 		queue = [];
 		results = [];
+		skipped = [];
 		status = "IDLE";
 		backoffMultiplier = 2;
 		backoff;
@@ -19845,12 +20369,16 @@
 			this.runId++;
 			this.queue = [];
 			this.results = [];
+			this.skipped = [];
 			this.status = "IDLE";
 			this.backoff = this.minBackoff;
 			this.pauseUntil = 0;
 			this.batchPauses = 0;
 			this.total = 0;
 			this.completed = 0;
+		}
+		getSkipped() {
+			return this.skipped;
 		}
 		on(event, fn) {
 			this.eventEmitter.on(event, fn);
@@ -19884,6 +20412,7 @@
 				this.progress(name, "processing");
 				this.backoff = this.minBackoff;
 				requestObject.retries = 0;
+				if (requestObject.cached) waitMs = 0;
 			} catch (error) {
 				if (runId !== this.runId) return;
 				if (error instanceof RateLimitError) {
@@ -19900,6 +20429,7 @@
 					requestObject.retries++;
 					if (requestObject.retries > MAX_RETRIES) {
 						console.warn(`[Exporter] "${name}" skipped after ${MAX_RETRIES} retries`);
+						this.skipped.push(name);
 						waitMs = 0;
 					} else {
 						this.backoff = Math.min(this.backoff * this.backoffMultiplier, this.maxBackoff);
@@ -19927,7 +20457,7 @@
 			this.eventEmitter.emit("done", this.results);
 		}
 	};
-	_css(".CheckBoxLabel {\n    position: relative;\n    display: flex;\n    font-size: 16px;\n    vertical-align: middle;\n}\n\n.CheckBoxLabel * {\n    cursor: pointer;\n}\n\n.CheckBoxLabel[disabled] {\n    opacity: 0.7;\n}\n\n.CheckBoxLabel[disabled] * {\n    cursor: not-allowed;\n}\n\n.CheckBoxLabel input {\n    position: absolute;\n    opacity: 0;\n    width: 100%;\n    height: 100%;\n    top: 0;\n    left: 0;\n    margin: 0;\n    padding: 0;\n}\n\n.CheckBoxLabel .IconWrapper {\n    display: inline-flex;\n    align-items: center;\n    position: relative;\n    vertical-align: middle;\n    font-size: 1.5rem;\n}\n\n.CheckBoxLabel input:checked ~ svg {\n    color: rgb(28 100 242);\n}\n\n.dark .CheckBoxLabel input:checked ~ svg {\n    color: rgb(144, 202, 249);\n}\n\n.CheckBoxLabel .LabelText {\n    margin-left: 0.5rem;\n    font-size: 1rem;\n    line-height: 1.5;\n}\n");
+	_css(".CheckBoxLabel {\n    position: relative;\n    display: flex;\n    font-size: 16px;\n    vertical-align: middle;\n}\n\n.CheckBoxLabel * {\n    cursor: pointer;\n}\n\n.CheckBoxLabel[disabled] {\n    opacity: 0.7;\n}\n\n.CheckBoxLabel[disabled] * {\n    cursor: not-allowed;\n}\n\n.CheckBoxLabel input {\n    position: absolute;\n    opacity: 0;\n    width: 100%;\n    height: 100%;\n    top: 0;\n    left: 0;\n    margin: 0;\n    padding: 0;\n}\n\n.CheckBoxLabel .IconWrapper {\n    display: inline-flex;\n    align-items: center;\n    position: relative;\n    vertical-align: middle;\n    font-size: 1.5rem;\n}\n\n.CheckBoxLabel input:checked ~ svg {\n    color: rgb(28 100 242);\n}\n\n:is(.dark, [data-theme=\"dark\"]) .CheckBoxLabel input:checked ~ svg {\n    color: rgb(144, 202, 249);\n}\n\n.CheckBoxLabel .LabelText {\n    margin-left: 0.5rem;\n    font-size: 1rem;\n    line-height: 1.5;\n}\n");
 	function FileCode() {
 		return o$5("svg", {
 			xmlns: "http://www.w3.org/2000/svg",
@@ -20312,6 +20842,17 @@
 	};
 	var useSettingContext = () => q$1(SettingContext);
 	var exportingRef = { current: false };
+	var conversationCache = new Map();
+	var listCache = null;
+	function dropFromListCache(removed) {
+		if (!listCache) return;
+		const ids = new Set(removed.map((c) => c.id));
+		listCache = {
+			...listCache,
+			items: listCache.items.filter((c) => !ids.has(c.id))
+		};
+	}
+	var MAX_SKIPPED_SHOWN = 20;
 	function toMs(time) {
 		if (time == null) return 0;
 		if (typeof time === "number") return time * 1e3;
@@ -20670,6 +21211,7 @@
 		const batchIndexRef = _$1(0);
 		const totalBatchesRef = _$1(0);
 		const cancelledRef = _$1(false);
+		const skippedRef = _$1([]);
 		const fetchGenRef = _$1(0);
 		const onUpload = T$4((e) => {
 			const file = e.target?.files?.[0];
@@ -20689,10 +21231,23 @@
 		}, [t]);
 		const startApiBatch = T$4((chunk) => {
 			requestQueue.clear();
-			chunk.forEach(({ id, title }) => {
+			chunk.forEach(({ id, title, update_time }) => {
+				const entry = conversationCache.get(id);
+				const cached = entry && entry.updateTime === update_time ? entry.conversation : void 0;
 				requestQueue.add({
 					name: title,
-					request: () => fetchConversation(id, exportType !== "JSON")
+					cached: !!cached,
+					request: async () => {
+						let conversation = cached;
+						if (!conversation) {
+							conversation = await fetchConversation(id);
+							conversationCache.set(id, {
+								updateTime: update_time,
+								conversation
+							});
+						}
+						return exportType === "JSON" ? conversation : withImageAssets(conversation);
+					}
 				});
 			});
 			requestQueue.start();
@@ -20751,12 +21306,21 @@
 					await callback(format, results, metaList, selectedProject?.display.name, partIndex, totalBatches);
 					markExported(results);
 				}
+				skippedRef.current.push(...requestQueue.getSkipped());
 				if (partIndex < totalBatches) {
 					await sleep(400);
 					batchIndexRef.current++;
 					const nextChunk = pendingBatchesRef.current[batchIndexRef.current];
 					if (nextChunk) startApiBatch(nextChunk);
-				} else setProcessing(false);
+				} else {
+					setProcessing(false);
+					const skipped = skippedRef.current;
+					if (skipped.length > 0) {
+						const shown = skipped.slice(0, MAX_SKIPPED_SHOWN).map((name) => `- ${name}`);
+						if (skipped.length > MAX_SKIPPED_SHOWN) shown.push("- …");
+						alert(`${t("Export Skipped Message", { n: skipped.length })}\n\n${shown.join("\n")}`);
+					}
+				}
 			});
 			return () => off();
 		}, [
@@ -20766,12 +21330,14 @@
 			format,
 			metaList,
 			startApiBatch,
-			selectedProject
+			selectedProject,
+			t
 		]);
 		p$6(() => {
 			const off = archiveQueue.on("done", () => {
 				setProcessing(false);
 				setApiConversations((prev) => prev.filter((c) => !selected.some((s) => s.id === c.id)));
+				dropFromListCache(selected);
 				setSelected([]);
 				alert(t("Conversation Archived Message"));
 			});
@@ -20785,6 +21351,7 @@
 			const off = deleteQueue.on("done", () => {
 				setProcessing(false);
 				setApiConversations((prev) => prev.filter((c) => !selected.some((s) => s.id === c.id)));
+				dropFromListCache(selected);
 				setSelected([]);
 				alert(t("Conversation Deleted Message"));
 			});
@@ -20807,6 +21374,7 @@
 		const exportAllFromApi = T$4(() => {
 			if (disabled) return;
 			cancelledRef.current = false;
+			skippedRef.current = [];
 			const chunks = chunkArray(selected, 100);
 			pendingBatchesRef.current = chunks;
 			batchIndexRef.current = 0;
@@ -20916,14 +21484,46 @@
 			const gen = ++fetchGenRef.current;
 			const alive = () => gen === fetchGenRef.current;
 			setSelected([]);
+			const cache = selectedProjectId === null && listCache?.limit === exportAllLimit ? listCache : null;
+			if (cache) {
+				setApiConversations(cache.items);
+				setHasMore(cache.hasMore);
+				setTotalAvailable(cache.total);
+				setLoading(false);
+				refreshConversationList(cache.items, (offset, limit) => fetchConversationsPage(null, offset, limit), 100, exportAllLimit).then(({ head, total }) => {
+					if (listCache) listCache = {
+						...listCache,
+						items: applyHead(head, listCache.items),
+						total: listCache.total !== null ? total : null
+					};
+					if (!alive() || !listCache) return;
+					setApiConversations((prev) => applyHead(head, prev));
+					setTotalAvailable(listCache.total);
+					const byId = new Map(head.map((c) => [c.id, c]));
+					setSelected((prev) => prev.map((c) => byId.get(c.id) ?? c));
+				}).catch((err) => console.error("Error refreshing conversations:", err));
+				return;
+			}
 			setApiConversations([]);
 			setHasMore(false);
 			setTotalAvailable(null);
 			setLoading(true);
+			let loadedHasMore = false;
+			let loadFailed = false;
 			fetchAllConversations(selectedProjectId, exportAllLimit, (batch) => {
 				if (alive()) setApiConversations((prev) => [...prev, ...batch]);
 			}, (hasMore) => {
+				loadedHasMore = hasMore;
 				if (alive()) setHasMore(hasMore);
+			}, () => {
+				loadFailed = true;
+			}).then((items) => {
+				if (selectedProjectId === null && items.length > 0 && !loadFailed) listCache = {
+					limit: exportAllLimit,
+					items,
+					hasMore: loadedHasMore,
+					total: null
+				};
 			}).catch((err) => {
 				if (!alive()) return;
 				console.error("Error fetching conversations:", err);
@@ -20939,7 +21539,14 @@
 				const page = await fetchConversationsPage(selectedProjectId, apiConversations.length, 100);
 				setApiConversations((prev) => [...prev, ...page.items]);
 				if (page.total !== null) setTotalAvailable(page.total);
-				setHasMore(page.items.length >= 100 && (page.total === null || apiConversations.length + page.items.length < page.total));
+				const more = page.items.length >= 100 && (page.total === null || apiConversations.length + page.items.length < page.total);
+				setHasMore(more);
+				if (selectedProjectId === null && listCache) listCache = {
+					...listCache,
+					items: [...listCache.items, ...page.items],
+					hasMore: more,
+					total: page.total ?? listCache.total
+				};
 			} catch (err) {
 				console.error("loadMore error", err);
 			} finally {
@@ -21172,6 +21779,11 @@
 				setLoading(false);
 			}
 		} : void 0;
+		const handleKeyDown = (e) => {
+			if (e.key !== "Enter" && e.key !== " ") return;
+			e.preventDefault();
+			e.currentTarget.click();
+		};
 		return o$5("div", {
 			className: `
             menu-item
@@ -21180,9 +21792,14 @@
             transition-colors duration-200
             cursor-pointer
             border border-menu ${className}`,
+			role: "button",
+			tabIndex: disabled ? -1 : 0,
 			onClick: handleClick,
 			onTouchStart: handleClick,
+			onKeyDown: handleKeyDown,
 			disabled,
+			"aria-disabled": disabled || void 0,
+			"aria-busy": loading || void 0,
 			"aria-label": ariaLabel,
 			title,
 			children: loading ? o$5("div", {
@@ -22097,8 +22714,8 @@
 			})] })]
 		});
 	};
-	_css("span[data-time-format] {\n    display: none;\n}\n\nbody[data-time-format=\"12\"] span[data-time-format=\"12\"] {\n    display: inline;\n}\n\nbody[data-time-format=\"24\"] span[data-time-format=\"24\"] {\n    display: inline;\n}\n\n.Select {\n    padding: 0 2rem 0 0.5rem;\n    width: auto;\n    min-width: 7.5rem;\n    border-radius: 4px;\n    box-shadow: 0 0 0 1px #6f6e77;\n}\n\n.dark .Select {\n    background-color: #2f2f2f;\n    color: #fff;\n    box-shadow: 0 0 0 1px #6f6e77;\n}\n\nhtml {\n    --ce-text-primary: var(--text-primary, #0d0d0d);\n    --ce-menu-primary: #ffffff;\n    --ce-menu-secondary: var(--sidebar-surface-secondary, #ececec);\n    --ce-border-light: #0d0d0d26;\n}\n\n.dark {\n    --ce-text-primary: var(--text-primary, #ececec);\n    --ce-menu-primary: #2A2A2A;\n    --ce-menu-secondary: var(--sidebar-surface-secondary, #212121);\n    --ce-border-light: var(--border-default, rgba(255, 255, 255, .15));\n}\n\n/* Define our own background in both themes — this used to lean on\n   ChatGPT's bg-menu utility class, which no longer paints one */\n.bg-menu {\n    background-color: var(--ce-menu-primary);\n}\n\n.dark .bg-menu {\n    background-color: var(--ce-menu-primary);\n}\n\n.border-menu {\n    border-color: var(--ce-border-light);\n}\n\n.menu-item {\n    height: 46px;\n}\n\n.menu-item[disabled] {\n    filter: brightness(0.5);\n}\n\n.ce-nav-trigger {\n    min-width: 0;\n    border: 0;\n    color: var(--ce-text-primary);\n}\n\n.ce-nav-trigger .ce-menu-item-text {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n\n.ce-nav-trigger-collapsed {\n    width: 32px;\n    height: 32px;\n    margin: 0 auto 0.5rem;\n    padding: 0;\n    justify-content: center;\n    gap: 0;\n    border-radius: 8px;\n    color: var(--text-secondary, var(--ce-text-primary));\n}\n\n.ce-nav-trigger-collapsed:hover {\n    background-color: var(--sidebar-surface-secondary, rgba(255, 255, 255, 0.1));\n}\n\n.ce-nav-trigger-collapsed .ce-menu-item-text {\n    display: none;\n}\n\n.ce-card {\n    border-radius: 1rem;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);\n}\n\n/* ChatGPT's main column carries its own z-index, which beats the menu's\n   portalled Radix popper wrapper (position: fixed, z-index: auto). Raise\n   only OUR wrapper — :has keeps ChatGPT's own Radix poppers untouched —\n   and stay below the dialogs at 1000/1001. */\n[data-radix-popper-content-wrapper]:has(.ce-card) {\n    z-index: 999 !important;\n}\n\n.dark .ce-card {\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);\n}\n\n.inputFieldSet {\n    display: block;\n    border-width: 2px;\n    border-style: groove;\n}\n\n.inputFieldSet legend {\n    margin-left: 4px;\n}\n\n.inputFieldSet input {\n    background-color: transparent;\n    box-shadow: none!important;\n}\n\n.row-half {\n    grid-column: auto / span 1;\n}\n\n.row-full {\n    grid-column: auto / span 2;\n}\n\n.dropdown-backdrop {\n    display: block;\n    position: fixed;\n    top: 0;\n    bottom: 0;\n    left: 0;\n    right: 0;\n    background-color: rgba(0,0,0,.5);\n    animation-name: pointerFadeIn;\n    animation-duration: .3s;\n}\n\n@keyframes fadeIn {\n    from {\n        opacity: 0;\n    }\n    to {\n        opacity: 1;\n    }\n}\n\n@keyframes slideUp {\n    from {\n        transform: translateY(100%);\n    }\n    to {\n        transform: translateY(0);\n    }\n}\n\n@keyframes pointerFadeIn {\n    from {\n        opacity: 0;\n        pointer-events: none;\n    }\n    to {\n        opacity: 1;\n        pointer-events: auto;\n    }\n}\n\n@keyframes rotate {\n    from {\n        transform: rotate(0deg);\n    }\n    to {\n        transform: rotate(360deg);\n    }\n}\n\n@keyframes circularDash {\n    0% {\n        stroke-dasharray: 1px, 200px;\n        stroke-dashoffset: 0;\n    }\n    50% {\n        stroke-dasharray: 100px, 200px;\n        stroke-dashoffset: -15px;\n    }\n    100% {\n        stroke-dasharray: 100px, 200px;\n        stroke-dashoffset: -125px;\n    }\n}\n");
-	_css(".DialogOverlay {\n    background-color: rgba(0, 0, 0, 0.44);\n    position: fixed;\n    inset: 0;\n    z-index: 1000;\n    animation: fadeIn 150ms cubic-bezier(0.16, 1, 0.3, 1);\n}\n\n.DialogContent {\n    background-color: #f3f3f3;\n    border-radius: 6px;\n    box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;\n    position: fixed;\n    top: 50%;\n    left: 50%;\n    transform: translate(-50%, -50%);\n    width: 90vw;\n    max-width: 560px;\n    max-height: 85vh;\n    overflow: hidden;\n    padding: 16px 24px;\n    z-index: 1001;\n    outline: none;\n    animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);\n    display: flex;\n    flex-direction: column;\n}\n\n.dark .DialogContent {\n    background-color: #2a2a2a;\n    border-color: #40414f;\n    border-width: 1px;\n}\n\n.DialogContent._export {\n    background-color: #ffffff;\n}\n\n.dark .DialogContent._export {\n    background-color: #2a2a2a;\n}\n\n.DialogContent input[type=\"checkbox\"] {\n    border: none;\n    outline: none;\n    box-shadow: none;\n}\n\n.DialogTitle {\n    margin: 0 0 16px 0;\n    font-weight: 500;\n    color: #1a1523;\n    font-size: 20px;\n    flex-shrink: 0;\n}\n\n.DialogBody {\n    flex: 1;\n    min-height: 0;\n    overflow-y: auto;\n    overflow-x: hidden;\n}\n\n.dark .DialogTitle {\n    color: #fff;\n}\n\n.Button {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    border-radius: 4px;\n    padding: 0 15px;\n    font-size: 15px;\n    line-height: 1;\n    height: 35px;\n}\n.Button.green {\n    background-color: #ddf3e4;\n    color: #18794e;\n}\n.Button.red {\n    background-color: #f9d9d9;\n    color: #a71d2a;\n}\n.Button.neutral {\n    background-color: transparent;\n    color: #6f6e77;\n    border: 1px solid #6f6e77;\n    font-size: 13px;\n    height: 26px;\n    padding: 0 8px;\n}\n.Button.green:hover {\n    background-color: #ccebd7;\n}\n.Button.neutral:hover {\n    background-color: rgba(111, 110, 119, 0.1);\n}\n.dark .Button.neutral {\n    color: #a0a0a8;\n    border-color: #a0a0a8;\n}\n.dark .Button.neutral:hover {\n    background-color: rgba(160, 160, 168, 0.1);\n}\n.Button:disabled {\n    opacity: 0.5;\n    color: #6f6e77;\n    background-color: #e0e0e0;\n    cursor: not-allowed;\n}\n.Button:disabled:hover {\n    background-color: #e0e0e0;\n}\n\n.IconButton {\n    font-family: inherit;\n    border-radius: 100%;\n    height: 25px;\n    width: 25px;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    color: #6f6e77;\n}\n.IconButton:hover {\n    background-color: rgba(0, 0, 0, 0.06);\n}\n\n.CloseButton {\n    position: absolute;\n    top: 10px;\n    right: 10px;\n}\n\n.Fieldset {\n    display: flex;\n    gap: 20px;\n    align-items: center;\n    margin-bottom: 15px;\n}\n\n.Label {\n    font-size: 15px;\n    color: #1a1523;\n    min-width: 90px;\n    text-align: right;\n}\n\n.dark .Label {\n    color: #fff;\n}\n\n.Input {\n    width: 100%;\n    flex: 1;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    border-radius: 4px;\n    padding: 0 10px;\n    font-size: 15px;\n    line-height: 1;\n    color: #000;\n    background-color: #fafafa;\n    box-shadow: 0 0 0 1px #6f6e77;\n    height: 35px;\n    outline: none;\n}\n\n.dark .Input {\n    background-color: #2f2f2f;\n    color: #fff;\n    box-shadow: 0 0 0 1px #6f6e77;\n}\n\n.Description {\n    font-size: 13px;\n    color: #5a5865;\n    text-align: right;\n    margin-bottom: 4px;\n}\n\n.dark .Description {\n    color: #bcbcbc;\n}\n\n.SelectSearch {\n    width: 100%;\n    padding: 8px 16px;\n    border: 1px solid #6f6e77;\n    border-bottom: none;\n    border-radius: 4px 4px 0 0;\n    background-color: transparent;\n    color: inherit;\n    font-size: 14px;\n    outline: none;\n    flex-shrink: 0;\n}\n.SelectSearch::placeholder {\n    color: #9ca3af;\n}\n\n.SelectToolbar {\n    display: flex;\n    align-items: center;\n    /* Minimum breathing room between the select-all label and the right\n       group once the ml-auto margin collapses under pressure */\n    gap: 12px;\n    padding: 12px 16px;\n    border-radius: 0;\n    border: 1px solid #6f6e77;\n    border-bottom: none;\n    flex-shrink: 0;\n}\n\n/* CJK labels wrap per-character when the row is squeezed — never shrink it */\n.SelectToolbar .CheckBoxLabel {\n    white-space: nowrap;\n    flex-shrink: 0;\n}\n\n.ProjectSelect .Select {\n    width: auto;\n}\n\n.SelectList {\n    position: relative;\n    width: 100%;\n    flex: 1;\n    min-height: 120px;\n    padding: 12px 16px;\n    overflow-x: hidden;\n    overflow-y: auto;\n    border: 1px solid #6f6e77;\n    border-radius: 0 0 4px 4px;\n    white-space: nowrap;\n}\n\n.SelectItem {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    overflow: hidden;\n}\n\n.SelectItem .CheckBoxLabel {\n    flex: 1;\n    min-width: 0;\n}\n\n.SelectItem .LabelText {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n\n.SelectItem label, .SelectItem input {\n    cursor: pointer;\n}\n\n.SelectItem span {\n    vertical-align: middle;\n}\n\n.SelectItemMeta {\n    flex-shrink: 0;\n    font-size: 0.7rem;\n    color: #9ca3af;\n    white-space: nowrap;\n    font-variant-numeric: tabular-nums;\n    min-width: 6.5rem;\n    text-align: right;\n}\n.SelectItemMetaActive {\n    color: #6b7280;\n    font-weight: 600;\n}\n.dark {\n    .SelectItemMetaActive { color: #d1d5db; }\n}\n\n/* ── Sortable column header row ── */\n.SelectListHeader {\n    display: flex;\n    align-items: center;\n    padding: 0 16px;\n    border: 1px solid #6f6e77;\n    border-bottom: none;\n    background: #f9fafb;\n    user-select: none;\n    flex-shrink: 0;\n}\n\n.dark {\n    .SelectListHeader { background: #1f2937; }\n}\n\n.SelectListHeaderCell {\n    flex-shrink: 0;\n    font-size: 0.68rem;\n    font-weight: 600;\n    color: #9ca3af;\n    letter-spacing: 0.03em;\n    text-transform: uppercase;\n    background: transparent;\n    border: none;\n    padding: 5px 4px;\n    cursor: pointer;\n    white-space: nowrap;\n    min-width: 6.5rem;\n    text-align: right;\n}\n.SelectListHeaderCell:hover { color: #374151; }\n.dark {\n    .SelectListHeaderCell:hover { color: #e5e7eb; }\n}\n.SelectListHeaderCellTitle {\n    flex: 1;\n    text-align: left;\n    padding-left: 28px; /* align with checkbox label */\n}\n.SelectListHeaderCellActive {\n    color: #2563eb;\n}\n.dark {\n    .SelectListHeaderCellActive { color: #60a5fa; }\n}\n\n\n@media (max-width: 480px) {\n    .DialogContent { max-height: 90vh; }\n    .SelectListHeaderCell:last-child { display: none; }\n    .SelectItemMeta:last-child { display: none; }\n    .ActionBar { justify-content: flex-end; }\n    .ActionBar > .Select { width: 100%; }\n    .ActionBar > .flex-grow { display: none; }\n}\n\n@keyframes contentShow {\n    from {\n        opacity: 0;\n        transform: translate(-50%, -48%) scale(0.96);\n    }\n    to {\n        opacity: 1;\n        transform: translate(-50%, -50%) scale(1);\n    }\n}\n");
+	_css(".ce-timestamp {\n    color: var(--color-text-tertiary, var(--text-tertiary, #8f8f8f));\n}\n\nspan[data-time-format] {\n    display: none;\n}\n\nbody[data-time-format=\"12\"] span[data-time-format=\"12\"] {\n    display: inline;\n}\n\nbody[data-time-format=\"24\"] span[data-time-format=\"24\"] {\n    display: inline;\n}\n\n.Select {\n    padding: 0 2rem 0 0.5rem;\n    width: auto;\n    min-width: 7.5rem;\n    border-radius: 4px;\n    box-shadow: 0 0 0 1px #6f6e77;\n}\n\n:is(.dark, [data-theme=\"dark\"]) .Select {\n    background-color: #2f2f2f;\n    color: #fff;\n    box-shadow: 0 0 0 1px #6f6e77;\n}\n\nhtml {\n    --ce-text-primary: var(--color-text-primary, var(--text-primary, #0d0d0d));\n    --ce-menu-primary: #ffffff;\n    --ce-menu-secondary: var(--sidebar-surface-secondary, #ececec);\n    --ce-border-light: #0d0d0d26;\n    --ce-hover: var(--color-token-list-hover-background, rgba(0, 0, 0, .05));\n}\n\n:is(.dark, [data-theme=\"dark\"]) {\n    --ce-text-primary: var(--color-text-primary, var(--text-primary, #ececec));\n    --ce-menu-primary: #2A2A2A;\n    --ce-menu-secondary: var(--sidebar-surface-secondary, #212121);\n    --ce-border-light: var(--color-token-border-default, var(--border-default, rgba(255, 255, 255, .15)));\n    --ce-hover: var(--color-token-list-hover-background, rgba(255, 255, 255, .1));\n}\n\n/* Define our own background in both themes — this used to lean on\n   ChatGPT's bg-menu utility class, which no longer paints one */\n.bg-menu {\n    background-color: var(--ce-menu-primary);\n}\n\n:is(.dark, [data-theme=\"dark\"]) .bg-menu {\n    background-color: var(--ce-menu-primary);\n}\n\n.border-menu {\n    border-color: var(--ce-border-light);\n}\n\n.menu-item {\n    height: 46px;\n}\n\n.menu-item[disabled] {\n    filter: brightness(0.5);\n}\n\n.ce-nav-trigger {\n    min-width: 0;\n    border: 0;\n    color: var(--ce-text-primary);\n}\n\n.ce-nav-trigger .ce-menu-item-text {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n\n.ce-nav-trigger-collapsed {\n    width: 32px;\n    height: 32px;\n    margin: 0 auto 0.5rem;\n    padding: 0;\n    justify-content: center;\n    gap: 0;\n    border-radius: 8px;\n    color: var(--color-text-secondary, var(--text-secondary, var(--ce-text-primary)));\n}\n\n/* ChatGPT no longer ships the `hoverable` styles these items relied on. */\n.menu-item.hoverable:not([disabled]):hover,\n.ce-nav-trigger-collapsed:hover {\n    background-color: var(--ce-hover);\n}\n\n.ce-nav-trigger-collapsed .ce-menu-item-text {\n    display: none;\n}\n\n.ce-card {\n    color: var(--ce-text-primary);\n    border-radius: 1rem;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);\n}\n\n.ce-card .menu-item {\n    column-gap: 8px;\n    padding-inline-start: 8px;\n}\n\n/* ChatGPT's main column carries its own z-index, which beats the menu's\n   portalled Radix popper wrapper (position: fixed, z-index: auto). Raise\n   only OUR wrapper — :has keeps ChatGPT's own Radix poppers untouched —\n   and stay below the dialogs at 1000/1001. */\n[data-radix-popper-content-wrapper]:has(.ce-card) {\n    z-index: 999 !important;\n}\n\n:is(.dark, [data-theme=\"dark\"]) .ce-card {\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);\n}\n\n.inputFieldSet {\n    display: block;\n    border-width: 2px;\n    border-style: groove;\n}\n\n.inputFieldSet legend {\n    margin-left: 4px;\n}\n\n.inputFieldSet input {\n    background-color: transparent;\n    box-shadow: none!important;\n}\n\n.row-half {\n    grid-column: auto / span 1;\n}\n\n.row-full {\n    grid-column: auto / span 2;\n}\n\n.dropdown-backdrop {\n    display: block;\n    position: fixed;\n    top: 0;\n    bottom: 0;\n    left: 0;\n    right: 0;\n    background-color: rgba(0,0,0,.5);\n    animation-name: pointerFadeIn;\n    animation-duration: .3s;\n}\n\n@keyframes fadeIn {\n    from {\n        opacity: 0;\n    }\n    to {\n        opacity: 1;\n    }\n}\n\n@keyframes slideUp {\n    from {\n        transform: translateY(100%);\n    }\n    to {\n        transform: translateY(0);\n    }\n}\n\n@keyframes pointerFadeIn {\n    from {\n        opacity: 0;\n        pointer-events: none;\n    }\n    to {\n        opacity: 1;\n        pointer-events: auto;\n    }\n}\n\n@keyframes rotate {\n    from {\n        transform: rotate(0deg);\n    }\n    to {\n        transform: rotate(360deg);\n    }\n}\n\n@keyframes circularDash {\n    0% {\n        stroke-dasharray: 1px, 200px;\n        stroke-dashoffset: 0;\n    }\n    50% {\n        stroke-dasharray: 100px, 200px;\n        stroke-dashoffset: -15px;\n    }\n    100% {\n        stroke-dasharray: 100px, 200px;\n        stroke-dashoffset: -125px;\n    }\n}\n");
+	_css(".DialogOverlay {\n    background-color: rgba(0, 0, 0, 0.44);\n    position: fixed;\n    inset: 0;\n    z-index: 1000;\n    animation: fadeIn 150ms cubic-bezier(0.16, 1, 0.3, 1);\n}\n\n.DialogContent {\n    color: var(--ce-text-primary);\n    background-color: #f3f3f3;\n    border-radius: 6px;\n    box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;\n    position: fixed;\n    top: 50%;\n    left: 50%;\n    transform: translate(-50%, -50%);\n    width: 90vw;\n    max-width: 560px;\n    max-height: 85vh;\n    overflow: hidden;\n    padding: 16px 24px;\n    z-index: 1001;\n    outline: none;\n    animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);\n    display: flex;\n    flex-direction: column;\n}\n\n:is(.dark, [data-theme=\"dark\"]) .DialogContent {\n    background-color: #2a2a2a;\n    border-color: #40414f;\n    border-width: 1px;\n}\n\n.DialogContent._export {\n    background-color: #ffffff;\n}\n\n:is(.dark, [data-theme=\"dark\"]) .DialogContent._export {\n    background-color: #2a2a2a;\n}\n\n.DialogContent input[type=\"checkbox\"] {\n    border: none;\n    outline: none;\n    box-shadow: none;\n}\n\n.DialogTitle {\n    margin: 0 0 16px 0;\n    font-weight: 500;\n    color: #1a1523;\n    font-size: 20px;\n    flex-shrink: 0;\n}\n\n.DialogBody {\n    flex: 1;\n    min-height: 0;\n    overflow-y: auto;\n    overflow-x: hidden;\n}\n\n:is(.dark, [data-theme=\"dark\"]) .DialogTitle {\n    color: #fff;\n}\n\n.Button {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    border-radius: 4px;\n    padding: 0 15px;\n    font-size: 15px;\n    line-height: 1;\n    height: 35px;\n}\n.Button.green {\n    background-color: #ddf3e4;\n    color: #18794e;\n}\n.Button.red {\n    background-color: #f9d9d9;\n    color: #a71d2a;\n}\n.Button.neutral {\n    background-color: transparent;\n    color: #6f6e77;\n    border: 1px solid #6f6e77;\n    font-size: 13px;\n    height: 26px;\n    padding: 0 8px;\n}\n.Button.green:hover {\n    background-color: #ccebd7;\n}\n.Button.neutral:hover {\n    background-color: rgba(111, 110, 119, 0.1);\n}\n:is(.dark, [data-theme=\"dark\"]) .Button.neutral {\n    color: #a0a0a8;\n    border-color: #a0a0a8;\n}\n:is(.dark, [data-theme=\"dark\"]) .Button.neutral:hover {\n    background-color: rgba(160, 160, 168, 0.1);\n}\n.Button:disabled {\n    opacity: 0.5;\n    color: #6f6e77;\n    background-color: #e0e0e0;\n    cursor: not-allowed;\n}\n.Button:disabled:hover {\n    background-color: #e0e0e0;\n}\n\n.IconButton {\n    font-family: inherit;\n    border-radius: 100%;\n    height: 25px;\n    width: 25px;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    color: #6f6e77;\n}\n.IconButton:hover {\n    background-color: rgba(0, 0, 0, 0.06);\n}\n\n.CloseButton {\n    position: absolute;\n    top: 10px;\n    right: 10px;\n}\n\n.Fieldset {\n    display: flex;\n    gap: 20px;\n    align-items: center;\n    margin-bottom: 15px;\n}\n\n.Label {\n    font-size: 15px;\n    color: #1a1523;\n    min-width: 90px;\n    text-align: right;\n}\n\n:is(.dark, [data-theme=\"dark\"]) .Label {\n    color: #fff;\n}\n\n.Input {\n    width: 100%;\n    flex: 1;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    border-radius: 4px;\n    padding: 0 10px;\n    font-size: 15px;\n    line-height: 1;\n    color: #000;\n    background-color: #fafafa;\n    box-shadow: 0 0 0 1px #6f6e77;\n    height: 35px;\n    outline: none;\n}\n\n:is(.dark, [data-theme=\"dark\"]) .Input {\n    background-color: #2f2f2f;\n    color: #fff;\n    box-shadow: 0 0 0 1px #6f6e77;\n}\n\n.Description {\n    font-size: 13px;\n    color: #5a5865;\n    text-align: right;\n    margin-bottom: 4px;\n}\n\n:is(.dark, [data-theme=\"dark\"]) .Description {\n    color: #bcbcbc;\n}\n\n.SelectSearch {\n    width: 100%;\n    padding: 8px 16px;\n    border: 1px solid #6f6e77;\n    border-bottom: none;\n    border-radius: 4px 4px 0 0;\n    background-color: transparent;\n    color: inherit;\n    font-size: 14px;\n    outline: none;\n    flex-shrink: 0;\n}\n.SelectSearch::placeholder {\n    color: #9ca3af;\n}\n\n.SelectToolbar {\n    display: flex;\n    align-items: center;\n    /* Minimum breathing room between the select-all label and the right\n       group once the ml-auto margin collapses under pressure */\n    gap: 12px;\n    padding: 12px 16px;\n    border-radius: 0;\n    border: 1px solid #6f6e77;\n    border-bottom: none;\n    flex-shrink: 0;\n}\n\n/* CJK labels wrap per-character when the row is squeezed — never shrink it */\n.SelectToolbar .CheckBoxLabel {\n    white-space: nowrap;\n    flex-shrink: 0;\n}\n\n.ProjectSelect .Select {\n    width: auto;\n}\n\n.SelectList {\n    position: relative;\n    width: 100%;\n    flex: 1;\n    min-height: 120px;\n    padding: 12px 16px;\n    overflow-x: hidden;\n    overflow-y: auto;\n    border: 1px solid #6f6e77;\n    border-radius: 0 0 4px 4px;\n    white-space: nowrap;\n}\n\n.SelectItem {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    overflow: hidden;\n}\n\n.SelectItem .CheckBoxLabel {\n    flex: 1;\n    min-width: 0;\n}\n\n.SelectItem .LabelText {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n\n.SelectItem label, .SelectItem input {\n    cursor: pointer;\n}\n\n.SelectItem span {\n    vertical-align: middle;\n}\n\n.SelectItemMeta {\n    flex-shrink: 0;\n    font-size: 0.7rem;\n    color: #9ca3af;\n    white-space: nowrap;\n    font-variant-numeric: tabular-nums;\n    min-width: 6.5rem;\n    text-align: right;\n}\n.SelectItemMetaActive {\n    color: #6b7280;\n    font-weight: 600;\n}\n:is(.dark, [data-theme=\"dark\"]) {\n    .SelectItemMetaActive { color: #d1d5db; }\n}\n\n/* ── Sortable column header row ── */\n.SelectListHeader {\n    display: flex;\n    align-items: center;\n    padding: 0 16px;\n    border: 1px solid #6f6e77;\n    border-bottom: none;\n    background: #f9fafb;\n    user-select: none;\n    flex-shrink: 0;\n}\n\n:is(.dark, [data-theme=\"dark\"]) {\n    .SelectListHeader { background: #1f2937; }\n}\n\n.SelectListHeaderCell {\n    flex-shrink: 0;\n    font-size: 0.68rem;\n    font-weight: 600;\n    color: #9ca3af;\n    letter-spacing: 0.03em;\n    text-transform: uppercase;\n    background: transparent;\n    border: none;\n    padding: 5px 4px;\n    cursor: pointer;\n    white-space: nowrap;\n    min-width: 6.5rem;\n    text-align: right;\n}\n.SelectListHeaderCell:hover { color: #374151; }\n:is(.dark, [data-theme=\"dark\"]) {\n    .SelectListHeaderCell:hover { color: #e5e7eb; }\n}\n.SelectListHeaderCellTitle {\n    flex: 1;\n    text-align: left;\n    padding-left: 28px; /* align with checkbox label */\n}\n.SelectListHeaderCellActive {\n    color: #2563eb;\n}\n:is(.dark, [data-theme=\"dark\"]) {\n    .SelectListHeaderCellActive { color: #60a5fa; }\n}\n\n\n@media (max-width: 480px) {\n    .DialogContent { max-height: 90vh; }\n    .SelectListHeaderCell:last-child { display: none; }\n    .SelectItemMeta:last-child { display: none; }\n    .ActionBar { justify-content: flex-end; }\n    .ActionBar > .Select { width: 100%; }\n    .ActionBar > .flex-grow { display: none; }\n}\n\n@keyframes contentShow {\n    from {\n        opacity: 0;\n        transform: translate(-50%, -48%) scale(0.96);\n    }\n    to {\n        opacity: 1;\n        transform: translate(-50%, -50%) scale(1);\n    }\n}\n");
 	function useCollapsedSidebar(container, isMobile) {
 		const [isCollapsed, setIsCollapsed] = h$4(false);
 		p$6(() => {
@@ -22316,10 +22933,12 @@
 	function Menu({ container }) {
 		return o$5(SettingProvider, { children: o$5(MenuInner, { container }) });
 	}
-	_css(".animate-fadeIn  {\n    animation: fadeIn .3s;\n}\n\n.animate-slideUp  {\n    animation: slideUp .3s;\n}\n\n.bg-blue-600 {\n    background-color: rgb(28 100 242);\n}\n\n.hover\\:bg-gray-500\\/10:hover {\n    background-color: hsla(0, 0%, 61%, .1)\n}\n\n.border-\\[\\#6f6e77\\] {\n    border-color: #6f6e77;\n}\n\n.cursor-help {\n    cursor: help;\n}\n\n.dark .dark\\:bg-white\\/5 {\n    background-color: rgb(255 255 255 / 5%);\n}\n\n.dark .dark\\:text-gray-200 {\n    color: rgb(229 231 235 / 1);\n}\n\n.dark .dark\\:text-gray-300 {\n    color: rgb(209 213 219 / 1);\n}\n\n.dark .dark\\:border-gray-\\[\\#86858d\\] {\n    border-color: #86858d;\n}\n\n.gap-x-1 {\n    column-gap: 0.25rem;\n}\n\n.h-2\\.5 {\n    height: 0.625rem;\n}\n\n.h-4 {\n    height: 1rem;\n}\n\n.inline-flex {\n    display: inline-flex;\n}\n\n.items-center {\n    align-items: center;\n}\n\n.ml-3 {\n    margin-left: 0.75rem;\n}\n\n.ml-4 {\n    margin-left: 1rem;\n}\n\n.mr-8 {\n    margin-right: 2rem;\n}\n\n.pb-0 {\n    padding-bottom: 0;\n}\n\n.pr-8 {\n    padding-right: 2rem;\n}\n\n.right-4 {\n    right: 1rem;\n}\n\n.rounded-full {\n    border-radius: 9999px;\n}\n\n.select-all {\n    user-select: all!important;\n}\n\n.shrink-0 {\n    flex-shrink: 0;\n}\n\n.min-w-0 {\n    min-width: 0;\n}\n\n.space-y-6>:not([hidden])~:not([hidden]) {\n    --tw-space-y-reverse: 0;\n    margin-top: calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));\n    margin-bottom: calc(1.5rem * var(--tw-space-y-reverse));\n}\n\n.truncate {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n\n.whitespace-nowrap {\n    white-space: nowrap;\n}\n\n@media (min-width:768px) {\n    /* md */\n}\n\n@media (min-width:1024px) {\n    .lg\\:mt-0 {\n        margin-top: 0;\n    }\n\n    .lg\\:top-8 {\n        top: 2rem;\n    }\n}\n\n\n.toggle-switch {\n    position: relative;\n    outline: none;\n    background-color: rgb(229 231 235);\n    border: 1px solid rgb(107 114 128);\n    border-radius: 9999px;\n    cursor: pointer;\n    height: 20px;\n    width: 32px;\n}\n\n.dark .toggle-switch {\n    background-color: rgb(255 255 255 / 5%);\n    border-color: rgb(255 255 255 / 1);\n}\n\n.toggle-switch[data-state=\"checked\"] {\n    background-color: rgb(0 0 0);\n    border-color: rgb(0 0 0);\n}\n\n.dark .toggle-switch[data-state=\"checked\"] {\n    background-color: rgb(22 163 74);\n    border-color: rgb(22 163 74);\n}\n\n.toggle-switch-handle {\n    display: block;\n    background-color: rgb(255 255 255);\n    border-radius: 9999px;\n    height: 16px;\n    width: 16px;\n    transition: transform 0.1s;\n    will-change: transform;\n    transform: translateX(1px);\n}\n\n.toggle-switch-handle[data-state=\"checked\"] {\n    transform: translateX(14px);\n}\n\n.toggle-switch-handle:hover {\n    background-color: rgb(243 244 246);\n}\n\n.toggle-switch-label {\n    color: rgb(107 114 128);\n    margin-left: 0.75rem;\n    font-size: 0.875rem;\n    font-weight: 500;\n}\n\n.toggle-switch-label:hover {\n    color: rgb(71 85 105);\n}\n\n");
+	_css(".animate-fadeIn  {\n    animation: fadeIn .3s;\n}\n\n.animate-slideUp  {\n    animation: slideUp .3s;\n}\n\n.bg-blue-600 {\n    background-color: rgb(28 100 242);\n}\n\n.hover\\:bg-gray-500\\/10:hover {\n    background-color: hsla(0, 0%, 61%, .1)\n}\n\n.border-\\[\\#6f6e77\\] {\n    border-color: #6f6e77;\n}\n\n.cursor-help {\n    cursor: help;\n}\n\n:is(.dark, [data-theme=\"dark\"]) .dark\\:bg-white\\/5 {\n    background-color: rgb(255 255 255 / 5%);\n}\n\n:is(.dark, [data-theme=\"dark\"]) .dark\\:text-gray-200 {\n    color: rgb(229 231 235 / 1);\n}\n\n:is(.dark, [data-theme=\"dark\"]) .dark\\:text-gray-300 {\n    color: rgb(209 213 219 / 1);\n}\n\n:is(.dark, [data-theme=\"dark\"]) .dark\\:border-gray-\\[\\#86858d\\] {\n    border-color: #86858d;\n}\n\n.gap-x-1 {\n    column-gap: 0.25rem;\n}\n\n.h-2\\.5 {\n    height: 0.625rem;\n}\n\n.h-4 {\n    height: 1rem;\n}\n\n.inline-flex {\n    display: inline-flex;\n}\n\n.items-center {\n    align-items: center;\n}\n\n.ml-3 {\n    margin-left: 0.75rem;\n}\n\n.ml-4 {\n    margin-left: 1rem;\n}\n\n.mr-8 {\n    margin-right: 2rem;\n}\n\n.pb-0 {\n    padding-bottom: 0;\n}\n\n.pr-8 {\n    padding-right: 2rem;\n}\n\n.right-4 {\n    right: 1rem;\n}\n\n.rounded-full {\n    border-radius: 9999px;\n}\n\n.select-all {\n    user-select: all!important;\n}\n\n.shrink-0 {\n    flex-shrink: 0;\n}\n\n.min-w-0 {\n    min-width: 0;\n}\n\n.space-y-6>:not([hidden])~:not([hidden]) {\n    --tw-space-y-reverse: 0;\n    margin-top: calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));\n    margin-bottom: calc(1.5rem * var(--tw-space-y-reverse));\n}\n\n.truncate {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n\n.whitespace-nowrap {\n    white-space: nowrap;\n}\n\n@media (min-width:768px) {\n    /* md */\n}\n\n@media (min-width:1024px) {\n    .lg\\:mt-0 {\n        margin-top: 0;\n    }\n\n    .lg\\:top-8 {\n        top: 2rem;\n    }\n}\n\n\n.toggle-switch {\n    position: relative;\n    outline: none;\n    background-color: rgb(229 231 235);\n    border: 1px solid rgb(107 114 128);\n    border-radius: 9999px;\n    cursor: pointer;\n    height: 20px;\n    width: 32px;\n}\n\n:is(.dark, [data-theme=\"dark\"]) .toggle-switch {\n    background-color: rgb(255 255 255 / 5%);\n    border-color: rgb(255 255 255 / 1);\n}\n\n.toggle-switch[data-state=\"checked\"] {\n    background-color: rgb(0 0 0);\n    border-color: rgb(0 0 0);\n}\n\n:is(.dark, [data-theme=\"dark\"]) .toggle-switch[data-state=\"checked\"] {\n    background-color: rgb(22 163 74);\n    border-color: rgb(22 163 74);\n}\n\n.toggle-switch-handle {\n    display: block;\n    background-color: rgb(255 255 255);\n    border-radius: 9999px;\n    height: 16px;\n    width: 16px;\n    transition: transform 0.1s;\n    will-change: transform;\n    transform: translateX(1px);\n}\n\n.toggle-switch-handle[data-state=\"checked\"] {\n    transform: translateX(14px);\n}\n\n.toggle-switch-handle:hover {\n    background-color: rgb(243 244 246);\n}\n\n.toggle-switch-label {\n    color: rgb(107 114 128);\n    margin-left: 0.75rem;\n    font-size: 0.875rem;\n    font-weight: 500;\n}\n\n.toggle-switch-label:hover {\n    color: rgb(71 85 105);\n}\n");
 	var PROFILE_BUTTON_SELECTOR = "[data-testid=\"accounts-profile-button\"]";
 	var SIDEBAR_SCROLL_SELECTOR = "[data-app-action-sidebar-scroll]";
 	var AUTOMATIONS_SELECTOR = "[data-sidebar-destination=\"builtin:automations\"]";
+	var MESSAGE_UNIT_SELECTOR = "[data-chatgpt-conversation-selection-target] [data-chatgpt-search-message-ids]";
+	var RAIL_MENU_BUTTON_SELECTOR = "[data-app-navigation-rail] button[aria-haspopup=\"menu\"]";
 	main();
 	function main() {
 		watchTemporaryChatId();
@@ -22350,6 +22969,7 @@
 			for (const selector of [
 				PROFILE_BUTTON_SELECTOR,
 				SIDEBAR_SCROLL_SELECTOR,
+				RAIL_MENU_BUTTON_SELECTOR,
 				AUTOMATIONS_SELECTOR
 			]) import_sentinel_umd.default.on(selector, syncNavMenu);
 			syncNavMenu();
@@ -22363,35 +22983,81 @@
 				const currentChatId = getChatIdFromUrl();
 				if (!currentChatId || currentChatId === chatId) return;
 				chatId = currentChatId;
-				const { conversationNodes } = processConversation(await fetchConversation(chatId, false));
+				const { conversationNodes } = processConversation(await fetchConversation(chatId));
 				const threadContents = Array.from(document.querySelectorAll("main [data-testid^=\"conversation-turn-\"] [data-message-id]"));
 				if (threadContents.length === 0) return;
 				threadContents.forEach((thread, index) => {
 					const createTime = conversationNodes[index]?.message?.create_time;
 					if (!createTime) return;
-					const date = new Date(createTime * 1e3);
-					const timestamp = document.createElement("time");
-					timestamp.className = "w-full text-gray-500 dark:text-gray-400 text-sm text-right";
-					timestamp.dateTime = date.toISOString();
-					timestamp.title = date.toLocaleString();
-					const hour12 = document.createElement("span");
-					hour12.setAttribute("data-time-format", "12");
-					hour12.textContent = date.toLocaleTimeString("en-US", {
-						hour: "2-digit",
-						minute: "2-digit"
-					});
-					const hour24 = document.createElement("span");
-					hour24.setAttribute("data-time-format", "24");
-					hour24.textContent = date.toLocaleTimeString("en-US", {
-						hour: "2-digit",
-						minute: "2-digit",
-						hour12: false
-					});
-					timestamp.append(hour12, hour24);
-					thread.append(timestamp);
+					thread.append(createTimestamp(createTime));
 				});
 			});
+			watchMessageTimestamps();
 		});
+	}
+	function watchMessageTimestamps() {
+		let chatId = "";
+		let createTimes = Promise.resolve(new Map());
+		const missingIds = new Set();
+		const loadCreateTimes = async (id) => {
+			const conversation = await fetchConversation(id);
+			const times = new Map();
+			Object.values(conversation.mapping).forEach(({ message }) => {
+				if (message?.create_time) times.set(message.id, message.create_time);
+			});
+			return times;
+		};
+		const findCreateTime = (times, ids) => {
+			for (let i = ids.length - 1; i >= 0; i--) {
+				const time = times.get(ids[i]);
+				if (time) return time;
+			}
+			return null;
+		};
+		import_sentinel_umd.default.on(MESSAGE_UNIT_SELECTOR, async (unit) => {
+			if (isSharePage()) return;
+			if (unit.parentElement?.closest("[data-chatgpt-search-message-ids]")) return;
+			const currentChatId = getChatIdFromUrl();
+			if (!currentChatId) return;
+			if (currentChatId !== chatId) {
+				chatId = currentChatId;
+				missingIds.clear();
+				createTimes = loadCreateTimes(chatId).catch(() => new Map());
+			}
+			const ids = unit.getAttribute("data-chatgpt-search-message-ids")?.split(/\s+/).filter(Boolean) ?? [];
+			if (ids.length === 0) return;
+			let createTime = findCreateTime(await createTimes, ids);
+			if (!createTime && ids.some((id) => !missingIds.has(id)) && currentChatId === chatId) {
+				ids.forEach((id) => missingIds.add(id));
+				createTimes = loadCreateTimes(chatId).catch(() => new Map());
+				createTime = findCreateTime(await createTimes, ids);
+			}
+			if (!createTime || !unit.isConnected || unit.querySelector(":scope > time[data-ce-timestamp]")) return;
+			unit.append(createTimestamp(createTime));
+		});
+	}
+	function createTimestamp(createTime) {
+		const date = new Date(createTime * 1e3);
+		const timestamp = document.createElement("time");
+		timestamp.className = "ce-timestamp w-full text-sm text-right";
+		timestamp.setAttribute("data-ce-timestamp", "");
+		timestamp.dateTime = date.toISOString();
+		timestamp.title = date.toLocaleString();
+		const hour12 = document.createElement("span");
+		hour12.setAttribute("data-time-format", "12");
+		hour12.textContent = date.toLocaleTimeString("en-US", {
+			hour: "2-digit",
+			minute: "2-digit"
+		});
+		const hour24 = document.createElement("span");
+		hour24.setAttribute("data-time-format", "24");
+		hour24.textContent = date.toLocaleTimeString("en-US", {
+			hour: "2-digit",
+			minute: "2-digit",
+			hour12: false
+		});
+		timestamp.append(hour12, hour24);
+		return timestamp;
 	}
 	function getMenuContainer() {
 		const container = document.createElement("div");
@@ -22415,6 +23081,11 @@
 			target,
 			insert: (container) => target.prepend(container)
 		}));
+		const railMenuButton = document.querySelector(RAIL_MENU_BUTTON_SELECTOR);
+		if (railMenuButton) return [{
+			target: railMenuButton,
+			insert: (container) => getNavMenuInsertionTarget(railMenuButton).before(container)
+		}];
 		return Array.from(document.querySelectorAll(AUTOMATIONS_SELECTOR)).map((target) => ({
 			target,
 			insert: (container) => getNavMenuInsertionTarget(target).before(container)
