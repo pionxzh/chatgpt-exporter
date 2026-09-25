@@ -21,4 +21,5 @@ node_modules
 *.sw?
 
 tsconfig.tsbuildinfo
-.claude
+.claude/*
+!.claude/skills/
