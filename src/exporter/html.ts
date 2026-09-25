@@ -146,8 +146,9 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
                 return transformed
             })
         }
-        if (message.author.role === 'user') {
-            postSteps = [...postSteps, input => `<p class="no-katex">${escapeHtml(input)}</p>`]
+        else {
+            // Only assistant replies are markdown. A tool message can hold an uploaded HTML page.
+            postSteps = [input => `<p class="no-katex">${escapeHtml(input)}</p>`]
         }
         const postProcess = (input: string) => postSteps.reduce((acc, fn) => fn(acc), input)
         const content = transformContent(message.content, message.metadata, postProcess)
@@ -232,7 +233,7 @@ function transformContent(
         case 'text':
             return postProcess(content.parts?.join('\n') || '')
         case 'code':
-            return `Code:\n\`\`\`\n${content.text}\n\`\`\`` || ''
+            return postProcess(`Code:\n\`\`\`\n${content.text}\n\`\`\``)
         case 'execution_output':
             if (metadata?.aggregate_result?.messages) {
                 return metadata.aggregate_result.messages
@@ -258,7 +259,7 @@ function transformContent(
             return content.parts?.map((part) => {
                 if (typeof part === 'string') return postProcess(part)
                 if (part.content_type === 'image_asset_pointer') return `<img src="${part.asset_pointer}" height="${part.height}" width="${part.width}" />`
-                if (part.content_type === 'audio_transcription') return `<div style="font-style: italic; opacity: 0.65;">“${part.text}”</div>`
+                if (part.content_type === 'audio_transcription') return `<div style="font-style: italic; opacity: 0.65;">“${escapeHtml(part.text)}”</div>`
                 if (part.content_type === 'audio_asset_pointer') return null
                 if (part.content_type === 'real_time_user_audio_video_asset_pointer') return null
                 return postProcess('[Unsupported multimodal content]')
