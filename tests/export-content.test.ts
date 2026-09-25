@@ -108,4 +108,11 @@ describe('exportAllToMarkdown', () => {
         expect(markdown).not.toContain('photo.png')
         expect(markdown).not.toContain('FILE CONTENT')
     })
+
+    it('renders a code message as a code block', async () => {
+        const markdown = await exportFile(exportAllToMarkdown, conversation([
+            { role: 'assistant', content: { content_type: 'code', text: 'print(1)' } },
+        ]))
+        expect(markdown).toContain('#### ChatGPT:\nCode:\n\n```\nprint(1)\n```')
+    })
 })
