@@ -4,7 +4,7 @@ import { checkIfConversationStarted, getChatIdFromUrl } from '../page'
 import { downloadFile, getFileNameWithFormat } from '../utils/download'
 import { Effect } from '../utils/effect'
 import { encodePng } from '../utils/png'
-import { sleep } from '../utils/utils'
+import { getColorScheme, sleep } from '../utils/utils'
 
 const MAX_SCREENSHOT_DIMENSION = 16_000
 const MAX_TILE_PIXELS = 16_000_000
@@ -46,7 +46,7 @@ export async function exportToPng(fileNameFormat: string) {
         return false
     }
 
-    const isDarkMode = document.documentElement.classList.contains('dark')
+    const isDarkMode = getColorScheme() === 'dark'
     const threadEl = thread as HTMLElement
     const turnContainers = Array.from(threadEl.querySelectorAll<HTMLElement>('[data-turn-id-container][data-is-intersecting]'))
         .filter(element => !!element.querySelector('[data-testid^="conversation-turn-"]') || element.offsetHeight > 0 || !!element.style.getPropertyValue('--last-known-height'))

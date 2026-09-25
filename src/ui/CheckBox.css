@@ -40,7 +40,7 @@
     color: rgb(28 100 242);
 }
 
-.dark .CheckBoxLabel input:checked ~ svg {
+:is(.dark, [data-theme="dark"]) .CheckBoxLabel input:checked ~ svg {
     color: rgb(144, 202, 249);
 }
 
