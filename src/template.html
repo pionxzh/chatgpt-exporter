@@ -23,40 +23,8 @@
                     { left: "\\(", right: "\\)", display: false }
                 ],
                 throwOnError: false,
-                ignoredClasses: ["no-katex"],
-                preProcess: function(math) {
-                    return `\\displaystyle \\Large ${math}`;
-                }
+                ignoredClasses: ["no-katex"]
             });
-            document.querySelectorAll('.katex').forEach(function(el) {
-                const parent = el.parentNode;
-                const grandparent = parent.parentNode;
-                if (grandparent.tagName === 'P' && isOnlyContent(grandparent, parent)) {
-                    el.style.width = '100%';
-                    el.style.display = 'block';
-                    el.style.textAlign = 'center';
-                    parent.style.textAlign = 'center';
-                } else {
-                    el.style.display = 'inline-block';
-                    el.style.width = 'fit-content';
-                }
-            });
-            function isOnlyContent(parent, element) {
-                let onlyKaTeX = true;
-                parent.childNodes.forEach(function(child) {
-                    console.log(child.textContent);
-                    if (child !== element) {
-                        if (child.nodeType === Node.TEXT_NODE) {
-                            if (child.textContent.trim().length > 0) {
-                                onlyKaTeX = false;
-                            }
-                        } else if (child.nodeType === Node.ELEMENT_NODE) {
-                            onlyKaTeX = false;
-                        }
-                    }
-                });
-                return onlyKaTeX;
-            }
         });
     </script>
 
@@ -120,12 +88,12 @@
             background-color: rgba(236,236,241,var(--tw-bg-opacity))
         }
 
-        .dark ::-webkit-scrollbar-thumb {
+        [data-theme="dark"] ::-webkit-scrollbar-thumb {
             --tw-bg-opacity: 1;
             background-color: rgba(86,88,105,var(--tw-bg-opacity))
         }
 
-        .dark ::-webkit-scrollbar-thumb:hover {
+        [data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
             --tw-bg-opacity: 1;
             background-color: rgba(172,172,190,var(--tw-bg-opacity))
         }
@@ -234,17 +202,17 @@
             margin-top: 0;
         }
 
-        p>code, li>code {
+        :not(pre)>code {
             color: var(--tw-prose-code);
-            font-weight: 600;
-            font-size: .875em;
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+            font-size: .92em;
+            background-color: rgba(0, 0, 0, .09);
+            border-radius: 6px;
+            padding: 1px 6px;
         }
 
-        p>code::before,
-        p>code::after,
-        li>code::before,
-        li>code::after {
-            content: "`";
+        [data-theme="dark"] :not(pre)>code {
+            background-color: rgba(255, 255, 255, .1);
         }
 
         hr {
@@ -537,12 +505,12 @@
             color: #6b7280;
         }
 
-        .dark .thinking {
+        [data-theme="dark"] .thinking {
             border-color: #4b5563;
         }
 
-        .dark .thinking summary,
-        .dark .thinking p {
+        [data-theme="dark"] .thinking summary,
+        [data-theme="dark"] .thinking p {
             color: #9ca3af;
         }
 
@@ -572,7 +540,7 @@
             color: #6b7280;
         }
 
-        .dark .attachments {
+        [data-theme="dark"] .attachments {
             color: #9ca3af;
         }
 
