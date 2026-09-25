@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { protectMath } from '../src/utils/latex'
+import { protectMath, toBracketDelimiters } from '../src/utils/latex'
 import { fromMarkdown, toHtml, toMarkdown } from '../src/utils/markdown'
 import { escapeHtml } from '../src/exporter/htmlTemplate'
 
@@ -37,21 +37,28 @@ describe('math in markdown export', () => {
 // Same steps as the HTML exporter
 function formatHtml(input: string) {
     const { text, restore } = protectMath(input)
-    return restore(toHtml(fromMarkdown(text)), escapeHtml)
+    return restore(toHtml(fromMarkdown(text)), formula => escapeHtml(toBracketDelimiters(formula)))
 }
 
 describe('math in HTML export', () => {
     it('keeps multi-line display math intact (#264)', () => {
         expect(formatHtml('Sum:\n\n\\[\n\\begin{aligned}\nS\n&= a\\,b \\\\\n=\nc\n\\end{aligned}\n\\]\n\nDone.'))
-            .toBe('<p>Sum:</p>\n<p>$$\n\\begin{aligned}\nS\n&amp;= a\\,b \\\\\n=\nc\n\\end{aligned}\n$$</p>\n<p>Done.</p>')
+            .toBe('<p>Sum:</p>\n<p>\\[\n\\begin{aligned}\nS\n&amp;= a\\,b \\\\\n=\nc\n\\end{aligned}\n\\]</p>\n<p>Done.</p>')
     })
 
     it('keeps math outside code in a message that has code', () => {
         expect(formatHtml('Then \\(x_1\\):\n\n```\n\\[a\\]\n```'))
-            .toBe('<p>Then $x_1$:</p>\n<pre><code>\\[a\\]\n</code></pre>')
+            .toBe('<p>Then \\(x_1\\):</p>\n<pre><code>\\[a\\]\n</code></pre>')
     })
 
     it('escapes HTML inside formulas', () => {
-        expect(formatHtml('\\(a<b\\)')).toBe('<p>$a&lt;b$</p>')
+        expect(formatHtml('\\(a<b\\)')).toBe('<p>\\(a&lt;b\\)</p>')
+    })
+
+    it('marks only recognized math for KaTeX', () => {
+        expect(formatHtml('Plans cost $5 and $10, and $x^2$ grows.'))
+            .toBe('<p>Plans cost $5 and $10, and \\(x^2\\) grows.</p>')
+        expect(formatHtml('Also $$E = mc^2$$ here.'))
+            .toBe('<p>Also \\[E = mc^2\\] here.</p>')
     })
 })

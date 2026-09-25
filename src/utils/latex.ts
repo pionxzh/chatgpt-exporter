@@ -42,3 +42,14 @@ export function protectMath(input: string): { text: string, restore: (text: stri
     })
     return { text, restore }
 }
+
+/**
+ * Rewrite a formula from `protectMath` with `\( \)` or `\[ \]` delimiters.
+ * The HTML export only renders those, so a `$` in plain text, such as a
+ * price, is not taken for math.
+ */
+export function toBracketDelimiters(formula: string): string {
+    const display = /^\$\$([\s\S]*)\$\$$/.exec(formula)
+    if (display) return `\\[${display[1]}\\]`
+    return `\\(${formula.slice(1, -1)}\\)`
+}

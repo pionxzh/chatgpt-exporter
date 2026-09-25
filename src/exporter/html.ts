@@ -7,7 +7,7 @@ import templateHtml from '../template.html?raw'
 import { checkIfTemporaryChatIsExportable } from '../temporaryChat'
 import { transformContentReferences } from '../utils/citations'
 import { buildZipFileName, downloadFile, getFileNameWithFormat } from '../utils/download'
-import { protectMath } from '../utils/latex'
+import { protectMath, toBracketDelimiters } from '../utils/latex'
 import { fromMarkdown, toHtml } from '../utils/markdown'
 import { ScriptStorage } from '../utils/storage'
 import { standardizeLineBreaks } from '../utils/text'
@@ -117,7 +117,7 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
             postSteps.push((input) => {
                 // Keep formulas out of the markdown round trip, which would eat their backslashes
                 const { text, restore } = protectMath(input)
-                return restore(toHtml(fromMarkdown(text)), escapeHtml)
+                return restore(toHtml(fromMarkdown(text)), formula => escapeHtml(toBracketDelimiters(formula)))
             })
         }
         else {
