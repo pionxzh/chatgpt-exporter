@@ -16,7 +16,7 @@ import {
 import { useGMStorage } from '../hooks/useGMStorage'
 
 const defaultFormat = 'ChatGPT-{title}'
-const defaultExportAllLimit = 1000
+const defaultExportAllLimit = 200
 
 export interface ExportMeta {
     name: string
