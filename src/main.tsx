@@ -9,11 +9,19 @@ import { onloadSafe } from './utils/utils'
 import './i18n'
 import './styles/missing-tailwind.css'
 
+// ChatGPT A/B tests its layout, so users can get different variants at the
+// same time. Each injection point notes the date it was added. Keep it for at
+// least 30 days, then remove it once no variant renders it anymore.
+
+// Added 2026-05-03.
 const PROFILE_BUTTON_SELECTOR = '[data-testid="accounts-profile-button"]'
+// Added 2026-09-20. Footer after the nav: 2026-09-26.
 const SIDEBAR_SCROLL_SELECTOR = '[data-app-action-sidebar-scroll]'
+// Added 2026-09-20.
 const AUTOMATIONS_SELECTOR = '[data-sidebar-destination="builtin:automations"]'
-// The redesigned navigation rail keeps the help and profile menus in its footer.
+// Added 2026-09-24.
 const MESSAGE_UNIT_SELECTOR = '[data-chatgpt-conversation-selection-target] [data-chatgpt-search-message-ids]'
+// Added 2026-09-25. The rail keeps the help and profile menus in its footer.
 const RAIL_MENU_BUTTON_SELECTOR = '[data-app-navigation-rail] button[aria-haspopup="menu"]'
 
 interface NavMenuMount {
@@ -70,14 +78,14 @@ function main() {
         syncNavMenu()
         setInterval(syncNavMenu, 1000)
 
-        // Support for share page
+        // Support for share page. Added 2024-09-07.
         if (isSharePage()) {
             sentinel.on(`div[role="presentation"] > .w-full > div >.flex.w-full`, (target) => {
                 target.prepend(getMenuContainer())
             })
         }
 
-        /** Insert timestamp to the bottom right of each message */
+        /** Insert timestamp to the bottom right of each message. Added 2023-11-13. */
         let chatId = ''
         sentinel.on('[role="presentation"]', async () => {
             // Share pages carry a share id, not a conversation id, so the
@@ -207,24 +215,46 @@ function getNavMenuMounts(): NavMenuMount[] {
         }))
     }
 
-    const profileFooters = Array.from(document.querySelectorAll(SIDEBAR_SCROLL_SELECTOR))
-        .map(scrollRoot => scrollRoot.nextElementSibling)
-        .filter((footer): footer is Element => !!footer?.querySelector('button[aria-haspopup="menu"]'))
-    if (profileFooters.length > 0) {
-        return profileFooters.map(target => ({
-            target,
-            insert: container => target.prepend(container),
-        }))
+    // The redesigned shell keeps the expanded sidebar and the collapsed rail
+    // mounted together and hides one with `inert`, so mount a menu in each.
+    const mounts: NavMenuMount[] = []
+
+    Array.from(document.querySelectorAll(SIDEBAR_SCROLL_SELECTOR)).forEach((scrollRoot) => {
+        // The profile footer follows either the scroll root or its wrapping nav.
+        const footer = [scrollRoot.nextElementSibling, scrollRoot.parentElement?.nextElementSibling]
+            .find(el => el?.querySelector('button[aria-haspopup="menu"]'))
+        if (footer) {
+            mounts.push({
+                target: footer,
+                insert: (container) => {
+                    // Line up with the sidebar rows, which the footer insets, and
+                    // keep a gap from the chat list that ends right above it.
+                    Object.assign((container as HTMLElement).style, {
+                        paddingInline: 'var(--padding-row-x)',
+                        paddingTop: '8px',
+                    })
+                    footer.prepend(container)
+                },
+            })
+        }
+    })
+
+    // Place the menu in its own row above the first footer menu of the rail.
+    const railMenuButton = document.querySelector(RAIL_MENU_BUTTON_SELECTOR)
+    const rail = railMenuButton?.closest('[data-app-navigation-rail]')
+    const railRow = rail && Array.from(rail.children).find(row => row.contains(railMenuButton))
+    if (railMenuButton && railRow) {
+        mounts.push({
+            target: railMenuButton,
+            insert: (container) => {
+                // The rail itself ignores pointer events and each row opts back in.
+                (container as HTMLElement).style.pointerEvents = 'auto'
+                railRow.before(container)
+            },
+        })
     }
 
-    // Place the menu above the first footer menu, which is the help menu.
-    const railMenuButton = document.querySelector(RAIL_MENU_BUTTON_SELECTOR)
-    if (railMenuButton) {
-        return [{
-            target: railMenuButton,
-            insert: container => getNavMenuInsertionTarget(railMenuButton).before(container),
-        }]
-    }
+    if (mounts.length > 0) return mounts
 
     return Array.from(document.querySelectorAll(AUTOMATIONS_SELECTOR)).map(target => ({
         target,
