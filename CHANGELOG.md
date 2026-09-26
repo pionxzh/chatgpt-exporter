@@ -1,5 +1,24 @@
 # Changelog
 
+## [2.36.3](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.36.2...userscript-v2.36.3) (2026-09-26)
+
+
+### Bug Fixes
+
+* fetch message timestamps only when they are enabled ([5208543](https://github.com/pionxzh/chatgpt-exporter/commit/5208543cbf7798a46c26def2f54a58a6044da16b))
+* keep a partial conversation list exportable after a list error ([c6f1588](https://github.com/pionxzh/chatgpt-exporter/commit/c6f158860a30be167508b343d50314a1db59ca73))
+* line up the sidebar Export row with ChatGPT's own rows ([87b26a1](https://github.com/pionxzh/chatgpt-exporter/commit/87b26a158d4fffaa069d71b3ad164a55b0494a1f))
+* load 200 conversations by default in Export All ([fd55afd](https://github.com/pionxzh/chatgpt-exporter/commit/fd55afd9d54838391924dcf50ebcb222b4bb0292))
+* match ChatGPT's switch style for exporter toggles ([1757ece](https://github.com/pionxzh/chatgpt-exporter/commit/1757ece107b4785f824461c8095027b125048082))
+* own the exporter UI styles instead of borrowing ChatGPT's classes ([1b309f7](https://github.com/pionxzh/chatgpt-exporter/commit/1b309f7e05dde04b7b3d5019c7a72756c1d68445))
+* surface conversation-list errors in Export All ([1715ca7](https://github.com/pionxzh/chatgpt-exporter/commit/1715ca717e1779ef7352a3855f26736bfca30005))
+
+
+### Performance Improvements
+
+* replace i18next with a small built-in translator ([5cc7269](https://github.com/pionxzh/chatgpt-exporter/commit/5cc72693affc078599984f44e71584424b14fa2b))
+* replace Radix and headlessui with native dialog and own hover card ([03ebb1d](https://github.com/pionxzh/chatgpt-exporter/commit/03ebb1dead6af850805570e1ee5be4aaeee4d051))
+
 ## [2.36.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.36.1...userscript-v2.36.2) (2026-09-26)
 
 
