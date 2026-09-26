@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.36.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.36.1...userscript-v2.36.2) (2026-09-26)
+
+
+### Bug Fixes
+
+* follow ChatGPT's accent color for checkboxes and toggles ([188ba3b](https://github.com/pionxzh/chatgpt-exporter/commit/188ba3b2b43bcb58ba77880408facfd84813076b))
+* keep the exporter menu visible in the collapsible sidebar layout ([11de3cd](https://github.com/pionxzh/chatgpt-exporter/commit/11de3cdff577970ee121c65ead05158f518e1a2d))
+
 ## [2.36.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.36.0...userscript-v2.36.1) (2026-09-25)
 
 
