@@ -145,14 +145,10 @@
     border-color: rgb(255 255 255 / 1);
 }
 
+/* ChatGPT's switches follow the accent chosen in Appearance. */
 .toggle-switch[data-state="checked"] {
-    background-color: rgb(0 0 0);
-    border-color: rgb(0 0 0);
-}
-
-:is(.dark, [data-theme="dark"]) .toggle-switch[data-state="checked"] {
-    background-color: rgb(22 163 74);
-    border-color: rgb(22 163 74);
+    background-color: var(--color-chart-blue, #3a83f7);
+    border-color: var(--color-chart-blue, #3a83f7);
 }
 
 .toggle-switch-handle {

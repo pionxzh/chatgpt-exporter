@@ -36,12 +36,9 @@
     font-size: 1.5rem;
 }
 
+/* Match ChatGPT's switches, which follow the accent chosen in Appearance. */
 .CheckBoxLabel input:checked ~ svg {
-    color: rgb(28 100 242);
-}
-
-:is(.dark, [data-theme="dark"]) .CheckBoxLabel input:checked ~ svg {
-    color: rgb(144, 202, 249);
+    color: var(--color-chart-blue, #3a83f7);
 }
 
 .CheckBoxLabel .LabelText {
