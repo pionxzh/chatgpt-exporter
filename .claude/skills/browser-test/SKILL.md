@@ -45,6 +45,8 @@ node scripts/export.mjs JSON "OpenAI Official Format"
   default. Exports contain real conversations: never commit them.
 - `measure-text.mjs` compares the width of text on the page and inside an
   SVG image. See below.
+- `ui-shot.mjs` opens one exporter UI state (`page`, `menu`, `setting`,
+  `export`, `json`) and screenshots it. See UI changes below.
 
 To open a conversation, click it in the sidebar through `eval.mjs`, for
 example `[...document.querySelectorAll('a, button')].find(e => e.textContent.trim() === 'Title').click()`.
@@ -57,6 +59,34 @@ example `[...document.querySelectorAll('a, button')].find(e => e.textContent.tri
 - macOS ImageIO (Preview, `sips`) cannot open PNGs taller than about 65k px.
 - MCP screenshots are scaled. Take click coordinates from
   `getBoundingClientRect()`, not from the screenshot.
+
+## UI changes
+
+Compare every UI change before and after, in both themes. Capture the
+baseline before editing, since the old build is gone once you rebuild:
+
+```sh
+pnpm build && node scripts/inject.mjs --reload
+for t in light dark; do
+  for s in menu setting export json; do
+    node scripts/ui-shot.mjs $s --theme $t --out /tmp/ui/before-$s-$t.png
+  done
+  node scripts/ui-shot.mjs setting --theme $t --scroll bottom --out /tmp/ui/before-setting2-$t.png
+done
+# edit, rebuild, reinject, then repeat with after-*.png and Read the pairs
+```
+
+- `--theme` flips `<html>` only, not the account setting, and lasts until
+  the tab reloads.
+- Check the collapsed rail too. Collapse the sidebar with an MCP click on
+  "Hide sidebar"; a synthetic `click()` does not toggle it. Hover states
+  also need MCP `hover`.
+- Toggling settings in the dialog writes them to the test profile. Put them
+  back when done.
+- To match a ChatGPT control, find the live one and read its computed
+  style instead of guessing. Settings > Security and login has switches in
+  both states; Library cards show checkboxes on hover.
+- Run `git checkout dist/chatgpt.user.js` before committing. CI builds dist.
 
 ## Screenshot bugs
 
