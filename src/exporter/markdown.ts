@@ -126,7 +126,7 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
             postSteps.push((input) => {
                 // Keep formulas out of the markdown round trip, which would escape them
                 const { text, restore } = protectMath(input)
-                return restore(toMarkdown(fromMarkdown(text)))
+                return restore(toMarkdown(fromMarkdown(text), text))
             })
         }
         const postProcess = (input: string) => postSteps.reduce((acc, fn) => fn(acc), input)

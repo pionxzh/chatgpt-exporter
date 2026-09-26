@@ -16,7 +16,32 @@ export function fromMarkdown(content: string): Root {
     })
 }
 
-export function toMarkdown(ast: Content | Root): string {
+const graphemes = new Intl.Segmenter(undefined, { granularity: 'grapheme' })
+const WIDE = /[\p{Extended_Pictographic}\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}\u3000-\u303F\uFF01-\uFF60\uFFE0-\uFFE6]/u
+
+/** Width in a monospace font, so tables line up with CJK text and emoji. */
+function displayWidth(value: string): number {
+    let width = 0
+    for (const { segment } of graphemes.segment(value)) width += WIDE.test(segment) ? 2 : 1
+    return width
+}
+
+/**
+ * Re-serializes a tree parsed from `source` in one consistent style: ATX
+ * headings, `*` emphasis, backtick fences, `---` rules and aligned tables.
+ *
+ * Text and line breaks are copied from `source` as written. The default
+ * handlers would escape characters like `_` and `[`, decode entities, and
+ * turn trailing-space line breaks into backslashes.
+ */
+export function toMarkdown(ast: Content | Root, source: string): string {
+    const slice = (node: Node) => {
+        const start = node.position!.start.offset!
+        let end = node.position!.end.offset!
+        // from-markdown 1.x ends a text node before the `;` of a trailing character reference
+        if (source[end] === ';' && /&(?:#x?[\da-f]+|\w+)$/i.test(source.slice(start, end))) end++
+        return source.slice(start, end)
+    }
     return tm(ast, {
         bullet: '-',
         bulletOther: '*',
@@ -30,7 +55,16 @@ export function toMarkdown(ast: Content | Root): string {
         ruleRepetition: 3,
         ruleSpaces: false,
         strong: '*',
-        extensions: [gfmToMarkdown()],
+        extensions: [gfmToMarkdown({ stringLength: displayWidth })],
+        handlers: {
+            // Continuation lines hold the container prefix (`> `, list indent),
+            // which the container handlers add back. A paragraph line never
+            // starts with whitespace or `>`, so strip those.
+            text: node => node.position
+                ? slice(node).split('\n').map((line, i) => i ? line.replace(/^[ \t>]*/, '') : line).join('\n')
+                : node.value,
+            break: node => node.position ? slice(node) : '  \n',
+        },
     })
 }
 

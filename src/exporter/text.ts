@@ -126,12 +126,7 @@ function reformatContent(input: string) {
 
         return [item]
     })
-    const result = toMarkdown(root)
-    // HACK: render to markdown will let [ be escaped, so we need to remove the first character
-    if (result.startsWith('\\[') && input.startsWith('[')) {
-        return result.slice(1)
-    }
-    return result
+    return toMarkdown(root, input)
 }
 
 /**
