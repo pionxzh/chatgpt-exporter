@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.36.4](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.36.3...userscript-v2.36.4) (2026-09-26)
+
+
+### Bug Fixes
+
+* keep assistant text as written in markdown and text exports ([4c8fe6e](https://github.com/pionxzh/chatgpt-exporter/commit/4c8fe6ea01d58a59bc59aea9ba1421fee7d80969))
+
+
+### Performance Improvements
+
+* compile markdown to HTML with micromark directly ([f9d9e4c](https://github.com/pionxzh/chatgpt-exporter/commit/f9d9e4c1b0d59f38b7b83dd65bb5967bfbd34609))
+
 ## [2.36.3](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.36.2...userscript-v2.36.3) (2026-09-26)
 
 
