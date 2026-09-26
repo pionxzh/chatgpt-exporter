@@ -88,9 +88,10 @@ describe('exportAllToHtml', () => {
 
         expect(html).toContain('<img src="https://example.com/a.png"')
         expect(html).not.toContain(INJECTED)
-        expect(html.match(/&lt;style&gt;body \{ display: none \}&lt;\/style&gt;/g)).toHaveLength(2)
+        // Escaped in the tool message, the transcription and the code block.
+        expect(html.match(/&lt;style&gt;body \{ display: none \}&lt;\/style&gt;/g)).toHaveLength(3)
         // The code message renders as a markdown code block.
-        expect(html).toContain('<pre><code>&#x3C;style>body { display: none }&#x3C;/style>')
+        expect(html).toContain('<pre><code>&lt;style&gt;body { display: none }&lt;/style&gt;')
     })
 
     it('lists uploaded files but not the tool message with their content', async () => {

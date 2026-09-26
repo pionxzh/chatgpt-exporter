@@ -1,10 +1,10 @@
-import { toHtml as hastToHtml } from 'hast-util-to-html'
+import { micromark } from 'micromark'
 import { fromMarkdown as fm } from 'mdast-util-from-markdown'
 import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm'
-import { toHast } from 'mdast-util-to-hast'
 import { toMarkdown as tm } from 'mdast-util-to-markdown'
-import { gfm } from 'micromark-extension-gfm'
+import { gfm, gfmHtml } from 'micromark-extension-gfm'
 import type { Content, Parent, Root } from 'mdast'
+import type { HtmlExtension } from 'micromark-extension-gfm'
 import type { Node } from 'unist'
 
 // ref: https://github.com/rxliuli/mdbook/blob/master/libs/markdown-util
@@ -34,8 +34,24 @@ export function toMarkdown(ast: Content | Root): string {
     })
 }
 
-export function toHtml(node: Root): string {
-    return hastToHtml(toHast(node)!)
+// Drop raw HTML in the markdown, as mdast-util-to-hast did, instead of
+// micromark's default of showing it escaped. ChatGPT writes <br> in tables.
+const dropRawHtml: HtmlExtension = {
+    exit: {
+        htmlFlowData() {},
+        htmlTextData() {},
+    },
+}
+
+/**
+ * Compiles markdown straight to HTML, without building a syntax tree.
+ * URLs with protocols other than http(s), mailto, irc and xmpp are dropped.
+ */
+export function toHtml(markdown: string): string {
+    return micromark(markdown, {
+        extensions: [gfm()],
+        htmlExtensions: [gfmHtml(), dropRawHtml],
+    })
 }
 
 export function flatMap<T extends Node>(

@@ -37,7 +37,7 @@ describe('math in markdown export', () => {
 // Same steps as the HTML exporter
 function formatHtml(input: string) {
     const { text, restore } = protectMath(input)
-    return restore(toHtml(fromMarkdown(text)), formula => escapeHtml(toBracketDelimiters(formula)))
+    return restore(toHtml(text), formula => escapeHtml(toBracketDelimiters(formula)))
 }
 
 describe('math in HTML export', () => {
