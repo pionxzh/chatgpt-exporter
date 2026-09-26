@@ -1,5 +1,4 @@
-import i18n from 'i18next'
-import { initReactI18next } from 'react-i18next'
+import { useSyncExternalStore } from 'preact/compat'
 import { KEY_LANGUAGE, KEY_OAI_LOCALE } from './constants'
 import en_US from './locales/en.json'
 import es from './locales/es.json'
@@ -11,13 +10,6 @@ import tr_TR from './locales/tr.json'
 import zh_Hans from './locales/zh-Hans.json'
 import zh_Hant from './locales/zh-Hant.json'
 import { ScriptStorage } from './utils/storage'
-
-declare module 'i18next' {
-    // Refs: https://www.i18next.com/overview/typescript#argument-of-type-defaulttfuncreturn-is-not-assignable-to-parameter-of-type-xyz
-    interface CustomTypeOptions {
-        returnNull: false
-    }
-}
 
 interface Locale {
     name: string
@@ -131,8 +123,8 @@ const LanguageMapping: Record<string, string> = {
     'zh-Hant': ZH_Hant.code,
 }
 
-const resources = LOCALES.reduce<Record<string, { translation: Record<string, string> }>>((acc, cur) => {
-    acc[cur.code] = { translation: cur.resource }
+const resources = LOCALES.reduce<Record<string, Record<string, string>>>((acc, cur) => {
+    acc[cur.code] = cur.resource
     return acc
 }, {})
 
@@ -174,20 +166,58 @@ function getDefaultLanguage() {
         ?? EN_US.code
 }
 
-i18n
-    .use(initReactI18next)
-    .init({
-        fallbackLng: EN_US.code,
-        lng: getDefaultLanguage(),
-        debug: process.env.NODE_ENV === 'development',
-        resources,
-        interpolation: {
-            escapeValue: false, // not needed for react as it escapes by default
-        },
-    })
+type TranslateOptions = Record<string, string | number>
 
-i18n.on('languageChanged', (lng) => {
+let language = getDefaultLanguage()
+const listeners = new Set<() => void>()
+
+/**
+ * Looks up `key` in the current language, then en-US, then returns the key itself.
+ * `{{name}}` placeholders are replaced from `options`.
+ */
+function t(key: string, options?: TranslateOptions): string {
+    const template = resources[language]?.[key] ?? resources[EN_US.code][key] ?? key
+    if (!options) return template
+    return template.replace(/\{\{\s*(\w+)\s*\}\}/g, (_, name: string) => String(options[name] ?? ''))
+}
+
+function changeLanguage(lng: string) {
+    if (lng === language) return
+    language = lng
     ScriptStorage.set(KEY_LANGUAGE, lng)
-})
+    listeners.forEach(listener => listener())
+}
+
+function subscribe(listener: () => void) {
+    listeners.add(listener)
+    return () => listeners.delete(listener)
+}
+
+const i18n = {
+    t,
+    changeLanguage,
+    get language() {
+        return language
+    },
+}
+
+const translators = new Map<string, typeof t>()
+function getTranslator(lng: string) {
+    let translator = translators.get(lng)
+    if (!translator) {
+        translator = (key, options) => t(key, options)
+        translators.set(lng, translator)
+    }
+    return translator
+}
+
+/**
+ * Re-renders the component when the language changes.
+ * `t` gets a new identity per language, so hook deps on it stay correct.
+ */
+export function useTranslation() {
+    const lng = useSyncExternalStore(subscribe, () => language)
+    return { t: getTranslator(lng), i18n }
+}
 
 export default i18n
