@@ -61,5 +61,8 @@
   "All conversations": "Toutes les conversations",
   "Load more conversations": "Charger {{n}} de plus",
   "Load more conversations remaining": "Charger {{n}} de plus · {{remaining}} restantes",
-  "Export Skipped Message": "{{n}} conversations ont échoué après plusieurs tentatives et ne figurent pas dans l'export :"
+  "Export Skipped Message": "{{n}} conversations ont échoué après plusieurs tentatives et ne figurent pas dans l'export :",
+  "List Rate Limited Wait": "Limite de requêtes de l'API atteinte · attendez {{n}} s et réessayez",
+  "List Rate Limited": "Limite de requêtes de l'API atteinte · réessayez dans un instant",
+  "List Load Failed": "Impossible de charger les conversations"
 }

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import type { ChangeEvent } from 'preact/compat'
-import { useTranslation } from '../i18n'
+import i18n, { useTranslation } from '../i18n'
 import { RateLimitError, archiveConversation, deleteConversation, fetchAllConversations, fetchConversation, fetchConversationsPage, fetchProjects, probeApi, withImageAssets } from '../api'
 import { EXPORT_OPERATION_BATCH, KEY_EXPORTED_UPDATE_TIMES } from '../constants'
 import { exportAllToHtml } from '../exporter/html'
@@ -119,21 +119,15 @@ function textSearch(title: string, query: string): boolean {
     }
 }
 
-/**
- * Turns a conversation-list failure into a line the dialog can show.
- *
- * A 429 names a wait only when the server sent `Retry-After`. `RateLimitError`
- * otherwise substitutes an interval of its own for the queue's backoff, and
- * repeating that as the API's answer would present a guess as a fact.
- */
+/** Name a wait only when the server sent `Retry-After`, not our own fallback. */
 function describeListLoadError(error: unknown): string {
     if (error instanceof RateLimitError) {
         return error.retryAfterFromServer
-            ? `Rate limited by the API · wait ${Math.ceil(error.retryAfterMs / 1000)}s and try again`
-            : 'Rate limited by the API · wait a moment and try again'
+            ? i18n.t('List Rate Limited Wait', { n: Math.ceil(error.retryAfterMs / 1000) })
+            : i18n.t('List Rate Limited')
     }
     if (error instanceof Error && error.message) return error.message
-    return 'Failed to load conversations'
+    return i18n.t('List Load Failed')
 }
 
 // ---------------------------------------------------------------------------
@@ -444,7 +438,8 @@ const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
 
     const [selected, setSelected] = useState<ApiConversationItem[]>([])
     const [exportType, setExportType] = useState(exportAllOptions[0].label)
-    const disabled = processing || !!error || selected.length === 0
+    // A list error leaves the loaded part exportable.
+    const disabled = processing || selected.length === 0
 
     // "Load more" state
     const [hasMore, setHasMore] = useState(false)
@@ -710,7 +705,6 @@ const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
             setApiConversations(cache.items)
             setHasMore(cache.hasMore)
             setTotalAvailable(cache.total)
-            // A failure under another scope must not disable Export over this list
             setError('')
             setLoading(false)
             refreshConversationList(
@@ -742,8 +736,6 @@ const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
         setApiConversations([])
         setHasMore(false)
         setTotalAvailable(null)
-        // An error belongs to the load that produced it: left standing it would
-        // keep Export disabled over a list that afterwards loaded fine
         setError('')
         setLoading(true)
         let loadedHasMore = false
@@ -756,9 +748,7 @@ const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
                 loadedHasMore = hasMore
                 if (alive()) setHasMore(hasMore)
             },
-            // Reported rather than thrown: the promise below still resolves, with
-            // the batches collected so far, so this is the only chance to say
-            // that a short — often empty — list is not the whole account
+            // The promise still resolves with the partial list, so report the error here.
             (error) => {
                 loadFailed = true
                 if (alive()) setError(describeListLoadError(error))

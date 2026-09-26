@@ -4,8 +4,7 @@ import { act } from 'preact/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ApiConversationItem, ApiProjectInfo } from '../src/api'
 
-// Tampermonkey injects the GM_* APIs at runtime; absent is what the page sees
-// before that, and `ScriptStorage` already falls back to localStorage for it.
+// Without the GM_* APIs, `ScriptStorage` falls back to localStorage.
 vi.mock('vite-plugin-monkey/dist/client', () => ({
     unsafeWindow: globalThis,
     monkeyWindow: globalThis,
@@ -191,15 +190,11 @@ afterEach(() => {
 
 describe('export All conversation-list load', () => {
     it('shows a rate-limited list as an error, not as an empty account', async () => {
-        // The failure that shipped: page one of the list is throttled.
         stubApi({ list: [tooManyRequests('60')] })
 
         await openDialog()
 
-        // `fetchAllConversations` resolves with what it had rather than
-        // rejecting, so only its onError callback can tell the dialog that this
-        // empty list is not the account. Without that the rows below are all the
-        // user sees, and they are what a genuinely empty account looks like.
+        // Without the error this looks like an account with no conversations.
         expect(counter()).toBe('0 / 0')
         expect(conversationTitles()).toEqual([])
         expect(listError()).toMatch(/rate limited/i)
@@ -208,7 +203,7 @@ describe('export All conversation-list load', () => {
         expect(button('Export').disabled).toBe(true)
     })
 
-    it('keeps the conversations it did load visible under the error', async () => {
+    it('keeps the conversations it did load visible and exportable under the error', async () => {
         const first = Array.from({ length: 100 }, (_, i) => item(`c${i}`))
         stubApi({ list: [page(first, 250), tooManyRequests('30')] })
 
@@ -217,11 +212,13 @@ describe('export All conversation-list load', () => {
         expect(conversationTitles()).toHaveLength(100)
         expect(conversationTitles()).toContain('c0')
         expect(listError()).toMatch(/rate limited/i)
+
+        await checkFirstConversation()
+        expect(button('Export').disabled).toBe(false)
     })
 
     it('does not quote our own fallback as the wait the server asked for', async () => {
-        // No Retry-After: RateLimitError substitutes 30 s for the queue's own
-        // backoff, which is not a promise the API made.
+        // Without Retry-After, the 30s wait is our fallback, not the server's.
         stubApi({ list: [tooManyRequests()] })
 
         await openDialog()
@@ -230,7 +227,7 @@ describe('export All conversation-list load', () => {
         expect(listError()).not.toContain('30')
     })
 
-    it('clears the error when the next load succeeds, re-enabling Export', async () => {
+    it('clears the error when the next load succeeds', async () => {
         stubApi({
             list: [tooManyRequests('60')],
             projectList: [json({ items: [item('p1'), item('p2')], cursor: null })],
@@ -239,19 +236,11 @@ describe('export All conversation-list load', () => {
 
         await openDialog()
         expect(listError()).toMatch(/rate limited/i)
-        expect(button('Export').disabled).toBe(true)
 
         await chooseProject('proj-1')
 
-        // The load that succeeded owns the view now, so the old error is gone
         expect(listError()).toBe('')
         expect(conversationTitles()).toEqual(['p1', 'p2'])
-
-        // Export is gated on `!!error` as well as the selection, so a stale
-        // error would keep it disabled over a list that loaded fine
-        expect(button('Export').disabled).toBe(true)
-        await checkFirstConversation()
-        expect(button('Export').disabled).toBe(false)
     })
 
     it('does not let a superseded load write over the current scope', async () => {

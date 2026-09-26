@@ -61,5 +61,8 @@
   "All conversations": "All conversations",
   "Load more conversations": "Load {{n}} more",
   "Load more conversations remaining": "Load {{n}} more · {{remaining}} left",
-  "Export Skipped Message": "{{n}} conversations failed after repeated retries and are missing from the export:"
+  "Export Skipped Message": "{{n}} conversations failed after repeated retries and are missing from the export:",
+  "List Rate Limited Wait": "Rate limited by the API · wait {{n}}s and try again",
+  "List Rate Limited": "Rate limited by the API · try again in a moment",
+  "List Load Failed": "Failed to load conversations"
 }
