@@ -34,7 +34,7 @@ const cdp = await connect()
 await cdp.run(`
     const clickItem = async (label) => {
         for (let i = 0; i < 20; i++) {
-            const el = [...document.querySelectorAll('.menu-item')].find(e => e.textContent.trim() === label)
+            const el = [...document.querySelectorAll('.ce-menu-item')].find(e => e.textContent.trim() === label)
             if (el) return el.click()
             await new Promise(r => setTimeout(r, 100))
         }

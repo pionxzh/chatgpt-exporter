@@ -7,7 +7,6 @@ import { Menu } from './ui/Menu'
 import { onloadSafe } from './utils/utils'
 
 import './i18n'
-import './styles/missing-tailwind.css'
 
 // ChatGPT A/B tests its layout, so users can get different variants at the
 // same time. Each injection point notes the date it was added. Keep it for at
@@ -176,7 +175,7 @@ function createTimestamp(createTime: number) {
     const date = new Date(createTime * 1000)
 
     const timestamp = document.createElement('time')
-    timestamp.className = 'ce-timestamp w-full text-sm text-right'
+    timestamp.className = 'ce-timestamp'
     timestamp.setAttribute('data-ce-timestamp', '')
     timestamp.dateTime = date.toISOString()
     timestamp.title = date.toLocaleString()
@@ -193,6 +192,7 @@ function createTimestamp(createTime: number) {
 
 function getMenuContainer() {
     const container = document.createElement('div')
+    container.className = 'ce-root'
     // to overlap on the list section
     container.style.zIndex = '99'
     render(<Menu container={container} />, container)

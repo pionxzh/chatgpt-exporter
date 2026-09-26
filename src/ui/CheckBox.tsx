@@ -27,8 +27,8 @@ export const CheckBox: React.FC<CheckBoxProps> = ({
         setChecked(checked)
     }, [checked])
     return (
-        <label className={`CheckBoxLabel ${className ?? ''}`} disabled={disabled}>
-            <span className="IconWrapper">
+        <label className={`ce-checkbox ${className ?? ''}`} disabled={disabled}>
+            <span className="ce-checkbox-icon">
                 <input
                     type="checkbox"
                     checked={isChecked}
@@ -37,7 +37,7 @@ export const CheckBox: React.FC<CheckBoxProps> = ({
                 />
                 {isChecked ? <IconCheckBoxChecked /> : <IconCheckBox />}
             </span>
-            <span className="LabelText">{label}</span>
+            <span className="ce-checkbox-label">{label}</span>
         </label>
     )
 }

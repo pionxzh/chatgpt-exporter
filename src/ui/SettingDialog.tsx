@@ -11,9 +11,10 @@ import type { FC } from '../type'
 import { IconCross, IconTrash } from './Icons'
 import { useSettingContext } from './SettingContext'
 import { Toggle } from './Toggle'
+import './SettingDialog.css'
 
 function Variable({ name, title }: { name: string, title: string }) {
-    return <strong className="cursor-help select-all whitespace-nowrap" title={title}>{name}</strong>
+    return <strong className="ce-variable" title={title}>{name}</strong>
 }
 
 interface SettingDialogProps {
@@ -62,19 +63,19 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                 {children}
             </Dialog.Trigger>
             <Dialog.Portal>
-                <Dialog.Overlay className="DialogOverlay" />
-                <Dialog.Content className="DialogContent">
-                    <Dialog.Title className="DialogTitle">{t('Exporter Settings')}</Dialog.Title>
-                    <div className="DialogBody">
-                        <dl className="space-y-6">
-                            <div className="relative flex bg-white dark:bg-white/5 rounded p-4">
+                <Dialog.Overlay className="ce-root ce-dialog-overlay" />
+                <Dialog.Content className="ce-root ce-dialog">
+                    <Dialog.Title className="ce-dialog-title">{t('Exporter Settings')}</Dialog.Title>
+                    <div className="ce-dialog-body">
+                        <dl className="ce-setting-list">
+                            <div className="ce-setting-card">
                                 <div>
-                                    <dt className="text-md font-medium text-gray-800 dark:text-white">
+                                    <dt className="ce-setting-title">
                                         {`${t('Language')} 🌐`}
                                     </dt>
                                     <dd>
                                         <select
-                                            className="Select mt-3"
+                                            className="ce-select ce-setting-select"
                                             value={i18n.language}
                                             onChange={e => i18n.changeLanguage(e.currentTarget.value)}
                                         >
@@ -85,13 +86,13 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                                     </dd>
                                 </div>
                             </div>
-                            <div className="relative flex bg-white dark:bg-white/5 rounded p-4">
+                            <div className="ce-setting-card">
                                 <div>
-                                    <dt className="text-md font-medium text-gray-800 dark:text-white">
+                                    <dt className="ce-setting-title">
                                         {t('File Name')}
                                     </dt>
                                     <dd>
-                                        <p className="text-sm text-gray-700 dark:text-gray-300">
+                                        <p className="ce-setting-desc">
                                             {t('Available variables')}:{' '}
                                             <Variable name="{title}" title={title} />
                                             ,{' '}
@@ -105,50 +106,50 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                                             ,{' '}
                                             <Variable name="{update_time}" title={unixTimestampToISOString(updateTime)} />
                                         </p>
-                                        <input className="Input mt-4" id="filename" value={format} onChange={e => setFormat(e.currentTarget.value)} />
-                                        <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">
+                                        <input className="ce-input ce-setting-filename" id="filename" value={format} onChange={e => setFormat(e.currentTarget.value)} />
+                                        <p className="ce-setting-desc ce-setting-preview-line">
                                             {t('Preview')}:{' '}
-                                            <span className="select-all" style={{ 'text-decoration': 'underline', 'text-underline-offset': 4 }}>{preview}</span>
+                                            <span className="ce-preview">{preview}</span>
                                         </p>
                                     </dd>
                                 </div>
                             </div>
-                            <div className="relative flex bg-white dark:bg-white/5 rounded p-4">
+                            <div className="ce-setting-card">
                                 <div>
-                                    <dt className="text-md font-medium text-gray-800 dark:text-white">
+                                    <dt className="ce-setting-title">
                                         {t('Export Thinking Process')}
                                     </dt>
-                                    <dd className="text-sm text-gray-700 dark:text-gray-300">
+                                    <dd className="ce-setting-desc">
                                         {t('Export Thinking Process Description')}
                                     </dd>
                                 </div>
-                                <div className="absolute right-4">
+                                <div className="ce-setting-control">
                                     <Toggle label="" checked={enableThinking} onCheckedUpdate={setEnableThinking} />
                                 </div>
                             </div>
-                            <div className="relative flex bg-white dark:bg-white/5 rounded p-4">
+                            <div className="ce-setting-card">
                                 <div>
-                                    <dt className="text-md font-medium text-gray-800 dark:text-white">
+                                    <dt className="ce-setting-title">
                                         {t('Export Sources')}
                                     </dt>
-                                    <dd className="text-sm text-gray-700 dark:text-gray-300">
+                                    <dd className="ce-setting-desc">
                                         {t('Export Sources Description')}
                                     </dd>
                                 </div>
-                                <div className="absolute right-4">
+                                <div className="ce-setting-control">
                                     <Toggle label="" checked={enableSources} onCheckedUpdate={setEnableSources} />
                                 </div>
                             </div>
-                            <div className="relative flex bg-white dark:bg-white/5 rounded p-4">
+                            <div className="ce-setting-card">
                                 <div>
-                                    <dt className="text-md font-medium text-gray-800 dark:text-white">
+                                    <dt className="ce-setting-title">
                                         {t('Export All Limit')}{' '}
                                         {/* Add translation key */}
                                     </dt>
-                                    <dd className="text-sm text-gray-700 dark:text-gray-300 mt-2">
+                                    <dd className="ce-setting-desc ce-mt-2">
                                         {t('Export All Limit Description')}{' '}
                                         {/* Add translation key */}
-                                        <div className="flex items-center gap-4 mt-3">
+                                        <div className="ce-range-row">
                                             <input
                                                 type="range"
                                                 min="100" // Set min value
@@ -162,40 +163,40 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                                                             10,
                                                         ),
                                                     )}
-                                                className="flex-grow h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                                                className="ce-range"
                                                 id="exportAllLimitSlider"
                                             />
-                                            <span className="font-medium text-gray-900 dark:text-gray-300 w-12 text-right">
+                                            <span className="ce-range-value">
                                                 {exportAllLimit}
                                             </span>
                                         </div>
                                     </dd>
                                 </div>
                             </div>
-                            <div className="relative flex bg-white dark:bg-white/5 rounded p-4">
+                            <div className="ce-setting-card">
                                 <div>
-                                    <dt className="text-md font-medium text-gray-800 dark:text-white">
+                                    <dt className="ce-setting-title">
                                         {t('Conversation Timestamp')}
                                     </dt>
-                                    <dd className="text-sm text-gray-700 dark:text-gray-300">
+                                    <dd className="ce-setting-desc">
                                         {t('Conversation Timestamp Description')}
                                         {enableTimestamp && (
                                             <>
-                                                <div className="mt-2">
+                                                <div className="ce-mt-2">
                                                     <Toggle
                                                         label={t('Use 24-hour format')}
                                                         checked={timeStamp24H}
                                                         onCheckedUpdate={setTimeStamp24H}
                                                     />
                                                 </div>
-                                                <div className="mt-2">
+                                                <div className="ce-mt-2">
                                                     <Toggle
                                                         label={t('Enable on HTML')}
                                                         checked={enableTimestampHTML}
                                                         onCheckedUpdate={setEnableTimestampHTML}
                                                     />
                                                 </div>
-                                                <div className="mt-2">
+                                                <div className="ce-mt-2">
                                                     <Toggle
                                                         label={t('Enable on Markdown')}
                                                         checked={enableTimestampMarkdown}
@@ -206,21 +207,21 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                                         )}
                                     </dd>
                                 </div>
-                                <div className="absolute right-4">
+                                <div className="ce-setting-control">
                                     <Toggle label="" checked={enableTimestamp} onCheckedUpdate={setEnableTimestamp} />
                                 </div>
                             </div>
-                            <div className="relative flex bg-white dark:bg-white/5 rounded p-4">
+                            <div className="ce-setting-card">
                                 <div>
-                                    <dt className="text-md font-medium text-gray-800 dark:text-white">
+                                    <dt className="ce-setting-title">
                                         {t('Export Metadata')}
                                     </dt>
-                                    <dd className="text-sm text-gray-700 dark:text-gray-300">
+                                    <dd className="ce-setting-desc">
                                         {t('Export Metadata Description')}
 
                                         {enableMeta && (
                                             <>
-                                                <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                                                <p className="ce-setting-desc ce-mt-2">
                                                     {t('Available variables')}:{' '}
                                                     <Variable name="{title}" title={title} />
                                                     ,{' '}
@@ -241,9 +242,9 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                                                 {exportMetaList.map((meta, i) => (
                                                     // Rows have no stable id; keying by index keeps the input focused while typing.
                                                     // eslint-disable-next-line react/no-array-index-key
-                                                    <div className="flex items-center mt-2" key={i}>
+                                                    <div className="ce-meta-row" key={i}>
                                                         <input
-                                                            className="Input"
+                                                            className="ce-input"
                                                             value={meta.name}
                                                             onChange={(e) => {
                                                                 const list = [...exportMetaList]
@@ -251,9 +252,9 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                                                                 setExportMetaList(list)
                                                             }}
                                                         />
-                                                        <span className="mx-2">→</span>
+                                                        <span className="ce-meta-arrow">→</span>
                                                         <input
-                                                            className="Input"
+                                                            className="ce-input"
                                                             value={meta.value}
                                                             onChange={(e) => {
                                                                 const list = [...exportMetaList]
@@ -262,17 +263,17 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                                                             }}
                                                         />
                                                         <button
-                                                            className="ml-2 rounded-full p-1 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition ease-in-out duration-150"
+                                                            className="ce-meta-remove"
                                                             aria-label="Remove"
                                                             onClick={() => setExportMetaList(exportMetaList.filter((_, j) => j !== i))}
                                                         >
-                                                            <IconTrash className="w-4 h-4" />
+                                                            <IconTrash className="ce-icon" />
                                                         </button>
                                                     </div>
                                                 ))}
-                                                <div className="flex justify-center items-center mt-2 pr-8">
+                                                <div className="ce-meta-add-row">
                                                     <button
-                                                        className="w-full border border-[#6f6e77] dark:border-gray-[#86858d] rounded-md py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition ease-in-out duration-150"
+                                                        className="ce-meta-add"
                                                         aria-label="Add"
                                                         onClick={() => setExportMetaList([...exportMetaList, { name: '', value: '' }])}
                                                     >
@@ -283,20 +284,20 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                                         )}
                                     </dd>
                                 </div>
-                                <div className="absolute right-4">
+                                <div className="ce-setting-control">
                                     <Toggle label="" checked={enableMeta} onCheckedUpdate={setEnableMeta} />
                                 </div>
                             </div>
                         </dl>
                     </div>
                     {/* Outside DialogBody so it stays pinned while the settings scroll */}
-                    <div className="flex shrink-0 pt-4" style={{ justifyContent: 'flex-end' }}>
+                    <div className="ce-dialog-footer">
                         <Dialog.Close asChild>
-                            <button className="Button green font-bold">{t('Save')}</button>
+                            <button className="ce-button ce-button-green ce-button-strong">{t('Save')}</button>
                         </Dialog.Close>
                     </div>
                     <Dialog.Close asChild>
-                        <button className="IconButton CloseButton" aria-label="Close">
+                        <button className="ce-icon-button ce-close-button" aria-label="Close">
                             <IconCross />
                         </button>
                     </Dialog.Close>

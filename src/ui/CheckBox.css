@@ -1,23 +1,23 @@
-.CheckBoxLabel {
+.ce-checkbox {
     position: relative;
     display: flex;
     font-size: 16px;
     vertical-align: middle;
 }
 
-.CheckBoxLabel * {
+.ce-checkbox * {
     cursor: pointer;
 }
 
-.CheckBoxLabel[disabled] {
+.ce-checkbox[disabled] {
     opacity: 0.7;
 }
 
-.CheckBoxLabel[disabled] * {
+.ce-checkbox[disabled] * {
     cursor: not-allowed;
 }
 
-.CheckBoxLabel input {
+.ce-checkbox input {
     position: absolute;
     opacity: 0;
     width: 100%;
@@ -28,7 +28,7 @@
     padding: 0;
 }
 
-.CheckBoxLabel .IconWrapper {
+.ce-checkbox-icon {
     display: inline-flex;
     align-items: center;
     position: relative;
@@ -36,12 +36,11 @@
     font-size: 1.5rem;
 }
 
-/* Match ChatGPT's switches, which follow the accent chosen in Appearance. */
-.CheckBoxLabel input:checked ~ svg {
-    color: var(--color-chart-blue, #3a83f7);
+.ce-checkbox input:checked ~ svg {
+    color: var(--ce-accent);
 }
 
-.CheckBoxLabel .LabelText {
+.ce-checkbox-label {
     margin-left: 0.5rem;
     font-size: 1rem;
     line-height: 1.5;

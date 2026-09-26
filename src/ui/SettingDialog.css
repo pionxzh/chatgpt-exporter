@@ -1,0 +1,117 @@
+.ce-setting-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.ce-setting-card {
+    position: relative;
+    display: flex;
+    padding: 16px;
+    border-radius: 4px;
+    background-color: var(--ce-card-surface);
+}
+
+.ce-setting-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--ce-text-primary);
+}
+
+.ce-setting-desc {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: var(--ce-text-secondary);
+}
+
+.ce-setting-control {
+    position: absolute;
+    right: 16px;
+}
+
+.ce-setting-select {
+    margin-top: 12px;
+}
+
+.ce-setting-filename {
+    margin-top: 16px;
+}
+
+.ce-setting-preview-line {
+    margin-top: 4px;
+}
+
+.ce-variable {
+    cursor: help;
+    user-select: all;
+    white-space: nowrap;
+    font-weight: 600;
+}
+
+.ce-preview {
+    user-select: all;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+.ce-range-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.ce-range {
+    /* ChatGPT's base styles strip the native look from range inputs. */
+    appearance: auto;
+    flex-grow: 1;
+    cursor: pointer;
+    accent-color: var(--ce-accent);
+}
+
+.ce-range-value {
+    width: 3rem;
+    text-align: right;
+    font-weight: 500;
+    color: var(--ce-text-primary);
+}
+
+.ce-meta-row {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.ce-meta-arrow {
+    margin: 0 8px;
+}
+
+.ce-meta-remove {
+    margin-left: 8px;
+    padding: 4px;
+    border-radius: 9999px;
+    color: var(--ce-text-secondary);
+    transition: background-color 150ms ease-in-out;
+}
+
+.ce-meta-add-row {
+    display: flex;
+    margin-top: 8px;
+    padding-right: 32px;
+}
+
+.ce-meta-add {
+    width: 100%;
+    padding: 8px 0;
+    border: 1px solid var(--ce-control-border);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--ce-text-secondary);
+    transition: background-color 150ms ease-in-out;
+}
+
+.ce-meta-remove:hover,
+.ce-meta-add:hover {
+    background-color: var(--ce-hover);
+}

@@ -135,13 +135,13 @@ const ProjectSelect: FC<ProjectSelectProps> = ({ projects, selected, setSelected
     const { t } = useTranslation()
 
     return (
-        <div className="ProjectSelect flex items-center text-gray-600 dark:text-gray-300 justify-between mb-3">
+        <div className="ce-project-select">
             {t('Select Project')}
-            <div className="flex items-center gap-2">
-                {loading && <IconLoading className="w-3 h-3" />}
+            <div className="ce-hstack">
+                {loading && <IconLoading className="ce-icon-sm" />}
                 <select
                     disabled={disabled}
-                    className="Select"
+                    className="ce-select"
                     value={selected ?? ''}
                     onChange={(e) => {
                         const val = e.currentTarget.value
@@ -223,7 +223,7 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
             {/* ── Search input ── */}
             <input
                 type="search"
-                className="SelectSearch"
+                className="ce-select-search"
                 placeholder={t('Search')}
                 value={query}
                 disabled={disabled}
@@ -235,7 +235,7 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
             />
 
             {/* ── Toolbar: select-all + status select + hint + counter ── */}
-            <div className="SelectToolbar">
+            <div className="ce-select-toolbar">
                 <CheckBox
                     label={t('Select All')}
                     disabled={disabled}
@@ -245,22 +245,21 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
                         setSelected(checked ? filtered : [])
                     }}
                 />
-                {/* min-w-0 lets the shrinkable items (hint first, then the loading
-                    indicator) truncate instead of the whole row wrapping */}
-                <div className="flex items-center gap-2 ml-auto min-w-0">
+                {/* min-width: 0 lets the shrinkable items (hint first, then the
+                    loading indicator) truncate instead of the whole row wrapping */}
+                <div className="ce-select-toolbar-end">
                     {loading && conversations.length > 0 && (
-                        <span className="flex items-center gap-1 truncate min-w-0 text-sm text-gray-500 dark:text-gray-400">
-                            <IconLoading className="w-3 h-3" />
+                        <span className="ce-toolbar-loading">
+                            <IconLoading className="ce-icon-sm" />
                             {t('Loading')}... ({conversations.length})
                         </span>
                     )}
                     <select
-                        className="Select shrink-0"
                         // Fixed width: only the placeholder is ever shown collapsed, and
                         // without it the control sizes itself to the longest option,
                         // which overflows the toolbar in verbose locales. The 2rem right
                         // padding keeps the placeholder off the dropdown chevron.
-                        style={{ fontSize: '0.75rem', padding: '2px 2rem 2px 0.5rem', width: '8.5rem', textOverflow: 'ellipsis' }}
+                        className="ce-select ce-toolbar-status"
                         disabled={disabled || filtered.length === 0}
                         value=""
                         title="Select conversations by export status"
@@ -274,21 +273,19 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
                         <option value="not_exported">{t('Select Not Exported')}</option>
                         <option value="updated">{t('Select Updated')}</option>
                     </select>
-                    {/* Highest shrink factor: the hint collapses before the
-                        loading indicator starts truncating */}
-                    <span className="truncate min-w-0 text-xs text-gray-400 dark:text-gray-500" style={{ flexShrink: 99 }}>
+                    <span className="ce-toolbar-hint">
                         {t('Shift Select Hint')}
                     </span>
-                    <span className="whitespace-nowrap shrink-0 text-sm font-medium tabular-nums text-gray-500 dark:text-gray-400">
+                    <span className="ce-toolbar-count">
                         {selected.length} / {filtered.length}
                     </span>
                 </div>
             </div>
 
             {/* ── Column headers with sort controls ── */}
-            <div className="SelectListHeader">
+            <div className="ce-list-header">
                 <button
-                    className={`SelectListHeaderCell SelectListHeaderCellTitle${sortField === 'title' ? ' SelectListHeaderCellActive' : ''}`}
+                    className={`ce-list-header-cell ce-list-header-cell-title${sortField === 'title' ? ' ce-list-header-cell-active' : ''}`}
                     onClick={() => {
                         if (sortField === 'title') {
                             setSortDir(d => d === 'asc' ? 'desc' : 'asc')
@@ -302,7 +299,7 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
                     Title {sortField === 'title' ? (sortDir === 'asc' ? '↑' : '↓') : '↕'}
                 </button>
                 <button
-                    className={`SelectListHeaderCell${sortField === 'create_time' ? ' SelectListHeaderCellActive' : ''}`}
+                    className={`ce-list-header-cell${sortField === 'create_time' ? ' ce-list-header-cell-active' : ''}`}
                     onClick={() => {
                         if (sortField === 'create_time') {
                             setSortDir(d => d === 'asc' ? 'desc' : 'asc')
@@ -316,7 +313,7 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
                     Created {sortField === 'create_time' ? (sortDir === 'asc' ? '↑' : '↓') : '↕'}
                 </button>
                 <button
-                    className={`SelectListHeaderCell${sortField === 'update_time' ? ' SelectListHeaderCellActive' : ''}`}
+                    className={`ce-list-header-cell${sortField === 'update_time' ? ' ce-list-header-cell-active' : ''}`}
                     onClick={() => {
                         if (sortField === 'update_time') {
                             setSortDir(d => d === 'asc' ? 'desc' : 'asc')
@@ -332,14 +329,14 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
             </div>
 
             {/* ── Conversation list ── */}
-            <ul className="SelectList">
-                {loading && conversations.length === 0 && <li className="SelectItem">{t('Loading')}...</li>}
-                {error && <li className="SelectItem">{t('Error')}: {error}</li>}
+            <ul className="ce-select-list">
+                {loading && conversations.length === 0 && <li className="ce-select-item">{t('Loading')}...</li>}
+                {error && <li className="ce-select-item">{t('Error')}: {error}</li>}
                 {filtered.map((c, index) => {
                     const isSelected = selected.some(x => x.id === c.id)
                     return (
                         <li
-                            className="SelectItem"
+                            className="ce-select-item"
                             key={c.id}
                             onClickCapture={(e: MouseEvent) => {
                                 if (disabled) return
@@ -366,15 +363,15 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
                                     setSelected(checked ? [...selected, c] : selected.filter(x => x.id !== c.id))
                                 }}
                             />
-                            {c.is_starred && <span title="Starred" style={{ color: '#f59e0b', flexShrink: 0 }}>★</span>}
+                            {c.is_starred && <span className="ce-starred" title="Starred">★</span>}
                             <span
-                                className={`SelectItemMeta${sortField === 'create_time' ? ' SelectItemMetaActive' : ''}`}
+                                className={`ce-select-item-meta${sortField === 'create_time' ? ' ce-select-item-meta-active' : ''}`}
                                 title={`Created: ${c.create_time ?? '—'}`}
                             >
                                 {formatConvDate(c.create_time)}
                             </span>
                             <span
-                                className={`SelectItemMeta${sortField === 'update_time' ? ' SelectItemMetaActive' : ''}`}
+                                className={`ce-select-item-meta${sortField === 'update_time' ? ' ce-select-item-meta-active' : ''}`}
                                 title={`Updated: ${c.update_time ?? '—'}`}
                             >
                                 {formatConvDate(c.update_time)}
@@ -383,7 +380,7 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
                     )
                 })}
                 {!loading && !error && filtered.length === 0 && conversations.length > 0 && (
-                    <li className="SelectItem text-gray-400 dark:text-gray-500">{t('No results')}</li>
+                    <li className="ce-select-item ce-select-item-empty">{t('No results')}</li>
                 )}
             </ul>
         </>
@@ -817,13 +814,13 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
 
     return (
         <>
-            <Dialog.Title className="DialogTitle">{t('Export Dialog Title')}</Dialog.Title>
-            <div className="flex items-center text-gray-600 dark:text-gray-300 flex justify-between border-b-[1px] pb-3 mb-3 dark:border-gray-700">
+            <Dialog.Title className="ce-dialog-title">{t('Export Dialog Title')}</Dialog.Title>
+            <div className="ce-export-source">
                 {t('Export from official export file')} (conversations.json)&nbsp;
-                <div className="flex items-center gap-2">
+                <div className="ce-hstack">
                     {exportSource === 'API' && (
                         <button
-                            className="Button neutral"
+                            className="ce-button ce-button-neutral"
                             style={{ fontSize: '0.72rem', padding: '2px 8px', whiteSpace: 'nowrap' }}
                             disabled={probeStatus === 'testing' || processing}
                             title={Object.keys(probeHeaders).length > 0
@@ -835,8 +832,8 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                         </button>
                     )}
                     {exportSource === 'API' && (
-                        <button className="btn relative btn-neutral" onClick={() => fileInputRef.current?.click()}>
-                            <IconUpload className="w-4 h-4" />
+                        <button className="ce-icon-button" aria-label="Upload" onClick={() => fileInputRef.current?.click()}>
+                            <IconUpload className="ce-icon" />
                         </button>
                     )}
                 </div>
@@ -844,7 +841,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
             <input
                 type="file"
                 accept="application/json"
-                className="hidden"
+                hidden
                 ref={fileInputRef}
                 onChange={onUpload}
             />
@@ -868,9 +865,9 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
 
             {/* Load-more button */}
             {exportSource === 'API' && !loading && !processing && hasMore && (
-                <div className="flex items-center justify-center mt-2 mb-1 gap-2">
+                <div className="ce-load-more">
                     <button
-                        className="Button neutral"
+                        className="ce-button ce-button-neutral"
                         style={{ fontSize: '0.8rem', padding: '4px 14px' }}
                         disabled={loadingMore}
                         onClick={loadMore}
@@ -882,16 +879,16 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                                 : t('Load more conversations', { n: EXPORT_OPERATION_BATCH })}
                     </button>
                     {totalAvailable !== null && !loadingMore && (
-                        <span className="text-xs text-gray-400 dark:text-gray-500 tabular-nums">
+                        <span className="ce-muted-count">
                             {apiConversations.length} / {totalAvailable}
                         </span>
                     )}
                 </div>
             )}
 
-            <div className="ActionBar flex flex-wrap mt-3 items-center gap-2">
+            <div className="ce-action-bar">
                 <select
-                    className="Select shrink-0"
+                    className="ce-select"
                     disabled={processing}
                     value={exportType}
                     onChange={e => setExportType(e.currentTarget.value)}
@@ -900,37 +897,37 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                         <option key={t(label)} value={label}>{label}</option>
                     ))}
                 </select>
-                <div className="flex flex-grow"></div>
-                <button className="Button red" disabled={disabled || exportSource === 'Local'} onClick={archiveAll}>
+                <div className="ce-spacer"></div>
+                <button className="ce-button ce-button-red" disabled={disabled || exportSource === 'Local'} onClick={archiveAll}>
                     {t('Archive')}
                 </button>
-                <button className="Button red" disabled={disabled || exportSource === 'Local'} onClick={deleteAll}>
+                <button className="ce-button ce-button-red" disabled={disabled || exportSource === 'Local'} onClick={deleteAll}>
                     {t('Delete')}
                 </button>
-                <button className="Button green" disabled={disabled} onClick={exportAll}>
+                <button className="ce-button ce-button-green" disabled={disabled} onClick={exportAll}>
                     {t('Export')}
                 </button>
             </div>
             {totalBatches > 1 && !processing && (
-                <p className="mt-1.5 text-xs text-right text-gray-400 dark:text-gray-500">
+                <p className="ce-batch-note">
                     {`${totalBatches} downloads \u00B7 100 conversations each`}
                 </p>
             )}
             {processing && (
                 <>
-                    <div className="mt-2 mb-1 justify-between flex items-center gap-2">
-                        <span className="truncate text-sm text-gray-600 dark:text-gray-300">
+                    <div className="ce-progress-header">
+                        <span className="ce-progress-name">
                             {progress.currentStatus === 'rate_limited'
                                 ? `⏳ Rate limited — waiting ${progress.rateLimitWaitSecs ?? '…'}s`
                                 : progress.currentName}
                         </span>
-                        <span className="shrink-0 tabular-nums text-sm text-gray-500 dark:text-gray-400">
+                        <span className="ce-progress-count">
                             {progress.totalBatches > 1
                                 ? `${t('Batch progress').replace('{{current}}', String(progress.batchIndex + 1)).replace('{{total}}', String(progress.totalBatches))} \u00B7 ${progress.completed}/${progress.total}`
                                 : `${progress.completed}/${progress.total}`}
                         </span>
                         <button
-                            className="Button red"
+                            className="ce-button ce-button-red"
                             style={{ fontSize: '0.75rem', padding: '3px 10px', height: 'auto' }}
                             title="Stop the export — any batches already downloaded are kept"
                             onClick={cancelExport}
@@ -938,9 +935,9 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                             {t('Cancel')}
                         </button>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
+                    <div className="ce-progress">
                         <div
-                            className={`h-2.5 rounded-full ${progress.currentStatus === 'rate_limited' ? 'bg-amber-500' : 'bg-blue-600'}`}
+                            className={`ce-progress-bar${progress.currentStatus === 'rate_limited' ? ' ce-progress-bar-waiting' : ''}`}
                             style={{ width: `${progress.total > 0 ? (progress.completed / progress.total) * 100 : 0}%` }}
                         />
                     </div>
@@ -949,7 +946,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
             {processing
                 ? (
                         <button
-                            className="IconButton CloseButton"
+                            className="ce-icon-button ce-close-button"
                             aria-label="Export in progress"
                             title="Click Cancel to stop the export"
                             style={{ cursor: 'not-allowed', opacity: 0.25 }}
@@ -959,7 +956,7 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                     )
                 : (
                         <Dialog.Close asChild>
-                            <button className="IconButton CloseButton" aria-label="Close">
+                            <button className="ce-icon-button ce-close-button" aria-label="Close">
                                 <IconCross />
                             </button>
                         </Dialog.Close>
@@ -995,9 +992,9 @@ export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange
                 {children}
             </Dialog.Trigger>
             <Dialog.Portal>
-                <Dialog.Overlay className="DialogOverlay" />
+                <Dialog.Overlay className="ce-root ce-dialog-overlay" />
                 <Dialog.Content
-                    className="DialogContent _export"
+                    className="ce-root ce-dialog ce-dialog-plain"
                     onEscapeKeyDown={guardClose}
                     onInteractOutside={guardClose}
                 >

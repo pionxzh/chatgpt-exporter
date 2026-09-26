@@ -1,0 +1,54 @@
+.ce-toggle {
+    display: inline-flex;
+    align-items: center;
+}
+
+.ce-toggle-switch {
+    position: relative;
+    outline: none;
+    background-color: var(--ce-track);
+    border: 1px solid rgb(107 114 128);
+    border-radius: 9999px;
+    cursor: pointer;
+    height: 20px;
+    width: 32px;
+}
+
+:is(.dark, [data-theme="dark"]) .ce-toggle-switch {
+    border-color: rgb(255 255 255);
+}
+
+.ce-toggle-switch[data-state="checked"] {
+    background-color: var(--ce-accent);
+    border-color: var(--ce-accent);
+}
+
+.ce-toggle-handle {
+    display: block;
+    background-color: rgb(255 255 255);
+    border-radius: 9999px;
+    height: 16px;
+    width: 16px;
+    transition: transform 0.1s;
+    will-change: transform;
+    transform: translateX(1px);
+}
+
+.ce-toggle-handle[data-state="checked"] {
+    transform: translateX(14px);
+}
+
+.ce-toggle-handle:hover {
+    background-color: rgb(243 244 246);
+}
+
+.ce-toggle-label {
+    color: var(--ce-text-secondary);
+    margin-left: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.ce-toggle-label:hover {
+    color: var(--ce-text-primary);
+}

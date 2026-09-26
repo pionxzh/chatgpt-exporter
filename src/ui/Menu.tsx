@@ -15,6 +15,7 @@ import { MenuItem } from './MenuItem'
 import { SettingProvider, useSettingContext } from './SettingContext'
 import { SettingDialog } from './SettingDialog'
 
+import './theme.css'
 import '../style.css'
 import './Dialog.css'
 
@@ -121,7 +122,7 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
         <>
             {isMobile && open && (
                 <div
-                    className="dropdown-backdrop animate-fadeIn"
+                    className="ce-backdrop"
                     onClick={() => setOpen(false)}
                 >
                 </div>
@@ -137,7 +138,7 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                     <MenuItem
                         className={isCollapsedSidebar
                             ? 'ce-nav-trigger ce-nav-trigger-collapsed'
-                            : 'ce-nav-trigger border-0 ms-2 me-1.5 mb-2'}
+                            : 'ce-nav-trigger ce-nav-trigger-expanded'}
                         text={t('ExportHelper')}
                         ariaLabel={t('ExportHelper')}
                         icon={IconArrowRightFromBracket}
@@ -152,15 +153,7 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                     forceMount={open || jsonOpen || settingOpen || exportOpen}
                 >
                     <HoverCard.Content
-                        className={`
-                        grid grid-cols-2
-                        bg-menu
-                        ce-card
-                        transition-opacity duration-200
-                        gap-1 py-2 px-1
-                        ${isMobile
-            ? 'animate-slideUp'
-            : 'animate-fadeIn'}`}
+                        className={`ce-root ce-card${isMobile ? ' ce-card-mobile' : ''}`}
                         style={{
                             width: isMobile ? 316 : 268,
                             left: -6,
@@ -176,7 +169,7 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                             open={settingOpen}
                             onOpenChange={setSettingOpen}
                         >
-                            <div className="row-full">
+                            <div className="ce-row-full">
                                 <MenuItem text={t('Setting')} icon={IconSetting} />
                             </div>
                         </SettingDialog>
@@ -185,25 +178,25 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                             text={t('Copy Text')}
                             successText={t('Copied!')}
                             icon={IconCopy}
-                            className="row-full"
+                            className="ce-row-full"
                             onClick={onClickText}
                         />
                         <MenuItem
                             text={t('Screenshot')}
                             icon={IconCamera}
-                            className="row-half"
+                            className="ce-row-half"
                             onClick={onClickPng}
                         />
                         <MenuItem
                             text={t('Markdown')}
                             icon={IconMarkdown}
-                            className="row-half"
+                            className="ce-row-half"
                             onClick={onClickMarkdown}
                         />
                         <MenuItem
                             text={t('HTML')}
                             icon={FileCode}
-                            className="row-half"
+                            className="ce-row-half"
                             onClick={onClickHtml}
                         />
                         <Dialog.Root
@@ -214,30 +207,30 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                                 <MenuItem
                                     text={t('JSON')}
                                     icon={IconJSON}
-                                    className="row-half"
+                                    className="ce-row-half"
                                     onClick={onClickJSON}
                                 />
                             </Dialog.Trigger>
                             <Dialog.Portal>
-                                <Dialog.Overlay className="DialogOverlay" />
-                                <Dialog.Content className="DialogContent" style={{ width: '320px' }}>
-                                    <Dialog.Title className="DialogTitle">{t('JSON')}</Dialog.Title>
+                                <Dialog.Overlay className="ce-root ce-dialog-overlay" />
+                                <Dialog.Content className="ce-root ce-dialog" style={{ width: '320px' }}>
+                                    <Dialog.Title className="ce-dialog-title">{t('JSON')}</Dialog.Title>
                                     <MenuItem
                                         text={t('OpenAI Official Format')}
                                         icon={IconCopy}
-                                        className="row-full"
+                                        className="ce-row-full"
                                         onClick={onClickOfficialJSON}
                                     />
                                     <MenuItem
                                         text="JSONL (TavernAI, SillyTavern)"
                                         icon={IconCopy}
-                                        className="row-full"
+                                        className="ce-row-full"
                                         onClick={onClickTavern}
                                     />
                                     <MenuItem
                                         text="Ooba (text-generation-webui)"
                                         icon={IconCopy}
-                                        className="row-full"
+                                        className="ce-row-full"
                                         onClick={onClickOoba}
                                     />
                                 </Dialog.Content>
@@ -248,7 +241,7 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                             open={exportOpen}
                             onOpenChange={setExportOpen}
                         >
-                            <div className="row-full">
+                            <div className="ce-row-full">
                                 <MenuItem
                                     text={t('Export All')}
                                     icon={IconZip}
@@ -261,8 +254,8 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                                 width="16"
                                 height="8"
                                 style={{
-                                    'fill': 'var(--ce-menu-secondary)',
-                                    'stroke': 'var(--ce-border-light)',
+                                    'fill': 'var(--ce-menu-arrow)',
+                                    'stroke': 'var(--ce-menu-border)',
                                     'stoke-width': '2px',
                                 }}
                             />

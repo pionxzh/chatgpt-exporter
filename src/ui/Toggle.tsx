@@ -1,4 +1,5 @@
 import { Switch } from '@headlessui/react'
+import './Toggle.css'
 
 interface ToggleProps {
     label?: string
@@ -11,20 +12,20 @@ interface ToggleProps {
  */
 export function Toggle({ label, checked = true, onCheckedUpdate }: ToggleProps) {
     return (
-        <div className="inline-flex items-center">
+        <div className="ce-toggle">
             <Switch
                 checked={checked}
                 onChange={onCheckedUpdate}
                 data-state={checked ? 'checked' : 'unchecked'}
-                className="toggle-switch"
+                className="ce-toggle-switch"
             >
                 <span
                     data-state={checked ? 'checked' : 'unchecked'}
-                    className="toggle-switch-handle"
+                    className="ce-toggle-handle"
                 >
                 </span>
             </Switch>
-            {label && <span className="toggle-switch-label">{label}</span>}
+            {label && <span className="ce-toggle-label">{label}</span>}
         </div>
     )
 }

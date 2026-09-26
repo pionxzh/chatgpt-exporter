@@ -1,0 +1,174 @@
+/*
+ * The exporter owns all of its styles. The only things it takes from
+ * ChatGPT are the theme variables below, each with a fallback so the UI
+ * still works when ChatGPT renames or drops one, and the light/dark switch.
+ */
+
+html {
+    --ce-text-primary: var(--color-text-primary, #0d0d0d);
+    --ce-text-secondary: var(--color-text-secondary, #5d5d5d);
+    --ce-text-tertiary: var(--color-text-tertiary, #8f8f8f);
+    --ce-border: var(--color-token-border-default, #0000001a);
+    --ce-border-light: var(--color-token-border-light, #0000000d);
+    --ce-hover: var(--color-token-list-hover-background, #0000000d);
+    /* ChatGPT's switches use this, and it follows the accent in Appearance. */
+    --ce-accent: var(--color-chart-blue, #3a83f7);
+    --ce-menu-arrow: var(--sidebar-surface-secondary, #ececec);
+
+    --ce-control-border: #6f6e77;
+    --ce-menu-surface: #ffffff;
+    --ce-menu-border: #0d0d0d26;
+    --ce-dialog-surface: #f3f3f3;
+    --ce-dialog-surface-plain: #ffffff;
+    --ce-card-surface: #ffffff;
+    --ce-input-surface: #fafafa;
+    --ce-track: rgb(229 231 235);
+    --ce-list-header-surface: #f9fafb;
+}
+
+:is(.dark, [data-theme="dark"]) {
+    --ce-text-primary: var(--color-text-primary, #ededed);
+    --ce-text-secondary: var(--color-text-secondary, #cdcdcd);
+    --ce-text-tertiary: var(--color-text-tertiary, #afafaf);
+    --ce-border: var(--color-token-border-default, #ffffff26);
+    --ce-border-light: var(--color-token-border-light, #ffffff0d);
+    --ce-hover: var(--color-token-list-hover-background, #ffffff1a);
+    --ce-menu-arrow: var(--sidebar-surface-secondary, #212121);
+
+    --ce-menu-surface: #2a2a2a;
+    --ce-menu-border: var(--color-token-border-default, #ffffff26);
+    --ce-dialog-surface: #2a2a2a;
+    --ce-dialog-surface-plain: #2a2a2a;
+    --ce-card-surface: rgb(255 255 255 / 5%);
+    --ce-input-surface: #2f2f2f;
+    --ce-track: rgb(255 255 255 / 10%);
+    --ce-list-header-surface: #1f2937;
+}
+
+/*
+ * Reset everything under our roots, so ChatGPT's base styles neither help
+ * nor break us. :where() keeps it at zero specificity, so any of our own
+ * class rules win over it.
+ */
+:where(.ce-root, .ce-root *, .ce-root ::before, .ce-root ::after) {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 0 solid;
+}
+
+:where(.ce-root :is(button, input, select, textarea)) {
+    font: inherit;
+    color: inherit;
+}
+
+/* A background drops the native look of a range input, so leave it alone. */
+:where(.ce-root :is(button, input:not([type="range"]), select, textarea)) {
+    background-color: transparent;
+}
+
+:where(.ce-root :is(button, select, [role="button"])) {
+    cursor: pointer;
+}
+
+:where(.ce-root :is(ul, ol)) {
+    list-style: none;
+}
+
+:where(.ce-root svg) {
+    display: block;
+    flex-shrink: 0;
+}
+
+:where(.ce-root [hidden]) {
+    display: none;
+}
+
+.ce-icon {
+    width: 1rem;
+    height: 1rem;
+}
+
+.ce-icon-sm {
+    width: 0.75rem;
+    height: 0.75rem;
+}
+
+.ce-icon-md {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.ce-icon-lg {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.ce-hstack {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.ce-mt-2 {
+    margin-top: 0.5rem;
+}
+
+.ce-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@keyframes ce-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes ce-slide-up {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+@keyframes ce-pointer-fade-in {
+    from {
+        opacity: 0;
+        pointer-events: none;
+    }
+    to {
+        opacity: 1;
+        pointer-events: auto;
+    }
+}
+
+@keyframes ce-rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes ce-circular-dash {
+    0% {
+        stroke-dasharray: 1px, 200px;
+        stroke-dashoffset: 0;
+    }
+    50% {
+        stroke-dasharray: 100px, 200px;
+        stroke-dashoffset: -15px;
+    }
+    100% {
+        stroke-dasharray: 100px, 200px;
+        stroke-dashoffset: -125px;
+    }
+}

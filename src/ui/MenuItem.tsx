@@ -41,7 +41,7 @@ export const MenuItem: FC<MenuItemProps> = ({ text, successText, disabled = fals
         }
         : undefined
 
-    // Items are divs so they fit ChatGPT's menu styles. Expose them as
+    // Items are divs so they fit the menu grid. Expose them as
     // buttons and let Enter and Space click them, which also reaches the
     // dialog triggers that wrap some of them.
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -53,13 +53,7 @@ export const MenuItem: FC<MenuItemProps> = ({ text, successText, disabled = fals
 
     return (
         <div
-            className={`
-            menu-item
-            __menu-item hoverable
-            flex flex-shrink-0 m-0 items-center gap-3 rounded-lg
-            transition-colors duration-200
-            cursor-pointer
-            border border-menu ${className}`}
+            className={`ce-menu-item ${className ?? ''}`}
             role="button"
             tabIndex={disabled ? -1 : 0}
             onClick={handleClick}
@@ -73,8 +67,8 @@ export const MenuItem: FC<MenuItemProps> = ({ text, successText, disabled = fals
         >
             {loading
                 ? (
-                        <div className="flex justify-center items-center w-full h-full">
-                            <IconLoading className="w-4 h-4" />
+                        <div className="ce-menu-item-loading">
+                            <IconLoading className="ce-icon" />
                         </div>
                     )
                 : (

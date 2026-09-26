@@ -5,7 +5,7 @@ import { getColorScheme } from '../src/utils/utils'
 
 beforeAll(() => {
     const style = document.createElement('style')
-    style.textContent = ['../src/style.css', '../src/ui/Dialog.css']
+    style.textContent = ['../src/ui/theme.css', '../src/style.css', '../src/ui/Dialog.css']
         .map(path => readFileSync(new URL(path, import.meta.url), 'utf8')).join('\n')
     document.head.append(style)
 })
@@ -22,21 +22,20 @@ describe.each(['class', 'data-theme'])('ui colors with %s themes', (attribute) =
     it.each(['light', 'dark'])('renders the %s menu and dialogs', (theme) => {
         document.documentElement.setAttribute(attribute, theme)
         document.body.innerHTML = `
-            <div class="ce-card bg-menu"></div>
-            <div class="DialogContent _export">
-                <h2 class="DialogTitle">Export</h2>
-                <input class="Input">
+            <div class="ce-card"></div>
+            <div class="ce-root ce-dialog ce-dialog-plain">
+                <input class="ce-input">
             </div>
         `
         const color = (selector: string, property: 'color' | 'backgroundColor') =>
             getComputedStyle(document.querySelector(selector)!)[property]
 
         const dark = theme === 'dark'
-        expect(color('.ce-card', 'backgroundColor')).toBe(dark ? '#2A2A2A' : '#ffffff')
-        expect(color('.ce-card', 'color')).toBe(dark ? '#ececec' : '#0d0d0d')
-        expect(color('.DialogContent', 'backgroundColor')).toBe(dark ? '#2a2a2a' : '#ffffff')
-        expect(color('.DialogTitle', 'color')).toBe(dark ? '#fff' : '#1a1523')
-        expect(color('.Input', 'backgroundColor')).toBe(dark ? '#2f2f2f' : '#fafafa')
+        expect(color('.ce-card', 'backgroundColor')).toBe(dark ? '#2a2a2a' : '#ffffff')
+        expect(color('.ce-card', 'color')).toBe(dark ? '#ededed' : '#0d0d0d')
+        expect(color('.ce-dialog', 'backgroundColor')).toBe(dark ? '#2a2a2a' : '#ffffff')
+        expect(color('.ce-dialog', 'color')).toBe(dark ? '#ededed' : '#0d0d0d')
+        expect(color('.ce-input', 'backgroundColor')).toBe(dark ? '#2f2f2f' : '#fafafa')
     })
 })
 
