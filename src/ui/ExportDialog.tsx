@@ -1,4 +1,3 @@
-import * as Dialog from '@radix-ui/react-dialog'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import type { ChangeEvent } from 'preact/compat'
 import { useTranslation } from '../i18n'
@@ -14,6 +13,7 @@ import { sleep } from '../utils/utils'
 import type { ApiConversationItem, ApiConversationWithId, ApiProjectInfo } from '../api'
 import type { FC } from '../type'
 import { CheckBox } from './CheckBox'
+import { Dialog } from './Dialog'
 import { IconCross, IconLoading, IconUpload } from './Icons'
 import { useSettingContext } from './SettingContext'
 
@@ -395,9 +395,10 @@ type ExportSource = 'API' | 'Local'
 
 interface DialogContentProps {
     format: string
+    onClose: () => void
 }
 
-const DialogContent: FC<DialogContentProps> = ({ format }) => {
+const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
     const { t } = useTranslation()
     const { enableMeta, exportMetaList, exportAllLimit } = useSettingContext()
     const metaList = useMemo(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList])
@@ -814,7 +815,6 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
 
     return (
         <>
-            <Dialog.Title className="ce-dialog-title">{t('Export Dialog Title')}</Dialog.Title>
             <div className="ce-export-source">
                 {t('Export from official export file')} (conversations.json)&nbsp;
                 <div className="ce-hstack">
@@ -955,11 +955,9 @@ const DialogContent: FC<DialogContentProps> = ({ format }) => {
                         </button>
                     )
                 : (
-                        <Dialog.Close asChild>
-                            <button className="ce-icon-button ce-close-button" aria-label="Close">
-                                <IconCross />
-                            </button>
-                        </Dialog.Close>
+                        <button className="ce-icon-button ce-close-button" aria-label="Close" onClick={onClose}>
+                            <IconCross />
+                        </button>
                     )}
         </>
     )
@@ -975,32 +973,21 @@ interface ExportDialogProps {
     onOpenChange: (value: boolean) => void
 }
 
-export const ExportDialog: FC<ExportDialogProps> = ({ format, open, onOpenChange, children }) => {
-    const guardClose = (e: Event) => {
-        if (exportingRef.current) e.preventDefault()
+export function ExportDialog({ format, open, onOpenChange }: ExportDialogProps) {
+    const { t } = useTranslation()
+    const onChange = (value: boolean) => {
+        if (!value && exportingRef.current) return // block close while exporting
+        onOpenChange(value)
     }
 
     return (
-        <Dialog.Root
+        <Dialog
             open={open}
-            onOpenChange={(val: boolean) => {
-                if (!val && exportingRef.current) return // block close while exporting
-                onOpenChange(val)
-            }}
+            onOpenChange={onChange}
+            title={t('Export Dialog Title')}
+            className="ce-dialog-plain"
         >
-            <Dialog.Trigger asChild>
-                {children}
-            </Dialog.Trigger>
-            <Dialog.Portal>
-                <Dialog.Overlay className="ce-root ce-dialog-overlay" />
-                <Dialog.Content
-                    className="ce-root ce-dialog ce-dialog-plain"
-                    onEscapeKeyDown={guardClose}
-                    onInteractOutside={guardClose}
-                >
-                    {open && <DialogContent format={format} />}
-                </Dialog.Content>
-            </Dialog.Portal>
-        </Dialog.Root>
+            <DialogContent format={format} onClose={() => onChange(false)} />
+        </Dialog>
     )
 }

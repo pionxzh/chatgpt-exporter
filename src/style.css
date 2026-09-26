@@ -115,12 +115,18 @@ body[data-time-format="24"] span[data-time-format="24"] {
     padding-inline-start: 8px;
 }
 
-/* ChatGPT's main column carries its own z-index, which beats the menu's
-   portalled Radix popper wrapper (position: fixed, z-index: auto). Raise
-   only OUR wrapper — :has keeps ChatGPT's own Radix poppers untouched —
-   and stay below the dialogs at 1000/1001. */
-[data-radix-popper-content-wrapper]:has(.ce-card) {
-    z-index: 999 !important;
+/* HoverCard sets left/top. ChatGPT's main column carries its own z-index,
+   so raise the card above it. Dialogs sit in the top layer, above this. */
+.ce-card {
+    position: fixed;
+    z-index: 999;
+}
+
+.ce-card-arrow {
+    position: absolute;
+    left: -8px;
+    fill: var(--ce-menu-arrow);
+    stroke: var(--ce-menu-border);
 }
 
 .ce-row-half {

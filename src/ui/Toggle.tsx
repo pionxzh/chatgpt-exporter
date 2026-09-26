@@ -1,4 +1,3 @@
-import { Switch } from '@headlessui/react'
 import './Toggle.css'
 
 interface ToggleProps {
@@ -13,9 +12,12 @@ interface ToggleProps {
 export function Toggle({ label, checked = true, onCheckedUpdate }: ToggleProps) {
     return (
         <div className="ce-toggle">
-            <Switch
-                checked={checked}
-                onChange={onCheckedUpdate}
+            <button
+                type="button"
+                role="switch"
+                aria-checked={checked}
+                aria-label={label || undefined}
+                onClick={() => onCheckedUpdate?.(!checked)}
                 data-state={checked ? 'checked' : 'unchecked'}
                 className="ce-toggle-switch"
             >
@@ -24,7 +26,7 @@ export function Toggle({ label, checked = true, onCheckedUpdate }: ToggleProps) 
                     className="ce-toggle-handle"
                 >
                 </span>
-            </Switch>
+            </button>
             {label && <span className="ce-toggle-label">{label}</span>}
         </div>
     )
