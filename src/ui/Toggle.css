@@ -3,43 +3,43 @@
     align-items: center;
 }
 
+/* Matches ChatGPT's own switches: no border, a tinted track, a white thumb. */
 .ce-toggle-switch {
     position: relative;
-    outline: none;
-    background-color: var(--ce-track);
-    border: 1px solid rgb(107 114 128);
-    border-radius: 9999px;
-    cursor: pointer;
-    height: 20px;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
     width: 32px;
-}
-
-:is(.dark, [data-theme="dark"]) .ce-toggle-switch {
-    border-color: rgb(255 255 255);
+    height: 20px;
+    border-radius: 9999px;
+    outline: none;
+    cursor: pointer;
+    background-color: color-mix(in srgb, var(--ce-text-primary) 10%, transparent);
+    transition: background-color 0.15s ease-out;
 }
 
 .ce-toggle-switch[data-state="checked"] {
     background-color: var(--ce-accent);
-    border-color: var(--ce-accent);
+}
+
+.ce-toggle-switch:focus-visible {
+    box-shadow: 0 0 0 2px var(--ce-accent);
 }
 
 .ce-toggle-handle {
     display: block;
-    background-color: rgb(255 255 255);
-    border-radius: 9999px;
-    height: 16px;
     width: 16px;
-    transition: transform 0.1s;
-    will-change: transform;
-    transform: translateX(1px);
+    height: 16px;
+    border: 1px solid #ffffff;
+    border-radius: 9999px;
+    background-color: #ffffff;
+    box-shadow: 0 1px 2px -1px #00000014;
+    transform: translateX(2px);
+    transition: transform 0.15s ease-out;
 }
 
 .ce-toggle-handle[data-state="checked"] {
     transform: translateX(14px);
-}
-
-.ce-toggle-handle:hover {
-    background-color: rgb(243 244 246);
 }
 
 .ce-toggle-label {
