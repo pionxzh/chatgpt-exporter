@@ -59,8 +59,10 @@ body[data-time-format="24"] span[data-time-format="24"] {
     white-space: nowrap;
 }
 
+/* Same box as ChatGPT's sidebar rows, so the icon lines up with theirs. */
 .ce-nav-trigger-expanded {
-    margin: 0 6px 8px 8px;
+    margin: 0 0 8px;
+    padding-inline: 10px;
 }
 
 .ce-nav-trigger-collapsed {
