@@ -61,5 +61,8 @@
   "All conversations": "すべての会話",
   "Load more conversations": "さらに {{n}} 件読み込む",
   "Load more conversations remaining": "さらに {{n}} 件読み込む · 残り {{remaining}} 件",
-  "Export Skipped Message": "{{n}} 件の会話は再試行しても失敗したため、エクスポートに含まれていません："
+  "Export Skipped Message": "{{n}} 件の会話は再試行しても失敗したため、エクスポートに含まれていません：",
+  "List Rate Limited Wait": "リクエストが多すぎます · {{n}} 秒後に再試行してください",
+  "List Rate Limited": "リクエストが多すぎます · しばらくしてから再試行してください",
+  "List Load Failed": "会話を読み込めませんでした"
 }

@@ -735,10 +735,7 @@ export async function deleteConversation(chatId: string): Promise<boolean> {
 export class RateLimitError extends Error {
     /** Milliseconds to wait before retrying */
     readonly retryAfterMs: number
-    /**
-     * Whether `retryAfterMs` is the wait the server asked for, or our own
-     * fallback. Only the former may be quoted to the user as the API's answer.
-     */
+    /** Whether `retryAfterMs` came from `Retry-After` rather than the fallback */
     readonly retryAfterFromServer: boolean
     constructor(retryAfterHeader: string | null) {
         super('Too Many Requests (429)')

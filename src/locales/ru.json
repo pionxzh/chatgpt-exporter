@@ -61,5 +61,8 @@
   "All conversations": "Все разговоры",
   "Load more conversations": "Загрузить ещё {{n}}",
   "Load more conversations remaining": "Загрузить ещё {{n}} · осталось {{remaining}}",
-  "Export Skipped Message": "{{n}} разговоров не удалось загрузить после нескольких попыток, они отсутствуют в экспорте:"
+  "Export Skipped Message": "{{n}} разговоров не удалось загрузить после нескольких попыток, они отсутствуют в экспорте:",
+  "List Rate Limited Wait": "Слишком много запросов к API · подождите {{n}} с и попробуйте снова",
+  "List Rate Limited": "Слишком много запросов к API · попробуйте чуть позже",
+  "List Load Failed": "Не удалось загрузить беседы"
 }

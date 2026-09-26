@@ -61,5 +61,8 @@
   "All conversations": "全部對話",
   "Load more conversations": "再載入 {{n}} 筆",
   "Load more conversations remaining": "再載入 {{n}} 筆 · 剩餘 {{remaining}} 筆",
-  "Export Skipped Message": "有 {{n}} 個對話重試多次仍失敗，沒有包含在匯出檔中："
+  "Export Skipped Message": "有 {{n}} 個對話重試多次仍失敗，沒有包含在匯出檔中：",
+  "List Rate Limited Wait": "請求太頻繁 · 請等 {{n}} 秒後再試",
+  "List Rate Limited": "請求太頻繁 · 請稍後再試",
+  "List Load Failed": "無法載入對話"
 }

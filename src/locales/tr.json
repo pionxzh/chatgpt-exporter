@@ -61,5 +61,8 @@
   "All conversations": "Tüm konuşmalar",
   "Load more conversations": "{{n}} tane daha yükle",
   "Load more conversations remaining": "{{n}} tane daha yükle · {{remaining}} kaldı",
-  "Export Skipped Message": "{{n}} konuşma tekrar denemelere rağmen başarısız oldu ve dışa aktarımda yer almıyor:"
+  "Export Skipped Message": "{{n}} konuşma tekrar denemelere rağmen başarısız oldu ve dışa aktarımda yer almıyor:",
+  "List Rate Limited Wait": "API istek sınırına ulaşıldı · {{n}} sn bekleyip tekrar deneyin",
+  "List Rate Limited": "API istek sınırına ulaşıldı · biraz sonra tekrar deneyin",
+  "List Load Failed": "Sohbetler yüklenemedi"
 }
