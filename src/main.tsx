@@ -1,6 +1,6 @@
 import { render } from 'preact'
 import sentinel from 'sentinel-js'
-import { fetchConversation, processConversation } from './api'
+import { fetchConversation } from './api'
 import { getChatIdFromUrl, isSharePage } from './page'
 import { watchTemporaryChatId } from './temporaryChat'
 import { Menu } from './ui/Menu'
@@ -84,31 +84,6 @@ function main() {
             })
         }
 
-        /** Insert timestamp to the bottom right of each message. Added 2023-11-13. */
-        let chatId = ''
-        sentinel.on('[role="presentation"]', async () => {
-            // Share pages carry a share id, not a conversation id, so the
-            // conversation API below would 404 on them.
-            if (isSharePage()) return
-
-            const currentChatId = getChatIdFromUrl()
-            if (!currentChatId || currentChatId === chatId) return
-            chatId = currentChatId
-
-            const rawConversation = await fetchConversation(chatId)
-            const { conversationNodes } = processConversation(rawConversation)
-
-            const threadContents = Array.from(document.querySelectorAll('main [data-testid^="conversation-turn-"] [data-message-id]'))
-            if (threadContents.length === 0) return
-
-            threadContents.forEach((thread, index) => {
-                const createTime = conversationNodes[index]?.message?.create_time
-                if (!createTime) return
-
-                thread.append(createTimestamp(createTime))
-            })
-        })
-
         watchMessageTimestamps()
     })
 }
@@ -122,6 +97,8 @@ function watchMessageTimestamps() {
     let createTimes: Promise<Map<string, number>> = Promise.resolve(new Map())
     // Ids that were missing after a refetch, so they do not refetch again.
     const missingIds = new Set<string>()
+    // Blocks that miss the first fetch share one refetch.
+    let refetch: Promise<Map<string, number>> | null = null
 
     const loadCreateTimes = async (id: string) => {
         const conversation = await fetchConversation(id)
@@ -142,7 +119,10 @@ function watchMessageTimestamps() {
         return null
     }
 
-    sentinel.on(MESSAGE_UNIT_SELECTOR, async (unit) => {
+    const stamp = async (unit: Element) => {
+        // Menu mirrors the timestamp setting to this attribute, and the
+        // timestamps stay hidden without it, so skip the fetch until then.
+        if (!document.body.hasAttribute('data-time-format')) return
         if (isSharePage()) return
         // Stamp the outermost block only.
         if (unit.parentElement?.closest('[data-chatgpt-search-message-ids]')) return
@@ -152,6 +132,7 @@ function watchMessageTimestamps() {
         if (currentChatId !== chatId) {
             chatId = currentChatId
             missingIds.clear()
+            refetch = null
             createTimes = loadCreateTimes(chatId).catch(() => new Map())
         }
 
@@ -162,13 +143,26 @@ function watchMessageTimestamps() {
         // Messages sent after the first fetch are not in it yet.
         if (!createTime && ids.some(id => !missingIds.has(id)) && currentChatId === chatId) {
             ids.forEach(id => missingIds.add(id))
-            createTimes = loadCreateTimes(chatId).catch(() => new Map())
+            refetch ??= loadCreateTimes(chatId)
+                .catch(() => new Map<string, number>())
+                .finally(() => {
+                    refetch = null
+                })
+            createTimes = refetch
             createTime = findCreateTime(await createTimes, ids)
         }
 
         if (!createTime || !unit.isConnected || unit.querySelector(':scope > time[data-ce-timestamp]')) return
         unit.append(createTimestamp(createTime))
-    })
+    }
+
+    sentinel.on(MESSAGE_UNIT_SELECTOR, stamp)
+
+    // Blocks that mounted while the setting was off, or before Menu applied
+    // it on load, were skipped. Stamp them once it turns on.
+    new MutationObserver(() => {
+        document.querySelectorAll(MESSAGE_UNIT_SELECTOR).forEach(stamp)
+    }).observe(document.body, { attributes: true, attributeFilter: ['data-time-format'] })
 }
 
 function createTimestamp(createTime: number) {
