@@ -1,6 +1,6 @@
 import JSZip from 'jszip'
-import { fetchConversation, getCurrentChatId, getFileAttachmentNames, processConversation, shouldSkipMessageInExport, withImageAssets } from '../api'
-import { KEY_SOURCES_ENABLED, KEY_THINKING_ENABLED, KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_MARKDOWN, baseUrl } from '../constants'
+import { fetchConversation, getCurrentChatId, getFileAttachmentNames, processConversation, replaceImageSources, shouldSkipMessageInExport, withImageAssets } from '../api'
+import { KEY_MARKDOWN_IMAGE_MODE, KEY_SOURCES_ENABLED, KEY_THINKING_ENABLED, KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_MARKDOWN, baseUrl } from '../constants'
 import i18n from '../i18n'
 import { checkIfConversationStarted } from '../page'
 import { checkIfTemporaryChatIsExportable } from '../temporaryChat'
@@ -11,10 +11,21 @@ import { fromMarkdown, toMarkdown } from '../utils/markdown'
 import { ScriptStorage } from '../utils/storage'
 import { standardizeLineBreaks } from '../utils/text'
 import { transformAuthor } from '../utils/author'
-import type { ApiConversationWithId, Citation, ConversationNodeMessage, ConversationResult, ThinkingContent } from '../api'
-import type { ExportMeta } from '../ui/SettingContext'
+import type { ApiConversation, ApiConversationWithId, Citation, ConversationNodeMessage, ConversationResult, ThinkingContent } from '../api'
+import type { ExportMeta, MarkdownImageMode } from '../ui/SettingContext'
 import type { PartInfo } from '../utils/download'
 import { getMetaVariables, resolveMetaList } from './meta'
+
+const ASSETS_DIR = 'assets'
+
+function getImageMode(): MarkdownImageMode {
+    return ScriptStorage.get<MarkdownImageMode>(KEY_MARKDOWN_IMAGE_MODE) ?? 'embed'
+}
+
+/** Omitted images skip the download, the other modes need the image data */
+function loadImages<T extends ApiConversation>(conversation: T, imageMode: MarkdownImageMode): Promise<T> {
+    return imageMode === 'omit' ? Promise.resolve(conversation) : withImageAssets(conversation)
+}
 
 export async function exportToMarkdown(fileNameFormat: string, metaList: ExportMeta[]) {
     if (!checkIfConversationStarted()) {
@@ -28,13 +39,25 @@ export async function exportToMarkdown(fileNameFormat: string, metaList: ExportM
     }
 
     const chatId = await getCurrentChatId()
-    const rawConversation = await withImageAssets(await fetchConversation(chatId))
+    const imageMode = getImageMode()
+    const assets = new Map<string, string>()
+    let rawConversation = await loadImages(await fetchConversation(chatId), imageMode)
+    if (imageMode === 'files') rawConversation = await extractImageFiles(rawConversation, assets)
     const enableThinking = ScriptStorage.get<boolean>(KEY_THINKING_ENABLED) ?? false
     const conversation = processConversation(rawConversation, { enableThinking })
-    const markdown = conversationToMarkdown(conversation, metaList)
+    const markdown = standardizeLineBreaks(conversationToMarkdown(conversation, metaList, imageMode))
 
     const fileName = getFileNameWithFormat(fileNameFormat, 'md', { title: conversation.title, chatId, createTime: conversation.createTime, updateTime: conversation.updateTime })
-    downloadFile(fileName, 'text/markdown', standardizeLineBreaks(markdown))
+    // A conversation without images stays a plain Markdown file
+    if (assets.size === 0) {
+        downloadFile(fileName, 'text/markdown', markdown)
+        return true
+    }
+
+    const zip = new JSZip()
+    zip.file(fileName, markdown)
+    addAssetsToZip(zip, assets)
+    downloadFile(fileName.replace(/\.md$/, '.zip'), 'application/zip', await generateZip(zip))
 
     return true
 }
@@ -43,7 +66,13 @@ export async function exportAllToMarkdown(fileNameFormat: string, apiConversatio
     const zip = new JSZip()
     const filenameMap = new Map<string, number>()
     const enableThinking = ScriptStorage.get<boolean>(KEY_THINKING_ENABLED) ?? false
-    const conversations = apiConversations.map(x => processConversation(x, { enableThinking }))
+    const imageMode = getImageMode()
+    // Shared by every conversation in the zip, file names are content hashes so they never collide
+    const assets = new Map<string, string>()
+    const rawConversations = imageMode === 'files'
+        ? await Promise.all(apiConversations.map(x => extractImageFiles(x, assets)))
+        : apiConversations
+    const conversations = rawConversations.map(x => processConversation(x, { enableThinking }))
     conversations.forEach((conversation) => {
         let fileName = getFileNameWithFormat(fileNameFormat, 'md', {
             title: conversation.title,
@@ -59,17 +88,12 @@ export async function exportAllToMarkdown(fileNameFormat: string, apiConversatio
         else {
             filenameMap.set(fileName, 1)
         }
-        const content = conversationToMarkdown(conversation, metaList)
+        const content = conversationToMarkdown(conversation, metaList, imageMode)
         zip.file(fileName, content)
     })
+    addAssetsToZip(zip, assets)
 
-    const blob = await zip.generateAsync({
-        type: 'blob',
-        compression: 'DEFLATE',
-        compressionOptions: {
-            level: 9,
-        },
-    })
+    const blob = await generateZip(zip)
     const partInfo: PartInfo | undefined = (partIndex != null && totalParts != null)
         ? { part: partIndex, total: totalParts }
         : undefined
@@ -78,7 +102,58 @@ export async function exportAllToMarkdown(fileNameFormat: string, apiConversatio
     return true
 }
 
-function conversationToMarkdown(conversation: ConversationResult, metaList?: ExportMeta[]) {
+function generateZip(zip: JSZip) {
+    return zip.generateAsync({
+        type: 'blob',
+        compression: 'DEFLATE',
+        compressionOptions: {
+            level: 9,
+        },
+    })
+}
+
+function addAssetsToZip(zip: JSZip, assets: Map<string, string>) {
+    assets.forEach((base64, name) => {
+        // Images are compressed already
+        zip.file(`${ASSETS_DIR}/${name}`, base64, { base64: true, compression: 'STORE' })
+    })
+}
+
+const IMAGE_EXTENSIONS: Record<string, string> = {
+    'image/jpeg': 'jpg',
+    'image/png': 'png',
+    'image/gif': 'gif',
+    'image/webp': 'webp',
+    'image/svg+xml': 'svg',
+}
+
+/**
+ * Returns a copy of the conversation with base64 data uri images moved into
+ * `assets`, keyed by file name, and replaced by a relative path to that file.
+ * Other image sources, like pointers that failed to download, are kept.
+ */
+async function extractImageFiles<T extends ApiConversation>(conversation: T, assets: Map<string, string>): Promise<T> {
+    const copy = structuredClone(conversation)
+    await replaceImageSources(copy, async (src) => {
+        const match = /^data:([^;,]*)[^,]*;base64,(.*)$/s.exec(src)
+        if (!match) return null
+
+        const [, mimeType, base64] = match
+        const ext = IMAGE_EXTENSIONS[mimeType.toLowerCase()] ?? 'bin'
+        const name = `image-${await hashBase64(base64)}.${ext}`
+        assets.set(name, base64)
+        return `${ASSETS_DIR}/${name}`
+    })
+    return copy
+}
+
+async function hashBase64(base64: string) {
+    const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0))
+    const digest = await crypto.subtle.digest('SHA-256', bytes)
+    return Array.from(new Uint8Array(digest).slice(0, 8), b => b.toString(16).padStart(2, '0')).join('')
+}
+
+function conversationToMarkdown(conversation: ConversationResult, metaList: ExportMeta[] | undefined, imageMode: MarkdownImageMode) {
     const { id, title, conversationNodes } = conversation
     const source = `${baseUrl}/c/${id}`
 
@@ -92,6 +167,10 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
     const timeStampMarkdown = ScriptStorage.get<boolean>(KEY_TIMESTAMP_MARKDOWN) ?? false
     const timeStamp24H = ScriptStorage.get<boolean>(KEY_TIMESTAMP_24H) ?? false
     const enableSources = ScriptStorage.get<boolean>(KEY_SOURCES_ENABLED) ?? true
+    // Same placeholder as the text export
+    const renderImage = imageMode === 'omit'
+        ? () => '[image]'
+        : (src: string) => `![image](${src})`
 
     const content = conversationNodes.map(({ message, thinking }) => {
         if (!message || !message.content) return null
@@ -130,7 +209,7 @@ function conversationToMarkdown(conversation: ConversationResult, metaList?: Exp
             })
         }
         const postProcess = (input: string) => postSteps.reduce((acc, fn) => fn(acc), input)
-        const content = transformContent(message.content, message.metadata, postProcess)
+        const content = transformContent(message.content, message.metadata, postProcess, renderImage)
         const attachments = getFileAttachmentNames(message).map(name => `- 📎 ${name}`).join('\n')
         const attachmentsBlock = attachments ? `\n\n${attachments}` : ''
 
@@ -181,6 +260,7 @@ function transformContent(
     content: ConversationNodeMessage['content'],
     metadata: ConversationNodeMessage['metadata'],
     postProcess: (input: string) => string,
+    renderImage: (src: string) => string,
 ) {
     switch (content.content_type) {
         case 'text':
@@ -191,7 +271,7 @@ function transformContent(
             if (metadata?.aggregate_result?.messages) {
                 return metadata.aggregate_result.messages
                     .filter(msg => msg.message_type === 'image')
-                    .map(msg => `![image](${msg.image_url})`)
+                    .map(msg => renderImage(msg.image_url))
                     .join('\n')
             }
             return postProcess(`Result:\n\`\`\`\n${content.text}\n\`\`\`` || '')
@@ -209,7 +289,7 @@ function transformContent(
         case 'multimodal_text': {
             return content.parts?.map((part) => {
                 if (typeof part === 'string') return postProcess(part)
-                if (part.content_type === 'image_asset_pointer') return `![image](${part.asset_pointer})`
+                if (part.content_type === 'image_asset_pointer') return renderImage(part.asset_pointer)
                 if (part.content_type === 'audio_transcription') return `[audio] ${part.text}`
                 if (part.content_type === 'audio_asset_pointer') return null
                 if (part.content_type === 'real_time_user_audio_video_asset_pointer') return null

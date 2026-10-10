@@ -4,6 +4,7 @@ import type { FC } from 'preact/compat'
 import {
     KEY_EXPORT_ALL_LIMIT,
     KEY_FILENAME_FORMAT,
+    KEY_MARKDOWN_IMAGE_MODE,
     KEY_META_ENABLED,
     KEY_META_LIST,
     KEY_SOURCES_ENABLED,
@@ -17,6 +18,10 @@ import { useGMStorage } from '../hooks/useGMStorage'
 
 const defaultFormat = 'ChatGPT-{title}'
 const defaultExportAllLimit = 200
+
+/** How Markdown exports carry images: inline data uris, a placeholder, or files next to the Markdown */
+export type MarkdownImageMode = 'embed' | 'omit' | 'files'
+export const defaultMarkdownImageMode: MarkdownImageMode = 'embed'
 
 export interface ExportMeta {
     name: string
@@ -49,6 +54,8 @@ const SettingContext = createContext({
     setEnableThinking: (_: boolean) => {},
     enableSources: true,
     setEnableSources: (_: boolean) => {},
+    markdownImageMode: defaultMarkdownImageMode as MarkdownImageMode,
+    setMarkdownImageMode: (_: MarkdownImageMode) => {},
     exportAllLimit: defaultExportAllLimit,
     setExportAllLimit: (_: number) => {},
     resetDefault: () => {},
@@ -67,6 +74,7 @@ export const SettingProvider: FC = ({ children }) => {
     const [exportMetaList, setExportMetaList] = useGMStorage(KEY_META_LIST, defaultExportMetaList)
     const [enableThinking, setEnableThinking] = useGMStorage(KEY_THINKING_ENABLED, false)
     const [enableSources, setEnableSources] = useGMStorage(KEY_SOURCES_ENABLED, true)
+    const [markdownImageMode, setMarkdownImageMode] = useGMStorage<MarkdownImageMode>(KEY_MARKDOWN_IMAGE_MODE, defaultMarkdownImageMode)
     const [exportAllLimit, setExportAllLimit] = useGMStorage(KEY_EXPORT_ALL_LIMIT, defaultExportAllLimit)
 
     const resetDefault = useCallback(() => {
@@ -76,6 +84,7 @@ export const SettingProvider: FC = ({ children }) => {
         setExportMetaList(defaultExportMetaList)
         setEnableThinking(false)
         setEnableSources(true)
+        setMarkdownImageMode(defaultMarkdownImageMode)
         setExportAllLimit(defaultExportAllLimit)
     }, [
         setFormat,
@@ -84,6 +93,7 @@ export const SettingProvider: FC = ({ children }) => {
         setExportMetaList,
         setEnableThinking,
         setEnableSources,
+        setMarkdownImageMode,
         setExportAllLimit,
     ])
 
@@ -109,6 +119,8 @@ export const SettingProvider: FC = ({ children }) => {
         setEnableThinking,
         enableSources,
         setEnableSources,
+        markdownImageMode,
+        setMarkdownImageMode,
 
         exportAllLimit,
         setExportAllLimit,
@@ -133,6 +145,8 @@ export const SettingProvider: FC = ({ children }) => {
         setEnableThinking,
         enableSources,
         setEnableSources,
+        markdownImageMode,
+        setMarkdownImageMode,
         exportAllLimit,
         setExportAllLimit,
         resetDefault,

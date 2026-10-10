@@ -16,6 +16,7 @@ export const KEY_META_ENABLED = 'exporter:enable_meta'
 export const KEY_META_LIST = 'exporter:meta_list'
 export const KEY_THINKING_ENABLED = 'exporter:enable_thinking'
 export const KEY_SOURCES_ENABLED = 'exporter:enable_sources'
+export const KEY_MARKDOWN_IMAGE_MODE = 'exporter:markdown_image_mode'
 export const KEY_EXPORT_ALL_LIMIT = 'exporter:export_all_limit'
 export const KEY_EXPORTED_UPDATE_TIMES = 'exporter:exported_update_times'
 

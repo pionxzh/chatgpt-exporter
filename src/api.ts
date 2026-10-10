@@ -518,55 +518,74 @@ export async function withImageAssets<T extends ApiConversation>(conversation: T
     return copy
 }
 
-/** avoid errors in parsing multimodal parts we don't understand */
-async function replaceImageAssets(conversation: ApiConversation): Promise<void> {
-    const isMultiModalInputImage = (part: any): part is MultiModalInputImage => {
+/**
+ * Image sources a conversation carries: uploaded and generated images in
+ * multimodal parts, and images from code execution output.
+ */
+interface ImageSource {
+    src: string
+    replace: (src: string) => void
+}
+
+function collectImageSources(conversation: ApiConversation): ImageSource[] {
+    const isImagePart = (part: any): part is MultiModalInputImage => {
         return typeof part === 'object'
             && part !== null
-            && 'content_type' in part
             && part.content_type === 'image_asset_pointer'
-            && 'asset_pointer' in part
             && typeof part.asset_pointer === 'string'
-            && part.asset_pointer.startsWith('sediment://')
     }
 
-    const imageAssets = Object.values(conversation.mapping).flatMap((node) => {
-        if (!node.message) return []
-        if (node.message.content.content_type !== 'multimodal_text') return []
+    return Object.values(conversation.mapping).flatMap((node): ImageSource[] => {
+        const message = node.message
+        if (!message) return []
 
-        return (Array.isArray(node.message.content.parts) ? node.message.content.parts : [])
-            .filter(isMultiModalInputImage)
+        if (message.content.content_type === 'multimodal_text') {
+            const parts = Array.isArray(message.content.parts) ? message.content.parts : []
+            return parts.filter(isImagePart).map(part => ({
+                src: part.asset_pointer,
+                replace: (src) => { part.asset_pointer = src },
+            }))
+        }
+
+        if (message.content.content_type === 'execution_output') {
+            const messages = message.metadata?.aggregate_result?.messages ?? []
+            return messages
+                .filter(msg => msg.message_type === 'image')
+                .map(msg => ({
+                    src: msg.image_url,
+                    replace: (src) => { msg.image_url = src },
+                }))
+        }
+
+        return []
     })
+}
 
-    const executionOutputs = Object.values(conversation.mapping).flatMap((node) => {
-        if (!node.message) return []
-        if (node.message.content.content_type !== 'execution_output') return []
-        if (!node.message.metadata?.aggregate_result?.messages) return []
+/**
+ * Replaces every image source in place with what `resolve` returns for it.
+ * A source is kept when `resolve` returns null or throws.
+ */
+export async function replaceImageSources(
+    conversation: ApiConversation,
+    resolve: (src: string) => Promise<string | null>,
+): Promise<void> {
+    await Promise.all(collectImageSources(conversation).map(async (image) => {
+        try {
+            const newSrc = await resolve(image.src)
+            if (newSrc) image.replace(newSrc)
+        }
+        catch (error) {
+            console.error('Failed to fetch image asset', error)
+        }
+    }))
+}
 
-        return node.message.metadata.aggregate_result.messages
-            .filter(msg => msg.message_type === 'image')
+/** avoid errors in parsing multimodal parts we don't understand */
+function replaceImageAssets(conversation: ApiConversation): Promise<void> {
+    return replaceImageSources(conversation, async (src) => {
+        if (!src.startsWith('sediment://')) return null
+        return fetchImageFromPointer(src)
     })
-
-    await Promise.all([
-        ...imageAssets.map(async (asset) => {
-            try {
-                const newAssetPointer = await fetchImageFromPointer(asset.asset_pointer)
-                if (newAssetPointer) asset.asset_pointer = newAssetPointer
-            }
-            catch (error) {
-                console.error('Failed to fetch image asset', error)
-            }
-        }),
-        ...executionOutputs.map(async (msg) => {
-            try {
-                const newImageUrl = await fetchImageFromPointer(msg.image_url)
-                if (newImageUrl) msg.image_url = newImageUrl
-            }
-            catch (error) {
-                console.error('Failed to fetch image asset', error)
-            }
-        }),
-    ])
 }
 
 export async function fetchConversation(chatId: string): Promise<ApiConversationWithId> {

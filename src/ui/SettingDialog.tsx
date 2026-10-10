@@ -6,6 +6,7 @@ import { getChatIdFromUrl } from '../page'
 import { getFileNameWithFormat } from '../utils/download'
 import { timestamp as _timestamp, dateStr, unixTimestampToISOString } from '../utils/utils'
 import type { FC } from '../type'
+import type { MarkdownImageMode } from './SettingContext'
 import { Dialog } from './Dialog'
 import { IconCross, IconTrash } from './Icons'
 import { useSettingContext } from './SettingContext'
@@ -36,6 +37,7 @@ export const SettingDialog: FC<SettingDialogProps> = ({
         exportMetaList, setExportMetaList,
         enableThinking, setEnableThinking,
         enableSources, setEnableSources,
+        markdownImageMode, setMarkdownImageMode,
         exportAllLimit, setExportAllLimit,
         /* eslint-enable antfu/consistent-list-newline */
     } = useSettingContext()
@@ -130,6 +132,27 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                         </div>
                         <div className="ce-setting-control">
                             <Toggle label="" checked={enableSources} onCheckedUpdate={setEnableSources} />
+                        </div>
+                    </div>
+                    <div className="ce-setting-card">
+                        <div>
+                            <dt className="ce-setting-title">
+                                {t('Markdown Images')}
+                            </dt>
+                            <dd className="ce-setting-desc">
+                                {t('Markdown Images Description')}
+                            </dd>
+                            <dd>
+                                <select
+                                    className="ce-select ce-setting-select"
+                                    value={markdownImageMode}
+                                    onChange={e => setMarkdownImageMode(e.currentTarget.value as MarkdownImageMode)}
+                                >
+                                    <option value="embed">{t('Markdown Images Embed')}</option>
+                                    <option value="omit">{t('Markdown Images Omit')}</option>
+                                    <option value="files">{t('Markdown Images Files')}</option>
+                                </select>
+                            </dd>
                         </div>
                     </div>
                     <div className="ce-setting-card">
