@@ -1,29 +1,24 @@
 import JSZip from 'jszip'
-import { fetchConversation, getCurrentChatId, getFileAttachmentNames, processConversation, replaceImageSources, shouldSkipMessageInExport, withImageAssets } from '../api'
-import { KEY_MARKDOWN_IMAGE_MODE, KEY_SOURCES_ENABLED, KEY_THINKING_ENABLED, KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_MARKDOWN, baseUrl } from '../constants'
+import { fetchConversation, getCurrentChatId, getFileAttachmentNames, processConversation, shouldSkipMessageInExport, withImageAssets } from '../api'
+import { KEY_SOURCES_ENABLED, KEY_THINKING_ENABLED, KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_MARKDOWN, baseUrl } from '../constants'
 import i18n from '../i18n'
 import { checkIfConversationStarted } from '../page'
 import { checkIfTemporaryChatIsExportable } from '../temporaryChat'
 import { transformContentReferences } from '../utils/citations'
 import { buildZipFileName, downloadFile, getFileNameWithFormat } from '../utils/download'
+import { addImageFilesToZip, extractImageFiles, getImageMode } from '../utils/imageFiles'
 import { protectMath } from '../utils/latex'
 import { fromMarkdown, toMarkdown } from '../utils/markdown'
 import { ScriptStorage } from '../utils/storage'
 import { standardizeLineBreaks } from '../utils/text'
 import { transformAuthor } from '../utils/author'
 import type { ApiConversation, ApiConversationWithId, Citation, ConversationNodeMessage, ConversationResult, ThinkingContent } from '../api'
-import type { ExportMeta, MarkdownImageMode } from '../ui/SettingContext'
+import type { ExportMeta, ImageMode } from '../ui/SettingContext'
 import type { PartInfo } from '../utils/download'
 import { getMetaVariables, resolveMetaList } from './meta'
 
-const ASSETS_DIR = 'assets'
-
-function getImageMode(): MarkdownImageMode {
-    return ScriptStorage.get<MarkdownImageMode>(KEY_MARKDOWN_IMAGE_MODE) ?? 'embed'
-}
-
 /** Omitted images skip the download, the other modes need the image data */
-function loadImages<T extends ApiConversation>(conversation: T, imageMode: MarkdownImageMode): Promise<T> {
+function loadImages<T extends ApiConversation>(conversation: T, imageMode: ImageMode): Promise<T> {
     return imageMode === 'omit' ? Promise.resolve(conversation) : withImageAssets(conversation)
 }
 
@@ -56,7 +51,7 @@ export async function exportToMarkdown(fileNameFormat: string, metaList: ExportM
 
     const zip = new JSZip()
     zip.file(fileName, markdown)
-    addAssetsToZip(zip, assets)
+    addImageFilesToZip(zip, assets)
     downloadFile(fileName.replace(/\.md$/, '.zip'), 'application/zip', await generateZip(zip))
 
     return true
@@ -91,7 +86,7 @@ export async function exportAllToMarkdown(fileNameFormat: string, apiConversatio
         const content = conversationToMarkdown(conversation, metaList, imageMode)
         zip.file(fileName, content)
     })
-    addAssetsToZip(zip, assets)
+    addImageFilesToZip(zip, assets)
 
     const blob = await generateZip(zip)
     const partInfo: PartInfo | undefined = (partIndex != null && totalParts != null)
@@ -112,48 +107,7 @@ function generateZip(zip: JSZip) {
     })
 }
 
-function addAssetsToZip(zip: JSZip, assets: Map<string, string>) {
-    assets.forEach((base64, name) => {
-        // Images are compressed already
-        zip.file(`${ASSETS_DIR}/${name}`, base64, { base64: true, compression: 'STORE' })
-    })
-}
-
-const IMAGE_EXTENSIONS: Record<string, string> = {
-    'image/jpeg': 'jpg',
-    'image/png': 'png',
-    'image/gif': 'gif',
-    'image/webp': 'webp',
-    'image/svg+xml': 'svg',
-}
-
-/**
- * Returns a copy of the conversation with base64 data uri images moved into
- * `assets`, keyed by file name, and replaced by a relative path to that file.
- * Other image sources, like pointers that failed to download, are kept.
- */
-async function extractImageFiles<T extends ApiConversation>(conversation: T, assets: Map<string, string>): Promise<T> {
-    const copy = structuredClone(conversation)
-    await replaceImageSources(copy, async (src) => {
-        const match = /^data:([^;,]*)[^,]*;base64,(.*)$/s.exec(src)
-        if (!match) return null
-
-        const [, mimeType, base64] = match
-        const ext = IMAGE_EXTENSIONS[mimeType.toLowerCase()] ?? 'bin'
-        const name = `image-${await hashBase64(base64)}.${ext}`
-        assets.set(name, base64)
-        return `${ASSETS_DIR}/${name}`
-    })
-    return copy
-}
-
-async function hashBase64(base64: string) {
-    const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0))
-    const digest = await crypto.subtle.digest('SHA-256', bytes)
-    return Array.from(new Uint8Array(digest).slice(0, 8), b => b.toString(16).padStart(2, '0')).join('')
-}
-
-function conversationToMarkdown(conversation: ConversationResult, metaList: ExportMeta[] | undefined, imageMode: MarkdownImageMode) {
+function conversationToMarkdown(conversation: ConversationResult, metaList: ExportMeta[] | undefined, imageMode: ImageMode) {
     const { id, title, conversationNodes } = conversation
     const source = `${baseUrl}/c/${id}`
 

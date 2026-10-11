@@ -1,10 +1,10 @@
 import JSZip from 'jszip'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ApiConversationWithId } from '../src/api'
-import type { MarkdownImageMode } from '../src/ui/SettingContext'
+import type { ImageMode } from '../src/ui/SettingContext'
 
 const downloadFile = vi.hoisted(() => vi.fn())
-const settings = vi.hoisted(() => ({ imageMode: null as MarkdownImageMode | null }))
+const settings = vi.hoisted(() => ({ imageMode: null as ImageMode | null }))
 
 // The userscript client touches `document` and constants read `location` at import time.
 vi.mock('vite-plugin-monkey/dist/client', () => ({ unsafeWindow: {} }))
@@ -15,7 +15,7 @@ vi.mock('../src/i18n', () => ({ default: { t: (key: string) => key } }))
 vi.mock('../src/page', () => ({}))
 vi.mock('../src/temporaryChat', () => ({}))
 vi.mock('../src/utils/storage', () => ({
-    ScriptStorage: { get: (key: string) => key === 'exporter:markdown_image_mode' ? settings.imageMode : null },
+    ScriptStorage: { get: (key: string) => key === 'exporter:image_mode' ? settings.imageMode : null },
 }))
 vi.mock('../src/utils/download', async importOriginal => ({
     ...await importOriginal<typeof import('../src/utils/download')>(),
@@ -23,6 +23,7 @@ vi.mock('../src/utils/download', async importOriginal => ({
 }))
 
 const { exportAllToMarkdown } = await import('../src/exporter/markdown')
+const { exportAllToJson } = await import('../src/exporter/json')
 
 const PNG = 'data:image/png;base64,iVBORw0KGgo='
 const JPEG = 'data:image/jpeg;base64,/9j/4AAQ'
@@ -66,14 +67,14 @@ function conversation(id: string, sources: { upload: string, output?: string }):
     } as unknown as ApiConversationWithId
 }
 
-async function exportZip(conversations: ApiConversationWithId[]) {
+async function exportZip(conversations: ApiConversationWithId[], exportAll: typeof exportAllToMarkdown = exportAllToMarkdown) {
     downloadFile.mockClear()
-    await exportAllToMarkdown('{title}', conversations)
+    await exportAll('{title}', conversations)
     const [, , blob] = downloadFile.mock.calls[0]
     return JSZip.loadAsync(await blob.arrayBuffer())
 }
 
-describe('markdown image modes', () => {
+describe('exportAllToMarkdown image modes', () => {
     beforeEach(() => {
         settings.imageMode = null
     })
@@ -121,5 +122,40 @@ describe('markdown image modes', () => {
         const zip = await exportZip([conversation('a', { upload: 'sediment://file_1' })])
         expect(Object.keys(zip.files).some(name => name.startsWith('assets/'))).toBe(false)
         expect(await zip.file('a.md')!.async('string')).toContain('![image](sediment://file_1)')
+    })
+})
+
+describe('exportAllToJson image modes', () => {
+    beforeEach(() => {
+        settings.imageMode = null
+    })
+
+    async function exportJson(conversations: ApiConversationWithId[]) {
+        const zip = await exportZip(conversations, exportAllToJson)
+        const json = async (name: string) => JSON.parse(await zip.file(name)!.async('string')) as ApiConversationWithId
+        return { zip, json }
+    }
+
+    const uploadOf = (conv: ApiConversationWithId) => (conv.mapping.m0.message!.content as any).parts[0].asset_pointer
+    const outputOf = (conv: ApiConversationWithId) => (conv.mapping.m1.message!.metadata as any).aggregate_result.messages[0].image_url
+
+    it('keeps data uris by default', async () => {
+        const { zip, json } = await exportJson([conversation('a', { upload: PNG })])
+        expect(uploadOf(await json('a.json'))).toBe(PNG)
+        expect(Object.keys(zip.files)).toEqual(['a.json'])
+    })
+
+    it('moves images into a shared assets folder', async () => {
+        settings.imageMode = 'files'
+        const a = conversation('a', { upload: PNG, output: JPEG })
+        const { zip, json } = await exportJson([a, conversation('b', { upload: PNG })])
+
+        const exportedA = await json('a.json')
+        expect(uploadOf(exportedA)).toMatch(/^assets\/image-[0-9a-f]{16}\.png$/)
+        expect(outputOf(exportedA)).toMatch(/^assets\/image-[0-9a-f]{16}\.jpg$/)
+        expect(uploadOf(await json('b.json'))).toBe(uploadOf(exportedA))
+        expect(await zip.file(uploadOf(exportedA))!.async('base64')).toBe('iVBORw0KGgo=')
+        expect(await zip.file(outputOf(exportedA))!.async('base64')).toBe('/9j/4AAQ')
+        expect(uploadOf(a)).toBe(PNG)
     })
 })
