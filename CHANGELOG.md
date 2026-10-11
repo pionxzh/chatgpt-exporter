@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.37.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.36.3...userscript-v2.37.0) (2026-10-11)
+
+
+### Features
+
+* choose how Markdown exports save images ([ec966c5](https://github.com/pionxzh/chatgpt-exporter/commit/ec966c51654c2726fec78b4b10f041be69999979)), closes [#405](https://github.com/pionxzh/chatgpt-exporter/issues/405)
+* save JSON (ZIP) images as files too ([82ec4bc](https://github.com/pionxzh/chatgpt-exporter/commit/82ec4bcfea9f6c651393861dbdf7c8eae8330045)), closes [#295](https://github.com/pionxzh/chatgpt-exporter/issues/295)
+
+
+### Bug Fixes
+
+* keep assistant text as written in markdown and text exports ([4c8fe6e](https://github.com/pionxzh/chatgpt-exporter/commit/4c8fe6ea01d58a59bc59aea9ba1421fee7d80969))
+
+
+### Performance Improvements
+
+* compile markdown to HTML with micromark directly ([f9d9e4c](https://github.com/pionxzh/chatgpt-exporter/commit/f9d9e4c1b0d59f38b7b83dd65bb5967bfbd34609))
+
 ## [2.36.3](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.36.2...userscript-v2.36.3) (2026-09-26)
 
 
