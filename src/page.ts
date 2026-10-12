@@ -88,8 +88,10 @@ export async function getUserAvatar(): Promise<string> {
 }
 
 export function checkIfConversationStarted() {
-    return !!document.querySelector([
+    // ChatGPT keeps previous conversations mounted under hidden ancestors;
+    // only a visible match means there is a conversation to export.
+    return Array.from(document.querySelectorAll<HTMLElement>([
         '[data-testid^="conversation-turn-"]',
         '[data-chatgpt-conversation-selection-target] [data-chatgpt-search-message-ids]',
-    ].join(', '))
+    ].join(', '))).some(el => el.offsetHeight > 0)
 }
