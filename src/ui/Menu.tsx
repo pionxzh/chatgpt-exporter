@@ -140,7 +140,7 @@ function MenuInner({ container }: { container: HTMLDivElement }) {
                 onOpenChange={setOpen}
                 keepMounted={jsonOpen || settingOpen || exportOpen}
                 isMobile={isMobile}
-                width={isMobile ? 316 : 268}
+                width={isMobile ? 316 : 276}
                 trigger={(
                     <MenuItem
                         className={isCollapsedSidebar
