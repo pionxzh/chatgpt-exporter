@@ -47,216 +47,23 @@
 
 > Tampermonkey를 사용하는 경우 브라우저 설정에서 [`Allow User Scripts`가 활성화되어 있는지](https://www.tampermonkey.net/faq.php?q=Q209) 확인하세요.
 
-#
-
-[📚 지원하는 형식](#-지원하는-형식) &nbsp;&nbsp;|&nbsp;&nbsp; [💡 예제](#-예제) &nbsp;&nbsp;|&nbsp;&nbsp; [📤 여러 대화 내보내기](#-여러-대화-내보내기) &nbsp;&nbsp;|&nbsp;&nbsp; [🤝 기여하기](#-기여하기) &nbsp;&nbsp;|&nbsp;&nbsp;[⭐ 별 기록](#-별-기록)
-
 </div>
 
 #
 
 ## 📚 지원하는 형식
 
-- [텍스트](#텍스트)
-- [HTML](#HTML)
-- [Markdown](#markdown)
-- [PNG](#스크린샷)
-- [JSON](#JSON)
+- 텍스트로 복사
+- 스크린샷 (PNG)
+- Markdown
+- HTML
+- JSON (OpenAI 공식 형식, TavernAI/SillyTavern, Ooba)
 
-## 💡 예제
-
-### 텍스트
-
-```
-너:
-ChatGPT Exporter 를 만들고 있어요. 어떻게 생각하세요?
-
-ChatGPT:
-ChatGPT Exporter 를 만들 계획이신 것 같군요. ChatGPT 는 OpenAI 에서 학습한 대규모
-언어 모델로서, 주어진 입력에 기반하여 인간과 유사한 텍스트 응답을 생성하는 데
-사용됩니다. 이는 챗봇, 고객 문의에 대한 자동 응답 등 다양한 응용 분야에서 활용될 수
-있습니다.
-
-하지만 대규모 언어 모델인 ChatGPT는 특정 작업을 위해 특별히 훈련된 것은 아니기
-때문에 생성된 텍스트의 품질은 사용 방식과 적용되는 문맥에 따라 달라집니다. ChatGPT
-를 책임있게 사용하고 해당 상황에서의 잠재적인 결과를 고려하는 것이 중요합니다.
-```
-
-### HTML
-
-<div align="center">
-
-<img width="643" alt="image" src="https://github.com/pionxzh/chatgpt-exporter/assets/9910706/47481c7a-4a6a-433b-b08e-fdf3bbabcb64">
-
-</div>
-
-### Markdown
-
-```
----
-title: ChatGPT Exporter Creation
-source: https://chat.openai.com/c/cf3f8850-1d69-43c8-b99b-affd0de4e76f
-author: ChatGPT
----
-
-# ChatGPT Exporter Creation
-
-#### You:
-ChatGPT Exporter 를 만들고 있어요. 어떻게 생각하세요?
-
-#### ChatGPT:
-ChatGPT Exporter 를 만들 계획이신 것 같군요. ChatGPT 는 OpenAI 에서 학습한 대규모
-언어 모델로서, 주어진 입력에 기반하여 인간과 유사한 텍스트 응답을 생성하는 데
-사용됩니다. 이는 챗봇, 고객 문의에 대한 자동 응답 등 다양한 응용 분야에서 활용될 수
-있습니다.
-
-하지만 대규모 언어 모델인 ChatGPT는 특정 작업을 위해 특별히 훈련된 것은 아니기
-때문에 생성된 텍스트의 품질은 사용 방식과 적용되는 문맥에 따라 달라집니다. ChatGPT
-를 책임있게 사용하고 해당 상황에서의 잠재적인 결과를 고려하는 것이 중요합니다.
-```
-
-### 스크린샷
-
-<div align="center">
-
-<img width="480" src="https://user-images.githubusercontent.com/9910706/205663680-6ac97fac-39b0-495c-bee4-8ef37713a9ae.png" />
-
-</div>
-
-### JSON
-
-API `https://chat.openai.com/backend-api/conversation/[id]` 에서 얻은 원시 콘텐츠
-
-<details>
-<summary>클릭하여 보기</summary>
-
-```json
-{
-    "id": "35a1fa05-e928-4c39-8ffa-ca74f75b509f",
-    "title": "AI Turing Test.",
-    "create_time": 1678015311.655875,
-    "mapping": {
-        "5c48fa3e-e4ee-4d00-aa66-8fbcb671a358": {
-            "id": "5c48fa3e-e4ee-4d00-aa66-8fbcb671a358",
-            "message": {
-                "id": "5c48fa3e-e4ee-4d00-aa66-8fbcb671a358",
-                "author": {
-                    "role": "system",
-                    "metadata": {}
-                },
-                "create_time": 1678015311.655875,
-                "content": {
-                    "content_type": "text",
-                    "parts": [
-                        ""
-                    ]
-                },
-                "end_turn": true,
-                "weight": 1,
-                "metadata": {},
-                "recipient": "all"
-            },
-            "parent": "9310b90f-d8f0-4be6-bac2-daacddac784f",
-            "children": [
-                "4afb9720-3a88-49b1-9309-e2b53d607f34"
-            ]
-        },
-        "9310b90f-d8f0-4be6-bac2-daacddac784f": {
-            "id": "9310b90f-d8f0-4be6-bac2-daacddac784f",
-            "children": [
-                "5c48fa3e-e4ee-4d00-aa66-8fbcb671a358"
-            ]
-        },
-        "4afb9720-3a88-49b1-9309-e2b53d607f34": {
-            "id": "4afb9720-3a88-49b1-9309-e2b53d607f34",
-            "message": {
-                "id": "4afb9720-3a88-49b1-9309-e2b53d607f34",
-                "author": {
-                    "role": "user",
-                    "metadata": {}
-                },
-                "create_time": 1678015311.656259,
-                "content": {
-                    "content_type": "text",
-                    "parts": [
-                        "write an poem about the Turing test"
-                    ]
-                },
-                "weight": 1,
-                "metadata": {
-                    "timestamp_": "absolute"
-                },
-                "recipient": "all"
-            },
-            "parent": "5c48fa3e-e4ee-4d00-aa66-8fbcb671a358",
-            "children": [
-                "7027f1a5-8bd5-4463-9869-8a1d1db2f9a1"
-            ]
-        },
-        "7027f1a5-8bd5-4463-9869-8a1d1db2f9a1": {
-            "id": "7027f1a5-8bd5-4463-9869-8a1d1db2f9a1",
-            "message": {
-                "id": "7027f1a5-8bd5-4463-9869-8a1d1db2f9a1",
-                "author": {
-                    "role": "assistant",
-                    "metadata": {}
-                },
-                "create_time": 1678185638.890551,
-                "content": {
-                    "content_type": "text",
-                    "parts": [
-                        "In the realm of machines and code,\nThere lies a test, with rules bestowed,\nA challenge to determine true mind,\nAnd if a machine's intelligence can find.\n\nThe Turing test, named for its creator,\nSeeks to find if a machine's behavior\nCan mimic that of a human so well,\nThat it's indistinguishable, can you tell?\n\nThrough conversations, the test is done,\nWith a judge and a machine, the game is run,\nIf the judge can't tell who is who,\nThen the machine's intelligence shines through.\n\nBut can a machine truly think?\nOr is it just a clever bit of link,\nBetween algorithms and programming code,\nCan it truly understand and decode?\n\nThe Turing test, a thought experiment,\nBrings up questions, doubts, and sentiment,\nFor as we strive to create machines smart,\nWe wonder, will they ever truly have heart?\n\nSo let us ponder and explore,\nAs we create machines more and more,\nThe Turing test a reminder to be,\nMindful of what our machines can truly see."
-                    ]
-                },
-                "end_turn": false,
-                "weight": 1,
-                "metadata": {
-                    "model_slug": "text-davinci-002-render-sha",
-                    "finish_details": {
-                        "type": "stop"
-                    },
-                    "timestamp_": "absolute"
-                },
-                "recipient": "all"
-            },
-            "parent": "4afb9720-3a88-49b1-9309-e2b53d607f34",
-            "children": []
-        }
-    },
-    "moderation_results": [],
-    "current_node": "7027f1a5-8bd5-4463-9869-8a1d1db2f9a1"
-}
-```
-</details>
-
-## 📤 여러 대화 내보내기
-
-"모두 내보내기" 버튼을 클릭하면 **대화 내보내기** 대화 상자가 나타납니다. 여기서 다음 기능을 사용할 수 있습니다.
-
-**공식 내보내기 파일(conversations.json)에서 내보내기**
-
-업로드 아이콘 버튼을 클릭하여 OpenAI에서 다운로드한 JSON 형식의 대화 파일을 업로드합니다.
-
-**API에서 내보내기**
-
-모든 대화 목록에서 내보낼 대화를 선택합니다. "모두 선택" 체크박스를 선택하면 모든 대화를 내보낼 수 있습니다.
-
-좌측 하단의 드롭다운 메뉴에서 내보내기 형식을 선택하세요. 다음 형식 중에서 선택할 수 있습니다.
-
-- **Markdown**
-- **HTML**
-- **JSON**
-- **JSON (ZIP)**
-
-원하는 작업을 수행하려면 버튼을 클릭하세요.
-
-- **보관** - 보관된 채팅 세션은 사이드바에서 사라지며 ChatGPT 설정에서 관리할 수 있습니다. 자세한 내용은 [#199](https://github.com/pionxzh/chatgpt-exporter/issues/199)을 참조하세요.
-- **삭제** - 선택한 대화를 삭제합니다.
-- **내보내기** - 선택한 대화를 선택한 형식으로 내보냅니다.
+**Export All**로 여러 대화를 한 번에 내보낼 수 있습니다.
 
 ## 💬 DeepSeek도 사용하시나요?
 
-[**DeepSeek Exporter**](https://github.com/pionxzh/deepseek-exporter)를 확인해 보세요 — [DeepSeek](https://chat.deepseek.com/)에서 동일한 원클릭 내보내기를 제공하는 자매 프로젝트입니다. DeepThink 추론 과정과 웹 검색 출처도 함께 내보낼 수 있습니다.
+[**DeepSeek Exporter**](https://github.com/pionxzh/deepseek-exporter)는 [DeepSeek](https://chat.deepseek.com/)에서도 같은 원클릭 내보내기를 제공하는 자매 프로젝트입니다. DeepThink 추론 과정과 웹 검색 출처도 함께 내보낼 수 있습니다.
 
 ## 🤝 기여하기
 
