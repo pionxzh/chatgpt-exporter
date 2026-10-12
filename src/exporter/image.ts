@@ -129,13 +129,14 @@ const growUserBubbles: SnapdomPlugin = {
 const CJK_FONT_FAMILY = 'chatgpt-exporter-cjk'
 const CJK_UNICODE_RANGE = 'U+2E80-2FFF, U+3000-303F, U+3040-30FF, U+3100-31FF, U+3400-4DBF, U+4E00-9FFF, U+F900-FAFF, U+FE30-FE4F, U+FF00-FFEF'
 const CJK_FONT_FACES = [
-    { weight: '100 400', names: ['PingFang TC', 'PingFangTC-Regular'] },
-    { weight: '500', names: ['PingFangTC-Medium'] },
-    { weight: '600 900', names: ['PingFangTC-Semibold'] },
-].map(({ weight, names }) => `
+    // The family-only local name maps to incorrect glyphs in Firefox SVG images.
+    { weight: '100 400', name: 'PingFangTC-Regular' },
+    { weight: '500', name: 'PingFangTC-Medium' },
+    { weight: '600 900', name: 'PingFangTC-Semibold' },
+].map(({ weight, name }) => `
     @font-face {
         font-family: "${CJK_FONT_FAMILY}";
-        src: ${names.map(name => `local("${name}")`).join(', ')};
+        src: local("${name}");
         font-weight: ${weight};
         unicode-range: ${CJK_UNICODE_RANGE};
     }
