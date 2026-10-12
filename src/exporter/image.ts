@@ -722,7 +722,10 @@ export async function exportToPng(fileNameFormat: string) {
 
     const effect = new Effect()
     const isDarkMode = getColorScheme() === 'dark'
-    const redesignedThread = document.querySelector<HTMLElement>(REDESIGNED_THREAD_SELECTOR)
+    // ChatGPT keeps previous conversations mounted under hidden ancestors.
+    // Capture the visible thread, not the first cached conversation in the DOM.
+    const redesignedThread = Array.from(document.querySelectorAll<HTMLElement>(REDESIGNED_THREAD_SELECTOR))
+        .find(thread => thread.offsetHeight > 0)
     const source = redesignedThread
         ? await prepareRedesignedThread(redesignedThread, effect, isDarkMode)
         : await prepareLegacyThread(effect, isDarkMode)
