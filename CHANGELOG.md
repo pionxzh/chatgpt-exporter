@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.37.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.37.0...userscript-v2.37.1) (2026-10-12)
+
+
+### Bug Fixes
+
+* export interactive replies from their Markdown version ([7076330](https://github.com/pionxzh/chatgpt-exporter/commit/70763307f0debb65dd7fbbb139d605dcea1f8246))
+* highlight the export trigger while its menu is open ([ee812c6](https://github.com/pionxzh/chatgpt-exporter/commit/ee812c69b527ad4c7c9059714bc7f2c8767ff3ac))
+* keep code blocks and charts that ChatGPT draws as widgets ([9a0ac68](https://github.com/pionxzh/chatgpt-exporter/commit/9a0ac6844459a81491b15c1e73c3daccf95c9e00))
+* keep menu labels clear of the item edge ([f78692c](https://github.com/pionxzh/chatgpt-exporter/commit/f78692cbe8fe9dc86b5883a5a463075072b54159))
+* keep the page's CJK font in screenshots when it already fits ([88e293f](https://github.com/pionxzh/chatgpt-exporter/commit/88e293f05775fccd662febabdebc88cbb3739a63))
+* skip hidden cached conversations during export ([a14a5e9](https://github.com/pionxzh/chatgpt-exporter/commit/a14a5e9beb6bda277adb405a90b321f497d2c863))
+* use PostScript names for CJK font faces in screenshots ([1fe8e1b](https://github.com/pionxzh/chatgpt-exporter/commit/1fe8e1b156f2f6ae26e0e73b873db4b18e2c9e59))
+
 ## [2.37.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.36.3...userscript-v2.37.0) (2026-10-11)
 
 
