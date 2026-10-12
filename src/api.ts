@@ -158,6 +158,11 @@ interface MessageMeta {
     finished_duration_sec?: number
     /** Reasoning activity title shown in the thinking panel */
     reasoning_title?: string
+    /** Interactive replies, whose `parts` hold widget markup only ChatGPT can render */
+    model_dil_v2?: {
+        /** ChatGPT's own Markdown version of the reply */
+        fallbackMarkdown?: string
+    }
 }
 
 export type AuthorRole = 'system' | 'assistant' | 'user' | 'tool'
@@ -1063,7 +1068,7 @@ function copyNode(node: ConversationNode): ConversationNode {
     if (!message) return { ...node }
 
     const content = message.content.content_type === 'text'
-        ? { ...message.content, parts: [...message.content.parts] }
+        ? { ...message.content, parts: getInteractiveFallbackParts(message) ?? [...message.content.parts] }
         : message.content
 
     return {
@@ -1074,6 +1079,25 @@ function copyNode(node: ConversationNode): ConversationNode {
             metadata: message.metadata && { ...message.metadata },
         },
     }
+}
+
+/**
+ * Interactive replies keep a JSX-like widget markup in `parts`, such as
+ * `<box>` and `DIL.useState(...)`. Export the Markdown version ChatGPT
+ * stores next to it instead.
+ */
+function getInteractiveFallbackParts(message: ConversationNodeMessage): string[] | null {
+    const markdown = message.metadata?.model_dil_v2?.fallbackMarkdown
+    if (typeof markdown !== 'string' || !markdown.trim() || message.content.content_type !== 'text') return null
+
+    // The markup ends with the blank line that separates this reply from the
+    // next one when they are merged, but the Markdown is trimmed.
+    const markup = message.content.parts.join('')
+    const leading = markup.slice(0, markup.length - markup.trimStart().length)
+    const trailing = markup.slice(markup.trimEnd().length)
+
+    // `<escape>` wraps a literal character, such as `<` in inline code.
+    return [leading + markdown.replaceAll(/<escape>([\s\S]*?)<\/escape>/g, '$1') + trailing]
 }
 
 function mergeContinuationNodes(nodes: ConversationNode[]): ConversationNode[] {
