@@ -166,3 +166,56 @@ describe('png conversation selection', () => {
         expect(document.querySelector('[data-chatgpt-exporter-screenshot-root]')).toBeNull()
     })
 })
+
+describe('png CJK metrics', () => {
+    // Stand in for the SVG probe: the image loads, and the painted box ends
+    // at `imageWidth` CSS px. The probe measures 800px on the page.
+    function stubProbeImage(imageWidth: number) {
+        vi.stubGlobal('Image', class {
+            onload: (() => void) | null = null
+            onerror: (() => void) | null = null
+            #src = ''
+            get src() { return this.#src }
+            set src(url: string) {
+                this.#src = url
+                setTimeout(() => this.onload?.())
+            }
+        })
+        vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(function (this: HTMLCanvasElement) {
+            // The probe image is 40px wider than the 800px page width.
+            const scale = this.width / 840
+            return {
+                drawImage: () => {},
+                getImageData: (_x: number, _y: number, width: number) => {
+                    const data = new Uint8ClampedArray(width * 4)
+                    for (let x = 0; x < Math.min(width, imageWidth * scale); x++) data.set([255, 0, 0, 255], x * 4)
+                    return { data }
+                },
+            } as unknown as CanvasRenderingContext2D
+        } as typeof HTMLCanvasElement.prototype.getContext)
+    }
+
+    function exportWithFont() {
+        mountThread('active')
+        document.querySelector<HTMLElement>('[data-chatgpt-conversation-selection-target]')!.style.fontFamily = 'system-ui'
+        return exportToPng('{title}')
+    }
+
+    it('keeps the page font when the image lays out CJK text at the page width', async () => {
+        stubProbeImage(800)
+
+        expect(await exportWithFont()).toBe(true)
+
+        const captured = mocks.snapdom.mock.calls[0][0] as HTMLElement
+        expect(captured.style.fontFamily).not.toContain('chatgpt-exporter-cjk')
+    })
+
+    it('swaps in the untracked CJK face when the image lays out CJK text wider', async () => {
+        stubProbeImage(808.5)
+
+        expect(await exportWithFont()).toBe(true)
+
+        const captured = mocks.snapdom.mock.calls[0][0] as HTMLElement
+        expect(captured.style.fontFamily).toContain('chatgpt-exporter-cjk')
+    })
+})

@@ -8,6 +8,7 @@ import { downloadFile, getFileNameWithFormat } from '../utils/download'
 import { Effect } from '../utils/effect'
 import { encodePng } from '../utils/png'
 import { getColorScheme, sleep } from '../utils/utils'
+import { escapeHtml } from './htmlTemplate'
 
 const MAX_SCREENSHOT_DIMENSION = 16_000
 const MAX_TILE_PIXELS = 16_000_000
@@ -142,16 +143,72 @@ const CJK_FONT_FACES = [
     }
 `).join('')
 
+const CJK_PROBE_TEXT = '中文字寬測試一二三四五六七八九十'
+/** Tracked text measures about 8.6px wider over the probe text, so 2px is noise. */
+const CJK_PROBE_TOLERANCE = 2
+
 /**
- * On macOS, `system-ui` tracks its CJK fallback tighter on the page than
- * inside the SVG image (15.34px vs 16px per glyph at 16px). Every
- * shrink-to-fit box, such as a user bubble, is frozen at its page width, so
- * the wider text in the image wraps its last character or gets truncated.
- * Lay the copy out with an untracked CJK font so both sides agree. Where the
- * font is missing, the face does not load and the original stack applies.
+ * How much wider CJK text in `root`'s font is inside an SVG image than on
+ * the page. Null when the image cannot be drawn or read back.
+ */
+async function measureCjkGap(root: HTMLElement): Promise<number | null> {
+    const probe = document.createElement('span')
+    probe.textContent = CJK_PROBE_TEXT
+    probe.style.cssText = 'position: absolute; font-size: 16px; white-space: pre'
+    root.appendChild(probe)
+    const pageWidth = probe.getBoundingClientRect().width
+    const { fontFamily, fontWeight } = getComputedStyle(probe)
+    probe.remove()
+
+    // Paint the span's box and find where it ends. The box follows the
+    // advance widths, not the glyph ink.
+    const scale = 2
+    const width = Math.ceil(pageWidth) + 40
+    const height = 32
+    const lang = root.closest<HTMLElement>('[lang]')?.lang ?? ''
+    const style = `font-family: ${fontFamily}; font-weight: ${fontWeight}; font-size: 16px; white-space: pre; background: #f00; color: transparent`
+    const img = await loadCorsImage(toSvgDataUrl(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">`
+        + `<foreignObject width="100%" height="100%">`
+        + `<div xmlns="http://www.w3.org/1999/xhtml" lang="${escapeHtml(lang)}"><span style="${escapeHtml(style)}">${CJK_PROBE_TEXT}</span></div>`
+        + `</foreignObject></svg>`))
+    if (!img) return null
+
+    try {
+        const canvas = document.createElement('canvas')
+        canvas.width = width * scale
+        canvas.height = height * scale
+        const ctx = canvas.getContext('2d')
+        if (!ctx) return null
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+        const { data } = ctx.getImageData(0, 8 * scale, canvas.width, 1)
+        let right = 0
+        for (let x = 0; x < canvas.width; x++) {
+            if (data[x * 4] > 200 && data[x * 4 + 1] < 60 && data[x * 4 + 3] > 128) right = x + 1
+        }
+        return right / scale - pageWidth
+    }
+    catch {
+        // Some browsers taint the canvas with any SVG image.
+        return null
+    }
+}
+
+/**
+ * On macOS, when the system's first language is not CJK, `system-ui` falls
+ * back to a CJK face that is tracked tighter on the page than inside the SVG
+ * image (15.34px vs 16px per glyph at 16px). Every shrink-to-fit box, such as
+ * a user bubble, is frozen at its page width, so the wider text in the image
+ * wraps its last character or gets truncated. Lay the copy out with an
+ * untracked CJK font so both sides agree. Where the font is missing, the face
+ * does not load and the original stack applies.
  * `root` must be attached and include `CJK_FONT_FACES`.
  */
 async function matchCjkMetrics(root: HTMLElement) {
+    // Elsewhere the page already uses an untracked face, such as Hiragino in
+    // a Japanese UI, and swapping it would only change the glyphs.
+    const gap = await measureCjkGap(root)
+    if (gap !== null && gap < CJK_PROBE_TOLERANCE) return
+
     // Prepend the face to every element that sets its own font stack.
     const elements = [root, ...Array.from(root.querySelectorAll<HTMLElement>('*'))]
     const families = new Map(elements.map(el => [el, getComputedStyle(el).fontFamily]))
