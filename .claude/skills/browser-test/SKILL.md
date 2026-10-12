@@ -40,9 +40,18 @@ node scripts/export.mjs JSON "OpenAI Official Format"
   result. Strings print raw, so large output such as a base64 PNG can be
   piped to a file. Use it instead of MCP `evaluate_script` with `filePath`,
   which only writes inside the repo.
-- `export.mjs` clicks a menu item, waits for the download, moves it out of
-  `~/Downloads` and unpacks zips. Output goes to the system temp dir by
-  default. Exports contain real conversations: never commit them.
+- `export.mjs` clicks a menu item, waits for the download and unpacks
+  zips. Output goes to the system temp dir by default. Exports contain real
+  conversations: never commit them. The JSON item opens a dialog, so name
+  the format too: `JSON "OpenAI Official Format"`.
+- Chrome lets a tab download only once without a user gesture. Later
+  downloads wait on a prompt in the address bar that a page screenshot does
+  not show, so a script sees no file and no error. `export.mjs` avoids it
+  with CDP `Browser.setDownloadBehavior`, which saves into its own folder
+  while its connection is open. To download any other way, such as an
+  `a.click()` through `eval.mjs`, open the same CDP session first. After
+  that call the check stays off and files go back to `~/Downloads` until
+  Chrome restarts, so restart it to reproduce the block.
 - `measure-text.mjs` compares the width of text on the page and inside an
   SVG image. See below.
 - `ui-shot.mjs` opens one exporter UI state (`page`, `menu`, `setting`,
