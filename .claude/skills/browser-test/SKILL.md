@@ -47,6 +47,7 @@ node scripts/export.mjs JSON "OpenAI Official Format"
   SVG image. See below.
 - `ui-shot.mjs` opens one exporter UI state (`page`, `menu`, `setting`,
   `export`, `json`) and screenshots it. See UI changes below.
+- `readme-hero.mjs` shoots the README hero images. See README hero below.
 
 To open a conversation, click it in the sidebar through `eval.mjs`, for
 example `[...document.querySelectorAll('a, button')].find(e => e.textContent.trim() === 'Title').click()`.
@@ -87,6 +88,32 @@ done
   style instead of guessing. Settings > Security and login has switches in
   both states; Library cards show checkboxes on hover.
 - Run `git checkout dist/chatgpt.user.js` before committing. CI builds dist.
+
+## README hero
+
+Each README shows `docs/readme/hero-<code>-<light|dark>.png` through a
+`<picture>`, so GitHub picks the image for the reader's theme. Reshoot them
+when the layout or the menu changes:
+
+```sh
+pnpm build
+node scripts/readme-hero.mjs            # all languages, into docs/readme
+node scripts/readme-hero.mjs fr ko      # only some
+```
+
+- Collapse ChatGPT's sidebar first, so no chat titles show. The script
+  stages the rest: it replaces the greeting, which can include the user's
+  name, hides the suggestions under the composer, which come from the
+  user's calendar and apps, and swaps the avatar for the OpenAI logo. Read
+  every image before committing anyway.
+- It switches ChatGPT's UI language in Settings and the exporter's
+  language for each shot, then sets both back to automatic. Check that
+  the account is back on "Auto detect" if a run fails.
+- Greetings and ChatGPT's option labels live in `LANGUAGES` at the top of
+  the script. A greeting should read like one of ChatGPT's own, short and
+  conversational, not a slogan. The exporter has no Korean locale, so the
+  Korean hero keeps the English menu.
+- Add a language there, in the README language bars and as a README file.
 
 ## Screenshot bugs
 
