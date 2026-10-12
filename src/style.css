@@ -114,7 +114,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
 
 .ce-card .ce-menu-item {
     column-gap: 8px;
-    padding-inline-start: 8px;
+    padding-inline: 8px;
 }
 
 .ce-dialog .ce-menu-item {
