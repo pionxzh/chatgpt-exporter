@@ -35,6 +35,8 @@ export function transformContentReferences(
     const fileReplacements = new Set<string>()
     for (const ref of sortedRefs) {
         if (!ref.matched_text) continue
+        // ChatGPT draws these code blocks as widgets, but the text already has their Markdown.
+        if (ref.type === 'client_defined_widget' && ref.data?.widget_type === 'code_block') continue
 
         const matchedText = normalizeCitationText(ref.matched_text)
         if (!matchedText) continue
@@ -76,6 +78,10 @@ export function formatCitationSource(source: ContentReferenceSource, output: Cit
 }
 
 function formatInlineReference(ref: ContentReference, output: CitationOutput, mode: 'expanded' | 'alt'): string {
+    if (ref.type === 'client_defined_widget' && ref.data?.widget_type === 'charts_widget_v2') {
+        return formatChart(ref.data.content as ChartContent | undefined)
+    }
+
     if (mode === 'alt') return formatAlt(ref.alt)
 
     if (output === 'markdown' && (ref.type === 'image_group' || ref.type === 'image_v2')) {
@@ -111,6 +117,37 @@ function formatImageResults(ref: ContentReference): string {
         })
         .filter(Boolean)
         .join('\n\n')
+}
+
+interface ChartContent {
+    meta?: { description?: string }
+    xKey?: string
+    series?: Array<{ dataKey: string, label?: string, valueSuffix?: string }>
+    data?: Array<Record<string, unknown>>
+    /** `data` with units, such as `63.4%` */
+    formattedData?: Array<Record<string, unknown>>
+}
+
+/** A chart becomes its description and a table of its data. */
+function formatChart(chart: ChartContent | undefined): string {
+    const { meta, xKey, series = [], data = [], formattedData } = chart ?? {}
+    if (!xKey || series.length === 0 || data.length === 0) return ''
+
+    const cell = (value: unknown) => String(value ?? '').replaceAll('|', '\\|').replaceAll('\n', ' ')
+    const row = (cells: unknown[]) => `| ${cells.map(cell).join(' | ')} |`
+    const rows = data.map((point, index) => row([
+        point[xKey],
+        ...series.map(({ dataKey, valueSuffix = '' }) => formattedData?.[index]?.[dataKey]
+            ?? (point[dataKey] == null ? '' : `${point[dataKey]}${valueSuffix}`)),
+    ]))
+    const table = [
+        row([xKey, ...series.map(({ dataKey, label }) => label || dataKey)]),
+        row([xKey, ...series].map(() => '---')),
+        ...rows,
+    ].join('\n')
+
+    const description = meta?.description?.trim()
+    return description ? `${description}\n\n${table}` : table
 }
 
 /**

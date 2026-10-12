@@ -85,6 +85,11 @@ export interface ContentReference {
     name?: string
     /** Image search results, wrapped in `image_result` on `image_group` references */
     images?: Array<ImageSearchResult & { image_result?: ImageSearchResult }>
+    /** What a `client_defined_widget` reference draws in place of `matched_text` */
+    data?: {
+        widget_type?: 'code_block' | 'charts_widget_v2' | (string & {})
+        content?: unknown
+    }
     // Legacy fields (may still be present in some responses)
     url?: string
     title?: string
