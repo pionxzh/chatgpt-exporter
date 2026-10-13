@@ -411,7 +411,7 @@ interface DialogContentProps {
 
 const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
     const { t } = useTranslation()
-    const { enableMeta, exportMetaList, exportAllLimit } = useSettingContext()
+    const { enableMeta, exportMetaList, exportAllLimit, imageMode } = useSettingContext()
     const metaList = useMemo(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList])
 
     const exportAllOptions = useMemo(() => [
@@ -502,12 +502,14 @@ const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
                         conversation = await fetchConversation(id)
                         conversationCache.set(id, { updateTime: update_time, conversation })
                     }
-                    return exportType === 'JSON' || exportType === 'JSONL (TavernAI, SillyTavern)' ? conversation : withImageAssets(conversation)
+                    const leaveOutImages = imageMode === 'omit' && (exportType === 'Markdown' || exportType === 'JSON (ZIP)')
+                    const skipImages = exportType === 'JSON' || exportType === 'JSONL (TavernAI, SillyTavern)' || leaveOutImages
+                    return skipImages ? conversation : withImageAssets(conversation)
                 },
             })
         })
         requestQueue.start()
-    }, [requestQueue, exportType])
+    }, [requestQueue, exportType, imageMode])
 
     useEffect(() => {
         const off = requestQueue.on('progress', (prog) => {

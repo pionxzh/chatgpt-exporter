@@ -57,3 +57,39 @@ describe('processConversation', () => {
         expect(texts(raw)).toEqual([['Hi'], ['First second']])
     })
 })
+
+describe('interactive replies', () => {
+    function interactive(markup: string, fallbackMarkdown: string) {
+        return {
+            ...message('assistant', markup),
+            metadata: { model_dil_v2: { code: 'DIL.render(...)', fallbackMarkdown, fallbackMarkdownVersion: 1 } },
+        }
+    }
+
+    // Two replies of one turn, split by a tool call that the export skips.
+    const first = interactive('<box padding={2}>\n  <text>Pick one</text>\n  <segmented-control value={choice} onChange={setChoice}/>\n</box>\n\n', 'Pick one\n\n- red\n- blue')
+    const second = interactive('## Next\n\n<text>Compare `a <escape><</escape> b`.</text>', '## Next\n\nCompare `a <escape><</escape> b`.')
+    const raw = {
+        id: 'chat-id',
+        title: 'Interactive',
+        create_time: 1,
+        update_time: 2,
+        current_node: 'second',
+        mapping: {
+            root: { id: 'root', children: ['user'] },
+            user: { id: 'user', parent: 'root', children: ['first'], message: message('user', 'Show me') },
+            first: { id: 'first', parent: 'user', children: ['second'], message: first },
+            second: { id: 'second', parent: 'first', children: [], message: second },
+        },
+    } as unknown as ApiConversationWithId
+
+    it('exports the Markdown version instead of the widget markup', () => {
+        expect(texts(raw)).toEqual([['Show me'], ['Pick one\n\n- red\n- blue\n\n## Next\n\nCompare `a < b`.']])
+    })
+
+    it('leaves the widget markup in the raw conversation', () => {
+        texts(raw)
+
+        expect(raw.mapping.first.message?.content).toEqual(first.content)
+    })
+})

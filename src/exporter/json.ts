@@ -5,6 +5,7 @@ import { checkIfConversationStarted } from '../page'
 import { checkIfTemporaryChatIsExportable } from '../temporaryChat'
 import { convertToOoba, convertToTavern } from '../utils/conversion'
 import { buildJsonBatchFileName, buildZipFileName, downloadFile, getFileNameWithFormat } from '../utils/download'
+import { addImageFilesToZip, extractImageFiles, getImageMode } from '../utils/imageFiles'
 import type { ApiConversationWithId } from '../api'
 import type { ExportMeta } from '../ui/SettingContext'
 import type { PartInfo } from '../utils/download'
@@ -130,7 +131,12 @@ export async function exportAllToOfficialJson(_fileNameFormat: string, apiConver
 export async function exportAllToJson(fileNameFormat: string, apiConversations: ApiConversationWithId[], _metaList?: ExportMeta[], projectName?: string, partIndex?: number, totalParts?: number) {
     const zip = new JSZip()
     const filenameMap = new Map<string, number>()
-    apiConversations.forEach((rawConversation) => {
+    // Shared by every conversation in the zip
+    const assets = new Map<string, string>()
+    const conversations = getImageMode() === 'files'
+        ? await Promise.all(apiConversations.map(x => extractImageFiles(x, assets)))
+        : apiConversations
+    conversations.forEach((rawConversation) => {
         let fileName = getFileNameWithFormat(fileNameFormat, 'json', {
             title: rawConversation.title || 'ChatGPT Conversation',
             chatId: rawConversation.id,
@@ -148,6 +154,7 @@ export async function exportAllToJson(fileNameFormat: string, apiConversations: 
         const content = conversationToJson(rawConversation)
         zip.file(fileName, content)
     })
+    addImageFilesToZip(zip, assets)
 
     const blob = await zip.generateAsync({
         type: 'blob',

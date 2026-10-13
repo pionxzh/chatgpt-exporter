@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.36.3
+// @version            2.37.1
 // @author             pionxzh
 // @description        Export ChatGPT conversations with one click — backup & share effortlessly!
 // @description:zh-CN  一键导出 ChatGPT 对话，轻松备份与分享
@@ -118,7 +118,7 @@
 		for (var u in l) n[u] = l[u];
 		return n;
 	}
-	function p$2(n) {
+	function p$1(n) {
 		var l = n.parentNode;
 		l && l.removeChild(n);
 	}
@@ -300,7 +300,7 @@
 				(y || v) && (y && (v && y.__html == v.__html || y.__html === l.innerHTML) || (l.innerHTML = y && y.__html || ""));
 			}
 			if (H$1(l, _, d, o, e), y) u.__k = [];
-			else if (P$1(l, h$1(b = u.props.children) ? b : [b], u, t, i, o && "foreignObject" !== k, r, f, r ? r[0] : t.__k && g$2(t, 0), e, s), null != r) for (b = r.length; b--;) null != r[b] && p$2(r[b]);
+			else if (P$1(l, h$1(b = u.props.children) ? b : [b], u, t, i, o && "foreignObject" !== k, r, f, r ? r[0] : t.__k && g$2(t, 0), e, s), null != r) for (b = r.length; b--;) null != r[b] && p$1(r[b]);
 			e || ("value" in _ && void 0 !== (b = _.value) && (b !== l.value || "progress" === k && !b || "option" === k && b !== d.value) && T$2(l, "value", b, d.value, !1), "checked" in _ && void 0 !== (b = _.checked) && b !== l.checked && T$2(l, "checked", b, d.checked, !1));
 		}
 		return l;
@@ -323,7 +323,7 @@
 			i.base = i.__P = null, n.__c = void 0;
 		}
 		if (i = n.__k) for (o = 0; o < i.length; o++) i[o] && q$2(i[o], u, t || "function" != typeof n.type);
-		t || null == n.__e || p$2(n.__e), n.__ = n.__e = n.__d = void 0;
+		t || null == n.__e || p$1(n.__e), n.__ = n.__e = n.__d = void 0;
 	}
 	function B$2(n, l, u) {
 		return this.constructor(n, u);
@@ -532,6 +532,7 @@
 	var KEY_META_LIST = "exporter:meta_list";
 	var KEY_THINKING_ENABLED = "exporter:enable_thinking";
 	var KEY_SOURCES_ENABLED = "exporter:enable_sources";
+	var KEY_IMAGE_MODE = "exporter:image_mode";
 	var KEY_EXPORT_ALL_LIMIT = "exporter:export_all_limit";
 	var KEY_EXPORTED_UPDATE_TIMES = "exporter:exported_update_times";
 	var _GM_deleteValue = (() => typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0)();
@@ -581,7 +582,7 @@
 		return defaultAvatar;
 	}
 	function checkIfConversationStarted() {
-		return !!document.querySelector(["[data-testid^=\"conversation-turn-\"]", "[data-chatgpt-conversation-selection-target] [data-chatgpt-search-message-ids]"].join(", "));
+		return Array.from(document.querySelectorAll(["[data-testid^=\"conversation-turn-\"]", "[data-chatgpt-conversation-selection-target] [data-chatgpt-search-message-ids]"].join(", "))).some((el) => el.offsetHeight > 0);
 	}
 	function isCompleteConversation(conversation) {
 		return !!conversation?.mapping && !!conversation.current_node;
@@ -812,36 +813,43 @@
 		await replaceImageAssets(copy);
 		return copy;
 	}
-	async function replaceImageAssets(conversation) {
-		const isMultiModalInputImage = (part) => {
-			return typeof part === "object" && part !== null && "content_type" in part && part.content_type === "image_asset_pointer" && "asset_pointer" in part && typeof part.asset_pointer === "string" && part.asset_pointer.startsWith("sediment://");
+	function collectImageSources(conversation) {
+		const isImagePart = (part) => {
+			return typeof part === "object" && part !== null && part.content_type === "image_asset_pointer" && typeof part.asset_pointer === "string";
 		};
-		const imageAssets = Object.values(conversation.mapping).flatMap((node) => {
-			if (!node.message) return [];
-			if (node.message.content.content_type !== "multimodal_text") return [];
-			return (Array.isArray(node.message.content.parts) ? node.message.content.parts : []).filter(isMultiModalInputImage);
+		return Object.values(conversation.mapping).flatMap((node) => {
+			const message = node.message;
+			if (!message) return [];
+			if (message.content.content_type === "multimodal_text") return (Array.isArray(message.content.parts) ? message.content.parts : []).filter(isImagePart).map((part) => ({
+				src: part.asset_pointer,
+				replace: (src) => {
+					part.asset_pointer = src;
+				}
+			}));
+			if (message.content.content_type === "execution_output") return (message.metadata?.aggregate_result?.messages ?? []).filter((msg) => msg.message_type === "image").map((msg) => ({
+				src: msg.image_url,
+				replace: (src) => {
+					msg.image_url = src;
+				}
+			}));
+			return [];
 		});
-		const executionOutputs = Object.values(conversation.mapping).flatMap((node) => {
-			if (!node.message) return [];
-			if (node.message.content.content_type !== "execution_output") return [];
-			if (!node.message.metadata?.aggregate_result?.messages) return [];
-			return node.message.metadata.aggregate_result.messages.filter((msg) => msg.message_type === "image");
-		});
-		await Promise.all([...imageAssets.map(async (asset) => {
+	}
+	async function replaceImageSources(conversation, resolve) {
+		await Promise.all(collectImageSources(conversation).map(async (image) => {
 			try {
-				const newAssetPointer = await fetchImageFromPointer(asset.asset_pointer);
-				if (newAssetPointer) asset.asset_pointer = newAssetPointer;
+				const newSrc = await resolve(image.src);
+				if (newSrc) image.replace(newSrc);
 			} catch (error) {
 				console.error("Failed to fetch image asset", error);
 			}
-		}), ...executionOutputs.map(async (msg) => {
-			try {
-				const newImageUrl = await fetchImageFromPointer(msg.image_url);
-				if (newImageUrl) msg.image_url = newImageUrl;
-			} catch (error) {
-				console.error("Failed to fetch image asset", error);
-			}
-		})]);
+		}));
+	}
+	function replaceImageAssets(conversation) {
+		return replaceImageSources(conversation, async (src) => {
+			if (!src.startsWith("sediment://")) return null;
+			return fetchImageFromPointer(src);
+		});
 	}
 	async function fetchConversation(chatId) {
 		if (chatId.startsWith("__share__")) {
@@ -1103,7 +1111,7 @@
 		if (!message) return { ...node };
 		const content = message.content.content_type === "text" ? {
 			...message.content,
-			parts: [...message.content.parts]
+			parts: getInteractiveFallbackParts(message) ?? [...message.content.parts]
 		} : message.content;
 		return {
 			...node,
@@ -1113,6 +1121,14 @@
 				metadata: message.metadata && { ...message.metadata }
 			}
 		};
+	}
+	function getInteractiveFallbackParts(message) {
+		const markdown = message.metadata?.model_dil_v2?.fallbackMarkdown;
+		if (typeof markdown !== "string" || !markdown.trim() || message.content.content_type !== "text") return null;
+		const markup = message.content.parts.join("");
+		const leading = markup.slice(0, markup.length - markup.trimStart().length);
+		const trailing = markup.slice(markup.trimEnd().length);
+		return [leading + markdown.replaceAll(/<escape>([\s\S]*?)<\/escape>/g, "$1") + trailing];
 	}
 	function mergeContinuationNodes(nodes) {
 		const result = [];
@@ -1249,7 +1265,7 @@
 		}
 		return o.__N || o.__;
 	}
-	function p$1(u, i) {
+	function p(u, i) {
 		var o = d(t$1++, 3);
 		!l$1.__s && z$1(o.__H, i) && (o.__ = u, o.i = i, r.__H.__h.push(o));
 	}
@@ -1584,7 +1600,7 @@
 			n,
 			e,
 			t
-		]), p$1(function() {
+		]), p(function() {
 			return E(u.__, u.v()) || o({ h: u }), n(function() {
 				E(u.__, u.v()) || o({ h: u });
 			});
@@ -1634,6 +1650,11 @@
 		"Export Thinking Process Description": "Include the model's thinking/reasoning process in exported Markdown and HTML files.",
 		"Export Sources": "Export Sources",
 		"Export Sources Description": "Include the source list shown at the end of each answer in exported Markdown and HTML files.",
+		Images: "Images",
+		"Images Description": "How images are saved in Markdown and JSON (ZIP) exports. When left out, Markdown shows [image] instead. HTML always embeds images.",
+		"Images Embed": "Embed in the file (base64)",
+		"Images Omit": "Leave out images",
+		"Images Files": "Save as separate files (.zip)",
 		Sources: "Sources",
 		"OpenAI Official Format": "OpenAI Official Format",
 		"Conversation Archive Alert": "Are you sure you want to archive all selected conversations?",
@@ -1702,6 +1723,11 @@
 		"Export Thinking Process Description": "Incluir el proceso de pensamiento/razonamiento del modelo en los archivos Markdown y HTML exportados.",
 		"Export Sources": "Exportar fuentes",
 		"Export Sources Description": "Incluir la lista de fuentes que se muestra al final de cada respuesta en los archivos Markdown y HTML exportados.",
+		Images: "Imágenes",
+		"Images Description": "Cómo se guardan las imágenes en las exportaciones Markdown y JSON (ZIP). Si se omiten, Markdown muestra [image] en su lugar. HTML siempre incrusta las imágenes.",
+		"Images Embed": "Incrustar en el archivo (base64)",
+		"Images Omit": "Omitir imágenes",
+		"Images Files": "Guardar como archivos separados (.zip)",
 		Sources: "Fuentes",
 		"OpenAI Official Format": "Formato Oficial de OpenAI",
 		"Conversation Archive Alert": "¿Estás seguro que quieres archivar todas las conversaciones seleccionadas?",
@@ -1770,6 +1796,11 @@
 		"Export Thinking Process Description": "Inclure le processus de réflexion/raisonnement du modèle dans les fichiers Markdown et HTML exportés.",
 		"Export Sources": "Exporter les sources",
 		"Export Sources Description": "Inclure la liste des sources affichée à la fin de chaque réponse dans les fichiers Markdown et HTML exportés.",
+		Images: "Images",
+		"Images Description": "Comment les images sont enregistrées dans les exports Markdown et JSON (ZIP). Si elles sont omises, Markdown affiche [image] à la place. HTML intègre toujours les images.",
+		"Images Embed": "Intégrer dans le fichier (base64)",
+		"Images Omit": "Omettre les images",
+		"Images Files": "Enregistrer en fichiers séparés (.zip)",
 		Sources: "Sources",
 		"OpenAI Official Format": "Format officiel OpenAI",
 		"Conversation Archive Alert": "Êtes-vous sûr de vouloir archiver toutes les conversations sélectionnées ?",
@@ -1838,6 +1869,11 @@
 		"Export Thinking Process Description": "Sertakan proses berpikir/penalaran model dalam file Markdown dan HTML yang diekspor.",
 		"Export Sources": "Ekspor Sumber",
 		"Export Sources Description": "Sertakan daftar sumber yang ditampilkan di akhir setiap jawaban dalam file Markdown dan HTML yang diekspor.",
+		Images: "Gambar",
+		"Images Description": "Cara gambar disimpan dalam ekspor Markdown dan JSON (ZIP). Jika dihilangkan, Markdown menampilkan [image] sebagai gantinya. HTML selalu menyematkan gambar.",
+		"Images Embed": "Sematkan di file (base64)",
+		"Images Omit": "Hilangkan gambar",
+		"Images Files": "Simpan sebagai file terpisah (.zip)",
 		Sources: "Sumber",
 		"OpenAI Official Format": "Format Resmi OpenAI",
 		"Conversation Archive Alert": "Apakah Anda yakin ingin mengarsipkan semua percakapan yang dipilih?",
@@ -1869,7 +1905,7 @@
 		Language: "言語",
 		"Copy Text": "テキストをコピー",
 		"Copied!": "コピーしました！",
-		Screenshot: "スクリーンショット",
+		Screenshot: "キャプチャ",
 		Markdown: "Markdown",
 		HTML: "HTML",
 		JSON: "JSON",
@@ -1906,6 +1942,11 @@
 		"Export Thinking Process Description": "エクスポートされたMarkdownおよびHTMLファイルにモデルの思考・推論プロセスを含めます。",
 		"Export Sources": "ソースをエクスポート",
 		"Export Sources Description": "各回答の末尾に表示されるソース一覧を、エクスポートされた Markdown および HTML ファイルに含めます。",
+		Images: "画像",
+		"Images Description": "Markdown と JSON (ZIP) のエクスポートでの画像の保存方法。省略した場合、Markdown では代わりに [image] と表示されます。HTML では常に画像が埋め込まれます。",
+		"Images Embed": "ファイルに埋め込む (base64)",
+		"Images Omit": "画像を省略",
+		"Images Files": "別ファイルとして保存 (.zip)",
 		Sources: "出典",
 		"OpenAI Official Format": "OpenAI公式フォーマット",
 		"Conversation Archive Alert": "選択したすべての会話をアーカイブしてもよろしいですか？",
@@ -1974,6 +2015,11 @@
 		"Export Thinking Process Description": "Включить процесс мышления/рассуждения модели в экспортированные файлы Markdown и HTML.",
 		"Export Sources": "Экспорт источников",
 		"Export Sources Description": "Включить список источников, показанный в конце каждого ответа, в экспортированные файлы Markdown и HTML.",
+		Images: "Изображения",
+		"Images Description": "Как сохранять изображения при экспорте в Markdown и JSON (ZIP). Если изображения пропущены, в Markdown вместо них будет [image]. HTML всегда встраивает изображения.",
+		"Images Embed": "Встроить в файл (base64)",
+		"Images Omit": "Не включать изображения",
+		"Images Files": "Сохранить отдельными файлами (.zip)",
 		Sources: "Источники",
 		"OpenAI Official Format": "Официальный формат OpenAI",
 		"Conversation Archive Alert": "Вы уверены, что хотите архивировать все выбранные разговоры?",
@@ -2042,6 +2088,11 @@
 		"Export Thinking Process Description": "Dışa aktarılan Markdown ve HTML dosyalarına modelin düşünme/akıl yürütme sürecini dahil et.",
 		"Export Sources": "Kaynakları Dışa Aktar",
 		"Export Sources Description": "Her yanıtın sonunda gösterilen kaynak listesini dışa aktarılan Markdown ve HTML dosyalarına dahil et.",
+		Images: "Görseller",
+		"Images Description": "Markdown ve JSON (ZIP) dışa aktarımlarında görsellerin nasıl kaydedileceği. Görseller çıkarıldığında Markdown yerine [image] gösterir. HTML görselleri her zaman gömer.",
+		"Images Embed": "Dosyaya göm (base64)",
+		"Images Omit": "Görselleri çıkar",
+		"Images Files": "Ayrı dosyalar olarak kaydet (.zip)",
 		Sources: "Kaynaklar",
 		"OpenAI Official Format": "OpenAI Resmi Format",
 		"Conversation Archive Alert": "Seçilen tüm konuşmaları arşivlemek istediğinizden emin misiniz?",
@@ -2110,6 +2161,11 @@
 		"Export Thinking Process Description": "在导出的 Markdown 和 HTML 文件中包含模型的思考/推理过程。",
 		"Export Sources": "导出来源",
 		"Export Sources Description": "在导出的 Markdown 和 HTML 文件中包含每个回答末尾显示的来源列表。",
+		Images: "图片",
+		"Images Description": "Markdown 和 JSON (ZIP) 导出时图片的保存方式。省略时，Markdown 会以 [image] 代替。HTML 始终嵌入图片。",
+		"Images Embed": "嵌入文件 (base64)",
+		"Images Omit": "省略图片",
+		"Images Files": "另存为单独文件 (.zip)",
 		Sources: "来源",
 		"OpenAI Official Format": "OpenAI 官方格式",
 		"Conversation Archive Alert": "确定要归档所有选取的对话？",
@@ -2178,6 +2234,11 @@
 		"Export Thinking Process Description": "在匯出的 Markdown 和 HTML 檔案中包含模型的思考/推理過程。",
 		"Export Sources": "匯出來源",
 		"Export Sources Description": "在匯出的 Markdown 和 HTML 檔案中包含每個回答末尾顯示的來源列表。",
+		Images: "圖片",
+		"Images Description": "Markdown 和 JSON (ZIP) 匯出時圖片的儲存方式。省略時，Markdown 會以 [image] 代替。HTML 一律嵌入圖片。",
+		"Images Embed": "嵌入檔案 (base64)",
+		"Images Omit": "省略圖片",
+		"Images Files": "另存為獨立檔案 (.zip)",
 		Sources: "來源",
 		"OpenAI Official Format": "OpenAI 官方格式",
 		"Conversation Archive Alert": "確定要封存所有選取的對話？",
@@ -2447,6 +2508,7 @@
 		const fileReplacements = new Set();
 		for (const ref of sortedRefs) {
 			if (!ref.matched_text) continue;
+			if (ref.type === "client_defined_widget" && ref.data?.widget_type === "code_block") continue;
 			const matchedText = normalizeCitationText(ref.matched_text);
 			if (!matchedText) continue;
 			const replacement = formatInlineReference(ref, outputType, inlineReferenceMode);
@@ -2472,6 +2534,7 @@
 		return `[${escapeMarkdownText(label)}](<${escapeMarkdownUrl(url)}>)`;
 	}
 	function formatInlineReference(ref, output, mode) {
+		if (ref.type === "client_defined_widget" && ref.data?.widget_type === "charts_widget_v2") return formatChart(ref.data.content);
 		if (mode === "alt") return formatAlt(ref.alt);
 		if (output === "markdown" && (ref.type === "image_group" || ref.type === "image_v2")) {
 			const images = formatImageResults(ref);
@@ -2494,6 +2557,20 @@
 			const page = image.url?.trim();
 			return page ? `[${markdown}](<${escapeMarkdownUrl(page)}>)` : markdown;
 		}).filter(Boolean).join("\n\n");
+	}
+	function formatChart(chart) {
+		const { meta, xKey, series = [], data = [], formattedData } = chart ?? {};
+		if (!xKey || series.length === 0 || data.length === 0) return "";
+		const cell = (value) => String(value ?? "").replaceAll("|", "\\|").replaceAll("\n", " ");
+		const row = (cells) => `| ${cells.map(cell).join(" | ")} |`;
+		const rows = data.map((point, index) => row([point[xKey], ...series.map(({ dataKey, valueSuffix = "" }) => formattedData?.[index]?.[dataKey] ?? (point[dataKey] == null ? "" : `${point[dataKey]}${valueSuffix}`))]));
+		const table = [
+			row([xKey, ...series.map(({ dataKey, label }) => label || dataKey)]),
+			row([xKey, ...series].map(() => "---")),
+			...rows
+		].join("\n");
+		const description = meta?.description?.trim();
+		return description ? `${description}\n\n${table}` : table;
 	}
 	function formatAlt(alt) {
 		return alt?.replaceAll(/\[([^\]]*)\]\(\)/g, "$1") ?? "";
@@ -2784,1900 +2861,13 @@
 		if (display) return `\\[${display[1]}\\]`;
 		return `\\(${formula.slice(1, -1)}\\)`;
 	}
-	var Schema = class {
-		constructor(property, normal, space) {
-			this.property = property;
-			this.normal = normal;
-			if (space) this.space = space;
-		}
-	};
-	Schema.prototype.property = {};
-	Schema.prototype.normal = {};
-	Schema.prototype.space = null;
-	function merge(definitions, space) {
-		const property = {};
-		const normal = {};
-		let index = -1;
-		while (++index < definitions.length) {
-			Object.assign(property, definitions[index].property);
-			Object.assign(normal, definitions[index].normal);
-		}
-		return new Schema(property, normal, space);
-	}
-	function normalize(value) {
-		return value.toLowerCase();
-	}
-	var Info = class {
-		constructor(property, attribute) {
-			this.property = property;
-			this.attribute = attribute;
-		}
-	};
-	Info.prototype.space = null;
-	Info.prototype.boolean = false;
-	Info.prototype.booleanish = false;
-	Info.prototype.overloadedBoolean = false;
-	Info.prototype.number = false;
-	Info.prototype.commaSeparated = false;
-	Info.prototype.spaceSeparated = false;
-	Info.prototype.commaOrSpaceSeparated = false;
-	Info.prototype.mustUseProperty = false;
-	Info.prototype.defined = false;
-	var types_exports = __exportAll({
-		boolean: () => boolean,
-		booleanish: () => booleanish,
-		commaOrSpaceSeparated: () => commaOrSpaceSeparated,
-		commaSeparated: () => commaSeparated,
-		number: () => number,
-		overloadedBoolean: () => overloadedBoolean,
-		spaceSeparated: () => spaceSeparated
-	});
-	var powers = 0;
-	var boolean = increment();
-	var booleanish = increment();
-	var overloadedBoolean = increment();
-	var number = increment();
-	var spaceSeparated = increment();
-	var commaSeparated = increment();
-	var commaOrSpaceSeparated = increment();
-	function increment() {
-		return 2 ** ++powers;
-	}
-	var checks = Object.keys(types_exports);
-	var DefinedInfo = class extends Info {
-		constructor(property, attribute, mask, space) {
-			let index = -1;
-			super(property, attribute);
-			mark(this, "space", space);
-			if (typeof mask === "number") while (++index < checks.length) {
-				const check = checks[index];
-				mark(this, checks[index], (mask & types_exports[check]) === types_exports[check]);
-			}
-		}
-	};
-	DefinedInfo.prototype.defined = true;
-	function mark(values, key, value) {
-		if (value) values[key] = value;
-	}
-	var own$7 = {}.hasOwnProperty;
-	function create(definition) {
-		const property = {};
-		const normal = {};
-		let prop;
-		for (prop in definition.properties) if (own$7.call(definition.properties, prop)) {
-			const value = definition.properties[prop];
-			const info = new DefinedInfo(prop, definition.transform(definition.attributes || {}, prop), value, definition.space);
-			if (definition.mustUseProperty && definition.mustUseProperty.includes(prop)) info.mustUseProperty = true;
-			property[prop] = info;
-			normal[normalize(prop)] = prop;
-			normal[normalize(info.attribute)] = prop;
-		}
-		return new Schema(property, normal, definition.space);
-	}
-	var xlink = create({
-		space: "xlink",
-		transform(_, prop) {
-			return "xlink:" + prop.slice(5).toLowerCase();
-		},
-		properties: {
-			xLinkActuate: null,
-			xLinkArcRole: null,
-			xLinkHref: null,
-			xLinkRole: null,
-			xLinkShow: null,
-			xLinkTitle: null,
-			xLinkType: null
-		}
-	});
-	var xml = create({
-		space: "xml",
-		transform(_, prop) {
-			return "xml:" + prop.slice(3).toLowerCase();
-		},
-		properties: {
-			xmlLang: null,
-			xmlBase: null,
-			xmlSpace: null
-		}
-	});
-	function caseSensitiveTransform(attributes, attribute) {
-		return attribute in attributes ? attributes[attribute] : attribute;
-	}
-	function caseInsensitiveTransform(attributes, property) {
-		return caseSensitiveTransform(attributes, property.toLowerCase());
-	}
-	var xmlns = create({
-		space: "xmlns",
-		attributes: { xmlnsxlink: "xmlns:xlink" },
-		transform: caseInsensitiveTransform,
-		properties: {
-			xmlns: null,
-			xmlnsXLink: null
-		}
-	});
-	var aria = create({
-		transform(_, prop) {
-			return prop === "role" ? prop : "aria-" + prop.slice(4).toLowerCase();
-		},
-		properties: {
-			ariaActiveDescendant: null,
-			ariaAtomic: booleanish,
-			ariaAutoComplete: null,
-			ariaBusy: booleanish,
-			ariaChecked: booleanish,
-			ariaColCount: number,
-			ariaColIndex: number,
-			ariaColSpan: number,
-			ariaControls: spaceSeparated,
-			ariaCurrent: null,
-			ariaDescribedBy: spaceSeparated,
-			ariaDetails: null,
-			ariaDisabled: booleanish,
-			ariaDropEffect: spaceSeparated,
-			ariaErrorMessage: null,
-			ariaExpanded: booleanish,
-			ariaFlowTo: spaceSeparated,
-			ariaGrabbed: booleanish,
-			ariaHasPopup: null,
-			ariaHidden: booleanish,
-			ariaInvalid: null,
-			ariaKeyShortcuts: null,
-			ariaLabel: null,
-			ariaLabelledBy: spaceSeparated,
-			ariaLevel: number,
-			ariaLive: null,
-			ariaModal: booleanish,
-			ariaMultiLine: booleanish,
-			ariaMultiSelectable: booleanish,
-			ariaOrientation: null,
-			ariaOwns: spaceSeparated,
-			ariaPlaceholder: null,
-			ariaPosInSet: number,
-			ariaPressed: booleanish,
-			ariaReadOnly: booleanish,
-			ariaRelevant: null,
-			ariaRequired: booleanish,
-			ariaRoleDescription: spaceSeparated,
-			ariaRowCount: number,
-			ariaRowIndex: number,
-			ariaRowSpan: number,
-			ariaSelected: booleanish,
-			ariaSetSize: number,
-			ariaSort: null,
-			ariaValueMax: number,
-			ariaValueMin: number,
-			ariaValueNow: number,
-			ariaValueText: null,
-			role: null
-		}
-	});
-	var html$5 = create({
-		space: "html",
-		attributes: {
-			acceptcharset: "accept-charset",
-			classname: "class",
-			htmlfor: "for",
-			httpequiv: "http-equiv"
-		},
-		transform: caseInsensitiveTransform,
-		mustUseProperty: [
-			"checked",
-			"multiple",
-			"muted",
-			"selected"
-		],
-		properties: {
-			abbr: null,
-			accept: commaSeparated,
-			acceptCharset: spaceSeparated,
-			accessKey: spaceSeparated,
-			action: null,
-			allow: null,
-			allowFullScreen: boolean,
-			allowPaymentRequest: boolean,
-			allowUserMedia: boolean,
-			alt: null,
-			as: null,
-			async: boolean,
-			autoCapitalize: null,
-			autoComplete: spaceSeparated,
-			autoFocus: boolean,
-			autoPlay: boolean,
-			capture: boolean,
-			charSet: null,
-			checked: boolean,
-			cite: null,
-			className: spaceSeparated,
-			cols: number,
-			colSpan: null,
-			content: null,
-			contentEditable: booleanish,
-			controls: boolean,
-			controlsList: spaceSeparated,
-			coords: number | commaSeparated,
-			crossOrigin: null,
-			data: null,
-			dateTime: null,
-			decoding: null,
-			default: boolean,
-			defer: boolean,
-			dir: null,
-			dirName: null,
-			disabled: boolean,
-			download: overloadedBoolean,
-			draggable: booleanish,
-			encType: null,
-			enterKeyHint: null,
-			form: null,
-			formAction: null,
-			formEncType: null,
-			formMethod: null,
-			formNoValidate: boolean,
-			formTarget: null,
-			headers: spaceSeparated,
-			height: number,
-			hidden: boolean,
-			high: number,
-			href: null,
-			hrefLang: null,
-			htmlFor: spaceSeparated,
-			httpEquiv: spaceSeparated,
-			id: null,
-			imageSizes: null,
-			imageSrcSet: null,
-			inputMode: null,
-			integrity: null,
-			is: null,
-			isMap: boolean,
-			itemId: null,
-			itemProp: spaceSeparated,
-			itemRef: spaceSeparated,
-			itemScope: boolean,
-			itemType: spaceSeparated,
-			kind: null,
-			label: null,
-			lang: null,
-			language: null,
-			list: null,
-			loading: null,
-			loop: boolean,
-			low: number,
-			manifest: null,
-			max: null,
-			maxLength: number,
-			media: null,
-			method: null,
-			min: null,
-			minLength: number,
-			multiple: boolean,
-			muted: boolean,
-			name: null,
-			nonce: null,
-			noModule: boolean,
-			noValidate: boolean,
-			onAbort: null,
-			onAfterPrint: null,
-			onAuxClick: null,
-			onBeforeMatch: null,
-			onBeforePrint: null,
-			onBeforeUnload: null,
-			onBlur: null,
-			onCancel: null,
-			onCanPlay: null,
-			onCanPlayThrough: null,
-			onChange: null,
-			onClick: null,
-			onClose: null,
-			onContextLost: null,
-			onContextMenu: null,
-			onContextRestored: null,
-			onCopy: null,
-			onCueChange: null,
-			onCut: null,
-			onDblClick: null,
-			onDrag: null,
-			onDragEnd: null,
-			onDragEnter: null,
-			onDragExit: null,
-			onDragLeave: null,
-			onDragOver: null,
-			onDragStart: null,
-			onDrop: null,
-			onDurationChange: null,
-			onEmptied: null,
-			onEnded: null,
-			onError: null,
-			onFocus: null,
-			onFormData: null,
-			onHashChange: null,
-			onInput: null,
-			onInvalid: null,
-			onKeyDown: null,
-			onKeyPress: null,
-			onKeyUp: null,
-			onLanguageChange: null,
-			onLoad: null,
-			onLoadedData: null,
-			onLoadedMetadata: null,
-			onLoadEnd: null,
-			onLoadStart: null,
-			onMessage: null,
-			onMessageError: null,
-			onMouseDown: null,
-			onMouseEnter: null,
-			onMouseLeave: null,
-			onMouseMove: null,
-			onMouseOut: null,
-			onMouseOver: null,
-			onMouseUp: null,
-			onOffline: null,
-			onOnline: null,
-			onPageHide: null,
-			onPageShow: null,
-			onPaste: null,
-			onPause: null,
-			onPlay: null,
-			onPlaying: null,
-			onPopState: null,
-			onProgress: null,
-			onRateChange: null,
-			onRejectionHandled: null,
-			onReset: null,
-			onResize: null,
-			onScroll: null,
-			onScrollEnd: null,
-			onSecurityPolicyViolation: null,
-			onSeeked: null,
-			onSeeking: null,
-			onSelect: null,
-			onSlotChange: null,
-			onStalled: null,
-			onStorage: null,
-			onSubmit: null,
-			onSuspend: null,
-			onTimeUpdate: null,
-			onToggle: null,
-			onUnhandledRejection: null,
-			onUnload: null,
-			onVolumeChange: null,
-			onWaiting: null,
-			onWheel: null,
-			open: boolean,
-			optimum: number,
-			pattern: null,
-			ping: spaceSeparated,
-			placeholder: null,
-			playsInline: boolean,
-			poster: null,
-			preload: null,
-			readOnly: boolean,
-			referrerPolicy: null,
-			rel: spaceSeparated,
-			required: boolean,
-			reversed: boolean,
-			rows: number,
-			rowSpan: number,
-			sandbox: spaceSeparated,
-			scope: null,
-			scoped: boolean,
-			seamless: boolean,
-			selected: boolean,
-			shape: null,
-			size: number,
-			sizes: null,
-			slot: null,
-			span: number,
-			spellCheck: booleanish,
-			src: null,
-			srcDoc: null,
-			srcLang: null,
-			srcSet: null,
-			start: number,
-			step: null,
-			style: null,
-			tabIndex: number,
-			target: null,
-			title: null,
-			translate: null,
-			type: null,
-			typeMustMatch: boolean,
-			useMap: null,
-			value: booleanish,
-			width: number,
-			wrap: null,
-			align: null,
-			aLink: null,
-			archive: spaceSeparated,
-			axis: null,
-			background: null,
-			bgColor: null,
-			border: number,
-			borderColor: null,
-			bottomMargin: number,
-			cellPadding: null,
-			cellSpacing: null,
-			char: null,
-			charOff: null,
-			classId: null,
-			clear: null,
-			code: null,
-			codeBase: null,
-			codeType: null,
-			color: null,
-			compact: boolean,
-			declare: boolean,
-			event: null,
-			face: null,
-			frame: null,
-			frameBorder: null,
-			hSpace: number,
-			leftMargin: number,
-			link: null,
-			longDesc: null,
-			lowSrc: null,
-			marginHeight: number,
-			marginWidth: number,
-			noResize: boolean,
-			noHref: boolean,
-			noShade: boolean,
-			noWrap: boolean,
-			object: null,
-			profile: null,
-			prompt: null,
-			rev: null,
-			rightMargin: number,
-			rules: null,
-			scheme: null,
-			scrolling: booleanish,
-			standby: null,
-			summary: null,
-			text: null,
-			topMargin: number,
-			valueType: null,
-			version: null,
-			vAlign: null,
-			vLink: null,
-			vSpace: number,
-			allowTransparency: null,
-			autoCorrect: null,
-			autoSave: null,
-			disablePictureInPicture: boolean,
-			disableRemotePlayback: boolean,
-			prefix: null,
-			property: null,
-			results: number,
-			security: null,
-			unselectable: null
-		}
-	});
-	var svg$1 = create({
-		space: "svg",
-		attributes: {
-			accentHeight: "accent-height",
-			alignmentBaseline: "alignment-baseline",
-			arabicForm: "arabic-form",
-			baselineShift: "baseline-shift",
-			capHeight: "cap-height",
-			className: "class",
-			clipPath: "clip-path",
-			clipRule: "clip-rule",
-			colorInterpolation: "color-interpolation",
-			colorInterpolationFilters: "color-interpolation-filters",
-			colorProfile: "color-profile",
-			colorRendering: "color-rendering",
-			crossOrigin: "crossorigin",
-			dataType: "datatype",
-			dominantBaseline: "dominant-baseline",
-			enableBackground: "enable-background",
-			fillOpacity: "fill-opacity",
-			fillRule: "fill-rule",
-			floodColor: "flood-color",
-			floodOpacity: "flood-opacity",
-			fontFamily: "font-family",
-			fontSize: "font-size",
-			fontSizeAdjust: "font-size-adjust",
-			fontStretch: "font-stretch",
-			fontStyle: "font-style",
-			fontVariant: "font-variant",
-			fontWeight: "font-weight",
-			glyphName: "glyph-name",
-			glyphOrientationHorizontal: "glyph-orientation-horizontal",
-			glyphOrientationVertical: "glyph-orientation-vertical",
-			hrefLang: "hreflang",
-			horizAdvX: "horiz-adv-x",
-			horizOriginX: "horiz-origin-x",
-			horizOriginY: "horiz-origin-y",
-			imageRendering: "image-rendering",
-			letterSpacing: "letter-spacing",
-			lightingColor: "lighting-color",
-			markerEnd: "marker-end",
-			markerMid: "marker-mid",
-			markerStart: "marker-start",
-			navDown: "nav-down",
-			navDownLeft: "nav-down-left",
-			navDownRight: "nav-down-right",
-			navLeft: "nav-left",
-			navNext: "nav-next",
-			navPrev: "nav-prev",
-			navRight: "nav-right",
-			navUp: "nav-up",
-			navUpLeft: "nav-up-left",
-			navUpRight: "nav-up-right",
-			onAbort: "onabort",
-			onActivate: "onactivate",
-			onAfterPrint: "onafterprint",
-			onBeforePrint: "onbeforeprint",
-			onBegin: "onbegin",
-			onCancel: "oncancel",
-			onCanPlay: "oncanplay",
-			onCanPlayThrough: "oncanplaythrough",
-			onChange: "onchange",
-			onClick: "onclick",
-			onClose: "onclose",
-			onCopy: "oncopy",
-			onCueChange: "oncuechange",
-			onCut: "oncut",
-			onDblClick: "ondblclick",
-			onDrag: "ondrag",
-			onDragEnd: "ondragend",
-			onDragEnter: "ondragenter",
-			onDragExit: "ondragexit",
-			onDragLeave: "ondragleave",
-			onDragOver: "ondragover",
-			onDragStart: "ondragstart",
-			onDrop: "ondrop",
-			onDurationChange: "ondurationchange",
-			onEmptied: "onemptied",
-			onEnd: "onend",
-			onEnded: "onended",
-			onError: "onerror",
-			onFocus: "onfocus",
-			onFocusIn: "onfocusin",
-			onFocusOut: "onfocusout",
-			onHashChange: "onhashchange",
-			onInput: "oninput",
-			onInvalid: "oninvalid",
-			onKeyDown: "onkeydown",
-			onKeyPress: "onkeypress",
-			onKeyUp: "onkeyup",
-			onLoad: "onload",
-			onLoadedData: "onloadeddata",
-			onLoadedMetadata: "onloadedmetadata",
-			onLoadStart: "onloadstart",
-			onMessage: "onmessage",
-			onMouseDown: "onmousedown",
-			onMouseEnter: "onmouseenter",
-			onMouseLeave: "onmouseleave",
-			onMouseMove: "onmousemove",
-			onMouseOut: "onmouseout",
-			onMouseOver: "onmouseover",
-			onMouseUp: "onmouseup",
-			onMouseWheel: "onmousewheel",
-			onOffline: "onoffline",
-			onOnline: "ononline",
-			onPageHide: "onpagehide",
-			onPageShow: "onpageshow",
-			onPaste: "onpaste",
-			onPause: "onpause",
-			onPlay: "onplay",
-			onPlaying: "onplaying",
-			onPopState: "onpopstate",
-			onProgress: "onprogress",
-			onRateChange: "onratechange",
-			onRepeat: "onrepeat",
-			onReset: "onreset",
-			onResize: "onresize",
-			onScroll: "onscroll",
-			onSeeked: "onseeked",
-			onSeeking: "onseeking",
-			onSelect: "onselect",
-			onShow: "onshow",
-			onStalled: "onstalled",
-			onStorage: "onstorage",
-			onSubmit: "onsubmit",
-			onSuspend: "onsuspend",
-			onTimeUpdate: "ontimeupdate",
-			onToggle: "ontoggle",
-			onUnload: "onunload",
-			onVolumeChange: "onvolumechange",
-			onWaiting: "onwaiting",
-			onZoom: "onzoom",
-			overlinePosition: "overline-position",
-			overlineThickness: "overline-thickness",
-			paintOrder: "paint-order",
-			panose1: "panose-1",
-			pointerEvents: "pointer-events",
-			referrerPolicy: "referrerpolicy",
-			renderingIntent: "rendering-intent",
-			shapeRendering: "shape-rendering",
-			stopColor: "stop-color",
-			stopOpacity: "stop-opacity",
-			strikethroughPosition: "strikethrough-position",
-			strikethroughThickness: "strikethrough-thickness",
-			strokeDashArray: "stroke-dasharray",
-			strokeDashOffset: "stroke-dashoffset",
-			strokeLineCap: "stroke-linecap",
-			strokeLineJoin: "stroke-linejoin",
-			strokeMiterLimit: "stroke-miterlimit",
-			strokeOpacity: "stroke-opacity",
-			strokeWidth: "stroke-width",
-			tabIndex: "tabindex",
-			textAnchor: "text-anchor",
-			textDecoration: "text-decoration",
-			textRendering: "text-rendering",
-			typeOf: "typeof",
-			underlinePosition: "underline-position",
-			underlineThickness: "underline-thickness",
-			unicodeBidi: "unicode-bidi",
-			unicodeRange: "unicode-range",
-			unitsPerEm: "units-per-em",
-			vAlphabetic: "v-alphabetic",
-			vHanging: "v-hanging",
-			vIdeographic: "v-ideographic",
-			vMathematical: "v-mathematical",
-			vectorEffect: "vector-effect",
-			vertAdvY: "vert-adv-y",
-			vertOriginX: "vert-origin-x",
-			vertOriginY: "vert-origin-y",
-			wordSpacing: "word-spacing",
-			writingMode: "writing-mode",
-			xHeight: "x-height",
-			playbackOrder: "playbackorder",
-			timelineBegin: "timelinebegin"
-		},
-		transform: caseSensitiveTransform,
-		properties: {
-			about: commaOrSpaceSeparated,
-			accentHeight: number,
-			accumulate: null,
-			additive: null,
-			alignmentBaseline: null,
-			alphabetic: number,
-			amplitude: number,
-			arabicForm: null,
-			ascent: number,
-			attributeName: null,
-			attributeType: null,
-			azimuth: number,
-			bandwidth: null,
-			baselineShift: null,
-			baseFrequency: null,
-			baseProfile: null,
-			bbox: null,
-			begin: null,
-			bias: number,
-			by: null,
-			calcMode: null,
-			capHeight: number,
-			className: spaceSeparated,
-			clip: null,
-			clipPath: null,
-			clipPathUnits: null,
-			clipRule: null,
-			color: null,
-			colorInterpolation: null,
-			colorInterpolationFilters: null,
-			colorProfile: null,
-			colorRendering: null,
-			content: null,
-			contentScriptType: null,
-			contentStyleType: null,
-			crossOrigin: null,
-			cursor: null,
-			cx: null,
-			cy: null,
-			d: null,
-			dataType: null,
-			defaultAction: null,
-			descent: number,
-			diffuseConstant: number,
-			direction: null,
-			display: null,
-			dur: null,
-			divisor: number,
-			dominantBaseline: null,
-			download: boolean,
-			dx: null,
-			dy: null,
-			edgeMode: null,
-			editable: null,
-			elevation: number,
-			enableBackground: null,
-			end: null,
-			event: null,
-			exponent: number,
-			externalResourcesRequired: null,
-			fill: null,
-			fillOpacity: number,
-			fillRule: null,
-			filter: null,
-			filterRes: null,
-			filterUnits: null,
-			floodColor: null,
-			floodOpacity: null,
-			focusable: null,
-			focusHighlight: null,
-			fontFamily: null,
-			fontSize: null,
-			fontSizeAdjust: null,
-			fontStretch: null,
-			fontStyle: null,
-			fontVariant: null,
-			fontWeight: null,
-			format: null,
-			fr: null,
-			from: null,
-			fx: null,
-			fy: null,
-			g1: commaSeparated,
-			g2: commaSeparated,
-			glyphName: commaSeparated,
-			glyphOrientationHorizontal: null,
-			glyphOrientationVertical: null,
-			glyphRef: null,
-			gradientTransform: null,
-			gradientUnits: null,
-			handler: null,
-			hanging: number,
-			hatchContentUnits: null,
-			hatchUnits: null,
-			height: null,
-			href: null,
-			hrefLang: null,
-			horizAdvX: number,
-			horizOriginX: number,
-			horizOriginY: number,
-			id: null,
-			ideographic: number,
-			imageRendering: null,
-			initialVisibility: null,
-			in: null,
-			in2: null,
-			intercept: number,
-			k: number,
-			k1: number,
-			k2: number,
-			k3: number,
-			k4: number,
-			kernelMatrix: commaOrSpaceSeparated,
-			kernelUnitLength: null,
-			keyPoints: null,
-			keySplines: null,
-			keyTimes: null,
-			kerning: null,
-			lang: null,
-			lengthAdjust: null,
-			letterSpacing: null,
-			lightingColor: null,
-			limitingConeAngle: number,
-			local: null,
-			markerEnd: null,
-			markerMid: null,
-			markerStart: null,
-			markerHeight: null,
-			markerUnits: null,
-			markerWidth: null,
-			mask: null,
-			maskContentUnits: null,
-			maskUnits: null,
-			mathematical: null,
-			max: null,
-			media: null,
-			mediaCharacterEncoding: null,
-			mediaContentEncodings: null,
-			mediaSize: number,
-			mediaTime: null,
-			method: null,
-			min: null,
-			mode: null,
-			name: null,
-			navDown: null,
-			navDownLeft: null,
-			navDownRight: null,
-			navLeft: null,
-			navNext: null,
-			navPrev: null,
-			navRight: null,
-			navUp: null,
-			navUpLeft: null,
-			navUpRight: null,
-			numOctaves: null,
-			observer: null,
-			offset: null,
-			onAbort: null,
-			onActivate: null,
-			onAfterPrint: null,
-			onBeforePrint: null,
-			onBegin: null,
-			onCancel: null,
-			onCanPlay: null,
-			onCanPlayThrough: null,
-			onChange: null,
-			onClick: null,
-			onClose: null,
-			onCopy: null,
-			onCueChange: null,
-			onCut: null,
-			onDblClick: null,
-			onDrag: null,
-			onDragEnd: null,
-			onDragEnter: null,
-			onDragExit: null,
-			onDragLeave: null,
-			onDragOver: null,
-			onDragStart: null,
-			onDrop: null,
-			onDurationChange: null,
-			onEmptied: null,
-			onEnd: null,
-			onEnded: null,
-			onError: null,
-			onFocus: null,
-			onFocusIn: null,
-			onFocusOut: null,
-			onHashChange: null,
-			onInput: null,
-			onInvalid: null,
-			onKeyDown: null,
-			onKeyPress: null,
-			onKeyUp: null,
-			onLoad: null,
-			onLoadedData: null,
-			onLoadedMetadata: null,
-			onLoadStart: null,
-			onMessage: null,
-			onMouseDown: null,
-			onMouseEnter: null,
-			onMouseLeave: null,
-			onMouseMove: null,
-			onMouseOut: null,
-			onMouseOver: null,
-			onMouseUp: null,
-			onMouseWheel: null,
-			onOffline: null,
-			onOnline: null,
-			onPageHide: null,
-			onPageShow: null,
-			onPaste: null,
-			onPause: null,
-			onPlay: null,
-			onPlaying: null,
-			onPopState: null,
-			onProgress: null,
-			onRateChange: null,
-			onRepeat: null,
-			onReset: null,
-			onResize: null,
-			onScroll: null,
-			onSeeked: null,
-			onSeeking: null,
-			onSelect: null,
-			onShow: null,
-			onStalled: null,
-			onStorage: null,
-			onSubmit: null,
-			onSuspend: null,
-			onTimeUpdate: null,
-			onToggle: null,
-			onUnload: null,
-			onVolumeChange: null,
-			onWaiting: null,
-			onZoom: null,
-			opacity: null,
-			operator: null,
-			order: null,
-			orient: null,
-			orientation: null,
-			origin: null,
-			overflow: null,
-			overlay: null,
-			overlinePosition: number,
-			overlineThickness: number,
-			paintOrder: null,
-			panose1: null,
-			path: null,
-			pathLength: number,
-			patternContentUnits: null,
-			patternTransform: null,
-			patternUnits: null,
-			phase: null,
-			ping: spaceSeparated,
-			pitch: null,
-			playbackOrder: null,
-			pointerEvents: null,
-			points: null,
-			pointsAtX: number,
-			pointsAtY: number,
-			pointsAtZ: number,
-			preserveAlpha: null,
-			preserveAspectRatio: null,
-			primitiveUnits: null,
-			propagate: null,
-			property: commaOrSpaceSeparated,
-			r: null,
-			radius: null,
-			referrerPolicy: null,
-			refX: null,
-			refY: null,
-			rel: commaOrSpaceSeparated,
-			rev: commaOrSpaceSeparated,
-			renderingIntent: null,
-			repeatCount: null,
-			repeatDur: null,
-			requiredExtensions: commaOrSpaceSeparated,
-			requiredFeatures: commaOrSpaceSeparated,
-			requiredFonts: commaOrSpaceSeparated,
-			requiredFormats: commaOrSpaceSeparated,
-			resource: null,
-			restart: null,
-			result: null,
-			rotate: null,
-			rx: null,
-			ry: null,
-			scale: null,
-			seed: null,
-			shapeRendering: null,
-			side: null,
-			slope: null,
-			snapshotTime: null,
-			specularConstant: number,
-			specularExponent: number,
-			spreadMethod: null,
-			spacing: null,
-			startOffset: null,
-			stdDeviation: null,
-			stemh: null,
-			stemv: null,
-			stitchTiles: null,
-			stopColor: null,
-			stopOpacity: null,
-			strikethroughPosition: number,
-			strikethroughThickness: number,
-			string: null,
-			stroke: null,
-			strokeDashArray: commaOrSpaceSeparated,
-			strokeDashOffset: null,
-			strokeLineCap: null,
-			strokeLineJoin: null,
-			strokeMiterLimit: number,
-			strokeOpacity: number,
-			strokeWidth: null,
-			style: null,
-			surfaceScale: number,
-			syncBehavior: null,
-			syncBehaviorDefault: null,
-			syncMaster: null,
-			syncTolerance: null,
-			syncToleranceDefault: null,
-			systemLanguage: commaOrSpaceSeparated,
-			tabIndex: number,
-			tableValues: null,
-			target: null,
-			targetX: number,
-			targetY: number,
-			textAnchor: null,
-			textDecoration: null,
-			textRendering: null,
-			textLength: null,
-			timelineBegin: null,
-			title: null,
-			transformBehavior: null,
-			type: null,
-			typeOf: commaOrSpaceSeparated,
-			to: null,
-			transform: null,
-			u1: null,
-			u2: null,
-			underlinePosition: number,
-			underlineThickness: number,
-			unicode: null,
-			unicodeBidi: null,
-			unicodeRange: null,
-			unitsPerEm: number,
-			values: null,
-			vAlphabetic: number,
-			vMathematical: number,
-			vectorEffect: null,
-			vHanging: number,
-			vIdeographic: number,
-			version: null,
-			vertAdvY: number,
-			vertOriginX: number,
-			vertOriginY: number,
-			viewBox: null,
-			viewTarget: null,
-			visibility: null,
-			width: null,
-			widths: null,
-			wordSpacing: null,
-			writingMode: null,
-			x: null,
-			x1: null,
-			x2: null,
-			xChannelSelector: null,
-			xHeight: number,
-			y: null,
-			y1: null,
-			y2: null,
-			yChannelSelector: null,
-			z: null,
-			zoomAndPan: null
-		}
-	});
-	var valid = /^data[-\w.:]+$/i;
-	var dash = /-[a-z]/g;
-	var cap = /[A-Z]/g;
-	function find(schema, value) {
-		const normal = normalize(value);
-		let prop = value;
-		let Type = Info;
-		if (normal in schema.normal) return schema.property[schema.normal[normal]];
-		if (normal.length > 4 && normal.slice(0, 4) === "data" && valid.test(value)) {
-			if (value.charAt(4) === "-") {
-				const rest = value.slice(5).replace(dash, camelcase);
-				prop = "data" + rest.charAt(0).toUpperCase() + rest.slice(1);
-			} else {
-				const rest = value.slice(4);
-				if (!dash.test(rest)) {
-					let dashes = rest.replace(cap, kebab);
-					if (dashes.charAt(0) !== "-") dashes = "-" + dashes;
-					value = "data" + dashes;
-				}
-			}
-			Type = DefinedInfo;
-		}
-		return new Type(prop, value);
-	}
-	function kebab($0) {
-		return "-" + $0.toLowerCase();
-	}
-	function camelcase($0) {
-		return $0.charAt(1).toUpperCase();
-	}
-	var html$4 = merge([
-		xml,
-		xlink,
-		xmlns,
-		aria,
-		html$5
-	], "html");
-	var svg = merge([
-		xml,
-		xlink,
-		xmlns,
-		aria,
-		svg$1
-	], "svg");
-	var htmlVoidElements = [
-		"area",
-		"base",
-		"basefont",
-		"bgsound",
-		"br",
-		"col",
-		"command",
-		"embed",
-		"frame",
-		"hr",
-		"image",
-		"img",
-		"input",
-		"isindex",
-		"keygen",
-		"link",
-		"menuitem",
-		"meta",
-		"nextid",
-		"param",
-		"source",
-		"track",
-		"wbr"
-	];
-	var own$6 = {}.hasOwnProperty;
-	function zwitch(key, options) {
-		const settings = options || {};
-		function one(value, ...parameters) {
-			let fn = one.invalid;
-			const handlers = one.handlers;
-			if (value && own$6.call(value, key)) {
-				const id = String(value[key]);
-				fn = own$6.call(handlers, id) ? handlers[id] : one.unknown;
-			}
-			if (fn) return fn.call(this, value, ...parameters);
-		}
-		one.handlers = settings.handlers || {};
-		one.invalid = settings.invalid;
-		one.unknown = settings.unknown;
-		return one;
-	}
-	function core(value, options) {
-		value = value.replace(options.subset ? charactersToExpression(options.subset) : /["&'<>`]/g, basic);
-		if (options.subset || options.escapeOnly) return value;
-		return value.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, surrogate).replace(/[\x01-\t\v\f\x0E-\x1F\x7F\x81\x8D\x8F\x90\x9D\xA0-\uFFFF]/g, basic);
-		function surrogate(pair, index, all) {
-			return options.format((pair.charCodeAt(0) - 55296) * 1024 + pair.charCodeAt(1) - 56320 + 65536, all.charCodeAt(index + 2), options);
-		}
-		function basic(character, index, all) {
-			return options.format(character.charCodeAt(0), all.charCodeAt(index + 1), options);
-		}
-	}
-	function charactersToExpression(subset) {
-		const groups = [];
-		let index = -1;
-		while (++index < subset.length) groups.push(subset[index].replace(/[|\\{}()[\]^$+*?.]/g, "\\$&"));
-		return new RegExp("(?:" + groups.join("|") + ")", "g");
-	}
-	function toHexadecimal(code, next, omit) {
-		const value = "&#x" + code.toString(16).toUpperCase();
-		return omit && next && !/[\dA-Fa-f]/.test(String.fromCharCode(next)) ? value : value + ";";
-	}
-	function toDecimal(code, next, omit) {
-		const value = "&#" + String(code);
-		return omit && next && !/\d/.test(String.fromCharCode(next)) ? value : value + ";";
-	}
-	var characterEntitiesLegacy = [
-		"AElig",
-		"AMP",
-		"Aacute",
-		"Acirc",
-		"Agrave",
-		"Aring",
-		"Atilde",
-		"Auml",
-		"COPY",
-		"Ccedil",
-		"ETH",
-		"Eacute",
-		"Ecirc",
-		"Egrave",
-		"Euml",
-		"GT",
-		"Iacute",
-		"Icirc",
-		"Igrave",
-		"Iuml",
-		"LT",
-		"Ntilde",
-		"Oacute",
-		"Ocirc",
-		"Ograve",
-		"Oslash",
-		"Otilde",
-		"Ouml",
-		"QUOT",
-		"REG",
-		"THORN",
-		"Uacute",
-		"Ucirc",
-		"Ugrave",
-		"Uuml",
-		"Yacute",
-		"aacute",
-		"acirc",
-		"acute",
-		"aelig",
-		"agrave",
-		"amp",
-		"aring",
-		"atilde",
-		"auml",
-		"brvbar",
-		"ccedil",
-		"cedil",
-		"cent",
-		"copy",
-		"curren",
-		"deg",
-		"divide",
-		"eacute",
-		"ecirc",
-		"egrave",
-		"eth",
-		"euml",
-		"frac12",
-		"frac14",
-		"frac34",
-		"gt",
-		"iacute",
-		"icirc",
-		"iexcl",
-		"igrave",
-		"iquest",
-		"iuml",
-		"laquo",
-		"lt",
-		"macr",
-		"micro",
-		"middot",
-		"nbsp",
-		"not",
-		"ntilde",
-		"oacute",
-		"ocirc",
-		"ograve",
-		"ordf",
-		"ordm",
-		"oslash",
-		"otilde",
-		"ouml",
-		"para",
-		"plusmn",
-		"pound",
-		"quot",
-		"raquo",
-		"reg",
-		"sect",
-		"shy",
-		"sup1",
-		"sup2",
-		"sup3",
-		"szlig",
-		"thorn",
-		"times",
-		"uacute",
-		"ucirc",
-		"ugrave",
-		"uml",
-		"uuml",
-		"yacute",
-		"yen",
-		"yuml"
-	];
-	var characterEntitiesHtml4 = {
-		nbsp: "\xA0",
-		iexcl: "¡",
-		cent: "¢",
-		pound: "£",
-		curren: "¤",
-		yen: "¥",
-		brvbar: "¦",
-		sect: "§",
-		uml: "¨",
-		copy: "©",
-		ordf: "ª",
-		laquo: "«",
-		not: "¬",
-		shy: "­",
-		reg: "®",
-		macr: "¯",
-		deg: "°",
-		plusmn: "±",
-		sup2: "²",
-		sup3: "³",
-		acute: "´",
-		micro: "µ",
-		para: "¶",
-		middot: "·",
-		cedil: "¸",
-		sup1: "¹",
-		ordm: "º",
-		raquo: "»",
-		frac14: "¼",
-		frac12: "½",
-		frac34: "¾",
-		iquest: "¿",
-		Agrave: "À",
-		Aacute: "Á",
-		Acirc: "Â",
-		Atilde: "Ã",
-		Auml: "Ä",
-		Aring: "Å",
-		AElig: "Æ",
-		Ccedil: "Ç",
-		Egrave: "È",
-		Eacute: "É",
-		Ecirc: "Ê",
-		Euml: "Ë",
-		Igrave: "Ì",
-		Iacute: "Í",
-		Icirc: "Î",
-		Iuml: "Ï",
-		ETH: "Ð",
-		Ntilde: "Ñ",
-		Ograve: "Ò",
-		Oacute: "Ó",
-		Ocirc: "Ô",
-		Otilde: "Õ",
-		Ouml: "Ö",
-		times: "×",
-		Oslash: "Ø",
-		Ugrave: "Ù",
-		Uacute: "Ú",
-		Ucirc: "Û",
-		Uuml: "Ü",
-		Yacute: "Ý",
-		THORN: "Þ",
-		szlig: "ß",
-		agrave: "à",
-		aacute: "á",
-		acirc: "â",
-		atilde: "ã",
-		auml: "ä",
-		aring: "å",
-		aelig: "æ",
-		ccedil: "ç",
-		egrave: "è",
-		eacute: "é",
-		ecirc: "ê",
-		euml: "ë",
-		igrave: "ì",
-		iacute: "í",
-		icirc: "î",
-		iuml: "ï",
-		eth: "ð",
-		ntilde: "ñ",
-		ograve: "ò",
-		oacute: "ó",
-		ocirc: "ô",
-		otilde: "õ",
-		ouml: "ö",
-		divide: "÷",
-		oslash: "ø",
-		ugrave: "ù",
-		uacute: "ú",
-		ucirc: "û",
-		uuml: "ü",
-		yacute: "ý",
-		thorn: "þ",
-		yuml: "ÿ",
-		fnof: "ƒ",
-		Alpha: "Α",
-		Beta: "Β",
-		Gamma: "Γ",
-		Delta: "Δ",
-		Epsilon: "Ε",
-		Zeta: "Ζ",
-		Eta: "Η",
-		Theta: "Θ",
-		Iota: "Ι",
-		Kappa: "Κ",
-		Lambda: "Λ",
-		Mu: "Μ",
-		Nu: "Ν",
-		Xi: "Ξ",
-		Omicron: "Ο",
-		Pi: "Π",
-		Rho: "Ρ",
-		Sigma: "Σ",
-		Tau: "Τ",
-		Upsilon: "Υ",
-		Phi: "Φ",
-		Chi: "Χ",
-		Psi: "Ψ",
-		Omega: "Ω",
-		alpha: "α",
-		beta: "β",
-		gamma: "γ",
-		delta: "δ",
-		epsilon: "ε",
-		zeta: "ζ",
-		eta: "η",
-		theta: "θ",
-		iota: "ι",
-		kappa: "κ",
-		lambda: "λ",
-		mu: "μ",
-		nu: "ν",
-		xi: "ξ",
-		omicron: "ο",
-		pi: "π",
-		rho: "ρ",
-		sigmaf: "ς",
-		sigma: "σ",
-		tau: "τ",
-		upsilon: "υ",
-		phi: "φ",
-		chi: "χ",
-		psi: "ψ",
-		omega: "ω",
-		thetasym: "ϑ",
-		upsih: "ϒ",
-		piv: "ϖ",
-		bull: "•",
-		hellip: "…",
-		prime: "′",
-		Prime: "″",
-		oline: "‾",
-		frasl: "⁄",
-		weierp: "℘",
-		image: "ℑ",
-		real: "ℜ",
-		trade: "™",
-		alefsym: "ℵ",
-		larr: "←",
-		uarr: "↑",
-		rarr: "→",
-		darr: "↓",
-		harr: "↔",
-		crarr: "↵",
-		lArr: "⇐",
-		uArr: "⇑",
-		rArr: "⇒",
-		dArr: "⇓",
-		hArr: "⇔",
-		forall: "∀",
-		part: "∂",
-		exist: "∃",
-		empty: "∅",
-		nabla: "∇",
-		isin: "∈",
-		notin: "∉",
-		ni: "∋",
-		prod: "∏",
-		sum: "∑",
-		minus: "−",
-		lowast: "∗",
-		radic: "√",
-		prop: "∝",
-		infin: "∞",
-		ang: "∠",
-		and: "∧",
-		or: "∨",
-		cap: "∩",
-		cup: "∪",
-		int: "∫",
-		there4: "∴",
-		sim: "∼",
-		cong: "≅",
-		asymp: "≈",
-		ne: "≠",
-		equiv: "≡",
-		le: "≤",
-		ge: "≥",
-		sub: "⊂",
-		sup: "⊃",
-		nsub: "⊄",
-		sube: "⊆",
-		supe: "⊇",
-		oplus: "⊕",
-		otimes: "⊗",
-		perp: "⊥",
-		sdot: "⋅",
-		lceil: "⌈",
-		rceil: "⌉",
-		lfloor: "⌊",
-		rfloor: "⌋",
-		lang: "〈",
-		rang: "〉",
-		loz: "◊",
-		spades: "♠",
-		clubs: "♣",
-		hearts: "♥",
-		diams: "♦",
-		quot: "\"",
-		amp: "&",
-		lt: "<",
-		gt: ">",
-		OElig: "Œ",
-		oelig: "œ",
-		Scaron: "Š",
-		scaron: "š",
-		Yuml: "Ÿ",
-		circ: "ˆ",
-		tilde: "˜",
-		ensp: " ",
-		emsp: " ",
-		thinsp: " ",
-		zwnj: "‌",
-		zwj: "‍",
-		lrm: "‎",
-		rlm: "‏",
-		ndash: "–",
-		mdash: "—",
-		lsquo: "‘",
-		rsquo: "’",
-		sbquo: "‚",
-		ldquo: "“",
-		rdquo: "”",
-		bdquo: "„",
-		dagger: "†",
-		Dagger: "‡",
-		permil: "‰",
-		lsaquo: "‹",
-		rsaquo: "›",
-		euro: "€"
-	};
-	var dangerous = [
-		"cent",
-		"copy",
-		"divide",
-		"gt",
-		"lt",
-		"not",
-		"para",
-		"times"
-	];
-	var own$5 = {}.hasOwnProperty;
-	var characters = {};
-	var key;
-	for (key in characterEntitiesHtml4) if (own$5.call(characterEntitiesHtml4, key)) characters[characterEntitiesHtml4[key]] = key;
-	function toNamed(code, next, omit, attribute) {
-		const character = String.fromCharCode(code);
-		if (own$5.call(characters, character)) {
-			const name = characters[character];
-			const value = "&" + name;
-			if (omit && characterEntitiesLegacy.includes(name) && !dangerous.includes(name) && (!attribute || next && next !== 61 && /[^\da-z]/i.test(String.fromCharCode(next)))) return value;
-			return value + ";";
-		}
-		return "";
-	}
-	function formatSmart(code, next, options) {
-		let numeric = toHexadecimal(code, next, options.omitOptionalSemicolons);
-		let named;
-		if (options.useNamedReferences || options.useShortestReferences) named = toNamed(code, next, options.omitOptionalSemicolons, options.attribute);
-		if ((options.useShortestReferences || !named) && options.useShortestReferences) {
-			const decimal = toDecimal(code, next, options.omitOptionalSemicolons);
-			if (decimal.length < numeric.length) numeric = decimal;
-		}
-		return named && (!options.useShortestReferences || named.length < numeric.length) ? named : numeric;
-	}
-	function stringifyEntities(value, options) {
-		return core(value, Object.assign({ format: formatSmart }, options));
-	}
-	function comment(node, _1, _2, state) {
-		return state.settings.bogusComments ? "<?" + stringifyEntities(node.value, Object.assign({}, state.settings.characterReferences, { subset: [">"] })) + ">" : "<!--" + node.value.replace(/^>|^->|<!--|-->|--!>|<!-$/g, encode) + "-->";
-		function encode($0) {
-			return stringifyEntities($0, Object.assign({}, state.settings.characterReferences, { subset: ["<", ">"] }));
-		}
-	}
-	function doctype(_1, _2, _3, state) {
-		return "<!" + (state.settings.upperDoctype ? "DOCTYPE" : "doctype") + (state.settings.tightDoctype ? "" : " ") + "html>";
-	}
-	function ccount(value, character) {
-		const source = String(value);
-		if (typeof character !== "string") throw new TypeError("Expected character");
-		let count = 0;
-		let index = source.indexOf(character);
-		while (index !== -1) {
-			count++;
-			index = source.indexOf(character, index + character.length);
-		}
-		return count;
-	}
-	function stringify$1(values, options) {
-		const settings = options || {};
-		return (values[values.length - 1] === "" ? [...values, ""] : values).join((settings.padRight ? " " : "") + "," + (settings.padLeft === false ? "" : " ")).trim();
-	}
-	function stringify(values) {
-		return values.join(" ").trim();
-	}
-	function whitespace(thing) {
-		const value = thing && typeof thing === "object" && thing.type === "text" ? thing.value || "" : thing;
-		return typeof value === "string" && value.replace(/[ \t\n\f\r]/g, "") === "";
-	}
-	var siblingAfter = siblings(1);
-	var siblingBefore = siblings(-1);
-	function siblings(increment) {
-		return sibling;
-		function sibling(parent, index, includeWhitespace) {
-			const siblings = parent ? parent.children : [];
-			let offset = (index || 0) + increment;
-			let next = siblings && siblings[offset];
-			if (!includeWhitespace) while (next && whitespace(next)) {
-				offset += increment;
-				next = siblings[offset];
-			}
-			return next;
-		}
-	}
-	var own$4 = {}.hasOwnProperty;
-	function omission(handlers) {
-		return omit;
-		function omit(node, index, parent) {
-			return own$4.call(handlers, node.tagName) && handlers[node.tagName](node, index, parent);
-		}
-	}
-	var closing = omission({
-		html: html$3,
-		head: headOrColgroupOrCaption,
-		body: body$1,
-		p,
-		li,
-		dt,
-		dd,
-		rt: rubyElement,
-		rp: rubyElement,
-		optgroup,
-		option,
-		menuitem,
-		colgroup: headOrColgroupOrCaption,
-		caption: headOrColgroupOrCaption,
-		thead,
-		tbody: tbody$1,
-		tfoot,
-		tr,
-		td: cells,
-		th: cells
-	});
-	function headOrColgroupOrCaption(_, index, parent) {
-		const next = siblingAfter(parent, index, true);
-		return !next || next.type !== "comment" && !(next.type === "text" && whitespace(next.value.charAt(0)));
-	}
-	function html$3(_, index, parent) {
-		const next = siblingAfter(parent, index);
-		return !next || next.type !== "comment";
-	}
-	function body$1(_, index, parent) {
-		const next = siblingAfter(parent, index);
-		return !next || next.type !== "comment";
-	}
-	function p(_, index, parent) {
-		const next = siblingAfter(parent, index);
-		return next ? next.type === "element" && (next.tagName === "address" || next.tagName === "article" || next.tagName === "aside" || next.tagName === "blockquote" || next.tagName === "details" || next.tagName === "div" || next.tagName === "dl" || next.tagName === "fieldset" || next.tagName === "figcaption" || next.tagName === "figure" || next.tagName === "footer" || next.tagName === "form" || next.tagName === "h1" || next.tagName === "h2" || next.tagName === "h3" || next.tagName === "h4" || next.tagName === "h5" || next.tagName === "h6" || next.tagName === "header" || next.tagName === "hgroup" || next.tagName === "hr" || next.tagName === "main" || next.tagName === "menu" || next.tagName === "nav" || next.tagName === "ol" || next.tagName === "p" || next.tagName === "pre" || next.tagName === "section" || next.tagName === "table" || next.tagName === "ul") : !parent || !(parent.type === "element" && (parent.tagName === "a" || parent.tagName === "audio" || parent.tagName === "del" || parent.tagName === "ins" || parent.tagName === "map" || parent.tagName === "noscript" || parent.tagName === "video"));
-	}
-	function li(_, index, parent) {
-		const next = siblingAfter(parent, index);
-		return !next || next.type === "element" && next.tagName === "li";
-	}
-	function dt(_, index, parent) {
-		const next = siblingAfter(parent, index);
-		return next && next.type === "element" && (next.tagName === "dt" || next.tagName === "dd");
-	}
-	function dd(_, index, parent) {
-		const next = siblingAfter(parent, index);
-		return !next || next.type === "element" && (next.tagName === "dt" || next.tagName === "dd");
-	}
-	function rubyElement(_, index, parent) {
-		const next = siblingAfter(parent, index);
-		return !next || next.type === "element" && (next.tagName === "rp" || next.tagName === "rt");
-	}
-	function optgroup(_, index, parent) {
-		const next = siblingAfter(parent, index);
-		return !next || next.type === "element" && next.tagName === "optgroup";
-	}
-	function option(_, index, parent) {
-		const next = siblingAfter(parent, index);
-		return !next || next.type === "element" && (next.tagName === "option" || next.tagName === "optgroup");
-	}
-	function menuitem(_, index, parent) {
-		const next = siblingAfter(parent, index);
-		return !next || next.type === "element" && (next.tagName === "menuitem" || next.tagName === "hr" || next.tagName === "menu");
-	}
-	function thead(_, index, parent) {
-		const next = siblingAfter(parent, index);
-		return next && next.type === "element" && (next.tagName === "tbody" || next.tagName === "tfoot");
-	}
-	function tbody$1(_, index, parent) {
-		const next = siblingAfter(parent, index);
-		return !next || next.type === "element" && (next.tagName === "tbody" || next.tagName === "tfoot");
-	}
-	function tfoot(_, index, parent) {
-		return !siblingAfter(parent, index);
-	}
-	function tr(_, index, parent) {
-		const next = siblingAfter(parent, index);
-		return !next || next.type === "element" && next.tagName === "tr";
-	}
-	function cells(_, index, parent) {
-		const next = siblingAfter(parent, index);
-		return !next || next.type === "element" && (next.tagName === "td" || next.tagName === "th");
-	}
-	var opening = omission({
-		html: html$2,
-		head,
-		body,
-		colgroup,
-		tbody
-	});
-	function html$2(node) {
-		const head = siblingAfter(node, -1);
-		return !head || head.type !== "comment";
-	}
-	function head(node) {
-		const children = node.children;
-		const seen = [];
-		let index = -1;
-		while (++index < children.length) {
-			const child = children[index];
-			if (child.type === "element" && (child.tagName === "title" || child.tagName === "base")) {
-				if (seen.includes(child.tagName)) return false;
-				seen.push(child.tagName);
-			}
-		}
-		return children.length > 0;
-	}
-	function body(node) {
-		const head = siblingAfter(node, -1, true);
-		return !head || head.type !== "comment" && !(head.type === "text" && whitespace(head.value.charAt(0))) && !(head.type === "element" && (head.tagName === "meta" || head.tagName === "link" || head.tagName === "script" || head.tagName === "style" || head.tagName === "template"));
-	}
-	function colgroup(node, index, parent) {
-		const previous = siblingBefore(parent, index);
-		const head = siblingAfter(node, -1, true);
-		if (parent && previous && previous.type === "element" && previous.tagName === "colgroup" && closing(previous, parent.children.indexOf(previous), parent)) return false;
-		return head && head.type === "element" && head.tagName === "col";
-	}
-	function tbody(node, index, parent) {
-		const previous = siblingBefore(parent, index);
-		const head = siblingAfter(node, -1);
-		if (parent && previous && previous.type === "element" && (previous.tagName === "thead" || previous.tagName === "tbody") && closing(previous, parent.children.indexOf(previous), parent)) return false;
-		return head && head.type === "element" && head.tagName === "tr";
-	}
-	var constants = {
-		name: [["	\n\f\r &/=>".split(""), "	\n\f\r \"&'/=>`".split("")], ["\0	\n\f\r \"&'/<=>".split(""), "\0	\n\f\r \"&'/<=>`".split("")]],
-		unquoted: [["	\n\f\r &>".split(""), "\0	\n\f\r \"&'<=>`".split("")], ["\0	\n\f\r \"&'<=>`".split(""), "\0	\n\f\r \"&'<=>`".split("")]],
-		single: [["&'".split(""), "\"&'`".split("")], ["\0&'".split(""), "\0\"&'`".split("")]],
-		double: [["\"&".split(""), "\"&'`".split("")], ["\0\"&".split(""), "\0\"&'`".split("")]]
-	};
-	function element$1(node, index, parent, state) {
-		const schema = state.schema;
-		const omit = schema.space === "svg" ? false : state.settings.omitOptionalTags;
-		let selfClosing = schema.space === "svg" ? state.settings.closeEmptyElements : state.settings.voids.includes(node.tagName.toLowerCase());
-		const parts = [];
-		let last;
-		if (schema.space === "html" && node.tagName === "svg") state.schema = svg;
-		const attrs = serializeAttributes(state, node.properties);
-		const content = state.all(schema.space === "html" && node.tagName === "template" ? node.content : node);
-		state.schema = schema;
-		if (content) selfClosing = false;
-		if (attrs || !omit || !opening(node, index, parent)) {
-			parts.push("<", node.tagName, attrs ? " " + attrs : "");
-			if (selfClosing && (schema.space === "svg" || state.settings.closeSelfClosing)) {
-				last = attrs.charAt(attrs.length - 1);
-				if (!state.settings.tightSelfClosing || last === "/" || last && last !== "\"" && last !== "'") parts.push(" ");
-				parts.push("/");
-			}
-			parts.push(">");
-		}
-		parts.push(content);
-		if (!selfClosing && (!omit || !closing(node, index, parent))) parts.push("</" + node.tagName + ">");
-		return parts.join("");
-	}
-	function serializeAttributes(state, props) {
-		const values = [];
-		let index = -1;
-		let key;
-		if (props) {
-			for (key in props) if (props[key] !== void 0 && props[key] !== null) {
-				const value = serializeAttribute(state, key, props[key]);
-				if (value) values.push(value);
-			}
-		}
-		while (++index < values.length) {
-			const last = state.settings.tightAttributes ? values[index].charAt(values[index].length - 1) : null;
-			if (index !== values.length - 1 && last !== "\"" && last !== "'") values[index] += " ";
-		}
-		return values.join("");
-	}
-	function serializeAttribute(state, key, value) {
-		const info = find(state.schema, key);
-		const x = state.settings.allowParseErrors && state.schema.space === "html" ? 0 : 1;
-		const y = state.settings.allowDangerousCharacters ? 0 : 1;
-		let quote = state.quote;
-		let result;
-		if (info.overloadedBoolean && (value === info.attribute || value === "")) value = true;
-		else if (info.boolean || info.overloadedBoolean && typeof value !== "string") value = Boolean(value);
-		if (value === void 0 || value === null || value === false || typeof value === "number" && Number.isNaN(value)) return "";
-		const name = stringifyEntities(info.attribute, Object.assign({}, state.settings.characterReferences, { subset: constants.name[x][y] }));
-		if (value === true) return name;
-		value = Array.isArray(value) ? (info.commaSeparated ? stringify$1 : stringify)(value, { padLeft: !state.settings.tightCommaSeparatedLists }) : String(value);
-		if (state.settings.collapseEmptyAttributes && !value) return name;
-		if (state.settings.preferUnquoted) result = stringifyEntities(value, Object.assign({}, state.settings.characterReferences, {
-			subset: constants.unquoted[x][y],
-			attribute: true
-		}));
-		if (result !== value) {
-			if (state.settings.quoteSmart && ccount(value, quote) > ccount(value, state.alternative)) quote = state.alternative;
-			result = quote + stringifyEntities(value, Object.assign({}, state.settings.characterReferences, {
-				subset: (quote === "'" ? constants.single : constants.double)[x][y],
-				attribute: true
-			})) + quote;
-		}
-		return name + (result ? "=" + result : result);
-	}
-	function text$5(node, _, parent, state) {
-		return parent && parent.type === "element" && (parent.tagName === "script" || parent.tagName === "style") ? node.value : stringifyEntities(node.value, Object.assign({}, state.settings.characterReferences, { subset: ["<", "&"] }));
-	}
-	function raw(node, index, parent, state) {
-		return state.settings.allowDangerousHtml ? node.value : text$5(node, index, parent, state);
-	}
-	function root$2(node, _1, _2, state) {
-		return state.all(node);
-	}
-	var handle$1 = zwitch("type", {
-		invalid: invalid$1,
-		unknown: unknown$1,
-		handlers: {
-			comment,
-			doctype,
-			element: element$1,
-			raw,
-			root: root$2,
-			text: text$5
-		}
-	});
-	function invalid$1(node) {
-		throw new Error("Expected node, not `" + node + "`");
-	}
-	function unknown$1(node) {
-		throw new Error("Cannot compile unknown node `" + node.type + "`");
-	}
-	function toHtml$1(tree, options) {
-		const options_ = options || {};
-		const quote = options_.quote || "\"";
-		const alternative = quote === "\"" ? "'" : "\"";
-		if (quote !== "\"" && quote !== "'") throw new Error("Invalid quote `" + quote + "`, expected `'` or `\"`");
-		return {
-			one: one$2,
-			all: all$2,
-			settings: {
-				omitOptionalTags: options_.omitOptionalTags || false,
-				allowParseErrors: options_.allowParseErrors || false,
-				allowDangerousCharacters: options_.allowDangerousCharacters || false,
-				quoteSmart: options_.quoteSmart || false,
-				preferUnquoted: options_.preferUnquoted || false,
-				tightAttributes: options_.tightAttributes || false,
-				upperDoctype: options_.upperDoctype || false,
-				tightDoctype: options_.tightDoctype || false,
-				bogusComments: options_.bogusComments || false,
-				tightCommaSeparatedLists: options_.tightCommaSeparatedLists || false,
-				tightSelfClosing: options_.tightSelfClosing || false,
-				collapseEmptyAttributes: options_.collapseEmptyAttributes || false,
-				allowDangerousHtml: options_.allowDangerousHtml || false,
-				voids: options_.voids || htmlVoidElements,
-				characterReferences: options_.characterReferences || options_.entities || {},
-				closeSelfClosing: options_.closeSelfClosing || false,
-				closeEmptyElements: options_.closeEmptyElements || false
-			},
-			schema: options_.space === "svg" ? svg : html$4,
-			quote,
-			alternative
-		}.one(Array.isArray(tree) ? {
-			type: "root",
-			children: tree
-		} : tree, void 0, void 0);
-	}
-	function one$2(node, index, parent) {
-		return handle$1(node, index, parent, this);
-	}
-	function all$2(parent) {
-		const results = [];
-		const children = parent && parent.children || [];
-		let index = -1;
-		while (++index < children.length) results[index] = this.one(children[index], index, parent);
-		return results.join("");
-	}
-	var emptyOptions = {};
-	function toString(value, options) {
-		const settings = options || emptyOptions;
-		return one$1(value, typeof settings.includeImageAlt === "boolean" ? settings.includeImageAlt : true, typeof settings.includeHtml === "boolean" ? settings.includeHtml : true);
-	}
-	function one$1(value, includeImageAlt, includeHtml) {
-		if (node(value)) {
-			if ("value" in value) return value.type === "html" && !includeHtml ? "" : value.value;
-			if (includeImageAlt && "alt" in value && value.alt) return value.alt;
-			if ("children" in value) return all$1(value.children, includeImageAlt, includeHtml);
-		}
-		if (Array.isArray(value)) return all$1(value, includeImageAlt, includeHtml);
-		return "";
-	}
-	function all$1(values, includeImageAlt, includeHtml) {
-		const result = [];
-		let index = -1;
-		while (++index < values.length) result[index] = one$1(values[index], includeImageAlt, includeHtml);
-		return result.join("");
-	}
-	function node(value) {
-		return Boolean(value && typeof value === "object");
+	var element = document.createElement("i");
+	function decodeNamedCharacterReference(value) {
+		const characterReference = "&" + value + ";";
+		element.innerHTML = characterReference;
+		const char = element.textContent;
+		if (char.charCodeAt(char.length - 1) === 59 && value !== "semi") return false;
+		return char === characterReference ? false : char;
 	}
 	function splice(list, start, remove, items) {
 		const end = list.length;
@@ -4708,7 +2898,7 @@
 		}
 		return items;
 	}
-	var hasOwnProperty = {}.hasOwnProperty;
+	var hasOwnProperty$1 = {}.hasOwnProperty;
 	function combineExtensions(extensions) {
 		const all = {};
 		let index = -1;
@@ -4718,11 +2908,11 @@
 	function syntaxExtension(all, extension) {
 		let hook;
 		for (hook in extension) {
-			const left = (hasOwnProperty.call(all, hook) ? all[hook] : void 0) || (all[hook] = {});
+			const left = (hasOwnProperty$1.call(all, hook) ? all[hook] : void 0) || (all[hook] = {});
 			const right = extension[hook];
 			let code;
 			for (code in right) {
-				if (!hasOwnProperty.call(left, code)) left[code] = [];
+				if (!hasOwnProperty$1.call(left, code)) left[code] = [];
 				const value = right[code];
 				constructs(left[code], Array.isArray(value) ? value : value ? [value] : []);
 			}
@@ -4733,6 +2923,41 @@
 		const before = [];
 		while (++index < list.length) (list[index].add === "after" ? existing : before).push(list[index]);
 		splice(existing, 0, 0, before);
+	}
+	function combineHtmlExtensions(htmlExtensions) {
+		const handlers = {};
+		let index = -1;
+		while (++index < htmlExtensions.length) htmlExtension(handlers, htmlExtensions[index]);
+		return handlers;
+	}
+	function htmlExtension(all, extension) {
+		let hook;
+		for (hook in extension) {
+			const left = (hasOwnProperty$1.call(all, hook) ? all[hook] : void 0) || (all[hook] = {});
+			const right = extension[hook];
+			let type;
+			if (right) for (type in right) left[type] = right[type];
+		}
+	}
+	function decodeNumericCharacterReference(value, base) {
+		const code = Number.parseInt(value, base);
+		if (code < 9 || code === 11 || code > 13 && code < 32 || code > 126 && code < 160 || code > 55295 && code < 57344 || code > 64975 && code < 65008 || (code & 65535) === 65535 || (code & 65535) === 65534 || code > 1114111) return "�";
+		return String.fromCharCode(code);
+	}
+	var characterReferences = {
+		"\"": "quot",
+		"&": "amp",
+		"<": "lt",
+		">": "gt"
+	};
+	function encode(value) {
+		return value.replace(/["&<>]/g, replace);
+		function replace(value) {
+			return "&" + characterReferences[value] + ";";
+		}
+	}
+	function normalizeIdentifier(value) {
+		return value.replace(/[\t\n\r ]+/g, " ").replace(/^ | $/g, "").toLowerCase().toUpperCase();
 	}
 	var unicodePunctuationRegex = /[!-/:-@[-`{-~\u00A1\u00A7\u00AB\u00B6\u00B7\u00BB\u00BF\u037E\u0387\u055A-\u055F\u0589\u058A\u05BE\u05C0\u05C3\u05C6\u05F3\u05F4\u0609\u060A\u060C\u060D\u061B\u061E\u061F\u066A-\u066D\u06D4\u0700-\u070D\u07F7-\u07F9\u0830-\u083E\u085E\u0964\u0965\u0970\u09FD\u0A76\u0AF0\u0C77\u0C84\u0DF4\u0E4F\u0E5A\u0E5B\u0F04-\u0F12\u0F14\u0F3A-\u0F3D\u0F85\u0FD0-\u0FD4\u0FD9\u0FDA\u104A-\u104F\u10FB\u1360-\u1368\u1400\u166E\u169B\u169C\u16EB-\u16ED\u1735\u1736\u17D4-\u17D6\u17D8-\u17DA\u1800-\u180A\u1944\u1945\u1A1E\u1A1F\u1AA0-\u1AA6\u1AA8-\u1AAD\u1B5A-\u1B60\u1BFC-\u1BFF\u1C3B-\u1C3F\u1C7E\u1C7F\u1CC0-\u1CC7\u1CD3\u2010-\u2027\u2030-\u2043\u2045-\u2051\u2053-\u205E\u207D\u207E\u208D\u208E\u2308-\u230B\u2329\u232A\u2768-\u2775\u27C5\u27C6\u27E6-\u27EF\u2983-\u2998\u29D8-\u29DB\u29FC\u29FD\u2CF9-\u2CFC\u2CFE\u2CFF\u2D70\u2E00-\u2E2E\u2E30-\u2E4F\u2E52\u3001-\u3003\u3008-\u3011\u3014-\u301F\u3030\u303D\u30A0\u30FB\uA4FE\uA4FF\uA60D-\uA60F\uA673\uA67E\uA6F2-\uA6F7\uA874-\uA877\uA8CE\uA8CF\uA8F8-\uA8FA\uA8FC\uA92E\uA92F\uA95F\uA9C1-\uA9CD\uA9DE\uA9DF\uAA5C-\uAA5F\uAADE\uAADF\uAAF0\uAAF1\uABEB\uFD3E\uFD3F\uFE10-\uFE19\uFE30-\uFE52\uFE54-\uFE61\uFE63\uFE68\uFE6A\uFE6B\uFF01-\uFF03\uFF05-\uFF0A\uFF0C-\uFF0F\uFF1A\uFF1B\uFF1F\uFF20\uFF3B-\uFF3D\uFF3F\uFF5B\uFF5D\uFF5F-\uFF65]/;
 	var asciiAlpha = regexCheck(/[A-Za-z]/);
@@ -4759,6 +2984,535 @@
 		return check;
 		function check(code) {
 			return code !== null && regex.test(String.fromCharCode(code));
+		}
+	}
+	function sanitizeUri(url, protocol) {
+		const value = encode(normalizeUri(url || ""));
+		if (!protocol) return value;
+		const colon = value.indexOf(":");
+		const questionMark = value.indexOf("?");
+		const numberSign = value.indexOf("#");
+		const slash = value.indexOf("/");
+		if (colon < 0 || slash > -1 && colon > slash || questionMark > -1 && colon > questionMark || numberSign > -1 && colon > numberSign || protocol.test(value.slice(0, colon))) return value;
+		return "";
+	}
+	function normalizeUri(value) {
+		const result = [];
+		let index = -1;
+		let start = 0;
+		let skip = 0;
+		while (++index < value.length) {
+			const code = value.charCodeAt(index);
+			let replace = "";
+			if (code === 37 && asciiAlphanumeric(value.charCodeAt(index + 1)) && asciiAlphanumeric(value.charCodeAt(index + 2))) skip = 2;
+			else if (code < 128) {
+				if (!/[!#$&-;=?-Z_a-z~]/.test(String.fromCharCode(code))) replace = String.fromCharCode(code);
+			} else if (code > 55295 && code < 57344) {
+				const next = value.charCodeAt(index + 1);
+				if (code < 56320 && next > 56319 && next < 57344) {
+					replace = String.fromCharCode(code, next);
+					skip = 1;
+				} else replace = "�";
+			} else replace = String.fromCharCode(code);
+			if (replace) {
+				result.push(value.slice(start, index), encodeURIComponent(replace));
+				start = index + skip + 1;
+				replace = "";
+			}
+			if (skip) {
+				index += skip;
+				skip = 0;
+			}
+		}
+		return result.join("") + value.slice(start);
+	}
+	var hasOwnProperty = {}.hasOwnProperty;
+	var protocolHref = /^(https?|ircs?|mailto|xmpp)$/i;
+	var protocolSrc = /^https?$/i;
+	function compile(options = {}) {
+		let tags = true;
+		const definitions = {};
+		const buffers = [[]];
+		const mediaStack = [];
+		const tightStack = [];
+		const handlers = combineHtmlExtensions([{
+			enter: {
+				blockQuote: onenterblockquote,
+				codeFenced: onentercodefenced,
+				codeFencedFenceInfo: buffer,
+				codeFencedFenceMeta: buffer,
+				codeIndented: onentercodeindented,
+				codeText: onentercodetext,
+				content: onentercontent,
+				definition: onenterdefinition,
+				definitionDestinationString: onenterdefinitiondestinationstring,
+				definitionLabelString: buffer,
+				definitionTitleString: buffer,
+				emphasis: onenteremphasis,
+				htmlFlow: onenterhtmlflow,
+				htmlText: onenterhtml,
+				image: onenterimage,
+				label: buffer,
+				link: onenterlink,
+				listItemMarker: onenterlistitemmarker,
+				listItemValue: onenterlistitemvalue,
+				listOrdered: onenterlistordered,
+				listUnordered: onenterlistunordered,
+				paragraph: onenterparagraph,
+				reference: buffer,
+				resource: onenterresource,
+				resourceDestinationString: onenterresourcedestinationstring,
+				resourceTitleString: buffer,
+				setextHeading: onentersetextheading,
+				strong: onenterstrong
+			},
+			exit: {
+				atxHeading: onexitatxheading,
+				atxHeadingSequence: onexitatxheadingsequence,
+				autolinkEmail: onexitautolinkemail,
+				autolinkProtocol: onexitautolinkprotocol,
+				blockQuote: onexitblockquote,
+				characterEscapeValue: onexitdata,
+				characterReferenceMarkerHexadecimal: onexitcharacterreferencemarker,
+				characterReferenceMarkerNumeric: onexitcharacterreferencemarker,
+				characterReferenceValue: onexitcharacterreferencevalue,
+				codeFenced: onexitflowcode,
+				codeFencedFence: onexitcodefencedfence,
+				codeFencedFenceInfo: onexitcodefencedfenceinfo,
+				codeFencedFenceMeta: resume,
+				codeFlowValue: onexitcodeflowvalue,
+				codeIndented: onexitflowcode,
+				codeText: onexitcodetext,
+				codeTextData: onexitdata,
+				data: onexitdata,
+				definition: onexitdefinition,
+				definitionDestinationString: onexitdefinitiondestinationstring,
+				definitionLabelString: onexitdefinitionlabelstring,
+				definitionTitleString: onexitdefinitiontitlestring,
+				emphasis: onexitemphasis,
+				hardBreakEscape: onexithardbreak,
+				hardBreakTrailing: onexithardbreak,
+				htmlFlow: onexithtml,
+				htmlFlowData: onexitdata,
+				htmlText: onexithtml,
+				htmlTextData: onexitdata,
+				image: onexitmedia,
+				label: onexitlabel,
+				labelText: onexitlabeltext,
+				lineEnding: onexitlineending,
+				link: onexitmedia,
+				listOrdered: onexitlistordered,
+				listUnordered: onexitlistunordered,
+				paragraph: onexitparagraph,
+				reference: resume,
+				referenceString: onexitreferencestring,
+				resource: resume,
+				resourceDestinationString: onexitresourcedestinationstring,
+				resourceTitleString: onexitresourcetitlestring,
+				setextHeading: onexitsetextheading,
+				setextHeadingLineSequence: onexitsetextheadinglinesequence,
+				setextHeadingText: onexitsetextheadingtext,
+				strong: onexitstrong,
+				thematicBreak: onexitthematicbreak
+			}
+		}].concat(options.htmlExtensions || []));
+		const data = {
+			tightStack,
+			definitions
+		};
+		const context = {
+			lineEndingIfNeeded,
+			options,
+			encode: encode$1,
+			raw,
+			tag,
+			buffer,
+			resume,
+			setData,
+			getData
+		};
+		let lineEndingStyle = options.defaultLineEnding;
+		return compile;
+		function compile(events) {
+			let index = -1;
+			let start = 0;
+			const listStack = [];
+			let head = [];
+			let body = [];
+			while (++index < events.length) {
+				if (!lineEndingStyle && (events[index][1].type === "lineEnding" || events[index][1].type === "lineEndingBlank")) lineEndingStyle = events[index][2].sliceSerialize(events[index][1]);
+				if (events[index][1].type === "listOrdered" || events[index][1].type === "listUnordered") {
+					if (events[index][0] === "enter") listStack.push(index);
+					else prepareList(events.slice(listStack.pop(), index));
+				}
+				if (events[index][1].type === "definition") {
+					if (events[index][0] === "enter") {
+						body = push(body, events.slice(start, index));
+						start = index;
+					} else {
+						head = push(head, events.slice(start, index + 1));
+						start = index + 1;
+					}
+				}
+			}
+			head = push(head, body);
+			head = push(head, events.slice(start));
+			index = -1;
+			const result = head;
+			if (handlers.enter.null) handlers.enter.null.call(context);
+			while (++index < events.length) {
+				const handler = handlers[result[index][0]];
+				if (hasOwnProperty.call(handler, result[index][1].type)) handler[result[index][1].type].call(Object.assign({ sliceSerialize: result[index][2].sliceSerialize }, context), result[index][1]);
+			}
+			if (handlers.exit.null) handlers.exit.null.call(context);
+			return buffers[0].join("");
+		}
+		function prepareList(slice) {
+			const length = slice.length;
+			let index = 0;
+			let containerBalance = 0;
+			let loose = false;
+			let atMarker;
+			while (++index < length) {
+				const event = slice[index];
+				if (event[1]._container) {
+					atMarker = void 0;
+					if (event[0] === "enter") containerBalance++;
+					else containerBalance--;
+				} else switch (event[1].type) {
+					case "listItemPrefix":
+						if (event[0] === "exit") atMarker = true;
+						break;
+					case "linePrefix": break;
+					case "lineEndingBlank":
+						if (event[0] === "enter" && !containerBalance) {
+							if (atMarker) atMarker = void 0;
+							else loose = true;
+						}
+						break;
+					default: atMarker = void 0;
+				}
+			}
+			slice[0][1]._loose = loose;
+		}
+		function setData(key, value) {
+			data[key] = value;
+		}
+		function getData(key) {
+			return data[key];
+		}
+		function buffer() {
+			buffers.push([]);
+		}
+		function resume() {
+			return buffers.pop().join("");
+		}
+		function tag(value) {
+			if (!tags) return;
+			setData("lastWasTag", true);
+			buffers[buffers.length - 1].push(value);
+		}
+		function raw(value) {
+			setData("lastWasTag");
+			buffers[buffers.length - 1].push(value);
+		}
+		function lineEnding() {
+			raw(lineEndingStyle || "\n");
+		}
+		function lineEndingIfNeeded() {
+			const buffer = buffers[buffers.length - 1];
+			const slice = buffer[buffer.length - 1];
+			const previous = slice ? slice.charCodeAt(slice.length - 1) : null;
+			if (previous === 10 || previous === 13 || previous === null) return;
+			lineEnding();
+		}
+		function encode$1(value) {
+			return getData("ignoreEncode") ? value : encode(value);
+		}
+		function onenterlistordered(token) {
+			tightStack.push(!token._loose);
+			lineEndingIfNeeded();
+			tag("<ol");
+			setData("expectFirstItem", true);
+		}
+		function onenterlistunordered(token) {
+			tightStack.push(!token._loose);
+			lineEndingIfNeeded();
+			tag("<ul");
+			setData("expectFirstItem", true);
+		}
+		function onenterlistitemvalue(token) {
+			if (getData("expectFirstItem")) {
+				const value = Number.parseInt(this.sliceSerialize(token), 10);
+				if (value !== 1) tag(" start=\"" + encode$1(String(value)) + "\"");
+			}
+		}
+		function onenterlistitemmarker() {
+			if (getData("expectFirstItem")) tag(">");
+			else onexitlistitem();
+			lineEndingIfNeeded();
+			tag("<li>");
+			setData("expectFirstItem");
+			setData("lastWasTag");
+		}
+		function onexitlistordered() {
+			onexitlistitem();
+			tightStack.pop();
+			lineEnding();
+			tag("</ol>");
+		}
+		function onexitlistunordered() {
+			onexitlistitem();
+			tightStack.pop();
+			lineEnding();
+			tag("</ul>");
+		}
+		function onexitlistitem() {
+			if (getData("lastWasTag") && !getData("slurpAllLineEndings")) lineEndingIfNeeded();
+			tag("</li>");
+			setData("slurpAllLineEndings");
+		}
+		function onenterblockquote() {
+			tightStack.push(false);
+			lineEndingIfNeeded();
+			tag("<blockquote>");
+		}
+		function onexitblockquote() {
+			tightStack.pop();
+			lineEndingIfNeeded();
+			tag("</blockquote>");
+			setData("slurpAllLineEndings");
+		}
+		function onenterparagraph() {
+			if (!tightStack[tightStack.length - 1]) {
+				lineEndingIfNeeded();
+				tag("<p>");
+			}
+			setData("slurpAllLineEndings");
+		}
+		function onexitparagraph() {
+			if (tightStack[tightStack.length - 1]) setData("slurpAllLineEndings", true);
+			else tag("</p>");
+		}
+		function onentercodefenced() {
+			lineEndingIfNeeded();
+			tag("<pre><code");
+			setData("fencesCount", 0);
+		}
+		function onexitcodefencedfenceinfo() {
+			tag(" class=\"language-" + resume() + "\"");
+		}
+		function onexitcodefencedfence() {
+			const count = getData("fencesCount") || 0;
+			if (!count) {
+				tag(">");
+				setData("slurpOneLineEnding", true);
+			}
+			setData("fencesCount", count + 1);
+		}
+		function onentercodeindented() {
+			lineEndingIfNeeded();
+			tag("<pre><code>");
+		}
+		function onexitflowcode() {
+			const count = getData("fencesCount");
+			if (count !== void 0 && count < 2 && data.tightStack.length > 0 && !getData("lastWasTag")) lineEnding();
+			if (getData("flowCodeSeenData")) lineEndingIfNeeded();
+			tag("</code></pre>");
+			if (count !== void 0 && count < 2) lineEndingIfNeeded();
+			setData("flowCodeSeenData");
+			setData("fencesCount");
+			setData("slurpOneLineEnding");
+		}
+		function onenterimage() {
+			mediaStack.push({ image: true });
+			tags = void 0;
+		}
+		function onenterlink() {
+			mediaStack.push({});
+		}
+		function onexitlabeltext(token) {
+			mediaStack[mediaStack.length - 1].labelId = this.sliceSerialize(token);
+		}
+		function onexitlabel() {
+			mediaStack[mediaStack.length - 1].label = resume();
+		}
+		function onexitreferencestring(token) {
+			mediaStack[mediaStack.length - 1].referenceId = this.sliceSerialize(token);
+		}
+		function onenterresource() {
+			buffer();
+			mediaStack[mediaStack.length - 1].destination = "";
+		}
+		function onenterresourcedestinationstring() {
+			buffer();
+			setData("ignoreEncode", true);
+		}
+		function onexitresourcedestinationstring() {
+			mediaStack[mediaStack.length - 1].destination = resume();
+			setData("ignoreEncode");
+		}
+		function onexitresourcetitlestring() {
+			mediaStack[mediaStack.length - 1].title = resume();
+		}
+		function onexitmedia() {
+			let index = mediaStack.length - 1;
+			const media = mediaStack[index];
+			const id = media.referenceId || media.labelId;
+			const context = media.destination === void 0 ? definitions[normalizeIdentifier(id)] : media;
+			tags = true;
+			while (index--) if (mediaStack[index].image) {
+				tags = void 0;
+				break;
+			}
+			if (media.image) {
+				tag("<img src=\"" + sanitizeUri(context.destination, options.allowDangerousProtocol ? void 0 : protocolSrc) + "\" alt=\"");
+				raw(media.label);
+				tag("\"");
+			} else tag("<a href=\"" + sanitizeUri(context.destination, options.allowDangerousProtocol ? void 0 : protocolHref) + "\"");
+			tag(context.title ? " title=\"" + context.title + "\"" : "");
+			if (media.image) tag(" />");
+			else {
+				tag(">");
+				raw(media.label);
+				tag("</a>");
+			}
+			mediaStack.pop();
+		}
+		function onenterdefinition() {
+			buffer();
+			mediaStack.push({});
+		}
+		function onexitdefinitionlabelstring(token) {
+			resume();
+			mediaStack[mediaStack.length - 1].labelId = this.sliceSerialize(token);
+		}
+		function onenterdefinitiondestinationstring() {
+			buffer();
+			setData("ignoreEncode", true);
+		}
+		function onexitdefinitiondestinationstring() {
+			mediaStack[mediaStack.length - 1].destination = resume();
+			setData("ignoreEncode");
+		}
+		function onexitdefinitiontitlestring() {
+			mediaStack[mediaStack.length - 1].title = resume();
+		}
+		function onexitdefinition() {
+			const media = mediaStack[mediaStack.length - 1];
+			const id = normalizeIdentifier(media.labelId);
+			resume();
+			if (!hasOwnProperty.call(definitions, id)) definitions[id] = mediaStack[mediaStack.length - 1];
+			mediaStack.pop();
+		}
+		function onentercontent() {
+			setData("slurpAllLineEndings", true);
+		}
+		function onexitatxheadingsequence(token) {
+			if (getData("headingRank")) return;
+			setData("headingRank", this.sliceSerialize(token).length);
+			lineEndingIfNeeded();
+			tag("<h" + getData("headingRank") + ">");
+		}
+		function onentersetextheading() {
+			buffer();
+			setData("slurpAllLineEndings");
+		}
+		function onexitsetextheadingtext() {
+			setData("slurpAllLineEndings", true);
+		}
+		function onexitatxheading() {
+			tag("</h" + getData("headingRank") + ">");
+			setData("headingRank");
+		}
+		function onexitsetextheadinglinesequence(token) {
+			setData("headingRank", this.sliceSerialize(token).charCodeAt(0) === 61 ? 1 : 2);
+		}
+		function onexitsetextheading() {
+			const value = resume();
+			lineEndingIfNeeded();
+			tag("<h" + getData("headingRank") + ">");
+			raw(value);
+			tag("</h" + getData("headingRank") + ">");
+			setData("slurpAllLineEndings");
+			setData("headingRank");
+		}
+		function onexitdata(token) {
+			raw(encode$1(this.sliceSerialize(token)));
+		}
+		function onexitlineending(token) {
+			if (getData("slurpAllLineEndings")) return;
+			if (getData("slurpOneLineEnding")) {
+				setData("slurpOneLineEnding");
+				return;
+			}
+			if (getData("inCodeText")) {
+				raw(" ");
+				return;
+			}
+			raw(encode$1(this.sliceSerialize(token)));
+		}
+		function onexitcodeflowvalue(token) {
+			raw(encode$1(this.sliceSerialize(token)));
+			setData("flowCodeSeenData", true);
+		}
+		function onexithardbreak() {
+			tag("<br />");
+		}
+		function onenterhtmlflow() {
+			lineEndingIfNeeded();
+			onenterhtml();
+		}
+		function onexithtml() {
+			setData("ignoreEncode");
+		}
+		function onenterhtml() {
+			if (options.allowDangerousHtml) setData("ignoreEncode", true);
+		}
+		function onenteremphasis() {
+			tag("<em>");
+		}
+		function onenterstrong() {
+			tag("<strong>");
+		}
+		function onentercodetext() {
+			setData("inCodeText", true);
+			tag("<code>");
+		}
+		function onexitcodetext() {
+			setData("inCodeText");
+			tag("</code>");
+		}
+		function onexitemphasis() {
+			tag("</em>");
+		}
+		function onexitstrong() {
+			tag("</strong>");
+		}
+		function onexitthematicbreak() {
+			lineEndingIfNeeded();
+			tag("<hr />");
+		}
+		function onexitcharacterreferencemarker(token) {
+			setData("characterReferenceType", token.type);
+		}
+		function onexitcharacterreferencevalue(token) {
+			let value = this.sliceSerialize(token);
+			value = getData("characterReferenceType") ? decodeNumericCharacterReference(value, getData("characterReferenceType") === "characterReferenceMarkerNumeric" ? 10 : 16) : decodeNamedCharacterReference(value);
+			raw(encode$1(value));
+			setData("characterReferenceType");
+		}
+		function onexitautolinkprotocol(token) {
+			const uri = this.sliceSerialize(token);
+			tag("<a href=\"" + sanitizeUri(uri, options.allowDangerousProtocol ? void 0 : protocolHref) + "\">");
+			raw(encode$1(uri));
+			tag("</a>");
+		}
+		function onexitautolinkemail(token) {
+			const uri = this.sliceSerialize(token);
+			tag("<a href=\"" + sanitizeUri("mailto:" + uri) + "\">");
+			raw(encode$1(uri));
+			tag("</a>");
 		}
 	}
 	function factorySpace(effects, ok, type, max) {
@@ -5308,14 +4062,6 @@
 			}
 			return nok(code);
 		}
-	}
-	var element = document.createElement("i");
-	function decodeNamedCharacterReference(value) {
-		const characterReference = "&" + value + ";";
-		element.innerHTML = characterReference;
-		const char = element.textContent;
-		if (char.charCodeAt(char.length - 1) === 59 && value !== "semi") return false;
-		return char === characterReference ? false : char;
 	}
 	var characterReference = {
 		name: "characterReference",
@@ -6043,9 +4789,6 @@
 			if (markdownSpace(code)) return factorySpace(effects, start, seen ? "linePrefix" : "lineSuffix")(code);
 			return ok(code);
 		}
-	}
-	function normalizeIdentifier(value) {
-		return value.replace(/[\t\n\r ]+/g, " ").replace(/^ | $/g, "").toLowerCase().toUpperCase();
 	}
 	var definition$1 = {
 		name: "definition",
@@ -7163,7 +5906,7 @@
 			return factorySpace(effects, ok, "linePrefix");
 		}
 	}
-	var thematicBreak$2 = {
+	var thematicBreak$1 = {
 		name: "thematicBreak",
 		tokenize: tokenizeThematicBreak
 	};
@@ -7196,7 +5939,7 @@
 			return atBreak(code);
 		}
 	}
-	var list$2 = {
+	var list$1 = {
 		name: "list",
 		tokenize: tokenizeListStart,
 		continuation: { tokenize: tokenizeListContinuation },
@@ -7225,7 +5968,7 @@
 				}
 				if (kind === "listUnordered") {
 					effects.enter("listItemPrefix");
-					return code === 42 || code === 45 ? effects.check(thematicBreak$2, nok, atMarker)(code) : atMarker(code);
+					return code === 42 || code === 45 ? effects.check(thematicBreak$1, nok, atMarker)(code) : atMarker(code);
 				}
 				if (!self.interrupt || code === 49) {
 					effects.enter("listItemPrefix");
@@ -7293,7 +6036,7 @@
 		function notInCurrentItem(code) {
 			self.containerState._closeFlow = true;
 			self.interrupt = void 0;
-			return factorySpace(effects, effects.attempt(list$2, ok, nok), "linePrefix", self.parser.constructs.disable.null.includes("codeIndented") ? void 0 : 4)(code);
+			return factorySpace(effects, effects.attempt(list$1, ok, nok), "linePrefix", self.parser.constructs.disable.null.includes("codeIndented") ? void 0 : 4)(code);
 		}
 	}
 	function tokenizeIndent$1(effects, ok, nok) {
@@ -7426,7 +6169,7 @@
 	}
 	var resolver = { resolveAll: createResolver() };
 	var string$1 = initializeFactory("string");
-	var text$4 = initializeFactory("text");
+	var text$3 = initializeFactory("text");
 	function initializeFactory(field) {
 		return {
 			tokenize: initializeText,
@@ -7796,22 +6539,22 @@
 		flowInitial: () => flowInitial,
 		insideSpan: () => insideSpan,
 		string: () => string,
-		text: () => text$3
+		text: () => text$2
 	});
 	var document$1 = {
-		[42]: list$2,
-		[43]: list$2,
-		[45]: list$2,
-		[48]: list$2,
-		[49]: list$2,
-		[50]: list$2,
-		[51]: list$2,
-		[52]: list$2,
-		[53]: list$2,
-		[54]: list$2,
-		[55]: list$2,
-		[56]: list$2,
-		[57]: list$2,
+		[42]: list$1,
+		[43]: list$1,
+		[45]: list$1,
+		[48]: list$1,
+		[49]: list$1,
+		[50]: list$1,
+		[51]: list$1,
+		[52]: list$1,
+		[53]: list$1,
+		[54]: list$1,
+		[55]: list$1,
+		[56]: list$1,
+		[57]: list$1,
 		[62]: blockQuote
 	};
 	var contentInitial = { [91]: definition$1 };
@@ -7822,11 +6565,11 @@
 	};
 	var flow = {
 		[35]: headingAtx,
-		[42]: thematicBreak$2,
-		[45]: [setextUnderline, thematicBreak$2],
+		[42]: thematicBreak$1,
+		[45]: [setextUnderline, thematicBreak$1],
 		[60]: htmlFlow,
 		[61]: setextUnderline,
-		[95]: thematicBreak$2,
+		[95]: thematicBreak$1,
 		[96]: codeFenced,
 		[126]: codeFenced
 	};
@@ -7834,7 +6577,7 @@
 		[38]: characterReference,
 		[92]: characterEscape
 	};
-	var text$3 = {
+	var text$2 = {
 		[-5]: lineEnding,
 		[-4]: lineEnding,
 		[-3]: lineEnding,
@@ -7860,7 +6603,7 @@
 			document: create(document$2),
 			flow: create(flow$1),
 			string: create(string$1),
-			text: create(text$4)
+			text: create(text$3)
 		};
 		return parser;
 		function create(initial) {
@@ -7869,6 +6612,10 @@
 				return createTokenizer(parser, initial, from);
 			}
 		}
+	}
+	function postprocess(events) {
+		while (!subtokenize(events));
+		return events;
 	}
 	var search = /[\0\t\n\r]/g;
 	function preprocess() {
@@ -7941,14 +6688,35 @@
 			return chunks;
 		}
 	}
-	function postprocess(events) {
-		while (!subtokenize(events));
-		return events;
+	var micromark = function(value, encoding, options) {
+		if (typeof encoding !== "string") {
+			options = encoding;
+			encoding = void 0;
+		}
+		return compile(options)(postprocess(parse(options).document().write(preprocess()(value, encoding, true))));
+	};
+	var emptyOptions$1 = {};
+	function toString(value, options) {
+		const settings = options || emptyOptions$1;
+		return one(value, typeof settings.includeImageAlt === "boolean" ? settings.includeImageAlt : true, typeof settings.includeHtml === "boolean" ? settings.includeHtml : true);
 	}
-	function decodeNumericCharacterReference(value, base) {
-		const code = Number.parseInt(value, base);
-		if (code < 9 || code === 11 || code > 13 && code < 32 || code > 126 && code < 160 || code > 55295 && code < 57344 || code > 64975 && code < 65008 || (code & 65535) === 65535 || (code & 65535) === 65534 || code > 1114111) return "�";
-		return String.fromCharCode(code);
+	function one(value, includeImageAlt, includeHtml) {
+		if (node(value)) {
+			if ("value" in value) return value.type === "html" && !includeHtml ? "" : value.value;
+			if (includeImageAlt && "alt" in value && value.alt) return value.alt;
+			if ("children" in value) return all(value.children, includeImageAlt, includeHtml);
+		}
+		if (Array.isArray(value)) return all(value, includeImageAlt, includeHtml);
+		return "";
+	}
+	function all(values, includeImageAlt, includeHtml) {
+		const result = [];
+		let index = -1;
+		while (++index < values.length) result[index] = one(values[index], includeImageAlt, includeHtml);
+		return result.join("");
+	}
+	function node(value) {
+		return Boolean(value && typeof value === "object");
 	}
 	var characterEscapeOrReference = /\\([!-/:-@[-`{-~])|&(#(?:\d{1,7}|x[\da-f]{1,6})|[\da-z]{1,31});/gi;
 	function decodeString(value) {
@@ -7965,16 +6733,16 @@
 	}
 	function stringifyPosition(value) {
 		if (!value || typeof value !== "object") return "";
-		if ("position" in value || "type" in value) return position$1(value.position);
-		if ("start" in value || "end" in value) return position$1(value);
-		if ("line" in value || "column" in value) return point$2(value);
+		if ("position" in value || "type" in value) return position(value.position);
+		if ("start" in value || "end" in value) return position(value);
+		if ("line" in value || "column" in value) return point$1(value);
 		return "";
 	}
-	function point$2(point) {
+	function point$1(point) {
 		return index(point && point.line) + ":" + index(point && point.column);
 	}
-	function position$1(pos) {
-		return point$2(pos && pos.start) + "-" + point$2(pos && pos.end);
+	function position(pos) {
+		return point$1(pos && pos.start) + "-" + point$1(pos && pos.end);
 	}
 	function index(value) {
 		return value && typeof value === "number" ? value : 1;
@@ -8126,12 +6894,12 @@
 				(tail[1] || defaultOnError).call(context, void 0, tail[0]);
 			}
 			tree.position = {
-				start: point$1(events.length > 0 ? events[0][1].start : {
+				start: point(events.length > 0 ? events[0][1].start : {
 					line: 1,
 					column: 1,
 					offset: 0
 				}),
-				end: point$1(events.length > 0 ? events[events.length - 2][1].end : {
+				end: point(events.length > 0 ? events[events.length - 2][1].end : {
 					line: 1,
 					column: 1,
 					offset: 0
@@ -8232,7 +7000,7 @@
 			this.stack[this.stack.length - 1].children.push(node);
 			this.stack.push(node);
 			this.tokenStack.push([token, errorHandler]);
-			node.position = { start: point$1(token.start) };
+			node.position = { start: point(token.start) };
 			return node;
 		}
 		function closer(and) {
@@ -8253,7 +7021,7 @@
 				if (onExitError) onExitError.call(this, token, open[0]);
 				else (open[1] || defaultOnError).call(this, token, open[0]);
 			}
-			node.position.end = point$1(token.end);
+			node.position.end = point(token.end);
 			return node;
 		}
 		function resume() {
@@ -8330,7 +7098,7 @@
 			let tail = node.children[node.children.length - 1];
 			if (!tail || tail.type !== "text") {
 				tail = text();
-				tail.position = { start: point$1(token.start) };
+				tail.position = { start: point(token.start) };
 				node.children.push(tail);
 			}
 			this.stack.push(tail);
@@ -8338,13 +7106,13 @@
 		function onexitdata(token) {
 			const tail = this.stack.pop();
 			tail.value += this.sliceSerialize(token);
-			tail.position.end = point$1(token.end);
+			tail.position.end = point(token.end);
 		}
 		function onexitlineending(token) {
 			const context = this.stack[this.stack.length - 1];
 			if (getData("atHardBreak")) {
 				const tail = context.children[context.children.length - 1];
-				tail.position.end = point$1(token.end);
+				tail.position.end = point(token.end);
 				setData("atHardBreak");
 				return;
 			}
@@ -8449,7 +7217,7 @@
 			} else value = decodeNamedCharacterReference(data);
 			const tail = this.stack.pop();
 			tail.value += value;
-			tail.position.end = point$1(token.end);
+			tail.position.end = point(token.end);
 		}
 		function onexitautolinkprotocol(token) {
 			onexitdata.call(this, token);
@@ -8567,7 +7335,7 @@
 			return { type: "thematicBreak" };
 		}
 	}
-	function point$1(d) {
+	function point(d) {
 		return {
 			line: d.line,
 			column: d.column,
@@ -8609,6 +7377,17 @@
 			start: right.start,
 			end: right.end
 		}) + ") is still open");
+	}
+	function ccount(value, character) {
+		const source = String(value);
+		if (typeof character !== "string") throw new TypeError("Expected character");
+		let count = 0;
+		let index = source.indexOf(character);
+		while (index !== -1) {
+			count++;
+			index = source.indexOf(character, index + character.length);
+		}
+		return count;
 	}
 	function escapeStringRegexp(string) {
 		if (typeof string !== "string") throw new TypeError("Expected a string");
@@ -9095,7 +7874,7 @@
 			return value;
 		}
 	}
-	footnoteReference$1.peek = footnoteReferencePeek;
+	footnoteReference.peek = footnoteReferencePeek;
 	function gfmFootnoteFromMarkdown() {
 		return {
 			enter: {
@@ -9124,7 +7903,7 @@
 			}],
 			handlers: {
 				footnoteDefinition,
-				footnoteReference: footnoteReference$1
+				footnoteReference
 			}
 		};
 	}
@@ -9167,7 +7946,7 @@
 	function exitFootnoteCall(token) {
 		this.exit(token);
 	}
-	function footnoteReference$1(node, _, context, safeOptions) {
+	function footnoteReference(node, _, context, safeOptions) {
 		const tracker = track(safeOptions);
 		let value = tracker.move("[^");
 		const exit = context.enter("footnoteReference");
@@ -9290,8 +8069,8 @@
 	function peekDelete() {
 		return "~";
 	}
-	inlineCode$1.peek = inlineCodePeek;
-	function inlineCode$1(node, _, state) {
+	inlineCode.peek = inlineCodePeek;
+	function inlineCode(node, _, state) {
 		let value = node.value || "";
 		let sequence = "`";
 		let index = -1;
@@ -9460,12 +8239,12 @@
 	}
 	function exitCodeText(token) {
 		let value = this.resume();
-		if (this.getData("inTable")) value = value.replace(/\\([\\|])/g, replace);
+		if (this.getData("inTable")) value = value.replace(/\\([\\|])/g, replace$1);
 		const node = this.stack[this.stack.length - 1];
 		node.value = value;
 		this.exit(token);
 	}
-	function replace($0, $1) {
+	function replace$1($0, $1) {
 		return $1 === "|" ? $1 : $0;
 	}
 	function gfmTableToMarkdown(options) {
@@ -9557,7 +8336,7 @@
 			return result;
 		}
 		function inlineCodeWithTable(node, parent, context) {
-			let value = inlineCode$1(node, parent, context);
+			let value = inlineCode(node, parent, context);
 			if (context.stack.includes("tableCell")) value = value.replace(/\|/g, "\\$&");
 			return value;
 		}
@@ -9573,7 +8352,7 @@
 		if (style !== "tab" && style !== "one" && style !== "mixed") throw new Error("Cannot serialize items with `" + style + "` for `options.listItemIndent`, expected `tab`, `one`, or `mixed`");
 		return style;
 	}
-	function listItem$1(node, parent, state, info) {
+	function listItem(node, parent, state, info) {
 		const listItemIndent = checkListItemIndent(state);
 		let bullet = state.bulletCurrent || checkBullet(state);
 		if (parent && parent.type === "list" && parent.ordered) bullet = (typeof parent.start === "number" && parent.start > -1 ? parent.start : 1) + (state.options.incrementListMarker === false ? 0 : parent.children.indexOf(node)) + bullet;
@@ -9643,7 +8422,7 @@
 		const checkbox = "[" + (node.checked ? "x" : " ") + "] ";
 		const tracker = track(safeOptions);
 		if (checkable) tracker.move(checkbox);
-		let value = listItem$1(node, parent, context, {
+		let value = listItem(node, parent, context, {
 			...safeOptions,
 			...tracker.current()
 		});
@@ -9671,899 +8450,22 @@
 			gfmTaskListItemToMarkdown
 		] };
 	}
-	function blockquote$1(state, node) {
-		const result = {
-			type: "element",
-			tagName: "blockquote",
-			properties: {},
-			children: state.wrap(state.all(node), true)
-		};
-		state.patch(node, result);
-		return state.applyData(node, result);
-	}
-	function hardBreak$1(state, node) {
-		const result = {
-			type: "element",
-			tagName: "br",
-			properties: {},
-			children: []
-		};
-		state.patch(node, result);
-		return [state.applyData(node, result), {
-			type: "text",
-			value: "\n"
-		}];
-	}
-	function code$2(state, node) {
-		const value = node.value ? node.value + "\n" : "";
-		const lang = node.lang ? node.lang.match(/^[^ \t]+(?=[ \t]|$)/) : null;
-		const properties = {};
-		if (lang) properties.className = ["language-" + lang];
-		let result = {
-			type: "element",
-			tagName: "code",
-			properties,
-			children: [{
-				type: "text",
-				value
-			}]
-		};
-		if (node.meta) result.data = { meta: node.meta };
-		state.patch(node, result);
-		result = state.applyData(node, result);
-		result = {
-			type: "element",
-			tagName: "pre",
-			properties: {},
-			children: [result]
-		};
-		state.patch(node, result);
-		return result;
-	}
-	function strikethrough(state, node) {
-		const result = {
-			type: "element",
-			tagName: "del",
-			properties: {},
-			children: state.all(node)
-		};
-		state.patch(node, result);
-		return state.applyData(node, result);
-	}
-	function emphasis$1(state, node) {
-		const result = {
-			type: "element",
-			tagName: "em",
-			properties: {},
-			children: state.all(node)
-		};
-		state.patch(node, result);
-		return state.applyData(node, result);
-	}
-	function normalizeUri(value) {
-		const result = [];
-		let index = -1;
-		let start = 0;
-		let skip = 0;
-		while (++index < value.length) {
-			const code = value.charCodeAt(index);
-			let replace = "";
-			if (code === 37 && asciiAlphanumeric(value.charCodeAt(index + 1)) && asciiAlphanumeric(value.charCodeAt(index + 2))) skip = 2;
-			else if (code < 128) {
-				if (!/[!#$&-;=?-Z_a-z~]/.test(String.fromCharCode(code))) replace = String.fromCharCode(code);
-			} else if (code > 55295 && code < 57344) {
-				const next = value.charCodeAt(index + 1);
-				if (code < 56320 && next > 56319 && next < 57344) {
-					replace = String.fromCharCode(code, next);
-					skip = 1;
-				} else replace = "�";
-			} else replace = String.fromCharCode(code);
-			if (replace) {
-				result.push(value.slice(start, index), encodeURIComponent(replace));
-				start = index + skip + 1;
-				replace = "";
-			}
-			if (skip) {
-				index += skip;
-				skip = 0;
-			}
-		}
-		return result.join("") + value.slice(start);
-	}
-	function footnoteReference(state, node) {
-		const id = String(node.identifier).toUpperCase();
-		const safeId = normalizeUri(id.toLowerCase());
-		const index = state.footnoteOrder.indexOf(id);
-		let counter;
-		if (index === -1) {
-			state.footnoteOrder.push(id);
-			state.footnoteCounts[id] = 1;
-			counter = state.footnoteOrder.length;
-		} else {
-			state.footnoteCounts[id]++;
-			counter = index + 1;
-		}
-		const reuseCounter = state.footnoteCounts[id];
-		const link = {
-			type: "element",
-			tagName: "a",
-			properties: {
-				href: "#" + state.clobberPrefix + "fn-" + safeId,
-				id: state.clobberPrefix + "fnref-" + safeId + (reuseCounter > 1 ? "-" + reuseCounter : ""),
-				dataFootnoteRef: true,
-				ariaDescribedBy: ["footnote-label"]
-			},
-			children: [{
-				type: "text",
-				value: String(counter)
-			}]
-		};
-		state.patch(node, link);
-		const sup = {
-			type: "element",
-			tagName: "sup",
-			properties: {},
-			children: [link]
-		};
-		state.patch(node, sup);
-		return state.applyData(node, sup);
-	}
-	function footnote(state, node) {
-		const footnoteById = state.footnoteById;
-		let no = 1;
-		while (no in footnoteById) no++;
-		const identifier = String(no);
-		footnoteById[identifier] = {
-			type: "footnoteDefinition",
-			identifier,
-			children: [{
-				type: "paragraph",
-				children: node.children
-			}],
-			position: node.position
-		};
-		return footnoteReference(state, {
-			type: "footnoteReference",
-			identifier,
-			position: node.position
-		});
-	}
-	function heading$1(state, node) {
-		const result = {
-			type: "element",
-			tagName: "h" + node.depth,
-			properties: {},
-			children: state.all(node)
-		};
-		state.patch(node, result);
-		return state.applyData(node, result);
-	}
-	function html$1(state, node) {
-		if (state.dangerous) {
-			const result = {
-				type: "raw",
-				value: node.value
-			};
-			state.patch(node, result);
-			return state.applyData(node, result);
-		}
-		return null;
-	}
-	function revert(state, node) {
-		const subtype = node.referenceType;
-		let suffix = "]";
-		if (subtype === "collapsed") suffix += "[]";
-		else if (subtype === "full") suffix += "[" + (node.label || node.identifier) + "]";
-		if (node.type === "imageReference") return {
-			type: "text",
-			value: "![" + node.alt + suffix
-		};
-		const contents = state.all(node);
-		const head = contents[0];
-		if (head && head.type === "text") head.value = "[" + head.value;
-		else contents.unshift({
-			type: "text",
-			value: "["
-		});
-		const tail = contents[contents.length - 1];
-		if (tail && tail.type === "text") tail.value += suffix;
-		else contents.push({
-			type: "text",
-			value: suffix
-		});
-		return contents;
-	}
-	function imageReference$1(state, node) {
-		const def = state.definition(node.identifier);
-		if (!def) return revert(state, node);
-		const properties = {
-			src: normalizeUri(def.url || ""),
-			alt: node.alt
-		};
-		if (def.title !== null && def.title !== void 0) properties.title = def.title;
-		const result = {
-			type: "element",
-			tagName: "img",
-			properties,
-			children: []
-		};
-		state.patch(node, result);
-		return state.applyData(node, result);
-	}
-	function image$1(state, node) {
-		const properties = { src: normalizeUri(node.url) };
-		if (node.alt !== null && node.alt !== void 0) properties.alt = node.alt;
-		if (node.title !== null && node.title !== void 0) properties.title = node.title;
-		const result = {
-			type: "element",
-			tagName: "img",
-			properties,
-			children: []
-		};
-		state.patch(node, result);
-		return state.applyData(node, result);
-	}
-	function inlineCode(state, node) {
-		const text = {
-			type: "text",
-			value: node.value.replace(/\r?\n|\r/g, " ")
-		};
-		state.patch(node, text);
-		const result = {
-			type: "element",
-			tagName: "code",
-			properties: {},
-			children: [text]
-		};
-		state.patch(node, result);
-		return state.applyData(node, result);
-	}
-	function linkReference$1(state, node) {
-		const def = state.definition(node.identifier);
-		if (!def) return revert(state, node);
-		const properties = { href: normalizeUri(def.url || "") };
-		if (def.title !== null && def.title !== void 0) properties.title = def.title;
-		const result = {
-			type: "element",
-			tagName: "a",
-			properties,
-			children: state.all(node)
-		};
-		state.patch(node, result);
-		return state.applyData(node, result);
-	}
-	function link$1(state, node) {
-		const properties = { href: normalizeUri(node.url) };
-		if (node.title !== null && node.title !== void 0) properties.title = node.title;
-		const result = {
-			type: "element",
-			tagName: "a",
-			properties,
-			children: state.all(node)
-		};
-		state.patch(node, result);
-		return state.applyData(node, result);
-	}
-	function listItem(state, node, parent) {
-		const results = state.all(node);
-		const loose = parent ? listLoose(parent) : listItemLoose(node);
-		const properties = {};
-		const children = [];
-		if (typeof node.checked === "boolean") {
-			const head = results[0];
-			let paragraph;
-			if (head && head.type === "element" && head.tagName === "p") paragraph = head;
-			else {
-				paragraph = {
-					type: "element",
-					tagName: "p",
-					properties: {},
-					children: []
-				};
-				results.unshift(paragraph);
-			}
-			if (paragraph.children.length > 0) paragraph.children.unshift({
-				type: "text",
-				value: " "
-			});
-			paragraph.children.unshift({
-				type: "element",
-				tagName: "input",
-				properties: {
-					type: "checkbox",
-					checked: node.checked,
-					disabled: true
-				},
-				children: []
-			});
-			properties.className = ["task-list-item"];
-		}
-		let index = -1;
-		while (++index < results.length) {
-			const child = results[index];
-			if (loose || index !== 0 || child.type !== "element" || child.tagName !== "p") children.push({
-				type: "text",
-				value: "\n"
-			});
-			if (child.type === "element" && child.tagName === "p" && !loose) children.push(...child.children);
-			else children.push(child);
-		}
-		const tail = results[results.length - 1];
-		if (tail && (loose || tail.type !== "element" || tail.tagName !== "p")) children.push({
-			type: "text",
-			value: "\n"
-		});
-		const result = {
-			type: "element",
-			tagName: "li",
-			properties,
-			children
-		};
-		state.patch(node, result);
-		return state.applyData(node, result);
-	}
-	function listLoose(node) {
-		let loose = false;
-		if (node.type === "list") {
-			loose = node.spread || false;
-			const children = node.children;
-			let index = -1;
-			while (!loose && ++index < children.length) loose = listItemLoose(children[index]);
-		}
-		return loose;
-	}
-	function listItemLoose(node) {
-		const spread = node.spread;
-		return spread === void 0 || spread === null ? node.children.length > 1 : spread;
-	}
-	function list$1(state, node) {
-		const properties = {};
-		const results = state.all(node);
-		let index = -1;
-		if (typeof node.start === "number" && node.start !== 1) properties.start = node.start;
-		while (++index < results.length) {
-			const child = results[index];
-			if (child.type === "element" && child.tagName === "li" && child.properties && Array.isArray(child.properties.className) && child.properties.className.includes("task-list-item")) {
-				properties.className = ["contains-task-list"];
-				break;
-			}
-		}
-		const result = {
-			type: "element",
-			tagName: node.ordered ? "ol" : "ul",
-			properties,
-			children: state.wrap(results, true)
-		};
-		state.patch(node, result);
-		return state.applyData(node, result);
-	}
-	function paragraph$1(state, node) {
-		const result = {
-			type: "element",
-			tagName: "p",
-			properties: {},
-			children: state.all(node)
-		};
-		state.patch(node, result);
-		return state.applyData(node, result);
-	}
-	function root$1(state, node) {
-		const result = {
-			type: "root",
-			children: state.wrap(state.all(node))
-		};
-		state.patch(node, result);
-		return state.applyData(node, result);
-	}
-	function strong$1(state, node) {
-		const result = {
-			type: "element",
-			tagName: "strong",
-			properties: {},
-			children: state.all(node)
-		};
-		state.patch(node, result);
-		return state.applyData(node, result);
-	}
-	var pointStart = point("start");
-	var pointEnd = point("end");
-	function position(node) {
-		return {
-			start: pointStart(node),
-			end: pointEnd(node)
-		};
-	}
-	function point(type) {
-		return point;
-		function point(node) {
-			const point = node && node.position && node.position[type] || {};
-			return {
-				line: point.line || null,
-				column: point.column || null,
-				offset: point.offset > -1 ? point.offset : null
-			};
-		}
-	}
-	function table(state, node) {
-		const rows = state.all(node);
-		const firstRow = rows.shift();
-		const tableContent = [];
-		if (firstRow) {
-			const head = {
-				type: "element",
-				tagName: "thead",
-				properties: {},
-				children: state.wrap([firstRow], true)
-			};
-			state.patch(node.children[0], head);
-			tableContent.push(head);
-		}
-		if (rows.length > 0) {
-			const body = {
-				type: "element",
-				tagName: "tbody",
-				properties: {},
-				children: state.wrap(rows, true)
-			};
-			const start = pointStart(node.children[1]);
-			const end = pointEnd(node.children[node.children.length - 1]);
-			if (start.line && end.line) body.position = {
-				start,
-				end
-			};
-			tableContent.push(body);
-		}
-		const result = {
-			type: "element",
-			tagName: "table",
-			properties: {},
-			children: state.wrap(tableContent, true)
-		};
-		state.patch(node, result);
-		return state.applyData(node, result);
-	}
-	function tableRow(state, node, parent) {
-		const siblings = parent ? parent.children : void 0;
-		const tagName = (siblings ? siblings.indexOf(node) : 1) === 0 ? "th" : "td";
-		const align = parent && parent.type === "table" ? parent.align : void 0;
-		const length = align ? align.length : node.children.length;
-		let cellIndex = -1;
-		const cells = [];
-		while (++cellIndex < length) {
-			const cell = node.children[cellIndex];
-			const properties = {};
-			const alignValue = align ? align[cellIndex] : void 0;
-			if (alignValue) properties.align = alignValue;
-			let result = {
-				type: "element",
-				tagName,
-				properties,
-				children: []
-			};
-			if (cell) {
-				result.children = state.all(cell);
-				state.patch(cell, result);
-				result = state.applyData(node, result);
-			}
-			cells.push(result);
-		}
-		const result = {
-			type: "element",
-			tagName: "tr",
-			properties: {},
-			children: state.wrap(cells, true)
-		};
-		state.patch(node, result);
-		return state.applyData(node, result);
-	}
-	function tableCell(state, node) {
-		const result = {
-			type: "element",
-			tagName: "td",
-			properties: {},
-			children: state.all(node)
-		};
-		state.patch(node, result);
-		return state.applyData(node, result);
-	}
-	var tab = 9;
-	var space = 32;
-	function trimLines(value) {
-		const source = String(value);
-		const search = /\r?\n|\r/g;
-		let match = search.exec(source);
-		let last = 0;
-		const lines = [];
-		while (match) {
-			lines.push(trimLine(source.slice(last, match.index), last > 0, true), match[0]);
-			last = match.index + match[0].length;
-			match = search.exec(source);
-		}
-		lines.push(trimLine(source.slice(last), last > 0, false));
-		return lines.join("");
-	}
-	function trimLine(value, start, end) {
-		let startIndex = 0;
-		let endIndex = value.length;
-		if (start) {
-			let code = value.codePointAt(startIndex);
-			while (code === tab || code === space) {
-				startIndex++;
-				code = value.codePointAt(startIndex);
-			}
-		}
-		if (end) {
-			let code = value.codePointAt(endIndex - 1);
-			while (code === tab || code === space) {
-				endIndex--;
-				code = value.codePointAt(endIndex - 1);
-			}
-		}
-		return endIndex > startIndex ? value.slice(startIndex, endIndex) : "";
-	}
-	function text$2(state, node) {
-		const result = {
-			type: "text",
-			value: trimLines(String(node.value))
-		};
-		state.patch(node, result);
-		return state.applyData(node, result);
-	}
-	function thematicBreak$1(state, node) {
-		const result = {
-			type: "element",
-			tagName: "hr",
-			properties: {},
-			children: []
-		};
-		state.patch(node, result);
-		return state.applyData(node, result);
-	}
-	var handlers = {
-		blockquote: blockquote$1,
-		break: hardBreak$1,
-		code: code$2,
-		delete: strikethrough,
-		emphasis: emphasis$1,
-		footnoteReference,
-		footnote,
-		heading: heading$1,
-		html: html$1,
-		imageReference: imageReference$1,
-		image: image$1,
-		inlineCode,
-		linkReference: linkReference$1,
-		link: link$1,
-		listItem,
-		list: list$1,
-		paragraph: paragraph$1,
-		root: root$1,
-		strong: strong$1,
-		table,
-		tableCell,
-		tableRow,
-		text: text$2,
-		thematicBreak: thematicBreak$1,
-		toml: ignore,
-		yaml: ignore,
-		definition: ignore,
-		footnoteDefinition: ignore
-	};
-	function ignore() {
-		return null;
-	}
-	var visit = (function(tree, test, visitor, reverse) {
-		if (typeof test === "function" && typeof visitor !== "function") {
-			reverse = visitor;
-			visitor = test;
-			test = null;
-		}
-		visitParents(tree, test, overload, reverse);
-		function overload(node, parents) {
-			const parent = parents[parents.length - 1];
-			return visitor(node, parent ? parent.children.indexOf(node) : null, parent);
-		}
-	});
-	function generated(node) {
-		return !node || !node.position || !node.position.start || !node.position.start.line || !node.position.start.column || !node.position.end || !node.position.end.line || !node.position.end.column;
-	}
 	var own$1 = {}.hasOwnProperty;
-	function definitions(tree) {
-		const cache = Object.create(null);
-		if (!tree || !tree.type) throw new Error("mdast-util-definitions expected node");
-		visit(tree, "definition", (definition) => {
-			const id = clean(definition.identifier);
-			if (id && !own$1.call(cache, id)) cache[id] = definition;
-		});
-		return definition;
-		function definition(identifier) {
-			const id = clean(identifier);
-			return id && own$1.call(cache, id) ? cache[id] : null;
-		}
-	}
-	function clean(value) {
-		return String(value || "").toUpperCase();
-	}
-	var own = {}.hasOwnProperty;
-	function createState(tree, options) {
+	function zwitch(key, options) {
 		const settings = options || {};
-		const dangerous = settings.allowDangerousHtml || false;
-		const footnoteById = {};
-		state.dangerous = dangerous;
-		state.clobberPrefix = settings.clobberPrefix === void 0 || settings.clobberPrefix === null ? "user-content-" : settings.clobberPrefix;
-		state.footnoteLabel = settings.footnoteLabel || "Footnotes";
-		state.footnoteLabelTagName = settings.footnoteLabelTagName || "h2";
-		state.footnoteLabelProperties = settings.footnoteLabelProperties || { className: ["sr-only"] };
-		state.footnoteBackLabel = settings.footnoteBackLabel || "Back to content";
-		state.unknownHandler = settings.unknownHandler;
-		state.passThrough = settings.passThrough;
-		state.handlers = {
-			...handlers,
-			...settings.handlers
-		};
-		state.definition = definitions(tree);
-		state.footnoteById = footnoteById;
-		state.footnoteOrder = [];
-		state.footnoteCounts = {};
-		state.patch = patch;
-		state.applyData = applyData;
-		state.one = oneBound;
-		state.all = allBound;
-		state.wrap = wrap;
-		state.augment = augment;
-		visit(tree, "footnoteDefinition", (definition) => {
-			const id = String(definition.identifier).toUpperCase();
-			if (!own.call(footnoteById, id)) footnoteById[id] = definition;
-		});
-		return state;
-		function augment(left, right) {
-			if (left && "data" in left && left.data) {
-				const data = left.data;
-				if (data.hName) {
-					if (right.type !== "element") right = {
-						type: "element",
-						tagName: "",
-						properties: {},
-						children: []
-					};
-					right.tagName = data.hName;
-				}
-				if (right.type === "element" && data.hProperties) right.properties = {
-					...right.properties,
-					...data.hProperties
-				};
-				if ("children" in right && right.children && data.hChildren) right.children = data.hChildren;
+		function one(value, ...parameters) {
+			let fn = one.invalid;
+			const handlers = one.handlers;
+			if (value && own$1.call(value, key)) {
+				const id = String(value[key]);
+				fn = own$1.call(handlers, id) ? handlers[id] : one.unknown;
 			}
-			if (left) {
-				const ctx = "type" in left ? left : { position: left };
-				if (!generated(ctx)) right.position = {
-					start: pointStart(ctx),
-					end: pointEnd(ctx)
-				};
-			}
-			return right;
+			if (fn) return fn.call(this, value, ...parameters);
 		}
-		function state(node, tagName, props, children) {
-			if (Array.isArray(props)) {
-				children = props;
-				props = {};
-			}
-			return augment(node, {
-				type: "element",
-				tagName,
-				properties: props || {},
-				children: children || []
-			});
-		}
-		function oneBound(node, parent) {
-			return one(state, node, parent);
-		}
-		function allBound(parent) {
-			return all(state, parent);
-		}
-	}
-	function patch(from, to) {
-		if (from.position) to.position = position(from);
-	}
-	function applyData(from, to) {
-		let result = to;
-		if (from && from.data) {
-			const hName = from.data.hName;
-			const hChildren = from.data.hChildren;
-			const hProperties = from.data.hProperties;
-			if (typeof hName === "string") {
-				if (result.type === "element") result.tagName = hName;
-				else result = {
-					type: "element",
-					tagName: hName,
-					properties: {},
-					children: []
-				};
-			}
-			if (result.type === "element" && hProperties) result.properties = {
-				...result.properties,
-				...hProperties
-			};
-			if ("children" in result && result.children && hChildren !== null && hChildren !== void 0) result.children = hChildren;
-		}
-		return result;
-	}
-	function one(state, node, parent) {
-		const type = node && node.type;
-		if (!type) throw new Error("Expected node, got `" + node + "`");
-		if (own.call(state.handlers, type)) return state.handlers[type](state, node, parent);
-		if (state.passThrough && state.passThrough.includes(type)) return "children" in node ? {
-			...node,
-			children: all(state, node)
-		} : node;
-		if (state.unknownHandler) return state.unknownHandler(state, node, parent);
-		return defaultUnknownHandler(state, node);
-	}
-	function all(state, parent) {
-		const values = [];
-		if ("children" in parent) {
-			const nodes = parent.children;
-			let index = -1;
-			while (++index < nodes.length) {
-				const result = one(state, nodes[index], parent);
-				if (result) {
-					if (index && nodes[index - 1].type === "break") {
-						if (!Array.isArray(result) && result.type === "text") result.value = result.value.replace(/^\s+/, "");
-						if (!Array.isArray(result) && result.type === "element") {
-							const head = result.children[0];
-							if (head && head.type === "text") head.value = head.value.replace(/^\s+/, "");
-						}
-					}
-					if (Array.isArray(result)) values.push(...result);
-					else values.push(result);
-				}
-			}
-		}
-		return values;
-	}
-	function defaultUnknownHandler(state, node) {
-		const data = node.data || {};
-		const result = "value" in node && !(own.call(data, "hProperties") || own.call(data, "hChildren")) ? {
-			type: "text",
-			value: node.value
-		} : {
-			type: "element",
-			tagName: "div",
-			properties: {},
-			children: all(state, node)
-		};
-		state.patch(node, result);
-		return state.applyData(node, result);
-	}
-	function wrap(nodes, loose) {
-		const result = [];
-		let index = -1;
-		if (loose) result.push({
-			type: "text",
-			value: "\n"
-		});
-		while (++index < nodes.length) {
-			if (index) result.push({
-				type: "text",
-				value: "\n"
-			});
-			result.push(nodes[index]);
-		}
-		if (loose && nodes.length > 0) result.push({
-			type: "text",
-			value: "\n"
-		});
-		return result;
-	}
-	function footer(state) {
-		const listItems = [];
-		let index = -1;
-		while (++index < state.footnoteOrder.length) {
-			const def = state.footnoteById[state.footnoteOrder[index]];
-			if (!def) continue;
-			const content = state.all(def);
-			const id = String(def.identifier).toUpperCase();
-			const safeId = normalizeUri(id.toLowerCase());
-			let referenceIndex = 0;
-			const backReferences = [];
-			while (++referenceIndex <= state.footnoteCounts[id]) {
-				const backReference = {
-					type: "element",
-					tagName: "a",
-					properties: {
-						href: "#" + state.clobberPrefix + "fnref-" + safeId + (referenceIndex > 1 ? "-" + referenceIndex : ""),
-						dataFootnoteBackref: true,
-						className: ["data-footnote-backref"],
-						ariaLabel: state.footnoteBackLabel
-					},
-					children: [{
-						type: "text",
-						value: "↩"
-					}]
-				};
-				if (referenceIndex > 1) backReference.children.push({
-					type: "element",
-					tagName: "sup",
-					children: [{
-						type: "text",
-						value: String(referenceIndex)
-					}]
-				});
-				if (backReferences.length > 0) backReferences.push({
-					type: "text",
-					value: " "
-				});
-				backReferences.push(backReference);
-			}
-			const tail = content[content.length - 1];
-			if (tail && tail.type === "element" && tail.tagName === "p") {
-				const tailTail = tail.children[tail.children.length - 1];
-				if (tailTail && tailTail.type === "text") tailTail.value += " ";
-				else tail.children.push({
-					type: "text",
-					value: " "
-				});
-				tail.children.push(...backReferences);
-			} else content.push(...backReferences);
-			const listItem = {
-				type: "element",
-				tagName: "li",
-				properties: { id: state.clobberPrefix + "fn-" + safeId },
-				children: state.wrap(content, true)
-			};
-			state.patch(def, listItem);
-			listItems.push(listItem);
-		}
-		if (listItems.length === 0) return;
-		return {
-			type: "element",
-			tagName: "section",
-			properties: {
-				dataFootnotes: true,
-				className: ["footnotes"]
-			},
-			children: [
-				{
-					type: "element",
-					tagName: state.footnoteLabelTagName,
-					properties: {
-						...JSON.parse(JSON.stringify(state.footnoteLabelProperties)),
-						id: "footnote-label"
-					},
-					children: [{
-						type: "text",
-						value: state.footnoteLabel
-					}]
-				},
-				{
-					type: "text",
-					value: "\n"
-				},
-				{
-					type: "element",
-					tagName: "ol",
-					properties: {},
-					children: state.wrap(listItems, true)
-				},
-				{
-					type: "text",
-					value: "\n"
-				}
-			]
-		};
-	}
-	function toHast(tree, options) {
-		const state = createState(tree, options);
-		const node = state.one(tree, null);
-		const foot = footer(state);
-		if (foot) node.children.push({
-			type: "text",
-			value: "\n"
-		}, foot);
-		return Array.isArray(node) ? {
-			type: "root",
-			children: node
-		} : node;
+		one.handlers = settings.handlers || {};
+		one.invalid = settings.invalid;
+		one.unknown = settings.unknown;
+		return one;
 	}
 	function configure(base, extension) {
 		let index = -1;
@@ -10733,6 +8635,18 @@
 	function emphasisPeek(_, _1, state) {
 		return state.options.emphasis || "*";
 	}
+	var visit = (function(tree, test, visitor, reverse) {
+		if (typeof test === "function" && typeof visitor !== "function") {
+			reverse = visitor;
+			visitor = test;
+			test = null;
+		}
+		visitParents(tree, test, overload, reverse);
+		function overload(node, parents) {
+			const parent = parents[parents.length - 1];
+			return visitor(node, parent ? parent.children.indexOf(node) : null, parent);
+		}
+	});
 	function formatHeadingAsSetext(node, state) {
 		let literalWithBreak = false;
 		visit(node, (node) => {
@@ -11097,11 +9011,11 @@
 		html,
 		image,
 		imageReference,
-		inlineCode: inlineCode$1,
+		inlineCode,
 		link,
 		linkReference,
 		list,
-		listItem: listItem$1,
+		listItem,
 		paragraph,
 		root,
 		strong,
@@ -11691,6 +9605,26 @@
 		if (events.length > 0 && !result) events[events.length - 1][1]._gfmAutolinkLiteralWalkedInto = true;
 		return result;
 	}
+	var gfmAutolinkLiteralHtml = { exit: {
+		literalAutolinkEmail,
+		literalAutolinkHttp,
+		literalAutolinkWww
+	} };
+	function literalAutolinkWww(token) {
+		anchorFromToken.call(this, token, "http://");
+	}
+	function literalAutolinkEmail(token) {
+		anchorFromToken.call(this, token, "mailto:");
+	}
+	function literalAutolinkHttp(token) {
+		anchorFromToken.call(this, token);
+	}
+	function anchorFromToken(token, protocol) {
+		const url = this.sliceSerialize(token);
+		this.tag("<a href=\"" + sanitizeUri((protocol || "") + url) + "\">");
+		this.raw(this.encode(url));
+		this.tag("</a>");
+	}
 	var indent = {
 		tokenize: tokenizeIndent,
 		partial: true
@@ -11949,6 +9883,124 @@
 			return tail && tail[1].type === "gfmFootnoteDefinitionIndent" && tail[2].sliceSerialize(tail[1], true).length === 4 ? ok(code) : nok(code);
 		}
 	}
+	var own = {}.hasOwnProperty;
+	var emptyOptions = {};
+	function defaultBackLabel(referenceIndex, rereferenceIndex) {
+		return "Back to reference " + (referenceIndex + 1) + (rereferenceIndex > 1 ? "-" + rereferenceIndex : "");
+	}
+	function gfmFootnoteHtml(options) {
+		const config = options || emptyOptions;
+		const label = config.label || "Footnotes";
+		const labelTagName = config.labelTagName || "h2";
+		const labelAttributes = config.labelAttributes === null || config.labelAttributes === void 0 ? "class=\"sr-only\"" : config.labelAttributes;
+		const backLabel = config.backLabel || defaultBackLabel;
+		const clobberPrefix = config.clobberPrefix === null || config.clobberPrefix === void 0 ? "user-content-" : config.clobberPrefix;
+		return {
+			enter: {
+				gfmFootnoteDefinition() {
+					this.getData("tightStack").push(false);
+				},
+				gfmFootnoteDefinitionLabelString() {
+					this.buffer();
+				},
+				gfmFootnoteCallString() {
+					this.buffer();
+				}
+			},
+			exit: {
+				gfmFootnoteDefinition() {
+					let definitions = this.getData("gfmFootnoteDefinitions");
+					const footnoteStack = this.getData("gfmFootnoteDefinitionStack");
+					const tightStack = this.getData("tightStack");
+					const current = footnoteStack.pop();
+					const value = this.resume();
+					if (!definitions) this.setData("gfmFootnoteDefinitions", definitions = {});
+					if (!own.call(definitions, current)) definitions[current] = value;
+					tightStack.pop();
+					this.setData("slurpOneLineEnding", true);
+					this.setData("lastWasTag");
+				},
+				gfmFootnoteDefinitionLabelString(token) {
+					let footnoteStack = this.getData("gfmFootnoteDefinitionStack");
+					if (!footnoteStack) this.setData("gfmFootnoteDefinitionStack", footnoteStack = []);
+					footnoteStack.push(normalizeIdentifier(this.sliceSerialize(token)));
+					this.resume();
+					this.buffer();
+				},
+				gfmFootnoteCallString(token) {
+					let calls = this.getData("gfmFootnoteCallOrder");
+					let counts = this.getData("gfmFootnoteCallCounts");
+					const id = normalizeIdentifier(this.sliceSerialize(token));
+					let counter;
+					this.resume();
+					if (!calls) this.setData("gfmFootnoteCallOrder", calls = []);
+					if (!counts) this.setData("gfmFootnoteCallCounts", counts = {});
+					const index = calls.indexOf(id);
+					const safeId = sanitizeUri(id.toLowerCase());
+					if (index === -1) {
+						calls.push(id);
+						counts[id] = 1;
+						counter = calls.length;
+					} else {
+						counts[id]++;
+						counter = index + 1;
+					}
+					const reuseCounter = counts[id];
+					this.tag("<sup><a href=\"#" + clobberPrefix + "fn-" + safeId + "\" id=\"" + clobberPrefix + "fnref-" + safeId + (reuseCounter > 1 ? "-" + reuseCounter : "") + "\" data-footnote-ref=\"\" aria-describedby=\"footnote-label\">" + String(counter) + "</a></sup>");
+				},
+				null() {
+					const calls = this.getData("gfmFootnoteCallOrder") || [];
+					const counts = this.getData("gfmFootnoteCallCounts") || {};
+					const definitions = this.getData("gfmFootnoteDefinitions") || {};
+					let index = -1;
+					if (calls.length > 0) {
+						this.lineEndingIfNeeded();
+						this.tag("<section data-footnotes=\"\" class=\"footnotes\"><" + labelTagName + " id=\"footnote-label\"" + (labelAttributes ? " " + labelAttributes : "") + ">");
+						this.raw(this.encode(label));
+						this.tag("</" + labelTagName + ">");
+						this.lineEndingIfNeeded();
+						this.tag("<ol>");
+					}
+					while (++index < calls.length) {
+						const id = calls[index];
+						const safeId = sanitizeUri(id.toLowerCase());
+						let referenceIndex = 0;
+						const references = [];
+						while (++referenceIndex <= counts[id]) references.push("<a href=\"#" + clobberPrefix + "fnref-" + safeId + (referenceIndex > 1 ? "-" + referenceIndex : "") + "\" data-footnote-backref=\"\" aria-label=\"" + this.encode(typeof backLabel === "string" ? backLabel : backLabel(index, referenceIndex)) + "\" class=\"data-footnote-backref\">↩" + (referenceIndex > 1 ? "<sup>" + referenceIndex + "</sup>" : "") + "</a>");
+						const reference = references.join(" ");
+						let injected = false;
+						this.lineEndingIfNeeded();
+						this.tag("<li id=\"" + clobberPrefix + "fn-" + safeId + "\">");
+						this.lineEndingIfNeeded();
+						this.tag(definitions[id].replace(/<\/p>(?:\r?\n|\r)?$/, ($0) => {
+							injected = true;
+							return " " + reference + $0;
+						}));
+						if (!injected) {
+							this.lineEndingIfNeeded();
+							this.tag(reference);
+						}
+						this.lineEndingIfNeeded();
+						this.tag("</li>");
+					}
+					if (calls.length > 0) {
+						this.lineEndingIfNeeded();
+						this.tag("</ol>");
+						this.lineEndingIfNeeded();
+						this.tag("</section>");
+					}
+				}
+			}
+		};
+	}
+	var gfmStrikethroughHtml = {
+		enter: { strikethrough() {
+			this.tag("<del>");
+		} },
+		exit: { strikethrough() {
+			this.tag("</del>");
+		} }
+	};
 	function gfmStrikethrough(options) {
 		let single = (options || {}).singleTilde;
 		const tokenizer = {
@@ -12059,6 +10111,96 @@
 				return ok(code);
 			}
 		}
+	}
+	var alignment = {
+		none: "",
+		left: " align=\"left\"",
+		right: " align=\"right\"",
+		center: " align=\"center\""
+	};
+	var gfmTableHtml = {
+		enter: {
+			table(token) {
+				const tableAlign = token._align;
+				this.lineEndingIfNeeded();
+				this.tag("<table>");
+				this.setData("tableAlign", tableAlign);
+			},
+			tableBody() {
+				this.tag("<tbody>");
+			},
+			tableData() {
+				const align = alignment[this.getData("tableAlign")[this.getData("tableColumn")]];
+				if (align === void 0) this.buffer();
+				else {
+					this.lineEndingIfNeeded();
+					this.tag("<td" + align + ">");
+				}
+			},
+			tableHead() {
+				this.lineEndingIfNeeded();
+				this.tag("<thead>");
+			},
+			tableHeader() {
+				const align = alignment[this.getData("tableAlign")[this.getData("tableColumn")]];
+				this.lineEndingIfNeeded();
+				this.tag("<th" + align + ">");
+			},
+			tableRow() {
+				this.setData("tableColumn", 0);
+				this.lineEndingIfNeeded();
+				this.tag("<tr>");
+			}
+		},
+		exit: {
+			codeTextData(token) {
+				let value = this.sliceSerialize(token);
+				if (this.getData("tableAlign")) value = value.replace(/\\([\\|])/g, replace);
+				this.raw(this.encode(value));
+			},
+			table() {
+				this.setData("tableAlign");
+				this.setData("slurpAllLineEndings");
+				this.lineEndingIfNeeded();
+				this.tag("</table>");
+			},
+			tableBody() {
+				this.lineEndingIfNeeded();
+				this.tag("</tbody>");
+			},
+			tableData() {
+				const tableAlign = this.getData("tableAlign");
+				const tableColumn = this.getData("tableColumn");
+				if (tableColumn in tableAlign) {
+					this.tag("</td>");
+					this.setData("tableColumn", tableColumn + 1);
+				} else this.resume();
+			},
+			tableHead() {
+				this.lineEndingIfNeeded();
+				this.tag("</thead>");
+			},
+			tableHeader() {
+				const tableColumn = this.getData("tableColumn");
+				this.tag("</th>");
+				this.setData("tableColumn", tableColumn + 1);
+			},
+			tableRow() {
+				const tableAlign = this.getData("tableAlign");
+				let tableColumn = this.getData("tableColumn");
+				while (tableColumn < tableAlign.length) {
+					this.lineEndingIfNeeded();
+					this.tag("<td" + alignment[tableAlign[tableColumn]] + "></td>");
+					tableColumn++;
+				}
+				this.setData("tableColumn", tableColumn);
+				this.lineEndingIfNeeded();
+				this.tag("</tr>");
+			}
+		}
+	};
+	function replace($0, $1) {
+		return $1 === "|" ? $1 : $0;
 	}
 	var EditMap = class {
 		constructor() {
@@ -12528,6 +10670,34 @@
 		const side = event[0] === "enter" ? "start" : "end";
 		return event[1][side];
 	}
+	var reFlow = /<(\/?)(iframe|noembed|noframes|plaintext|script|style|title|textarea|xmp)(?=[\t\n\f\r />])/gi;
+	var reText = new RegExp("^" + reFlow.source, "i");
+	var gfmTagfilterHtml = { exit: {
+		htmlFlowData(token) {
+			exitHtmlData.call(this, token, reFlow);
+		},
+		htmlTextData(token) {
+			exitHtmlData.call(this, token, reText);
+		}
+	} };
+	function exitHtmlData(token, filter) {
+		let value = this.sliceSerialize(token);
+		if (this.options.allowDangerousHtml) value = value.replace(filter, "&lt;$1$2");
+		this.raw(this.encode(value));
+	}
+	var gfmTaskListItemHtml = {
+		enter: { taskListCheck() {
+			this.tag("<input type=\"checkbox\" disabled=\"\" ");
+		} },
+		exit: {
+			taskListCheck() {
+				this.tag("/>");
+			},
+			taskListCheckValueChecked() {
+				this.tag("checked=\"\" ");
+			}
+		}
+	};
 	var tasklistCheck = { tokenize: tokenizeTasklistCheck };
 	var gfmTaskListItem = { text: { [91]: tasklistCheck } };
 	function tokenizeTasklistCheck(effects, ok, nok) {
@@ -12587,13 +10757,36 @@
 			gfmTaskListItem
 		]);
 	}
+	function gfmHtml(options) {
+		return combineHtmlExtensions([
+			gfmAutolinkLiteralHtml,
+			gfmFootnoteHtml(options),
+			gfmStrikethroughHtml,
+			gfmTableHtml,
+			gfmTagfilterHtml,
+			gfmTaskListItemHtml
+		]);
+	}
 	function fromMarkdown(content) {
 		return fromMarkdown$1(content, {
 			extensions: [gfm()],
 			mdastExtensions: [gfmFromMarkdown()]
 		});
 	}
-	function toMarkdown(ast) {
+	var graphemes = new Intl.Segmenter(void 0, { granularity: "grapheme" });
+	var WIDE = /[\p{Extended_Pictographic}\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}\u3000-\u303F\uFF01-\uFF60\uFFE0-\uFFE6]/u;
+	function displayWidth(value) {
+		let width = 0;
+		for (const { segment } of graphemes.segment(value)) width += WIDE.test(segment) ? 2 : 1;
+		return width;
+	}
+	function toMarkdown(ast, source) {
+		const slice = (node) => {
+			const start = node.position.start.offset;
+			let end = node.position.end.offset;
+			if (source[end] === ";" && /&(?:#x?[\da-f]+|\w+)$/i.test(source.slice(start, end))) end++;
+			return source.slice(start, end);
+		};
 		return toMarkdown$1(ast, {
 			bullet: "-",
 			bulletOther: "*",
@@ -12607,11 +10800,22 @@
 			ruleRepetition: 3,
 			ruleSpaces: false,
 			strong: "*",
-			extensions: [gfmToMarkdown()]
+			extensions: [gfmToMarkdown({ stringLength: displayWidth })],
+			handlers: {
+				text: (node) => node.position ? slice(node).split("\n").map((line, i) => i ? line.replace(/^[ \t>]*/, "") : line).join("\n") : node.value,
+				break: (node) => node.position ? slice(node) : "  \n"
+			}
 		});
 	}
-	function toHtml(node) {
-		return toHtml$1(toHast(node));
+	var dropRawHtml = { exit: {
+		htmlFlowData() {},
+		htmlTextData() {}
+	} };
+	function toHtml(markdown) {
+		return micromark(markdown, {
+			extensions: [gfm()],
+			htmlExtensions: [gfmHtml(), dropRawHtml]
+		});
 	}
 	function flatMap(tree, fn) {
 		function transform(node, i, parent) {
@@ -12743,7 +10947,7 @@
 				}));
 				postSteps.push((input) => {
 					const { text, restore } = protectMath(input);
-					return restore(toHtml(fromMarkdown(text)), (formula) => escapeHtml(toBracketDelimiters(formula)));
+					return restore(toHtml(text), (formula) => escapeHtml(toBracketDelimiters(formula)));
 				});
 			} else postSteps = [(input) => `<p class="no-katex">${escapeHtml(input)}</p>`];
 			const postProcess = (input) => postSteps.reduce((acc, fn) => fn(acc), input);
@@ -13054,25 +11258,59 @@
 	var CJK_FONT_FACES = [
 		{
 			weight: "100 400",
-			names: ["PingFang TC", "PingFangTC-Regular"]
+			name: "PingFangTC-Regular"
 		},
 		{
 			weight: "500",
-			names: ["PingFangTC-Medium"]
+			name: "PingFangTC-Medium"
 		},
 		{
 			weight: "600 900",
-			names: ["PingFangTC-Semibold"]
+			name: "PingFangTC-Semibold"
 		}
-	].map(({ weight, names }) => `
+	].map(({ weight, name }) => `
     @font-face {
         font-family: "${CJK_FONT_FAMILY}";
-        src: ${names.map((name) => `local("${name}")`).join(", ")};
+        src: local("${name}");
         font-weight: ${weight};
         unicode-range: ${CJK_UNICODE_RANGE};
     }
 `).join("");
+	var CJK_PROBE_TEXT = "中文字寬測試一二三四五六七八九十";
+	var CJK_PROBE_TOLERANCE = 2;
+	async function measureCjkGap(root) {
+		const probe = document.createElement("span");
+		probe.textContent = CJK_PROBE_TEXT;
+		probe.style.cssText = "position: absolute; font-size: 16px; white-space: pre";
+		root.appendChild(probe);
+		const pageWidth = probe.getBoundingClientRect().width;
+		const { fontFamily, fontWeight } = getComputedStyle(probe);
+		probe.remove();
+		const scale = 2;
+		const width = Math.ceil(pageWidth) + 40;
+		const height = 32;
+		const lang = root.closest("[lang]")?.lang ?? "";
+		const style = `font-family: ${fontFamily}; font-weight: ${fontWeight}; font-size: 16px; white-space: pre; background: #f00; color: transparent`;
+		const img = await loadCorsImage(toSvgDataUrl(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml" lang="${escapeHtml(lang)}"><span style="${escapeHtml(style)}">${CJK_PROBE_TEXT}</span></div></foreignObject></svg>`));
+		if (!img) return null;
+		try {
+			const canvas = document.createElement("canvas");
+			canvas.width = width * scale;
+			canvas.height = 64;
+			const ctx = canvas.getContext("2d");
+			if (!ctx) return null;
+			ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+			const { data } = ctx.getImageData(0, 16, canvas.width, 1);
+			let right = 0;
+			for (let x = 0; x < canvas.width; x++) if (data[x * 4] > 200 && data[x * 4 + 1] < 60 && data[x * 4 + 3] > 128) right = x + 1;
+			return right / scale - pageWidth;
+		} catch {
+			return null;
+		}
+	}
 	async function matchCjkMetrics(root) {
+		const gap = await measureCjkGap(root);
+		if (gap !== null && gap < CJK_PROBE_TOLERANCE) return;
 		const elements = [root, ...Array.from(root.querySelectorAll("*"))];
 		const families = new Map(elements.map((el) => [el, getComputedStyle(el).fontFamily]));
 		elements.forEach((el) => {
@@ -13498,7 +11736,7 @@
 		}
 		const effect = new Effect();
 		const isDarkMode = getColorScheme() === "dark";
-		const redesignedThread = document.querySelector(REDESIGNED_THREAD_SELECTOR);
+		const redesignedThread = Array.from(document.querySelectorAll(REDESIGNED_THREAD_SELECTOR)).find((thread) => thread.offsetHeight > 0);
 		const source = redesignedThread ? await prepareRedesignedThread(redesignedThread, effect, isDarkMode) : await prepareLegacyThread(effect, isDarkMode);
 		if (!source) {
 			effect.dispose();
@@ -13703,6 +11941,43 @@
 		if (oobaData.visible[0] && oobaData.visible[0][0] === "<|BEGIN-VISIBLE-CHAT|>") oobaData.visible[0][0] = "";
 		return JSON.stringify(oobaData, null, 2);
 	}
+	var ASSETS_DIR = "assets";
+	var IMAGE_EXTENSIONS = {
+		"image/jpeg": "jpg",
+		"image/png": "png",
+		"image/gif": "gif",
+		"image/webp": "webp",
+		"image/svg+xml": "svg"
+	};
+	function getImageMode() {
+		return ScriptStorage.get("exporter:image_mode") ?? "embed";
+	}
+	async function extractImageFiles(conversation, assets) {
+		const copy = structuredClone(conversation);
+		await replaceImageSources(copy, async (src) => {
+			const match = /^data:([^;,]*)[^,]*;base64,(.*)$/s.exec(src);
+			if (!match) return null;
+			const [, mimeType, base64] = match;
+			const ext = IMAGE_EXTENSIONS[mimeType.toLowerCase()] ?? "bin";
+			const name = `image-${await hashBase64(base64)}.${ext}`;
+			assets.set(name, base64);
+			return `${ASSETS_DIR}/${name}`;
+		});
+		return copy;
+	}
+	function addImageFilesToZip(zip, assets) {
+		assets.forEach((base64, name) => {
+			zip.file(`${ASSETS_DIR}/${name}`, base64, {
+				base64: true,
+				compression: "STORE"
+			});
+		});
+	}
+	async function hashBase64(base64) {
+		const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+		const digest = await crypto.subtle.digest("SHA-256", bytes);
+		return Array.from(new Uint8Array(digest).slice(0, 8), (b) => b.toString(16).padStart(2, "0")).join("");
+	}
 	async function exportToJson(fileNameFormat) {
 		if (!checkIfConversationStarted()) {
 			alert(i18n.t("Please start a conversation first"));
@@ -13766,7 +12041,8 @@
 	async function exportAllToJson(fileNameFormat, apiConversations, _metaList, projectName, partIndex, totalParts) {
 		const zip = new jszip.default();
 		const filenameMap = new Map();
-		apiConversations.forEach((rawConversation) => {
+		const assets = new Map();
+		(getImageMode() === "files" ? await Promise.all(apiConversations.map((x) => extractImageFiles(x, assets))) : apiConversations).forEach((rawConversation) => {
 			let fileName = getFileNameWithFormat(fileNameFormat, "json", {
 				title: rawConversation.title || "ChatGPT Conversation",
 				chatId: rawConversation.id,
@@ -13781,6 +12057,7 @@
 			const content = conversationToJson(rawConversation);
 			zip.file(fileName, content);
 		});
+		addImageFilesToZip(zip, assets);
 		const blob = await zip.generateAsync({
 			type: "blob",
 			compression: "DEFLATE",
@@ -13795,6 +12072,9 @@
 	function conversationToJson(conversation) {
 		return JSON.stringify(conversation);
 	}
+	function loadImages(conversation, imageMode) {
+		return imageMode === "omit" ? Promise.resolve(conversation) : withImageAssets(conversation);
+	}
 	async function exportToMarkdown(fileNameFormat, metaList) {
 		if (!checkIfConversationStarted()) {
 			alert(i18n.t("Please start a conversation first"));
@@ -13805,21 +12085,36 @@
 			return false;
 		}
 		const chatId = await getCurrentChatId();
-		const conversation = processConversation(await withImageAssets(await fetchConversation(chatId)), { enableThinking: ScriptStorage.get("exporter:enable_thinking") ?? false });
-		const markdown = conversationToMarkdown(conversation, metaList);
-		downloadFile(getFileNameWithFormat(fileNameFormat, "md", {
+		const imageMode = getImageMode();
+		const assets = new Map();
+		let rawConversation = await loadImages(await fetchConversation(chatId), imageMode);
+		if (imageMode === "files") rawConversation = await extractImageFiles(rawConversation, assets);
+		const enableThinking = ScriptStorage.get("exporter:enable_thinking") ?? false;
+		const conversation = processConversation(rawConversation, { enableThinking });
+		const markdown = standardizeLineBreaks(conversationToMarkdown(conversation, metaList, imageMode));
+		const fileName = getFileNameWithFormat(fileNameFormat, "md", {
 			title: conversation.title,
 			chatId,
 			createTime: conversation.createTime,
 			updateTime: conversation.updateTime
-		}), "text/markdown", standardizeLineBreaks(markdown));
+		});
+		if (assets.size === 0) {
+			downloadFile(fileName, "text/markdown", markdown);
+			return true;
+		}
+		const zip = new jszip.default();
+		zip.file(fileName, markdown);
+		addImageFilesToZip(zip, assets);
+		downloadFile(fileName.replace(/\.md$/, ".zip"), "application/zip", await generateZip(zip));
 		return true;
 	}
 	async function exportAllToMarkdown(fileNameFormat, apiConversations, metaList, projectName, partIndex, totalParts) {
 		const zip = new jszip.default();
 		const filenameMap = new Map();
 		const enableThinking = ScriptStorage.get("exporter:enable_thinking") ?? false;
-		apiConversations.map((x) => processConversation(x, { enableThinking })).forEach((conversation) => {
+		const imageMode = getImageMode();
+		const assets = new Map();
+		(imageMode === "files" ? await Promise.all(apiConversations.map((x) => extractImageFiles(x, assets))) : apiConversations).map((x) => processConversation(x, { enableThinking })).forEach((conversation) => {
 			let fileName = getFileNameWithFormat(fileNameFormat, "md", {
 				title: conversation.title,
 				chatId: conversation.id,
@@ -13831,21 +12126,25 @@
 				filenameMap.set(fileName, count + 1);
 				fileName = `${fileName.slice(0, -3)} (${count}).md`;
 			} else filenameMap.set(fileName, 1);
-			const content = conversationToMarkdown(conversation, metaList);
+			const content = conversationToMarkdown(conversation, metaList, imageMode);
 			zip.file(fileName, content);
 		});
-		const blob = await zip.generateAsync({
-			type: "blob",
-			compression: "DEFLATE",
-			compressionOptions: { level: 9 }
-		});
+		addImageFilesToZip(zip, assets);
+		const blob = await generateZip(zip);
 		downloadFile(buildZipFileName("markdown", projectName, partIndex != null && totalParts != null ? {
 			part: partIndex,
 			total: totalParts
 		} : void 0), "application/zip", blob);
 		return true;
 	}
-	function conversationToMarkdown(conversation, metaList) {
+	function generateZip(zip) {
+		return zip.generateAsync({
+			type: "blob",
+			compression: "DEFLATE",
+			compressionOptions: { level: 9 }
+		});
+	}
+	function conversationToMarkdown(conversation, metaList, imageMode) {
 		const { id, title, conversationNodes } = conversation;
 		const _metaList = resolveMetaList(metaList, getMetaVariables(conversation, `${baseUrl}/c/${id}`)).map(([name, val]) => `${name}: ${val}`);
 		const frontMatter = _metaList.length > 0 ? `---\n${_metaList.join("\n")}\n---\n\n` : "";
@@ -13853,6 +12152,7 @@
 		const timeStampMarkdown = ScriptStorage.get("exporter:timestamp_markdown") ?? false;
 		const timeStamp24H = ScriptStorage.get("exporter:timestamp_24h") ?? false;
 		const enableSources = ScriptStorage.get("exporter:enable_sources") ?? true;
+		const renderImage = imageMode === "omit" ? () => "[image]" : (src) => `![image](${src})`;
 		return `${frontMatter}# ${title}\n\n${conversationNodes.map(({ message, thinking }) => {
 			if (!message || !message.content) return null;
 			if (shouldSkipMessageInExport(message)) return null;
@@ -13880,10 +12180,10 @@
 			}
 			if (message.author.role === "assistant") postSteps.push((input) => {
 				const { text, restore } = protectMath(input);
-				return restore(toMarkdown(fromMarkdown(text)));
+				return restore(toMarkdown(fromMarkdown(text), text));
 			});
 			const postProcess = (input) => postSteps.reduce((acc, fn) => fn(acc), input);
-			const content = transformContent$1(message.content, message.metadata, postProcess);
+			const content = transformContent$1(message.content, message.metadata, postProcess, renderImage);
 			const attachments = getFileAttachmentNames(message).map((name) => `- 📎 ${name}`).join("\n");
 			const attachmentsBlock = attachments ? `\n\n${attachments}` : "";
 			return `#### ${author}:\n${timestampHtml}${thinkingBlock}${content}${attachmentsBlock}`;
@@ -13903,12 +12203,12 @@
 			return `[^${citation.metadata?.extra?.cited_message_idx ?? 1}]: ${citation.metadata?.title ?? "No title"}`;
 		}).join("\n")}`;
 	}
-	function transformContent$1(content, metadata, postProcess) {
+	function transformContent$1(content, metadata, postProcess, renderImage) {
 		switch (content.content_type) {
 			case "text": return postProcess(content.parts?.join("\n") || "");
 			case "code": return postProcess(`Code:\n\`\`\`\n${content.text}\n\`\`\``);
 			case "execution_output":
-				if (metadata?.aggregate_result?.messages) return metadata.aggregate_result.messages.filter((msg) => msg.message_type === "image").map((msg) => `![image](${msg.image_url})`).join("\n");
+				if (metadata?.aggregate_result?.messages) return metadata.aggregate_result.messages.filter((msg) => msg.message_type === "image").map((msg) => renderImage(msg.image_url)).join("\n");
 				return postProcess(`Result:\n\`\`\`\n${content.text}\n\`\`\`` || "");
 			case "tether_quote": return postProcess(`> ${content.title || content.text || ""}`);
 			case "tether_browsing_code": return postProcess("");
@@ -13919,7 +12219,7 @@
 			}
 			case "multimodal_text": return content.parts?.map((part) => {
 				if (typeof part === "string") return postProcess(part);
-				if (part.content_type === "image_asset_pointer") return `![image](${part.asset_pointer})`;
+				if (part.content_type === "image_asset_pointer") return renderImage(part.asset_pointer);
 				if (part.content_type === "audio_transcription") return `[audio] ${part.text}`;
 				if (part.content_type === "audio_asset_pointer") return null;
 				if (part.content_type === "real_time_user_audio_video_asset_pointer") return null;
@@ -14018,9 +12318,7 @@
 			if (item.type === "emphasis") return item.children;
 			return [item];
 		});
-		const result = toMarkdown(root);
-		if (result.startsWith("\\[") && input.startsWith("[")) return result.slice(1);
-		return result;
+		return toMarkdown(root, input);
 	}
 	function transformFootNotes(input, metadata) {
 		return input.replace(/【(\d+)†\((.+?)\)】/g, (match, citeIndex, _evidenceText) => {
@@ -14080,7 +12378,7 @@
 		const onOpenChangeRef = _$1(onOpenChange);
 		onOpenChangeRef.current = onOpenChange;
 		const close = () => onOpenChangeRef.current(false);
-		p$1(() => {
+		p(() => {
 			const onBackdropClick = (e) => {
 				e.stopPropagation();
 				close();
@@ -14565,7 +12863,7 @@
 			setChecked(newValue);
 			onCheckedChange?.(newValue);
 		};
-		p$1(() => {
+		p(() => {
 			setChecked(checked);
 		}, [checked]);
 		return o("label", {
@@ -14594,6 +12892,7 @@
 	}
 	var defaultFormat = "ChatGPT-{title}";
 	var defaultExportAllLimit = 200;
+	var defaultImageMode = "embed";
 	var defaultExportMetaList = [{
 		name: "title",
 		value: "{title}"
@@ -14620,6 +12919,8 @@
 		setEnableThinking: (_) => {},
 		enableSources: true,
 		setEnableSources: (_) => {},
+		imageMode: defaultImageMode,
+		setImageMode: (_) => {},
 		exportAllLimit: defaultExportAllLimit,
 		setExportAllLimit: (_) => {},
 		resetDefault: () => {}
@@ -14634,6 +12935,7 @@
 		const [exportMetaList, setExportMetaList] = useGMStorage(KEY_META_LIST, defaultExportMetaList);
 		const [enableThinking, setEnableThinking] = useGMStorage(KEY_THINKING_ENABLED, false);
 		const [enableSources, setEnableSources] = useGMStorage(KEY_SOURCES_ENABLED, true);
+		const [imageMode, setImageMode] = useGMStorage(KEY_IMAGE_MODE, defaultImageMode);
 		const [exportAllLimit, setExportAllLimit] = useGMStorage(KEY_EXPORT_ALL_LIMIT, defaultExportAllLimit);
 		const resetDefault = T$1(() => {
 			setFormat(defaultFormat);
@@ -14642,6 +12944,7 @@
 			setExportMetaList(defaultExportMetaList);
 			setEnableThinking(false);
 			setEnableSources(true);
+			setImageMode(defaultImageMode);
 			setExportAllLimit(defaultExportAllLimit);
 		}, [
 			setFormat,
@@ -14650,6 +12953,7 @@
 			setExportMetaList,
 			setEnableThinking,
 			setEnableSources,
+			setImageMode,
 			setExportAllLimit
 		]);
 		const value = F$1(() => ({
@@ -14671,6 +12975,8 @@
 			setEnableThinking,
 			enableSources,
 			setEnableSources,
+			imageMode,
+			setImageMode,
 			exportAllLimit,
 			setExportAllLimit,
 			resetDefault
@@ -14693,6 +12999,8 @@
 			setEnableThinking,
 			enableSources,
 			setEnableSources,
+			imageMode,
+			setImageMode,
 			exportAllLimit,
 			setExportAllLimit,
 			resetDefault
@@ -15014,7 +13322,7 @@
 	};
 	var DialogContent = ({ format, onClose }) => {
 		const { t } = useTranslation();
-		const { enableMeta, exportMetaList, exportAllLimit } = useSettingContext();
+		const { enableMeta, exportMetaList, exportAllLimit, imageMode } = useSettingContext();
 		const metaList = F$1(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList]);
 		const exportAllOptions = F$1(() => [
 			{
@@ -15103,13 +13411,17 @@
 								conversation
 							});
 						}
-						return exportType === "JSON" ? conversation : withImageAssets(conversation);
+						return exportType === "JSON" || imageMode === "omit" && (exportType === "Markdown" || exportType === "JSON (ZIP)") ? conversation : withImageAssets(conversation);
 					}
 				});
 			});
 			requestQueue.start();
-		}, [requestQueue, exportType]);
-		p$1(() => {
+		}, [
+			requestQueue,
+			exportType,
+			imageMode
+		]);
+		p(() => {
 			const off = requestQueue.on("progress", (prog) => {
 				setProcessing(true);
 				setProgress({
@@ -15123,7 +13435,7 @@
 			});
 			return () => off();
 		}, [requestQueue]);
-		p$1(() => {
+		p(() => {
 			const off = archiveQueue.on("progress", (prog) => {
 				setProcessing(true);
 				setProgress({
@@ -15135,7 +13447,7 @@
 			});
 			return () => off();
 		}, [archiveQueue]);
-		p$1(() => {
+		p(() => {
 			const off = deleteQueue.on("progress", (prog) => {
 				setProcessing(true);
 				setProgress({
@@ -15147,7 +13459,7 @@
 			});
 			return () => off();
 		}, [deleteQueue]);
-		p$1(() => {
+		p(() => {
 			const off = requestQueue.on("done", async (results) => {
 				if (cancelledRef.current) {
 					cancelledRef.current = false;
@@ -15190,7 +13502,7 @@
 			selectedProject,
 			t
 		]);
-		p$1(() => {
+		p(() => {
 			const off = archiveQueue.on("done", () => {
 				setProcessing(false);
 				setApiConversations((prev) => prev.filter((c) => !selected.some((s) => s.id === c.id)));
@@ -15204,7 +13516,7 @@
 			selected,
 			t
 		]);
-		p$1(() => {
+		p(() => {
 			const off = deleteQueue.on("done", () => {
 				setProcessing(false);
 				setApiConversations((prev) => prev.filter((c) => !selected.some((s) => s.id === c.id)));
@@ -15316,7 +13628,7 @@
 			archiveQueue,
 			t
 		]);
-		p$1(() => {
+		p(() => {
 			const genRef = fetchGenRef;
 			return () => {
 				exportingRef.current = false;
@@ -15330,14 +13642,14 @@
 			archiveQueue,
 			deleteQueue
 		]);
-		p$1(() => {
+		p(() => {
 			exportingRef.current = processing;
 		}, [processing]);
-		p$1(() => {
+		p(() => {
 			setProjectsLoading(true);
 			fetchProjects().then(setProjects).catch((err) => console.error("Error fetching projects:", err)).finally(() => setProjectsLoading(false));
 		}, []);
-		p$1(() => {
+		p(() => {
 			const gen = ++fetchGenRef.current;
 			const alive = () => gen === fetchGenRef.current;
 			setSelected([]);
@@ -15633,8 +13945,8 @@
 			cancelClose();
 			closeTimer.current = window.setTimeout(() => onOpenChange(false), CLOSE_DELAY);
 		};
-		p$1(() => cancelClose, []);
-		p$1(() => {
+		p(() => cancelClose, []);
+		p(() => {
 			if (!open || keepMounted) return;
 			const close = () => onOpenChange(false);
 			const onPointerDown = (e) => {
@@ -15724,6 +14036,7 @@
 		});
 		return o(k$1, { children: [o("div", {
 			ref: triggerRef,
+			"data-state": open ? "open" : "closed",
 			onPointerEnter,
 			onPointerLeave,
 			children: trigger
@@ -15822,7 +14135,7 @@
 		});
 	}
 	var SettingDialog = ({ open, onOpenChange }) => {
-		const { format, setFormat, enableTimestamp, setEnableTimestamp, timeStamp24H, setTimeStamp24H, enableTimestampHTML, setEnableTimestampHTML, enableTimestampMarkdown, setEnableTimestampMarkdown, enableMeta, setEnableMeta, exportMetaList, setExportMetaList, enableThinking, setEnableThinking, enableSources, setEnableSources, exportAllLimit, setExportAllLimit } = useSettingContext();
+		const { format, setFormat, enableTimestamp, setEnableTimestamp, timeStamp24H, setTimeStamp24H, enableTimestampHTML, setEnableTimestampHTML, enableTimestampMarkdown, setEnableTimestampMarkdown, enableMeta, setEnableMeta, exportMetaList, setExportMetaList, enableThinking, setEnableThinking, enableSources, setEnableSources, imageMode, setImageMode, exportAllLimit, setExportAllLimit } = useSettingContext();
 		const { t, i18n } = useTranslation();
 		const _title = useTitle();
 		const date = dateStr();
@@ -15965,6 +14278,38 @@
 										onCheckedUpdate: setEnableSources
 									})
 								})]
+							}),
+							o("div", {
+								className: "ce-setting-card",
+								children: o("div", { children: [
+									o("dt", {
+										className: "ce-setting-title",
+										children: t("Images")
+									}),
+									o("dd", {
+										className: "ce-setting-desc",
+										children: t("Images Description")
+									}),
+									o("dd", { children: o("select", {
+										className: "ce-select ce-setting-select",
+										value: imageMode,
+										onChange: (e) => setImageMode(e.currentTarget.value),
+										children: [
+											o("option", {
+												value: "embed",
+												children: t("Images Embed")
+											}),
+											o("option", {
+												value: "omit",
+												children: t("Images Omit")
+											}),
+											o("option", {
+												value: "files",
+												children: t("Images Files")
+											})
+										]
+									}) })
+								] })
 							}),
 							o("div", {
 								className: "ce-setting-card",
@@ -16181,11 +14526,11 @@
 		});
 	};
 	_css("/*\n * The exporter owns all of its styles. The only things it takes from\n * ChatGPT are the theme variables below, each with a fallback so the UI\n * still works when ChatGPT renames or drops one, and the light/dark switch.\n */\n\nhtml {\n    --ce-text-primary: var(--color-text-primary, #0d0d0d);\n    --ce-text-secondary: var(--color-text-secondary, #5d5d5d);\n    --ce-text-tertiary: var(--color-text-tertiary, #8f8f8f);\n    --ce-border: var(--color-token-border-default, #0000001a);\n    --ce-border-light: var(--color-token-border-light, #0000000d);\n    --ce-hover: var(--color-token-list-hover-background, #0000000d);\n    /* ChatGPT's switches use this, and it follows the accent in Appearance. */\n    --ce-accent: var(--color-chart-blue, #3a83f7);\n    --ce-menu-arrow: var(--sidebar-surface-secondary, #ececec);\n\n    --ce-control-border: #6f6e77;\n    --ce-menu-surface: #ffffff;\n    --ce-menu-border: #0d0d0d26;\n    --ce-dialog-surface: #f3f3f3;\n    --ce-dialog-surface-plain: #ffffff;\n    --ce-card-surface: #ffffff;\n    --ce-input-surface: #fafafa;\n    --ce-track: rgb(229 231 235);\n    --ce-list-header-surface: #f9fafb;\n}\n\n:is(.dark, [data-theme=\"dark\"]) {\n    --ce-text-primary: var(--color-text-primary, #ededed);\n    --ce-text-secondary: var(--color-text-secondary, #cdcdcd);\n    --ce-text-tertiary: var(--color-text-tertiary, #afafaf);\n    --ce-border: var(--color-token-border-default, #ffffff26);\n    --ce-border-light: var(--color-token-border-light, #ffffff0d);\n    --ce-hover: var(--color-token-list-hover-background, #ffffff1a);\n    --ce-menu-arrow: var(--sidebar-surface-secondary, #212121);\n\n    --ce-menu-surface: #2a2a2a;\n    --ce-menu-border: var(--color-token-border-default, #ffffff26);\n    --ce-dialog-surface: #2a2a2a;\n    --ce-dialog-surface-plain: #2a2a2a;\n    --ce-card-surface: rgb(255 255 255 / 5%);\n    --ce-input-surface: #2f2f2f;\n    --ce-track: rgb(255 255 255 / 10%);\n    --ce-list-header-surface: #1f2937;\n}\n\n/*\n * Reset everything under our roots, so ChatGPT's base styles neither help\n * nor break us. :where() keeps it at zero specificity, so any of our own\n * class rules win over it.\n */\n:where(.ce-root, .ce-root *, .ce-root ::before, .ce-root ::after) {\n    box-sizing: border-box;\n    margin: 0;\n    padding: 0;\n    border: 0 solid;\n}\n\n:where(.ce-root :is(button, input, select, textarea)) {\n    font: inherit;\n    color: inherit;\n}\n\n/* A background drops the native look of a range input, so leave it alone. */\n:where(.ce-root :is(button, input:not([type=\"range\"]), select, textarea)) {\n    background-color: transparent;\n}\n\n:where(.ce-root :is(button, select, [role=\"button\"])) {\n    cursor: pointer;\n}\n\n:where(.ce-root :is(ul, ol)) {\n    list-style: none;\n}\n\n:where(.ce-root svg) {\n    display: block;\n    flex-shrink: 0;\n}\n\n:where(.ce-root [hidden]) {\n    display: none;\n}\n\n.ce-icon {\n    width: 1rem;\n    height: 1rem;\n}\n\n.ce-icon-sm {\n    width: 0.75rem;\n    height: 0.75rem;\n}\n\n.ce-icon-md {\n    width: 1.25rem;\n    height: 1.25rem;\n}\n\n.ce-icon-lg {\n    width: 1.5rem;\n    height: 1.5rem;\n}\n\n.ce-hstack {\n    display: flex;\n    align-items: center;\n    gap: 0.5rem;\n}\n\n.ce-mt-2 {\n    margin-top: 0.5rem;\n}\n\n.ce-truncate {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n\n@keyframes ce-fade-in {\n    from {\n        opacity: 0;\n    }\n    to {\n        opacity: 1;\n    }\n}\n\n@keyframes ce-slide-up {\n    from {\n        transform: translateY(100%);\n    }\n    to {\n        transform: translateY(0);\n    }\n}\n\n@keyframes ce-pointer-fade-in {\n    from {\n        opacity: 0;\n        pointer-events: none;\n    }\n    to {\n        opacity: 1;\n        pointer-events: auto;\n    }\n}\n\n@keyframes ce-rotate {\n    from {\n        transform: rotate(0deg);\n    }\n    to {\n        transform: rotate(360deg);\n    }\n}\n\n@keyframes ce-circular-dash {\n    0% {\n        stroke-dasharray: 1px, 200px;\n        stroke-dashoffset: 0;\n    }\n    50% {\n        stroke-dasharray: 100px, 200px;\n        stroke-dashoffset: -15px;\n    }\n    100% {\n        stroke-dasharray: 100px, 200px;\n        stroke-dashoffset: -125px;\n    }\n}\n");
-	_css(".ce-timestamp {\n    display: block;\n    width: 100%;\n    font-size: 0.875rem;\n    line-height: 1.25rem;\n    text-align: right;\n    color: var(--ce-text-tertiary);\n}\n\nspan[data-time-format] {\n    display: none;\n}\n\nbody[data-time-format=\"12\"] span[data-time-format=\"12\"] {\n    display: inline;\n}\n\nbody[data-time-format=\"24\"] span[data-time-format=\"24\"] {\n    display: inline;\n}\n\n.ce-menu-item {\n    display: flex;\n    flex-shrink: 0;\n    align-items: center;\n    gap: 12px;\n    height: 46px;\n    border: 1px solid var(--ce-menu-border);\n    border-radius: 8px;\n    cursor: pointer;\n    transition: background-color 0.2s;\n}\n\n.ce-menu-item[disabled] {\n    filter: brightness(0.5);\n}\n\n.ce-menu-item:not([disabled]):hover {\n    background-color: var(--ce-hover);\n}\n\n.ce-menu-item-loading {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    width: 100%;\n    height: 100%;\n}\n\n.ce-nav-trigger {\n    min-width: 0;\n    border: 0;\n    color: var(--ce-text-primary);\n}\n\n.ce-nav-trigger .ce-menu-item-text {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n\n/* Same box as ChatGPT's sidebar rows, so the icon lines up with theirs. */\n.ce-nav-trigger-expanded {\n    margin: 0 0 8px;\n    padding-inline: 10px;\n}\n\n.ce-nav-trigger-collapsed {\n    width: 32px;\n    height: 32px;\n    margin: 0 auto 0.5rem;\n    padding: 0;\n    justify-content: center;\n    gap: 0;\n    border-radius: 8px;\n    color: var(--ce-text-secondary);\n}\n\n.ce-nav-trigger-collapsed .ce-menu-item-text {\n    display: none;\n}\n\n.ce-divider {\n    height: 1px;\n    background-color: var(--ce-border-light);\n}\n\n.ce-card {\n    display: grid;\n    grid-template-columns: repeat(2, minmax(0, 1fr));\n    gap: 4px;\n    padding: 8px 4px;\n    color: var(--ce-text-primary);\n    background-color: var(--ce-menu-surface);\n    border-radius: 1rem;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);\n    transition: opacity 0.2s;\n    animation: ce-fade-in 0.3s;\n}\n\n.ce-card-mobile {\n    animation: ce-slide-up 0.3s;\n}\n\n:is(.dark, [data-theme=\"dark\"]) .ce-card {\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);\n}\n\n.ce-card .ce-menu-item {\n    column-gap: 8px;\n    padding-inline-start: 8px;\n}\n\n.ce-dialog .ce-menu-item {\n    padding-inline-start: 8px;\n}\n\n/* HoverCard sets left/top. ChatGPT's main column carries its own z-index,\n   so raise the card above it. Dialogs sit in the top layer, above this. */\n.ce-card {\n    position: fixed;\n    z-index: 999;\n}\n\n.ce-card-arrow {\n    position: absolute;\n    left: -8px;\n    fill: var(--ce-menu-arrow);\n    stroke: var(--ce-menu-border);\n}\n\n.ce-row-half {\n    grid-column: auto / span 1;\n}\n\n.ce-row-full {\n    grid-column: auto / span 2;\n}\n\n.ce-backdrop {\n    display: block;\n    position: fixed;\n    inset: 0;\n    background-color: rgba(0, 0, 0, 0.5);\n    animation: ce-pointer-fade-in 0.3s;\n}\n");
+	_css(".ce-timestamp {\n    display: block;\n    width: 100%;\n    font-size: 0.875rem;\n    line-height: 1.25rem;\n    text-align: right;\n    color: var(--ce-text-tertiary);\n}\n\nspan[data-time-format] {\n    display: none;\n}\n\nbody[data-time-format=\"12\"] span[data-time-format=\"12\"] {\n    display: inline;\n}\n\nbody[data-time-format=\"24\"] span[data-time-format=\"24\"] {\n    display: inline;\n}\n\n.ce-menu-item {\n    display: flex;\n    flex-shrink: 0;\n    align-items: center;\n    gap: 12px;\n    height: 46px;\n    border: 1px solid var(--ce-menu-border);\n    border-radius: 8px;\n    cursor: pointer;\n    transition: background-color 0.2s;\n}\n\n.ce-menu-item[disabled] {\n    filter: brightness(0.5);\n}\n\n.ce-menu-item:not([disabled]):hover {\n    background-color: var(--ce-hover);\n}\n\n.ce-menu-item-loading {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    width: 100%;\n    height: 100%;\n}\n\n.ce-nav-trigger {\n    min-width: 0;\n    border: 0;\n    color: var(--ce-text-primary);\n}\n\n/* Mark the trigger while its menu is open, like ChatGPT's selected rail items. */\n[data-state=\"open\"] > .ce-nav-trigger {\n    color: var(--ce-text-primary);\n    background-color: var(--ce-hover);\n}\n\n.ce-nav-trigger .ce-menu-item-text {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n\n/* Same box as ChatGPT's sidebar rows, so the icon lines up with theirs. */\n.ce-nav-trigger-expanded {\n    margin: 0 0 8px;\n    padding-inline: 10px;\n}\n\n.ce-nav-trigger-collapsed {\n    width: 32px;\n    height: 32px;\n    margin: 0 auto 0.5rem;\n    padding: 0;\n    justify-content: center;\n    gap: 0;\n    border-radius: 8px;\n    color: var(--ce-text-secondary);\n}\n\n.ce-nav-trigger-collapsed .ce-menu-item-text {\n    display: none;\n}\n\n.ce-divider {\n    height: 1px;\n    background-color: var(--ce-border-light);\n}\n\n.ce-card {\n    display: grid;\n    grid-template-columns: repeat(2, minmax(0, 1fr));\n    gap: 4px;\n    padding: 8px;\n    color: var(--ce-text-primary);\n    background-color: var(--ce-menu-surface);\n    border-radius: 1rem;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);\n    transition: opacity 0.2s;\n    animation: ce-fade-in 0.3s;\n}\n\n.ce-card-mobile {\n    animation: ce-slide-up 0.3s;\n}\n\n:is(.dark, [data-theme=\"dark\"]) .ce-card {\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);\n}\n\n.ce-card .ce-menu-item {\n    column-gap: 8px;\n    padding-inline: 8px;\n}\n\n.ce-dialog .ce-menu-item {\n    padding-inline-start: 8px;\n}\n\n/* HoverCard sets left/top. ChatGPT's main column carries its own z-index,\n   so raise the card above it. Dialogs sit in the top layer, above this. */\n.ce-card {\n    position: fixed;\n    z-index: 999;\n}\n\n.ce-card-arrow {\n    position: absolute;\n    left: -8px;\n    fill: var(--ce-menu-arrow);\n    stroke: var(--ce-menu-border);\n}\n\n.ce-row-half {\n    grid-column: auto / span 1;\n}\n\n.ce-row-full {\n    grid-column: auto / span 2;\n}\n\n.ce-backdrop {\n    display: block;\n    position: fixed;\n    inset: 0;\n    background-color: rgba(0, 0, 0, 0.5);\n    animation: ce-pointer-fade-in 0.3s;\n}\n");
 	_css("/* Native <dialog>: the backdrop replaces a separate overlay element. */\n.ce-dialog::backdrop {\n    background-color: rgba(0, 0, 0, 0.44);\n    animation: ce-fade-in 150ms cubic-bezier(0.16, 1, 0.3, 1);\n}\n\n.ce-dialog {\n    color: var(--ce-text-primary);\n    background-color: var(--ce-dialog-surface);\n    border-radius: 6px;\n    box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;\n    position: fixed;\n    /* The UA sheet sets inset: 0 and margin: auto on a modal <dialog>. */\n    inset: 50% auto auto 50%;\n    margin: 0;\n    border: 0;\n    transform: translate(-50%, -50%);\n    width: 90vw;\n    max-width: 560px;\n    max-height: 85vh;\n    overflow: hidden;\n    padding: 16px 24px;\n    outline: none;\n    animation: ce-content-show 150ms cubic-bezier(0.16, 1, 0.3, 1);\n    display: flex;\n    flex-direction: column;\n}\n\n/* display: flex above would otherwise show a closed <dialog>. */\n.ce-dialog:not([open]) {\n    display: none;\n}\n\n.ce-dialog-plain {\n    background-color: var(--ce-dialog-surface-plain);\n}\n\n:is(.dark, [data-theme=\"dark\"]) .ce-dialog {\n    border: 1px solid #40414f;\n}\n\n.ce-dialog-title {\n    margin: 0 0 16px 0;\n    font-weight: 500;\n    font-size: 20px;\n    line-height: 1.5;\n    flex-shrink: 0;\n}\n\n.ce-dialog-body {\n    flex: 1;\n    min-height: 0;\n    overflow-y: auto;\n    overflow-x: hidden;\n}\n\n.ce-dialog-footer {\n    display: flex;\n    flex-shrink: 0;\n    justify-content: flex-end;\n    padding-top: 16px;\n}\n\n.ce-button {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    border-radius: 4px;\n    padding: 0 15px;\n    font-size: 15px;\n    line-height: 1;\n    height: 35px;\n}\n.ce-button-strong {\n    font-weight: 700;\n}\n.ce-button-green {\n    background-color: #ddf3e4;\n    color: #18794e;\n}\n.ce-button-green:hover {\n    background-color: #ccebd7;\n}\n.ce-button-red {\n    background-color: #f9d9d9;\n    color: #a71d2a;\n}\n.ce-button-neutral {\n    color: #6f6e77;\n    border: 1px solid #6f6e77;\n    font-size: 13px;\n    height: 26px;\n    padding: 0 8px;\n}\n.ce-button-neutral:hover {\n    background-color: rgba(111, 110, 119, 0.1);\n}\n:is(.dark, [data-theme=\"dark\"]) .ce-button-neutral {\n    color: #a0a0a8;\n    border-color: #a0a0a8;\n}\n:is(.dark, [data-theme=\"dark\"]) .ce-button-neutral:hover {\n    background-color: rgba(160, 160, 168, 0.1);\n}\n.ce-button:disabled,\n.ce-button:disabled:hover {\n    opacity: 0.5;\n    color: #6f6e77;\n    background-color: #e0e0e0;\n    cursor: not-allowed;\n}\n\n.ce-icon-button {\n    border-radius: 100%;\n    height: 25px;\n    width: 25px;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    color: var(--ce-text-secondary);\n}\n.ce-icon-button:hover {\n    background-color: var(--ce-hover);\n}\n\n.ce-close-button {\n    position: absolute;\n    top: 10px;\n    right: 10px;\n}\n\n.ce-input {\n    width: 100%;\n    flex: 1;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    border-radius: 4px;\n    padding: 0 10px;\n    font-size: 15px;\n    line-height: 1;\n    color: var(--ce-text-primary);\n    background-color: var(--ce-input-surface);\n    box-shadow: 0 0 0 1px var(--ce-control-border);\n    height: 35px;\n    outline: none;\n}\n\n.ce-select {\n    appearance: none;\n    height: 2rem;\n    padding: 0 2rem 0 0.5rem;\n    width: auto;\n    min-width: 7.5rem;\n    border-radius: 4px;\n    color: var(--ce-text-primary);\n    background-color: var(--ce-input-surface);\n    /* Our own chevron, since appearance: none drops the native one. */\n    background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%238f8f8f' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E\");\n    background-repeat: no-repeat;\n    background-position: right 0.5rem center;\n    background-size: 1rem;\n    box-shadow: 0 0 0 1px var(--ce-control-border);\n}\n\n.ce-select:disabled {\n    opacity: 0.6;\n    cursor: not-allowed;\n}\n\n/* ── Export dialog ── */\n\n.ce-export-source {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    padding-bottom: 12px;\n    margin-bottom: 12px;\n    border-bottom: 1px solid var(--ce-border);\n    color: var(--ce-text-secondary);\n}\n\n.ce-project-select {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    margin-bottom: 12px;\n    color: var(--ce-text-secondary);\n}\n\n.ce-select-search {\n    width: 100%;\n    padding: 8px 16px;\n    border: 1px solid var(--ce-control-border);\n    border-bottom: none;\n    border-radius: 4px 4px 0 0;\n    font-size: 14px;\n    outline: none;\n    flex-shrink: 0;\n}\n.ce-select-search::placeholder {\n    color: var(--ce-text-tertiary);\n}\n\n.ce-select-toolbar {\n    display: flex;\n    align-items: center;\n    /* Minimum breathing room between the select-all label and the right\n       group once the auto margin collapses under pressure */\n    gap: 12px;\n    padding: 12px 16px;\n    border: 1px solid var(--ce-control-border);\n    border-bottom: none;\n    flex-shrink: 0;\n}\n\n/* CJK labels wrap per-character when the row is squeezed — never shrink it */\n.ce-select-toolbar .ce-checkbox {\n    white-space: nowrap;\n    flex-shrink: 0;\n}\n\n.ce-select-toolbar-end {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    margin-left: auto;\n    min-width: 0;\n}\n\n.ce-toolbar-loading {\n    display: flex;\n    align-items: center;\n    gap: 4px;\n    min-width: 0;\n    overflow: hidden;\n    white-space: nowrap;\n    font-size: 0.875rem;\n    color: var(--ce-text-tertiary);\n}\n\n.ce-toolbar-status {\n    flex-shrink: 0;\n    height: auto;\n    font-size: 0.75rem;\n    padding: 2px 2rem 2px 0.5rem;\n    width: 8.5rem;\n    text-overflow: ellipsis;\n}\n\n.ce-toolbar-hint {\n    min-width: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n    font-size: 0.75rem;\n    color: var(--ce-text-tertiary);\n    /* Highest shrink factor: the hint collapses before the loading\n       indicator starts truncating */\n    flex-shrink: 99;\n}\n\n.ce-toolbar-count {\n    flex-shrink: 0;\n    white-space: nowrap;\n    font-size: 0.875rem;\n    font-weight: 500;\n    font-variant-numeric: tabular-nums;\n    color: var(--ce-text-tertiary);\n}\n\n.ce-select-list {\n    position: relative;\n    width: 100%;\n    flex: 1;\n    min-height: 120px;\n    padding: 12px 16px;\n    overflow-x: hidden;\n    overflow-y: auto;\n    border: 1px solid var(--ce-control-border);\n    border-radius: 0 0 4px 4px;\n    white-space: nowrap;\n}\n\n.ce-select-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    overflow: hidden;\n}\n\n.ce-select-item-empty {\n    color: var(--ce-text-tertiary);\n}\n\n.ce-select-item .ce-checkbox {\n    flex: 1;\n    min-width: 0;\n}\n\n.ce-select-item .ce-checkbox-label {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n\n.ce-starred {\n    flex-shrink: 0;\n    color: #f59e0b;\n}\n\n.ce-select-item-meta {\n    flex-shrink: 0;\n    font-size: 0.7rem;\n    color: var(--ce-text-tertiary);\n    white-space: nowrap;\n    font-variant-numeric: tabular-nums;\n    min-width: 6.5rem;\n    text-align: right;\n}\n.ce-select-item-meta-active {\n    color: var(--ce-text-secondary);\n    font-weight: 600;\n}\n\n/* ── Sortable column header row ── */\n.ce-list-header {\n    display: flex;\n    align-items: center;\n    padding: 0 16px;\n    border: 1px solid var(--ce-control-border);\n    border-bottom: none;\n    background: var(--ce-list-header-surface);\n    user-select: none;\n    flex-shrink: 0;\n}\n\n.ce-list-header-cell {\n    flex-shrink: 0;\n    font-size: 0.68rem;\n    font-weight: 600;\n    color: var(--ce-text-tertiary);\n    letter-spacing: 0.03em;\n    text-transform: uppercase;\n    padding: 5px 4px;\n    white-space: nowrap;\n    min-width: 6.5rem;\n    text-align: right;\n}\n.ce-list-header-cell:hover {\n    color: var(--ce-text-primary);\n}\n.ce-list-header-cell-title {\n    flex: 1;\n    text-align: left;\n    padding-left: 28px; /* align with checkbox label */\n}\n.ce-list-header-cell-active {\n    color: var(--ce-accent);\n}\n\n.ce-load-more {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    gap: 8px;\n    margin: 8px 0 4px;\n}\n\n.ce-muted-count {\n    font-size: 0.75rem;\n    font-variant-numeric: tabular-nums;\n    color: var(--ce-text-tertiary);\n}\n\n.ce-action-bar {\n    display: flex;\n    flex-wrap: wrap;\n    align-items: center;\n    gap: 8px;\n    margin-top: 12px;\n}\n\n.ce-action-bar > .ce-select {\n    flex-shrink: 0;\n}\n\n.ce-spacer {\n    flex-grow: 1;\n}\n\n.ce-batch-note {\n    margin-top: 6px;\n    font-size: 0.75rem;\n    text-align: right;\n    color: var(--ce-text-tertiary);\n}\n\n.ce-progress-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin: 8px 0 4px;\n}\n\n.ce-progress-name {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n    font-size: 0.875rem;\n    color: var(--ce-text-secondary);\n}\n\n.ce-progress-count {\n    flex-shrink: 0;\n    font-size: 0.875rem;\n    font-variant-numeric: tabular-nums;\n    color: var(--ce-text-tertiary);\n}\n\n.ce-progress {\n    width: 100%;\n    height: 10px;\n    margin-bottom: 16px;\n    border-radius: 9999px;\n    background-color: var(--ce-track);\n}\n\n.ce-progress-bar {\n    height: 100%;\n    border-radius: 9999px;\n    background-color: var(--ce-accent);\n}\n\n.ce-progress-bar-waiting {\n    background-color: #f59e0b;\n}\n\n@media (max-width: 480px) {\n    .ce-dialog { max-height: 90vh; }\n    .ce-list-header-cell:last-child { display: none; }\n    .ce-select-item-meta:last-child { display: none; }\n    .ce-action-bar { justify-content: flex-end; }\n    .ce-action-bar > .ce-select { width: 100%; }\n    .ce-action-bar > .ce-spacer { display: none; }\n}\n\n@keyframes ce-content-show {\n    from {\n        opacity: 0;\n        transform: translate(-50%, -48%) scale(0.96);\n    }\n    to {\n        opacity: 1;\n        transform: translate(-50%, -50%) scale(1);\n    }\n}\n");
 	function useCollapsedSidebar(container, isMobile) {
 		const [isCollapsed, setIsCollapsed] = h(false);
-		p$1(() => {
+		p(() => {
 			if (isMobile) {
 				setIsCollapsed(false);
 				return;
@@ -16233,7 +14578,7 @@
 		const [exportOpen, setExportOpen] = h(false);
 		const [settingOpen, setSettingOpen] = h(false);
 		const { format, enableTimestamp, timeStamp24H, enableMeta, exportMetaList } = useSettingContext();
-		p$1(() => {
+		p(() => {
 			if (enableTimestamp) document.body.setAttribute("data-time-format", timeStamp24H ? "24" : "12");
 			else document.body.removeAttribute("data-time-format");
 		}, [enableTimestamp, timeStamp24H]);
@@ -16269,7 +14614,7 @@
 				onOpenChange: setOpen,
 				keepMounted: jsonOpen || settingOpen || exportOpen,
 				isMobile,
-				width: isMobile ? 316 : 268,
+				width: isMobile ? 316 : 292,
 				trigger: o(MenuItem, {
 					className: isCollapsedSidebar ? "ce-nav-trigger ce-nav-trigger-collapsed" : "ce-nav-trigger ce-nav-trigger-expanded",
 					text: t("ExportHelper"),

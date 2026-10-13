@@ -40,13 +40,23 @@ node scripts/export.mjs JSON "OpenAI Official Format"
   result. Strings print raw, so large output such as a base64 PNG can be
   piped to a file. Use it instead of MCP `evaluate_script` with `filePath`,
   which only writes inside the repo.
-- `export.mjs` clicks a menu item, waits for the download, moves it out of
-  `~/Downloads` and unpacks zips. Output goes to the system temp dir by
-  default. Exports contain real conversations: never commit them.
+- `export.mjs` clicks a menu item, waits for the download and unpacks
+  zips. Output goes to the system temp dir by default. Exports contain real
+  conversations: never commit them. The JSON item opens a dialog, so name
+  the format too: `JSON "OpenAI Official Format"`.
+- Chrome lets a tab download only once without a user gesture. Later
+  downloads wait on a prompt in the address bar that a page screenshot does
+  not show, so a script sees no file and no error. `export.mjs` avoids it
+  with CDP `Browser.setDownloadBehavior`, which saves into its own folder
+  while its connection is open. To download any other way, such as an
+  `a.click()` through `eval.mjs`, open the same CDP session first. After
+  that call the check stays off and files go back to `~/Downloads` until
+  Chrome restarts, so restart it to reproduce the block.
 - `measure-text.mjs` compares the width of text on the page and inside an
   SVG image. See below.
 - `ui-shot.mjs` opens one exporter UI state (`page`, `menu`, `setting`,
   `export`, `json`) and screenshots it. See UI changes below.
+- `readme-hero.mjs` shoots the README hero images. See README hero below.
 
 To open a conversation, click it in the sidebar through `eval.mjs`, for
 example `[...document.querySelectorAll('a, button')].find(e => e.textContent.trim() === 'Title').click()`.
@@ -87,6 +97,32 @@ done
   style instead of guessing. Settings > Security and login has switches in
   both states; Library cards show checkboxes on hover.
 - Run `git checkout dist/chatgpt.user.js` before committing. CI builds dist.
+
+## README hero
+
+Each README shows `docs/readme/hero-<code>-<light|dark>.png` through a
+`<picture>`, so GitHub picks the image for the reader's theme. Reshoot them
+when the layout or the menu changes:
+
+```sh
+pnpm build
+node scripts/readme-hero.mjs            # all languages, into docs/readme
+node scripts/readme-hero.mjs fr ko      # only some
+```
+
+- Collapse ChatGPT's sidebar first, so no chat titles show. The script
+  stages the rest: it replaces the greeting, which can include the user's
+  name, hides the suggestions under the composer, which come from the
+  user's calendar and apps, and swaps the avatar for the OpenAI logo. Read
+  every image before committing anyway.
+- It switches ChatGPT's UI language in Settings and the exporter's
+  language for each shot, then sets both back to automatic. Check that
+  the account is back on "Auto detect" if a run fails.
+- Greetings and ChatGPT's option labels live in `LANGUAGES` at the top of
+  the script. A greeting should read like one of ChatGPT's own, short and
+  conversational, not a slogan. The exporter has no Korean locale, so the
+  Korean hero keeps the English menu.
+- Add a language there, in the README language bars and as a README file.
 
 ## Screenshot bugs
 

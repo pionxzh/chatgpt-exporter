@@ -147,6 +147,7 @@ export function HoverCard({ open, onOpenChange, keepMounted, isMobile, width, tr
         <>
             <div
                 ref={triggerRef}
+                data-state={open ? 'open' : 'closed'}
                 onPointerEnter={onPointerEnter}
                 onPointerLeave={onPointerLeave}
             >

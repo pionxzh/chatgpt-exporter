@@ -4,6 +4,11 @@ import type { ApiConversationWithId } from '../src/api'
 
 const downloadFile = vi.hoisted(() => vi.fn())
 
+// The userscript client touches `document` and constants read `location` at import time.
+vi.mock('vite-plugin-monkey/dist/client', () => ({ unsafeWindow: {} }))
+vi.stubGlobal('location', { href: 'https://chatgpt.com/' })
+vi.mock('../src/utils/storage', () => ({ ScriptStorage: { get: () => null } }))
+
 // Only loaded for the single-chat export path, which this test does not use.
 vi.mock('../src/i18n', () => ({ default: {} }))
 vi.mock('../src/page', () => ({}))

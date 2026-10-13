@@ -1,5 +1,36 @@
 # Changelog
 
+## [2.37.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.37.0...userscript-v2.37.1) (2026-10-12)
+
+
+### Bug Fixes
+
+* export interactive replies from their Markdown version ([7076330](https://github.com/pionxzh/chatgpt-exporter/commit/70763307f0debb65dd7fbbb139d605dcea1f8246))
+* highlight the export trigger while its menu is open ([ee812c6](https://github.com/pionxzh/chatgpt-exporter/commit/ee812c69b527ad4c7c9059714bc7f2c8767ff3ac))
+* keep code blocks and charts that ChatGPT draws as widgets ([9a0ac68](https://github.com/pionxzh/chatgpt-exporter/commit/9a0ac6844459a81491b15c1e73c3daccf95c9e00))
+* keep menu labels clear of the item edge ([f78692c](https://github.com/pionxzh/chatgpt-exporter/commit/f78692cbe8fe9dc86b5883a5a463075072b54159))
+* keep the page's CJK font in screenshots when it already fits ([88e293f](https://github.com/pionxzh/chatgpt-exporter/commit/88e293f05775fccd662febabdebc88cbb3739a63))
+* skip hidden cached conversations during export ([a14a5e9](https://github.com/pionxzh/chatgpt-exporter/commit/a14a5e9beb6bda277adb405a90b321f497d2c863))
+* use PostScript names for CJK font faces in screenshots ([1fe8e1b](https://github.com/pionxzh/chatgpt-exporter/commit/1fe8e1b156f2f6ae26e0e73b873db4b18e2c9e59))
+
+## [2.37.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.36.3...userscript-v2.37.0) (2026-10-11)
+
+
+### Features
+
+* choose how Markdown exports save images ([ec966c5](https://github.com/pionxzh/chatgpt-exporter/commit/ec966c51654c2726fec78b4b10f041be69999979)), closes [#405](https://github.com/pionxzh/chatgpt-exporter/issues/405)
+* save JSON (ZIP) images as files too ([82ec4bc](https://github.com/pionxzh/chatgpt-exporter/commit/82ec4bcfea9f6c651393861dbdf7c8eae8330045)), closes [#295](https://github.com/pionxzh/chatgpt-exporter/issues/295)
+
+
+### Bug Fixes
+
+* keep assistant text as written in markdown and text exports ([4c8fe6e](https://github.com/pionxzh/chatgpt-exporter/commit/4c8fe6ea01d58a59bc59aea9ba1421fee7d80969))
+
+
+### Performance Improvements
+
+* compile markdown to HTML with micromark directly ([f9d9e4c](https://github.com/pionxzh/chatgpt-exporter/commit/f9d9e4c1b0d59f38b7b83dd65bb5967bfbd34609))
+
 ## [2.36.3](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.36.2...userscript-v2.36.3) (2026-09-26)
 
 

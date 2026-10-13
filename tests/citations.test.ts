@@ -112,3 +112,47 @@ describe('image search results', () => {
         expect(transformContentReferences(group.matched_text, metadata, { output: 'text', inlineReferenceMode: 'alt' })).toBe(group.alt)
     })
 })
+
+describe('interactive widgets', () => {
+    const code = '```js\nconst total = a + b\n```'
+    const chart = 'genui{"charts_widget_v2":{}}'
+    const metadata = {
+        content_references: [
+            {
+                type: 'client_defined_widget',
+                matched_text: code,
+                start_idx: 0,
+                end_idx: 0,
+                alt: null,
+                data: { widget_type: 'code_block', language: 'js', content: 'const total = a + b' },
+            },
+            {
+                type: 'client_defined_widget',
+                matched_text: chart,
+                start_idx: 0,
+                end_idx: 0,
+                alt: null,
+                data: {
+                    widget_type: 'charts_widget_v2',
+                    content: {
+                        meta: { description: 'Weekly visits.' },
+                        xKey: 'day',
+                        series: [{ dataKey: 'visits', label: 'Visits', valueSuffix: 'k' }, { dataKey: 'note' }],
+                        data: [{ day: 'Mon', visits: 1.5, note: 'a|b' }, { day: 'Tue', visits: 2 }],
+                        formattedData: [{ day: 'Mon', visits: '1.5k' }],
+                    },
+                },
+            },
+        ],
+    } as unknown as ConversationNodeMessage['metadata']
+    const table = 'Weekly visits.\n\n| day | Visits | note |\n| --- | --- | --- |\n| Mon | 1.5k | a\\|b |\n| Tue | 2k |  |'
+
+    it('keeps code blocks', () => {
+        expect(transformContentReferences(`Run:\n\n${code}`, metadata)).toBe(`Run:\n\n${code}`)
+    })
+
+    it('turns charts into a table', () => {
+        expect(transformContentReferences(`Data:\n\n${chart}\n\nEnd.`, metadata)).toBe(`Data:\n\n${table}\n\nEnd.`)
+        expect(transformContentReferences(chart, metadata, { output: 'text', inlineReferenceMode: 'alt' })).toBe(table)
+    })
+})

@@ -53,6 +53,12 @@ body[data-time-format="24"] span[data-time-format="24"] {
     color: var(--ce-text-primary);
 }
 
+/* Mark the trigger while its menu is open, like ChatGPT's selected rail items. */
+[data-state="open"] > .ce-nav-trigger {
+    color: var(--ce-text-primary);
+    background-color: var(--ce-hover);
+}
+
 .ce-nav-trigger .ce-menu-item-text {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -89,7 +95,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 4px;
-    padding: 8px 4px;
+    padding: 8px;
     color: var(--ce-text-primary);
     background-color: var(--ce-menu-surface);
     border-radius: 1rem;
@@ -108,7 +114,7 @@ body[data-time-format="24"] span[data-time-format="24"] {
 
 .ce-card .ce-menu-item {
     column-gap: 8px;
-    padding-inline-start: 8px;
+    padding-inline: 8px;
 }
 
 .ce-dialog .ce-menu-item {

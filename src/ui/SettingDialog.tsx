@@ -6,6 +6,7 @@ import { getChatIdFromUrl } from '../page'
 import { getFileNameWithFormat } from '../utils/download'
 import { timestamp as _timestamp, dateStr, unixTimestampToISOString } from '../utils/utils'
 import type { FC } from '../type'
+import type { ImageMode } from './SettingContext'
 import { Dialog } from './Dialog'
 import { IconCross, IconTrash } from './Icons'
 import { useSettingContext } from './SettingContext'
@@ -36,6 +37,7 @@ export const SettingDialog: FC<SettingDialogProps> = ({
         exportMetaList, setExportMetaList,
         enableThinking, setEnableThinking,
         enableSources, setEnableSources,
+        imageMode, setImageMode,
         exportAllLimit, setExportAllLimit,
         /* eslint-enable antfu/consistent-list-newline */
     } = useSettingContext()
@@ -130,6 +132,27 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                         </div>
                         <div className="ce-setting-control">
                             <Toggle label="" checked={enableSources} onCheckedUpdate={setEnableSources} />
+                        </div>
+                    </div>
+                    <div className="ce-setting-card">
+                        <div>
+                            <dt className="ce-setting-title">
+                                {t('Images')}
+                            </dt>
+                            <dd className="ce-setting-desc">
+                                {t('Images Description')}
+                            </dd>
+                            <dd>
+                                <select
+                                    className="ce-select ce-setting-select"
+                                    value={imageMode}
+                                    onChange={e => setImageMode(e.currentTarget.value as ImageMode)}
+                                >
+                                    <option value="embed">{t('Images Embed')}</option>
+                                    <option value="omit">{t('Images Omit')}</option>
+                                    <option value="files">{t('Images Files')}</option>
+                                </select>
+                            </dd>
                         </div>
                     </div>
                     <div className="ce-setting-card">
