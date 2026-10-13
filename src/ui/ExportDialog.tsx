@@ -418,7 +418,7 @@ const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
         { label: 'Markdown', callback: exportAllToMarkdown },
         { label: 'HTML', callback: exportAllToHtml },
         { label: 'JSON', callback: exportAllToOfficialJson },
-        { label: 'JSON (ZIP)', callback: exportAllToJson },
+        { label: 'OpenAI JSON (ZIP)', callback: exportAllToJson },
         { label: 'TavernAI JSONL (ZIP)', callback: exportAllToTavern },
     ], [])
 
@@ -502,7 +502,7 @@ const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
                         conversation = await fetchConversation(id)
                         conversationCache.set(id, { updateTime: update_time, conversation })
                     }
-                    const leaveOutImages = imageMode === 'omit' && (exportType === 'Markdown' || exportType === 'JSON (ZIP)')
+                    const leaveOutImages = imageMode === 'omit' && (exportType === 'Markdown' || exportType === 'OpenAI JSON (ZIP)')
                     const skipImages = exportType === 'JSON' || exportType === 'TavernAI JSONL (ZIP)' || leaveOutImages
                     return skipImages ? conversation : withImageAssets(conversation)
                 },
