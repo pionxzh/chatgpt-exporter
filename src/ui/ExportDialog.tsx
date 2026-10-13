@@ -419,7 +419,7 @@ const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
         { label: 'HTML', callback: exportAllToHtml },
         { label: 'JSON', callback: exportAllToOfficialJson },
         { label: 'JSON (ZIP)', callback: exportAllToJson },
-        { label: 'JSONL (TavernAI, SillyTavern)', callback: exportAllToTavern },
+        { label: 'TavernAI JSONL (ZIP)', callback: exportAllToTavern },
     ], [])
 
     const fileInputRef = useRef<HTMLInputElement>(null)
@@ -503,7 +503,7 @@ const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
                         conversationCache.set(id, { updateTime: update_time, conversation })
                     }
                     const leaveOutImages = imageMode === 'omit' && (exportType === 'Markdown' || exportType === 'JSON (ZIP)')
-                    const skipImages = exportType === 'JSON' || exportType === 'JSONL (TavernAI, SillyTavern)' || leaveOutImages
+                    const skipImages = exportType === 'JSON' || exportType === 'TavernAI JSONL (ZIP)' || leaveOutImages
                     return skipImages ? conversation : withImageAssets(conversation)
                 },
             })
