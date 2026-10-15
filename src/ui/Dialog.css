@@ -382,14 +382,7 @@
 }
 
 .ce-action-bar > .ce-select {
-    /* Long format names may not displace the Export button.
-       The native option menu retains the complete name. */
-    flex: 0 1 auto;
-    min-width: 0;
-    max-width: 45%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .ce-spacer {
@@ -449,7 +442,7 @@
     .ce-list-header-cell:last-child { display: none; }
     .ce-select-item-meta:last-child { display: none; }
     .ce-action-bar { justify-content: flex-end; }
-    .ce-action-bar > .ce-select { width: 100%; max-width: none; }
+    .ce-action-bar > .ce-select { width: 100%; }
     .ce-action-bar > .ce-spacer { display: none; }
 }
 
