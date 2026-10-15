@@ -385,8 +385,16 @@
     flex-shrink: 0;
 }
 
-.ce-spacer {
-    flex-grow: 1;
+/* The buttons wrap as one group, so Export never sits alone on its own row.
+   They only wrap among themselves when long labels overflow a full row. */
+.ce-action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    flex-shrink: 0;
+    gap: 8px;
+    max-width: 100%;
+    margin-left: auto;
 }
 
 .ce-batch-note {
@@ -441,9 +449,7 @@
     .ce-dialog { max-height: 90vh; }
     .ce-list-header-cell:last-child { display: none; }
     .ce-select-item-meta:last-child { display: none; }
-    .ce-action-bar { justify-content: flex-end; }
     .ce-action-bar > .ce-select { width: 100%; }
-    .ce-action-bar > .ce-spacer { display: none; }
 }
 
 @keyframes ce-content-show {

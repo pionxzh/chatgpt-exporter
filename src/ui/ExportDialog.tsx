@@ -918,16 +918,17 @@ const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
                         <option key={t(label)} value={label}>{label}</option>
                     ))}
                 </select>
-                <div className="ce-spacer"></div>
-                <button className="ce-button ce-button-red" disabled={disabled || exportSource === 'Local'} onClick={archiveAll}>
-                    {t('Archive')}
-                </button>
-                <button className="ce-button ce-button-red" disabled={disabled || exportSource === 'Local'} onClick={deleteAll}>
-                    {t('Delete')}
-                </button>
-                <button className="ce-button ce-button-green" disabled={disabled} onClick={exportAll}>
-                    {t('Export')}
-                </button>
+                <div className="ce-action-buttons">
+                    <button className="ce-button ce-button-red" disabled={disabled || exportSource === 'Local'} onClick={archiveAll}>
+                        {t('Archive')}
+                    </button>
+                    <button className="ce-button ce-button-red" disabled={disabled || exportSource === 'Local'} onClick={deleteAll}>
+                        {t('Delete')}
+                    </button>
+                    <button className="ce-button ce-button-green" disabled={disabled} onClick={exportAll}>
+                        {t('Export')}
+                    </button>
+                </div>
             </div>
             {totalBatches > 1 && !processing && (
                 <p className="ce-batch-note">
