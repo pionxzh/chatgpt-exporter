@@ -59,6 +59,43 @@ export async function exportToTavern(fileNameFormat: string) {
     return true
 }
 
+export async function exportAllToTavern(fileNameFormat: string, apiConversations: ApiConversationWithId[], _metaList?: ExportMeta[], projectName?: string, partIndex?: number, totalParts?: number) {
+    const zip = new JSZip()
+    const filenameMap = new Map<string, number>()
+    const conversations = apiConversations.map(x => processConversation(x))
+    conversations.forEach((conversation) => {
+        let fileName = getFileNameWithFormat(`${fileNameFormat}.tavern`, 'jsonl', {
+            title: conversation.title,
+            chatId: conversation.id,
+            createTime: conversation.createTime,
+            updateTime: conversation.updateTime,
+        })
+        if (filenameMap.has(fileName)) {
+            const count = filenameMap.get(fileName) ?? 1
+            filenameMap.set(fileName, count + 1)
+            fileName = `${fileName.slice(0, -'.tavern.jsonl'.length)} (${count}).tavern.jsonl`
+        }
+        else {
+            filenameMap.set(fileName, 1)
+        }
+        zip.file(fileName, convertToTavern(conversation))
+    })
+
+    const blob = await zip.generateAsync({
+        type: 'blob',
+        compression: 'DEFLATE',
+        compressionOptions: {
+            level: 9,
+        },
+    })
+    const partInfo: PartInfo | undefined = (partIndex != null && totalParts != null)
+        ? { part: partIndex, total: totalParts }
+        : undefined
+    downloadFile(buildZipFileName('tavern', projectName, partInfo), 'application/zip', blob)
+
+    return true
+}
+
 export async function exportToOoba(fileNameFormat: string) {
     if (!checkIfConversationStarted()) {
         alert(i18n.t('Please start a conversation first'))

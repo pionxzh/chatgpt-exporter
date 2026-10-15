@@ -4,7 +4,7 @@ import i18n, { useTranslation } from '../i18n'
 import { RateLimitError, archiveConversation, deleteConversation, fetchAllConversations, fetchConversation, fetchConversationsPage, fetchProjects, probeApi, withImageAssets } from '../api'
 import { EXPORT_OPERATION_BATCH, KEY_EXPORTED_UPDATE_TIMES } from '../constants'
 import { exportAllToHtml } from '../exporter/html'
-import { exportAllToJson, exportAllToOfficialJson } from '../exporter/json'
+import { exportAllToJson, exportAllToOfficialJson, exportAllToTavern } from '../exporter/json'
 import { exportAllToMarkdown } from '../exporter/markdown'
 import { applyHead, refreshConversationList } from '../utils/conversationList'
 import { RequestQueue } from '../utils/queue'
@@ -419,6 +419,7 @@ const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
         { label: 'HTML', callback: exportAllToHtml },
         { label: 'JSON', callback: exportAllToOfficialJson },
         { label: 'JSON (ZIP)', callback: exportAllToJson },
+        { label: 'TavernAI JSONL (ZIP)', callback: exportAllToTavern },
     ], [])
 
     const fileInputRef = useRef<HTMLInputElement>(null)
@@ -502,7 +503,7 @@ const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
                         conversationCache.set(id, { updateTime: update_time, conversation })
                     }
                     const leaveOutImages = imageMode === 'omit' && (exportType === 'Markdown' || exportType === 'JSON (ZIP)')
-                    const skipImages = exportType === 'JSON' || leaveOutImages
+                    const skipImages = exportType === 'JSON' || exportType === 'TavernAI JSONL (ZIP)' || leaveOutImages
                     return skipImages ? conversation : withImageAssets(conversation)
                 },
             })
