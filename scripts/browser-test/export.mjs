@@ -5,7 +5,7 @@
 //
 // Usage: node export.mjs <menu item> [dialog item] [--out dir] [--timeout seconds]
 
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { basename, extname, join } from 'node:path'
 import JSZip from 'jszip'
@@ -34,7 +34,13 @@ const downloadDir = mkdtempSync(join(tmpdir(), 'chatgpt-exporter-download-'))
 const browser = await connect({ target: 'browser' })
 await browser.send('Browser.setDownloadBehavior', { behavior: 'allow', downloadPath: downloadDir })
 
+// An alert means the exporter refused, so stop waiting and show it. Keep the
+// connection open while waiting, since cdp.mjs answers dialogs only then.
 const cdp = await connect()
+let alerted = null
+cdp.on('Page.javascriptDialogOpening', ({ type, message }) => {
+    if (type === 'alert') alerted = message
+})
 await cdp.run(`
     const clickItem = async (label) => {
         for (let i = 0; i < 20; i++) {
@@ -48,7 +54,6 @@ await cdp.run(`
     await clickItem(${JSON.stringify(item)})
     ${dialogItem ? `await clickItem(${JSON.stringify(dialogItem)})` : ''}
 `)
-cdp.close()
 console.log('clicked', [item, dialogItem].filter(Boolean).join(' > '))
 
 // Wait for a new file whose size has settled.
@@ -57,6 +62,7 @@ let file = null
 let lastSize = -1
 while (Date.now() < deadline) {
     await new Promise(resolve => setTimeout(resolve, 1000))
+    if (alerted !== null) break
     const added = readdirSync(downloadDir).filter(name => !name.endsWith('.crdownload') && !name.startsWith('.'))
     if (added.length === 0) continue
     const candidate = join(downloadDir, added[0])
@@ -65,10 +71,13 @@ while (Date.now() < deadline) {
     file = candidate
     lastSize = size
 }
+cdp.close()
 browser.close()
 if (!file) {
     rmSync(downloadDir, { recursive: true, force: true })
-    console.error(`No download within ${timeout / 1000}s. Check the page console for errors.`)
+    console.error(alerted !== null
+        ? `The page alerted instead of downloading: ${alerted}`
+        : `No download within ${timeout / 1000}s. Check the page console for errors.`)
     process.exit(1)
 }
 

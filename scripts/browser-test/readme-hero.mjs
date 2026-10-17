@@ -11,6 +11,7 @@
 // composer are hidden and the avatar becomes the OpenAI logo.
 // Output goes to docs/readme by default, as hero-<code>-<theme>.png.
 
+import { Buffer } from 'node:buffer'
 import { execFileSync } from 'node:child_process'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
@@ -18,7 +19,7 @@ import { fileURLToPath } from 'node:url'
 import { connect } from './cdp.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
-const repo = join(here, '../../../..')
+const repo = join(here, '../..')
 
 // ChatGPT's option in Settings > General > Language (null: "Auto detect",
 // the first option, whose label is translated), the exporter locale (null:

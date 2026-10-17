@@ -11,7 +11,7 @@ import { connect } from './cdp.mjs'
 
 const args = process.argv.slice(2)
 const reload = args.includes('--reload')
-const distPath = args.find(arg => arg !== '--reload') || fileURLToPath(new URL('../../../../dist/chatgpt.user.js', import.meta.url))
+const distPath = args.find(arg => arg !== '--reload') || fileURLToPath(new URL('../../dist/chatgpt.user.js', import.meta.url))
 const dist = readFileSync(distPath, 'utf8')
 const requires = [...dist.matchAll(/^\/\/ @require\s+(\S+)/gm)].map(match => match[1])
 const libraries = await Promise.all(requires.map(url => fetch(url).then(res => res.text())))

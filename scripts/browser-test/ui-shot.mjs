@@ -7,6 +7,7 @@
 // The theme is switched on <html> only, so the account setting is untouched.
 // It lasts until the tab reloads. Output goes to the system temp dir by default.
 
+import { Buffer } from 'node:buffer'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
