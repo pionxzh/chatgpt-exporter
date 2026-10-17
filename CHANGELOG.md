@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.38.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.37.1...userscript-v2.38.0) (2026-10-17)
+
+
+### Features
+
+* add TavernAI JSONL to bulk export ([c8bd69c](https://github.com/pionxzh/chatgpt-exporter/commit/c8bd69c36702b417aa20e2af3d35d77ea7c06d93)), closes [#404](https://github.com/pionxzh/chatgpt-exporter/issues/404)
+
+
+### Bug Fixes
+
+* keep the bulk export buttons together when the bar wraps ([9e8d822](https://github.com/pionxzh/chatgpt-exporter/commit/9e8d822280d150f8d87f1e3e42164805f6670a67))
+
 ## [2.37.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.37.0...userscript-v2.37.1) (2026-10-12)
 
 
