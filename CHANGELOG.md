@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.38.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.38.0...userscript-v2.38.1) (2026-10-30)
+
+
+### Bug Fixes
+
+* keep inline links that ChatGPT writes as url markers ([ba36a28](https://github.com/pionxzh/chatgpt-exporter/commit/ba36a289195288f97c81ff2f2af308fda11f319e)), closes [#413](https://github.com/pionxzh/chatgpt-exporter/issues/413)
+
 ## [2.38.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.37.1...userscript-v2.38.0) (2026-10-17)
 
 
