@@ -156,3 +156,38 @@ describe('interactive widgets', () => {
         expect(transformContentReferences(chart, metadata, { output: 'text', inlineReferenceMode: 'alt' })).toBe(table)
     })
 })
+
+describe('inline links', () => {
+    const link = 'urlRelease [notes]https://example.com/release'
+    // Shape of ChatGPT's reference: the URL is in `safe_urls` and `item`, not on the reference
+    const metadata = {
+        content_references: [{
+            type: 'url',
+            matched_text: link,
+            start_idx: 0,
+            end_idx: 0,
+            safe_urls: ['https://example.com/release', 'https://example.com/release?utm_source=chatgpt.com'],
+            refs: [],
+            alt: '[Release [notes]](https://example.com/release?utm_source=chatgpt.com)',
+            title: 'Release [notes]',
+            item: { title: 'Release | Example', url: 'https://example.com/release?utm_source=chatgpt.com' },
+        }],
+    } as unknown as ConversationNodeMessage['metadata']
+    const expected = 'See [Release \\[notes\\]](<https://example.com/release>) now.'
+
+    it('keeps the link of a referenced marker', () => {
+        expect(transformContentReferences(`See ${link} now.`, metadata)).toBe(expected)
+    })
+
+    it('reads the link from a marker without a reference', () => {
+        expect(transformContentReferences(`See ${link} now.`, { content_references: [] } as unknown as ConversationNodeMessage['metadata']))
+            .toBe(expected)
+    })
+
+    it('keeps the link in text', () => {
+        expect(transformContentReferences(`See ${link} now.`, metadata, { output: 'text', inlineReferenceMode: 'alt', includeSourceList: false }))
+            .toBe(expected)
+        expect(transformContentReferences(`See ${link} now.`, metadata, { output: 'text' }))
+            .toBe('See Release [notes]: https://example.com/release now.')
+    })
+})

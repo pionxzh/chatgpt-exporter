@@ -10,6 +10,11 @@ interface TransformContentReferenceOptions {
 }
 
 const CitationMarkerRegex = /\uE200cite(?:\uE202[^\uE200\uE201]*)+\uE201/gu
+/**
+ * An inline link, `urlLabelhttps://\u2026`. The Markdown version of an
+ * interactive reply has these without a content reference.
+ */
+const UrlMarkerRegex = /\uE200url\uE202([^\uE200\uE201\uE202]*)\uE202([^\uE200\uE201\uE202]+)\uE201/gu
 
 export function normalizeCitationText(input: string): string {
     return input
@@ -37,6 +42,8 @@ export function transformContentReferences(
         if (!ref.matched_text) continue
         // ChatGPT draws these code blocks as widgets, but the text already has their Markdown.
         if (ref.type === 'client_defined_widget' && ref.data?.widget_type === 'code_block') continue
+        // The marker itself has the link, see UrlMarkerRegex
+        if (ref.type === 'url') continue
 
         const matchedText = normalizeCitationText(ref.matched_text)
         if (!matchedText) continue
@@ -51,6 +58,12 @@ export function transformContentReferences(
         const escaped = escapeRegExp(replacement)
         output = output.replaceAll(new RegExp(`${escaped}(?:\\s*${escaped})+`, 'g'), () => replacement)
     }
+
+    // Alt text is Markdown, as ChatGPT writes it
+    const linkOutput = inlineReferenceMode === 'alt' ? 'markdown' : outputType
+    output = output.replaceAll(UrlMarkerRegex, (_, label: string, url: string) => {
+        return formatCitationSource({ title: label, url }, linkOutput)
+    })
 
     output = output.replace(CitationMarkerRegex, '')
 
