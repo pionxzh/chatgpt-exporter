@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.38.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.38.1...userscript-v2.38.2) (2026-11-03)
+
+
+### Bug Fixes
+
+* check the highlight.js theme's integrity like the other CDN files ([35cd24d](https://github.com/pionxzh/chatgpt-exporter/commit/35cd24d3eff4864d1dab151dbd1315079d8249e8))
+* don't wait on cancelling the temporary chat stream copy ([fa23073](https://github.com/pionxzh/chatgpt-exporter/commit/fa23073a428a6b36dc64ff284d06073757cd3671))
+* keep entity names and drop image groups left in interactive replies ([7a7b447](https://github.com/pionxzh/chatgpt-exporter/commit/7a7b44760758a9f73c47af4da1958abfcb908d64))
+* keep the user avatar in the HTML export's CSS ([f69361e](https://github.com/pionxzh/chatgpt-exporter/commit/f69361e066e9cc316687aa18742e22789caf7823))
+* load every image in the HTML export up front ([85634cf](https://github.com/pionxzh/chatgpt-exporter/commit/85634cffebb9d7b8d3e4b1c6c8e98c4b29e3c59a))
+* mark exported zips as made on Unix so macOS unzip keeps names ([cf44458](https://github.com/pionxzh/chatgpt-exporter/commit/cf44458b8bc6947dcc6deae2e78755581aa559a4))
+* show the menu in the expanded sidebar of another layout variant ([6588bee](https://github.com/pionxzh/chatgpt-exporter/commit/6588bee706ef4130add8ebd7d461713ddc576c86)), closes [#397](https://github.com/pionxzh/chatgpt-exporter/issues/397)
+
+
+### Performance Improvements
+
+* reduce export polling and image processing overhead ([fa6662a](https://github.com/pionxzh/chatgpt-exporter/commit/fa6662a3cf09ddd6898bb8473e74d1ab2caebe53))
+
 ## [2.38.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.38.0...userscript-v2.38.1) (2026-10-30)
 
 
