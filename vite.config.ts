@@ -63,26 +63,23 @@ export default defineConfig({
                 ],
                 // Serialized into the bundle and run in the page, so it must be self-contained.
                 cssSideEffects: (css: string) => {
-                    const win = window as Window & {
-                        __chatgptExporterStyles?: Set<HTMLStyleElement>
-                        __chatgptExporterStyleObserver?: MutationObserver
-                    }
-
-                    win.__chatgptExporterStyles ??= new Set()
-                    win.__chatgptExporterStyleObserver ??= new MutationObserver(() => {
-                        for (const style of win.__chatgptExporterStyles!) {
-                            if (!style.isConnected && document.head) document.head.append(style)
-                        }
-                    })
-                    win.__chatgptExporterStyleObserver.observe(document.documentElement, {
-                        childList: true,
-                        subtree: true,
-                    })
-
                     const style = document.createElement('style')
                     style.textContent = css
-                    win.__chatgptExporterStyles.add(style)
-                    document.head.append(style)
+                    let head = document.head
+                    head.append(style)
+
+                    // Hydration can drop the style from <head>, or swap <head> itself.
+                    // Only watch those two levels: a subtree observer would run on
+                    // every DOM change while a reply streams in.
+                    const observer = new MutationObserver(() => {
+                        if (document.head && document.head !== head) {
+                            head = document.head
+                            observer.observe(head, { childList: true })
+                        }
+                        if (!style.isConnected) document.head?.append(style)
+                    })
+                    observer.observe(document.documentElement, { childList: true })
+                    observer.observe(head, { childList: true })
                 },
             },
             server: {
