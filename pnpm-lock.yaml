@@ -12,8 +12,8 @@ dependencies:
     specifier: ^8.0.4
     version: 8.0.4
   jszip:
-    specifier: 3.9.1
-    version: 3.9.1
+    specifier: 3.10.2
+    version: 3.10.2
   mdast:
     specifier: ^3.0.0
     version: 3.0.0
@@ -3847,13 +3847,13 @@ packages:
     resolution: {integrity: sha512-gfFQZrcTc8CnKXp6Y4/CBT3fTc0OVuDofpre4aEeEpSBPV5X5v4+Vmx+8snU7RLPrNHPKSgLxGo9YuQzz20o+w==}
     dev: true
 
-  /jszip@3.9.1:
-    resolution: {integrity: sha512-H9A60xPqJ1CuC4Ka6qxzXZeU8aNmgOeP5IFqwJbQQwtu2EUYxota3LdsiZWplF7Wgd9tkAd0mdu36nceSaPuYw==}
+  /jszip@3.10.2:
+    resolution: {integrity: sha512-3l+rb15IOWtUhU0H5MFqES/T6Kh7abYwjosBey/vD6hDt8zoEffkSC5Ws5SGtgVw3gBx2NEbhTeSW1+kWkpyTQ==}
     dependencies:
       lie: 3.3.0
       pako: 1.0.11
       readable-stream: 2.3.8
-      set-immediate-shim: 1.0.1
+      setimmediate: 1.0.5
     dev: false
 
   /katex@0.16.11:
@@ -5079,9 +5079,8 @@ packages:
     resolution: {integrity: sha512-jbGZvDqhmjd5IZh8a3qCypmc1Hlgdu+vastCCT6nK2Vopfsoq/3fstVMJxZJtxy2wlw9EVVGmFeGFObVp9E6MA==}
     dev: false
 
-  /set-immediate-shim@1.0.1:
-    resolution: {integrity: sha512-Li5AOqrZWCVA2n5kryzEmqai6bKSIvpz5oUJHPVj6+dsbD3X1ixtsY5tEnsaNpH3pFAHmG8eIHUrtEtohrg+UQ==}
-    engines: {node: '>=0.10.0'}
+  /setimmediate@1.0.5:
+    resolution: {integrity: sha512-MATJdZp8sLqDl/68LfQmbP8zKPLQNV6BIZoIgrscFDQ+RsvK/BxeDQOgyxKKoh0y/8h3BqVFnCqQ/gd+reiIXA==}
     dev: false
 
   /shebang-command@2.0.0:

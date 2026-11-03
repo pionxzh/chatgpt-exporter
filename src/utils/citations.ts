@@ -74,7 +74,7 @@ export function transformContentReferences(
         }
     }
 
-    return output
+    return output.replace(/[\uE200-\uE20F]/g, '')
 }
 
 export function formatCitationSource(source: ContentReferenceSource, output: CitationOutput): string {

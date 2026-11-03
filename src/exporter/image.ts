@@ -383,13 +383,16 @@ async function inlineExternalImages(root: HTMLElement, isDarkMode: boolean) {
         catch {
             return
         }
-        imagesBySrc.set(src, [...(imagesBySrc.get(src) ?? []), img])
+        const targets = imagesBySrc.get(src)
+        if (targets) targets.push(img)
+        else imagesBySrc.set(src, [img])
     })
 
     const queue = Array.from(imagesBySrc.entries())
+    let nextIndex = 0
     const worker = async () => {
-        for (let entry = queue.shift(); entry; entry = queue.shift()) {
-            const [src, targets] = entry
+        while (nextIndex < queue.length) {
+            const [src, targets] = queue[nextIndex++]
             const source = await loadCorsImage(src)
             targets.forEach((target) => {
                 let dataUrl: string | null = null

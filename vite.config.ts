@@ -63,13 +63,26 @@ export default defineConfig({
                 ],
                 // Serialized into the bundle and run in the page, so it must be self-contained.
                 cssSideEffects: (css: string) => {
-                    const o = document.createElement('style')
-                    o.textContent = css
-                    document.head.append(o)
-                    setInterval(() => {
-                        if (o.isConnected) return
-                        document.head.append(o)
-                    }, 300)
+                    const win = window as Window & {
+                        __chatgptExporterStyles?: Set<HTMLStyleElement>
+                        __chatgptExporterStyleObserver?: MutationObserver
+                    }
+
+                    win.__chatgptExporterStyles ??= new Set()
+                    win.__chatgptExporterStyleObserver ??= new MutationObserver(() => {
+                        for (const style of win.__chatgptExporterStyles!) {
+                            if (!style.isConnected && document.head) document.head.append(style)
+                        }
+                    })
+                    win.__chatgptExporterStyleObserver.observe(document.documentElement, {
+                        childList: true,
+                        subtree: true,
+                    })
+
+                    const style = document.createElement('style')
+                    style.textContent = css
+                    win.__chatgptExporterStyles.add(style)
+                    document.head.append(style)
                 },
             },
             server: {
