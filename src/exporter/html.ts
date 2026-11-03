@@ -217,7 +217,7 @@ function transformContent(
             if (metadata?.aggregate_result?.messages) {
                 return metadata.aggregate_result.messages
                     .filter(msg => msg.message_type === 'image')
-                    .map(msg => `<img src="${escapeHtml(msg.image_url)}" height="${escapeHtml(String(msg.height))}" width="${escapeHtml(String(msg.width))}" loading="lazy" decoding="async" />`)
+                    .map(msg => `<img src="${escapeHtml(msg.image_url)}" height="${escapeHtml(String(msg.height))}" width="${escapeHtml(String(msg.width))}" decoding="async" />`)
                     .join('\n')
             }
             return postProcess(`Result:\n\`\`\`\n${content.text}\n\`\`\`` || '')
@@ -237,7 +237,7 @@ function transformContent(
         case 'multimodal_text': {
             return content.parts?.map((part) => {
                 if (typeof part === 'string') return postProcess(part)
-                if (part.content_type === 'image_asset_pointer') return `<img src="${escapeHtml(part.asset_pointer)}" height="${escapeHtml(String(part.height))}" width="${escapeHtml(String(part.width))}" loading="lazy" decoding="async" />`
+                if (part.content_type === 'image_asset_pointer') return `<img src="${escapeHtml(part.asset_pointer)}" height="${escapeHtml(String(part.height))}" width="${escapeHtml(String(part.width))}" decoding="async" />`
                 if (part.content_type === 'audio_transcription') return `<div style="font-style: italic; opacity: 0.65;">“${escapeHtml(part.text)}”</div>`
                 if (part.content_type === 'audio_asset_pointer') return null
                 if (part.content_type === 'real_time_user_audio_video_asset_pointer') return null
