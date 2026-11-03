@@ -14,13 +14,16 @@ import './i18n'
 
 // Added 2026-05-03.
 const PROFILE_BUTTON_SELECTOR = '[data-testid="accounts-profile-button"]'
-// Added 2026-09-20. Footer after the nav: 2026-09-26.
+// Added 2026-09-20. Footer after the nav: 2026-09-26. Footer one level
+// further up: 2026-11-04.
 const SIDEBAR_SCROLL_SELECTOR = '[data-app-action-sidebar-scroll]'
 // Added 2026-09-20.
 const AUTOMATIONS_SELECTOR = '[data-sidebar-destination="builtin:automations"]'
 // Added 2026-09-24.
 const MESSAGE_UNIT_SELECTOR = '[data-chatgpt-conversation-selection-target] [data-chatgpt-search-message-ids]'
 // Added 2026-09-25. The rail keeps the help and profile menus in its footer.
+// Since 2026-11-04 some variants also put menus such as Pinned at the top, so
+// use the last one.
 const RAIL_MENU_BUTTON_SELECTOR = '[data-app-navigation-rail] button[aria-haspopup="menu"]'
 
 interface NavMenuMount {
@@ -214,8 +217,10 @@ function getNavMenuMounts(): NavMenuMount[] {
     const mounts: NavMenuMount[] = []
 
     Array.from(document.querySelectorAll(SIDEBAR_SCROLL_SELECTOR)).forEach((scrollRoot) => {
-        // The profile footer follows either the scroll root or its wrapping nav.
-        const footer = [scrollRoot.nextElementSibling, scrollRoot.parentElement?.nextElementSibling]
+        // The profile footer follows the scroll root, its wrapper or the nav
+        // around that wrapper, depending on the variant.
+        const wrapper = scrollRoot.parentElement
+        const footer = [scrollRoot.nextElementSibling, wrapper?.nextElementSibling, wrapper?.parentElement?.nextElementSibling]
             .find(el => el?.querySelector('button[aria-haspopup="menu"]'))
         if (footer) {
             mounts.push({
@@ -233,8 +238,8 @@ function getNavMenuMounts(): NavMenuMount[] {
         }
     })
 
-    // Place the menu in its own row above the first footer menu of the rail.
-    const railMenuButton = document.querySelector(RAIL_MENU_BUTTON_SELECTOR)
+    // Place the menu in its own row above the last footer menu of the rail.
+    const railMenuButton = Array.from(document.querySelectorAll(RAIL_MENU_BUTTON_SELECTOR)).at(-1) ?? null
     const rail = railMenuButton?.closest('[data-app-navigation-rail]')
     const railRow = rail && Array.from(rail.children).find(row => row.contains(railMenuButton))
     if (railMenuButton && railRow) {
