@@ -15,6 +15,14 @@ const CitationMarkerRegex = /\uE200cite(?:\uE202[^\uE200\uE201]*)+\uE201/gu
  * interactive reply has these without a content reference.
  */
 const UrlMarkerRegex = /\uE200url\uE202([^\uE200\uE201\uE202]*)\uE202([^\uE200\uE201\uE202]+)\uE201/gu
+/**
+ * A named place, person or business, `entity["turn0business0","Name"]`.
+ * ChatGPT shows only the name. Interactive replies have these without a
+ * content reference too.
+ */
+const EntityMarkerRegex = /\uE200entity\uE202([^\uE200\uE201]*)\uE201/gu
+/** An image carousel. Without a content reference there are no images to show. */
+const ImageGroupMarkerRegex = /\uE200image_group\uE202[^\uE200\uE201]*\uE201/gu
 
 export function normalizeCitationText(input: string): string {
     return input
@@ -64,6 +72,12 @@ export function transformContentReferences(
     output = output.replaceAll(UrlMarkerRegex, (_, label: string, url: string) => {
         return formatCitationSource({ title: label, url }, linkOutput)
     })
+    output = output.replaceAll(EntityMarkerRegex, (marker, data: string) => {
+        const name = parseEntityName(data)
+        if (name === null) return marker
+        return linkOutput === 'markdown' ? escapeMarkdownText(name) : name
+    })
+    output = output.replace(ImageGroupMarkerRegex, '')
 
     output = output.replace(CitationMarkerRegex, '')
 
@@ -75,6 +89,15 @@ export function transformContentReferences(
     }
 
     return output.replace(/[\uE200-\uE20F]/g, '')
+}
+
+function parseEntityName(data: string): string | null {
+    try {
+        const parsed: unknown = JSON.parse(data)
+        if (Array.isArray(parsed) && typeof parsed[1] === 'string') return parsed[1]
+    }
+    catch {}
+    return null
 }
 
 export function formatCitationSource(source: ContentReferenceSource, output: CitationOutput): string {

@@ -192,6 +192,20 @@ describe('inline links', () => {
     })
 })
 
+describe('entity and image group markers without references', () => {
+    const entity = '\uE200entity\uE202["turn0business0","Cafe [One]"]\uE201'
+    const imageGroup = '\uE200image_group\uE202{"query":["a quiet cafe"],"layout":"carousel"}\uE201'
+
+    it('keeps only the entity name', () => {
+        expect(transformContentReferences(`## 1. ${entity}`, undefined)).toBe('## 1. Cafe \\[One\\]')
+        expect(transformContentReferences(`Visit ${entity}.`, undefined, { output: 'text' })).toBe('Visit Cafe [One].')
+    })
+
+    it('drops image groups', () => {
+        expect(transformContentReferences(`Intro\n\n${imageGroup}\n\nNext`, undefined)).toBe('Intro\n\n\n\nNext')
+    })
+})
+
 describe('residual OpenAI markers', () => {
     it('removes unknown private-use control characters after citation processing', () => {
         expect(transformContentReferences('before \uE20A marker \uE20F after', undefined, {
