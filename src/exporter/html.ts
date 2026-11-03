@@ -101,7 +101,7 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
         const author = transformAuthor(message.author)
         const authorType = message.author.role === 'user' ? 'user' : 'assistant'
         const avatarEl = message.author.role === 'user'
-            ? `<img alt="${escapeHtml(author)}" src="${escapeHtml(avatar)}" />`
+            ? `<img alt="${escapeHtml(author)}" />`
             : '<svg width="41" height="41"><use xlink:href="#chatgpt" /></svg>'
 
         let postSteps: Array<(input: string) => string> = []
@@ -176,6 +176,7 @@ function conversationToHtml(conversation: ConversationResult, avatar: string, me
         source: escapeHtml(source),
         lang: escapeHtml(lang),
         theme: escapeHtml(theme),
+        avatar,
         details: metaDetailsHtml(_metaList),
         content: conversationHtml,
     })
