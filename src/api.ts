@@ -571,12 +571,12 @@ function collectImageSources(conversation: ApiConversation): ImageSource[] {
     })
 }
 
+const IMAGE_SOURCE_CONCURRENCY = 4
+
 /**
  * Replaces every image source in place with what `resolve` returns for it.
  * A source is kept when `resolve` returns null or throws.
  */
-const IMAGE_SOURCE_CONCURRENCY = 4
-
 export async function replaceImageSources(
     conversation: ApiConversation,
     resolve: (src: string) => Promise<string | null>,
