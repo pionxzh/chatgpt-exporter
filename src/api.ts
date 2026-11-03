@@ -958,7 +958,7 @@ export function shouldSkipMessageInExport(message?: ConversationNodeMessage): bo
     if (!message || !message.content) return true
 
     // ChatGPT is talking to tool
-    if (message.recipient !== 'all') return true
+    if (message.recipient != null && message.recipient !== 'all') return true
 
     // Skip "thinking" content (hidden reasoning steps from thinking models)
     if (message.content.content_type === 'thoughts') return true
