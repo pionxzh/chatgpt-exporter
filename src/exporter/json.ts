@@ -83,6 +83,8 @@ export async function exportAllToTavern(fileNameFormat: string, apiConversations
 
     const blob = await zip.generateAsync({
         type: 'blob',
+        // A DOS-made zip makes macOS `unzip` garble non-ASCII file names
+        platform: 'UNIX',
         compression: 'DEFLATE',
         compressionOptions: {
             level: 9,
@@ -158,6 +160,8 @@ export async function exportAllToJson(fileNameFormat: string, apiConversations: 
 
     const blob = await zip.generateAsync({
         type: 'blob',
+        // A DOS-made zip makes macOS `unzip` garble non-ASCII file names
+        platform: 'UNIX',
         compression: 'DEFLATE',
         compressionOptions: {
             level: 9,

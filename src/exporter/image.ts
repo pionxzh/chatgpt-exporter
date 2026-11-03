@@ -823,7 +823,8 @@ export async function exportToPng(fileNameFormat: string) {
         zip.file(`${baseName}-${String(index + 1).padStart(digits, '0')}.png`, png)
     })
     // PNGs are already compressed.
-    const blob = await zip.generateAsync({ type: 'blob', compression: 'STORE' })
+    // A DOS-made zip makes macOS `unzip` garble non-ASCII file names
+    const blob = await zip.generateAsync({ type: 'blob', compression: 'STORE', platform: 'UNIX' })
     downloadFile(getFileNameWithFormat(fileNameFormat, 'zip', { chatId }), 'application/zip', blob)
 
     return true

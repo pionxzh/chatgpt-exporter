@@ -100,6 +100,8 @@ export async function exportAllToMarkdown(fileNameFormat: string, apiConversatio
 function generateZip(zip: JSZip) {
     return zip.generateAsync({
         type: 'blob',
+        // A DOS-made zip makes macOS `unzip` garble non-ASCII file names
+        platform: 'UNIX',
         compression: 'DEFLATE',
         compressionOptions: {
             level: 9,
