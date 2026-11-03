@@ -191,3 +191,11 @@ describe('inline links', () => {
             .toBe('See Release [notes]: https://example.com/release now.')
     })
 })
+
+describe('residual OpenAI markers', () => {
+    it('removes unknown private-use control characters after citation processing', () => {
+        expect(transformContentReferences('before \uE20A marker \uE20F after', undefined, {
+            includeSourceList: false,
+        })).toBe('before  marker  after')
+    })
+})

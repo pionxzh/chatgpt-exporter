@@ -122,7 +122,8 @@ async function readConversationId(response: Response) {
     finally {
         // Release the copy. Cancelling one branch of a teed stream leaves the
         // branch the page is reading alone.
-        reader.cancel().catch(() => {})
+        await reader.cancel().catch(() => {})
+        reader.releaseLock()
     }
 }
 

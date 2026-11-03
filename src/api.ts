@@ -575,19 +575,39 @@ function collectImageSources(conversation: ApiConversation): ImageSource[] {
  * Replaces every image source in place with what `resolve` returns for it.
  * A source is kept when `resolve` returns null or throws.
  */
+const IMAGE_SOURCE_CONCURRENCY = 4
+
 export async function replaceImageSources(
     conversation: ApiConversation,
     resolve: (src: string) => Promise<string | null>,
 ): Promise<void> {
-    await Promise.all(collectImageSources(conversation).map(async (image) => {
-        try {
-            const newSrc = await resolve(image.src)
-            if (newSrc) image.replace(newSrc)
+    const imagesBySrc = new Map<string, ImageSource[]>()
+    for (const image of collectImageSources(conversation)) {
+        const images = imagesBySrc.get(image.src)
+        if (images) images.push(image)
+        else imagesBySrc.set(image.src, [image])
+    }
+
+    const queue = Array.from(imagesBySrc.entries())
+    let nextIndex = 0
+
+    const worker = async () => {
+        while (nextIndex < queue.length) {
+            const [src, images] = queue[nextIndex++]
+            try {
+                const newSrc = await resolve(src)
+                if (newSrc) images.forEach(image => image.replace(newSrc))
+            }
+            catch (error) {
+                console.error('Failed to fetch image asset', error)
+            }
         }
-        catch (error) {
-            console.error('Failed to fetch image asset', error)
-        }
-    }))
+    }
+
+    await Promise.all(Array.from(
+        { length: Math.min(IMAGE_SOURCE_CONCURRENCY, queue.length) },
+        worker,
+    ))
 }
 
 /** avoid errors in parsing multimodal parts we don't understand */
