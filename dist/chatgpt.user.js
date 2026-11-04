@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.38.2
+// @version            2.38.3
 // @author             pionxzh
 // @description        Export ChatGPT conversations with one click — backup & share effortlessly!
 // @description:zh-CN  一键导出 ChatGPT 对话，轻松备份与分享
@@ -26,7 +26,7 @@
 // @match              https://chatgpt.com/gpts/*
 // @match              https://chatgpt.com/share/*
 // @match              https://chatgpt.com/share/*/continue
-// @require            https://cdn.jsdelivr.net/npm/jszip@3.10.2/dist/jszip.min.js
+// @require            https://cdn.jsdelivr.net/npm/jszip@3.9.1/dist/jszip.min.js
 // @require            https://cdn.jsdelivr.net/npm/@zumer/snapdom@2.24.10/dist/snapdom.js
 // @grant              GM_deleteValue
 // @grant              GM_getValue
