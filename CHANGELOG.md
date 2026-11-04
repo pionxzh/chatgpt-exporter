@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.38.3](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.38.2...userscript-v2.38.3) (2026-11-04)
+
+
+### Bug Fixes
+
+* go back to jszip 3.9.1 so zip exports finish in the userscript sandbox ([2e9b8e9](https://github.com/pionxzh/chatgpt-exporter/commit/2e9b8e9bdd4ddf6b19c6d407f22abd068f0f06a8)), closes [#419](https://github.com/pionxzh/chatgpt-exporter/issues/419)
+
 ## [2.38.2](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.38.1...userscript-v2.38.2) (2026-11-03)
 
 
