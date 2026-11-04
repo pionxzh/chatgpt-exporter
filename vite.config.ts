@@ -57,6 +57,9 @@ export default defineConfig({
             build: {
                 fileName: 'chatgpt.user.js',
                 externalGlobals: [
+                    // Keep jszip at 3.9.1. From 3.10.0 its setImmediate polyfill
+                    // checks `event.source === self`, which never holds in a
+                    // userscript sandbox, so generateAsync never resolves.
                     ['jszip', cdn.jsdelivr('JSZip', 'dist/jszip.min.js')],
                     // SnapDOM's IIFE exposes its named export as window.snapdom.
                     ['@zumer/snapdom', cdn.jsdelivr('window', 'dist/snapdom.js')],
