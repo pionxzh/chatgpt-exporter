@@ -7,6 +7,7 @@ import { exportAllToHtml } from '../exporter/html'
 import { exportAllToJson, exportAllToOfficialJson, exportAllToTavern } from '../exporter/json'
 import { exportAllToMarkdown } from '../exporter/markdown'
 import { applyHead, refreshConversationList } from '../utils/conversationList'
+import { collectConversations } from '../utils/importFiles'
 import { RequestQueue } from '../utils/queue'
 import { ScriptStorage } from '../utils/storage'
 import { sleep } from '../utils/utils'
@@ -471,21 +472,29 @@ const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
     /** Incremented on each new fetch; callbacks check this to discard stale results after remount */
     const fetchGenRef = useRef(0)
 
-    const onUpload = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        const file = (e.target as HTMLInputElement)?.files?.[0]
-        if (!file) return
-        const fileReader = new FileReader()
-        fileReader.onload = () => {
-            const data = JSON.parse(fileReader.result as string)
-            if (!Array.isArray(data)) {
-                alert(t('Invalid File Format'))
-                return
+    const onUpload = useCallback(async (e: ChangeEvent<HTMLInputElement>) => {
+        const input = e.target as HTMLInputElement
+        const files = Array.from(input.files ?? []).sort((a, b) => a.name.localeCompare(b.name))
+        // Let the same files be picked again.
+        input.value = ''
+        if (!files.length) return
+
+        const parsed = await Promise.all(files.map(async (file) => {
+            try {
+                return JSON.parse(await file.text()) as unknown
             }
-            setSelected([])
-            setExportSource('Local')
-            setLocalConversations(data)
+            catch {
+                return null
+            }
+        }))
+        const conversations = collectConversations(parsed)
+        if (!conversations.length) {
+            alert(t('Invalid File Format'))
+            return
         }
-        fileReader.readAsText(file)
+        setSelected([])
+        setExportSource('Local')
+        setLocalConversations(conversations)
     }, [t])
 
     const startApiBatch = useCallback((chunk: ApiConversationItem[]) => {
@@ -837,7 +846,7 @@ const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
     return (
         <>
             <div className="ce-export-source">
-                {t('Export from official export file')} (conversations.json)&nbsp;
+                {t('Export from official export file')} (conversations*.json)&nbsp;
                 <div className="ce-hstack">
                     {exportSource === 'API' && (
                         <button
@@ -862,6 +871,7 @@ const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
             <input
                 type="file"
                 accept="application/json"
+                multiple
                 hidden
                 ref={fileInputRef}
                 onChange={onUpload}
