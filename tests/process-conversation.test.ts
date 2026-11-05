@@ -50,6 +50,26 @@ describe('processConversation', () => {
         expect(raw).toEqual(expected)
     })
 
+    it('keeps the runs of a scheduled task apart', () => {
+        const run = (text: string) => ({
+            ...message('assistant', text),
+            metadata: { automation_id: 'automation-id' },
+        })
+        const raw = {
+            ...conversation(),
+            current_node: 'tuesday',
+            mapping: {
+                root: { id: 'root', children: ['user'] },
+                user: { id: 'user', parent: 'root', children: ['setup'], message: message('user', 'Every morning') },
+                setup: { id: 'setup', parent: 'user', children: ['monday'], message: message('assistant', 'Scheduled') },
+                monday: { id: 'monday', parent: 'setup', children: ['tuesday'], message: run('Monday report') },
+                tuesday: { id: 'tuesday', parent: 'monday', children: [], message: run('Tuesday report') },
+            },
+        } as unknown as ApiConversationWithId
+
+        expect(texts(raw)).toEqual([['Every morning'], ['Scheduled'], ['Monday report'], ['Tuesday report']])
+    })
+
     it('gives the same result when the same conversation is processed twice', () => {
         const raw = conversation()
         texts(raw)

@@ -158,6 +158,8 @@ interface MessageMeta {
     finished_duration_sec?: number
     /** Reasoning activity title shown in the thinking panel */
     reasoning_title?: string
+    /** Set on each run of a scheduled task. Runs follow each other with no user message in between. */
+    automation_id?: string
     /** Interactive replies, whose `parts` hold widget markup only ChatGPT can render */
     model_dil_v2?: {
         /** ChatGPT's own Markdown version of the reply */
@@ -1175,6 +1177,8 @@ function mergeContinuationNodes(nodes: ConversationNode[]): ConversationNode[] {
             // task. Those stay unmerged.
             && prevNode.message.recipient === 'all' && node.message.recipient === 'all'
             && prevNode.message.content.content_type === 'text' && node.message.content.content_type === 'text'
+            // Each run of a scheduled task is its own reply.
+            && !node.message.metadata?.automation_id
         ) {
             const separator = prevNode.message.channel !== node.message.channel ? '\n\n' : ''
             prevNode.message.content.parts[prevNode.message.content.parts.length - 1] += separator + node.message.content.parts[0]
