@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.38.4](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.38.3...userscript-v2.38.4) (2026-11-05)
+
+
+### Bug Fixes
+
+* retain official JSON messages with missing recipient ([44affd4](https://github.com/pionxzh/chatgpt-exporter/commit/44affd4d68c88f73be59f8adda521da08ba95ba0))
+
 ## [2.38.3](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.38.2...userscript-v2.38.3) (2026-11-04)
 
 
