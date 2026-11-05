@@ -295,7 +295,8 @@ export interface ConversationNodeMessage {
     // end_turn: boolean
     id: string
     metadata?: MessageMeta
-    recipient: 'all' | 'browser' | 'python' | 'dalle.text2im' & (string & {})
+    /** Missing in the official data export. */
+    recipient?: 'all' | 'browser' | 'python' | 'dalle.text2im' & (string & {}) | null
     channel?: string | null
     status: string
     end_turn?: boolean
@@ -1010,12 +1011,13 @@ export function processConversation(conversation: ApiConversationWithId, options
         || Object.values(conversation.mapping).find(node => !node.children || node.children.length === 0)?.id
     if (!startNodeId) throw new Error('Failed to find start node.')
 
-    const conversationNodes = extractConversationResult(conversation.mapping, startNodeId)
-    const { model, modelSlug } = extractModel(conversation.mapping, conversationNodes)
+    const mapping = flagOfficialExportPreambles(conversation.mapping, startNodeId)
+    const conversationNodes = extractConversationResult(mapping, startNodeId)
+    const { model, modelSlug } = extractModel(mapping, conversationNodes)
     const mergedConversationNodes = mergeContinuationNodes(conversationNodes)
 
     if (options?.enableThinking) {
-        attachThinkingToNodes(conversation.mapping, mergedConversationNodes, startNodeId)
+        attachThinkingToNodes(mapping, mergedConversationNodes, startNodeId)
     }
 
     return {
@@ -1027,6 +1029,48 @@ export function processConversation(conversation: ApiConversationWithId, options
         updateTime,
         conversationNodes: mergedConversationNodes,
     }
+}
+
+/**
+ * The official data export (`conversations-*.json`) leaves out tool and
+ * system messages, and drops `recipient`, `channel` and
+ * `is_thinking_preamble_message`. The preambles themselves stay. Flag them
+ * again so they are hidden and moved into the thinking block like in API
+ * conversations. A reply followed by a thinking step is a preamble.
+ *
+ * Returns the mapping unchanged when nothing needs a flag. Flagged nodes are
+ * copies, the raw mapping is left intact.
+ */
+function flagOfficialExportPreambles(mapping: Record<string, ConversationNode>, startNodeId: string): Record<string, ConversationNode> {
+    let result = mapping
+    let childMessage: ConversationNodeMessage | undefined
+    let currentNodeId: string | undefined = startNodeId
+
+    while (currentNodeId) {
+        const node: ConversationNode | undefined = mapping[currentNodeId]
+        if (!node) break
+
+        const { message } = node
+        const childType = childMessage?.content.content_type
+        if (
+            message
+            && message.recipient == null
+            && message.author.role === 'assistant'
+            && message.content.content_type === 'text'
+            && (childType === 'thoughts' || childType === 'reasoning_recap')
+        ) {
+            if (result === mapping) result = { ...mapping }
+            result[currentNodeId] = {
+                ...node,
+                message: { ...message, metadata: { ...message.metadata, is_thinking_preamble_message: true } },
+            }
+        }
+
+        childMessage = message
+        currentNodeId = node.parent
+    }
+
+    return result
 }
 
 function extractModel(conversationMapping: Record<string, ConversationNode>, conversationNodes: ConversationNode[]) {
@@ -1126,6 +1170,9 @@ function mergeContinuationNodes(nodes: ConversationNode[]): ConversationNode[] {
         const prevNode = result[result.length - 1]
         if (
             prevNode?.message?.author.role === 'assistant' && node.message?.author.role === 'assistant'
+            // Official exports have no `recipient` or `channel`, so a continuation
+            // looks the same as separate replies, such as the runs of a scheduled
+            // task. Those stay unmerged.
             && prevNode.message.recipient === 'all' && node.message.recipient === 'all'
             && prevNode.message.content.content_type === 'text' && node.message.content.content_type === 'text'
         ) {
