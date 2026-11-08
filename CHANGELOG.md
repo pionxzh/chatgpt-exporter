@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.39.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.38.3...userscript-v2.39.0) (2026-11-08)
+
+
+### Features
+
+* import an official export split across several files ([023cf2b](https://github.com/pionxzh/chatgpt-exporter/commit/023cf2b1ece2d41d9be326c026f7ae6ae10c9ae5))
+
+
+### Bug Fixes
+
+* hide thinking preambles in official data exports ([8e5bd2a](https://github.com/pionxzh/chatgpt-exporter/commit/8e5bd2a4ad8e3f87a64f0abb7dd4090f86828145))
+* keep scheduled task runs as separate replies ([8b924f5](https://github.com/pionxzh/chatgpt-exporter/commit/8b924f57f4e2ce0b5bffb55661f8b48ede3bc0b6))
+* retain official JSON messages with missing recipient ([44affd4](https://github.com/pionxzh/chatgpt-exporter/commit/44affd4d68c88f73be59f8adda521da08ba95ba0))
+
 ## [2.38.3](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.38.2...userscript-v2.38.3) (2026-11-04)
 
 
