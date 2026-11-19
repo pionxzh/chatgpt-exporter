@@ -37,6 +37,7 @@ export const SettingDialog: FC<SettingDialogProps> = ({
         exportMetaList, setExportMetaList,
         enableThinking, setEnableThinking,
         enableSources, setEnableSources,
+        enablePromptHeadings, setEnablePromptHeadings,
         imageMode, setImageMode,
         exportAllLimit, setExportAllLimit,
         /* eslint-enable antfu/consistent-list-newline */
@@ -132,6 +133,19 @@ export const SettingDialog: FC<SettingDialogProps> = ({
                         </div>
                         <div className="ce-setting-control">
                             <Toggle label="" checked={enableSources} onCheckedUpdate={setEnableSources} />
+                        </div>
+                    </div>
+                    <div className="ce-setting-card">
+                        <div>
+                            <dt className="ce-setting-title">
+                                {t('Prompt Headings')}
+                            </dt>
+                            <dd className="ce-setting-desc">
+                                {t('Prompt Headings Description')}
+                            </dd>
+                        </div>
+                        <div className="ce-setting-control">
+                            <Toggle label="" checked={enablePromptHeadings} onCheckedUpdate={setEnablePromptHeadings} />
                         </div>
                     </div>
                     <div className="ce-setting-card">

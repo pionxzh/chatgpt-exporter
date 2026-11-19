@@ -7,6 +7,7 @@ import {
     KEY_IMAGE_MODE,
     KEY_META_ENABLED,
     KEY_META_LIST,
+    KEY_PROMPT_HEADINGS_ENABLED,
     KEY_SOURCES_ENABLED,
     KEY_THINKING_ENABLED,
     KEY_TIMESTAMP_24H,
@@ -57,6 +58,8 @@ const SettingContext = createContext({
     setEnableThinking: (_: boolean) => {},
     enableSources: true,
     setEnableSources: (_: boolean) => {},
+    enablePromptHeadings: false,
+    setEnablePromptHeadings: (_: boolean) => {},
     imageMode: defaultImageMode as ImageMode,
     setImageMode: (_: ImageMode) => {},
     exportAllLimit: defaultExportAllLimit,
@@ -77,6 +80,7 @@ export const SettingProvider: FC = ({ children }) => {
     const [exportMetaList, setExportMetaList] = useGMStorage(KEY_META_LIST, defaultExportMetaList)
     const [enableThinking, setEnableThinking] = useGMStorage(KEY_THINKING_ENABLED, false)
     const [enableSources, setEnableSources] = useGMStorage(KEY_SOURCES_ENABLED, true)
+    const [enablePromptHeadings, setEnablePromptHeadings] = useGMStorage(KEY_PROMPT_HEADINGS_ENABLED, false)
     const [imageMode, setImageMode] = useGMStorage<ImageMode>(KEY_IMAGE_MODE, defaultImageMode)
     const [exportAllLimit, setExportAllLimit] = useGMStorage(KEY_EXPORT_ALL_LIMIT, defaultExportAllLimit)
 
@@ -87,6 +91,7 @@ export const SettingProvider: FC = ({ children }) => {
         setExportMetaList(defaultExportMetaList)
         setEnableThinking(false)
         setEnableSources(true)
+        setEnablePromptHeadings(false)
         setImageMode(defaultImageMode)
         setExportAllLimit(defaultExportAllLimit)
     }, [
@@ -96,6 +101,7 @@ export const SettingProvider: FC = ({ children }) => {
         setExportMetaList,
         setEnableThinking,
         setEnableSources,
+        setEnablePromptHeadings,
         setImageMode,
         setExportAllLimit,
     ])
@@ -122,6 +128,8 @@ export const SettingProvider: FC = ({ children }) => {
         setEnableThinking,
         enableSources,
         setEnableSources,
+        enablePromptHeadings,
+        setEnablePromptHeadings,
         imageMode,
         setImageMode,
 
@@ -148,6 +156,8 @@ export const SettingProvider: FC = ({ children }) => {
         setEnableThinking,
         enableSources,
         setEnableSources,
+        enablePromptHeadings,
+        setEnablePromptHeadings,
         imageMode,
         setImageMode,
         exportAllLimit,
