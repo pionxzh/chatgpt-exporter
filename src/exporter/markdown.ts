@@ -1,6 +1,6 @@
 import JSZip from 'jszip'
 import { fetchConversation, getCurrentChatId, getFileAttachmentNames, processConversation, shouldSkipMessageInExport, withImageAssets } from '../api'
-import { KEY_SOURCES_ENABLED, KEY_THINKING_ENABLED, KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_MARKDOWN, baseUrl } from '../constants'
+import { KEY_PROMPT_HEADINGS_ENABLED, KEY_SOURCES_ENABLED, KEY_THINKING_ENABLED, KEY_TIMESTAMP_24H, KEY_TIMESTAMP_ENABLED, KEY_TIMESTAMP_MARKDOWN, baseUrl } from '../constants'
 import i18n from '../i18n'
 import { checkIfConversationStarted } from '../page'
 import { checkIfTemporaryChatIsExportable } from '../temporaryChat'
@@ -8,7 +8,7 @@ import { transformContentReferences } from '../utils/citations'
 import { buildZipFileName, downloadFile, getFileNameWithFormat } from '../utils/download'
 import { addImageFilesToZip, extractImageFiles, getImageMode } from '../utils/imageFiles'
 import { protectMath } from '../utils/latex'
-import { fromMarkdown, toMarkdown } from '../utils/markdown'
+import { escapeMarkdownText, fromMarkdown, getPromptTitle, nestHeadings, toMarkdown } from '../utils/markdown'
 import { ScriptStorage } from '../utils/storage'
 import { standardizeLineBreaks } from '../utils/text'
 import { transformAuthor } from '../utils/author'
@@ -123,11 +123,13 @@ function conversationToMarkdown(conversation: ConversationResult, metaList: Expo
     const timeStampMarkdown = ScriptStorage.get<boolean>(KEY_TIMESTAMP_MARKDOWN) ?? false
     const timeStamp24H = ScriptStorage.get<boolean>(KEY_TIMESTAMP_24H) ?? false
     const enableSources = ScriptStorage.get<boolean>(KEY_SOURCES_ENABLED) ?? true
+    const enablePromptHeadings = ScriptStorage.get<boolean>(KEY_PROMPT_HEADINGS_ENABLED) ?? false
     // Same placeholder as the text export
     const renderImage = imageMode === 'omit'
         ? () => '[image]'
         : (src: string) => `![image](${src})`
 
+    let promptCount = 0
     const content = conversationNodes.map(({ message, thinking }) => {
         if (!message || !message.content) return null
 
@@ -144,6 +146,17 @@ function conversationToMarkdown(conversation: ConversationResult, metaList: Expo
         }
 
         const author = transformAuthor(message.author)
+        let header = `#### ${author}:\n`
+        if (enablePromptHeadings) {
+            // Only prompts go into the outline, the author stays as a label
+            header = `**${author}:**\n\n`
+            if (message.author.role === 'user') {
+                promptCount++
+                const title = getPromptTitle(getPromptText(message.content))
+                    || i18n.t('Prompt Heading Fallback', { n: promptCount })
+                header = `## ${escapeMarkdownText(title)}\n\n${header}`
+            }
+        }
         const thinkingBlock = thinking ? formatThinkingMarkdown(thinking) : ''
 
         const postSteps: Array<(input: string) => string> = []
@@ -161,7 +174,10 @@ function conversationToMarkdown(conversation: ConversationResult, metaList: Expo
             postSteps.push((input) => {
                 // Keep formulas out of the markdown round trip, which would escape them
                 const { text, restore } = protectMath(input)
-                return restore(toMarkdown(fromMarkdown(text), text))
+                const tree = fromMarkdown(text)
+                // Keep the reply's own headings under the prompt heading in the outline
+                if (enablePromptHeadings) nestHeadings(tree, 3)
+                return restore(toMarkdown(tree, text))
             })
         }
         const postProcess = (input: string) => postSteps.reduce((acc, fn) => fn(acc), input)
@@ -169,12 +185,32 @@ function conversationToMarkdown(conversation: ConversationResult, metaList: Expo
         const attachments = getFileAttachmentNames(message).map(name => `- 📎 ${name}`).join('\n')
         const attachmentsBlock = attachments ? `\n\n${attachments}` : ''
 
-        return `#### ${author}:\n${timestampHtml}${thinkingBlock}${content}${attachmentsBlock}`
+        return `${header}${timestampHtml}${thinkingBlock}${content}${attachmentsBlock}`
     }).filter(Boolean).join('\n\n')
 
     const markdown = `${frontMatter}# ${title}\n\n${content}`
 
     return markdown
+}
+
+/**
+ * What the user typed or said, without images and audio
+ */
+function getPromptText(content: ConversationNodeMessage['content']): string {
+    switch (content.content_type) {
+        case 'text':
+            return content.parts?.join('\n') ?? ''
+        case 'multimodal_text':
+            return content.parts
+                ?.map((part) => {
+                    if (typeof part === 'string') return part
+                    if (part.content_type === 'audio_transcription') return part.text
+                    return ''
+                })
+                .join('\n') ?? ''
+        default:
+            return ''
+    }
 }
 
 /**
