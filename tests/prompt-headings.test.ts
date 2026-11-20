@@ -28,7 +28,7 @@ vi.mock('../src/utils/download', async importOriginal => ({
 }))
 
 const { exportAllToMarkdown } = await import('../src/exporter/markdown')
-const { KEY_PROMPT_HEADINGS_ENABLED } = await import('../src/constants')
+const { KEY_PROMPT_HEADINGS_ENABLED, KEY_THINKING_ENABLED } = await import('../src/constants')
 
 function conversation(messages: Array<{ role: string, content: unknown, metadata?: unknown }>): ApiConversationWithId {
     const ids = messages.map((_, i) => `m${i}`)
@@ -179,5 +179,35 @@ describe('prompt headings in Markdown exports', () => {
         ]))
         expect(markdown.match(/^#+ .*$/gm)).toEqual(['# Chat', '# Draw a cat', '## Here it is', '#### Details'])
         expect(markdown).toContain('**ChatGPT:**\n\n![image](https://example.com/cat.png)\n\n**ChatGPT:**\n\n## Here it is')
+    })
+
+    it('nests headings in the prompt under its heading and keeps the rest as written', async () => {
+        settings.set(KEY_PROMPT_HEADINGS_ENABLED, true)
+        const markdown = await exportMarkdown(conversation([
+            { role: 'user', content: text('Review this README:\n\n# My *lib*\n\nUse   it.\n\n## Install') },
+            { role: 'assistant', content: text('Looks good.') },
+        ]))
+        expect(markdown.match(/^#+ .*$/gm)).toEqual(['# Chat', '# Review this README:', '## My *lib*', '### Install'])
+        expect(markdown).toContain('**You:**\n\nReview this README:\n\n## My *lib*\n\nUse   it.\n\n### Install')
+    })
+
+    it('leaves the prompt as written when the setting is off', async () => {
+        const markdown = await exportMarkdown(conversation([
+            { role: 'user', content: text('# Notes\n\nSome text') },
+            { role: 'assistant', content: text('OK.') },
+        ]))
+        expect(markdown).toContain('#### You:\n# Notes\n\nSome text')
+    })
+
+    it('nests headings in the thinking process', async () => {
+        settings.set(KEY_PROMPT_HEADINGS_ENABLED, true)
+        settings.set(KEY_THINKING_ENABLED, true)
+        const markdown = await exportMarkdown(conversation([
+            { role: 'user', content: text('Plan a trip') },
+            { role: 'assistant', content: { content_type: 'thoughts', thoughts: [{ summary: 'Plan', content: '# Options\n\nTrain or plane.' }] } },
+            { role: 'assistant', content: text('Take the train.') },
+        ]))
+        expect(markdown.match(/^#+ .*$/gm)).toEqual(['# Chat', '# Plan a trip', '## Options'])
+        expect(markdown).toContain('<summary>Thinking</summary>\n\n## Options\n\nTrain or plane.')
     })
 })

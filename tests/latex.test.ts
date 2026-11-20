@@ -22,6 +22,13 @@ describe('math in markdown export', () => {
             .toBe('Here $h_1$ and $z * 2$ are vectors, and $$x_1$$ too.\n')
     })
 
+    it('can put formulas back as written, without converting delimiters', () => {
+        const input = 'Text\n  \\[\n  a_1\n  \\]\nand \\(b\\), $c$, $$d$$.'
+        const { text, restoreSource } = protectMath(input)
+        expect(text).not.toContain('a_1')
+        expect(restoreSource(text)).toBe(input)
+    })
+
     it('leaves code untouched', () => {
         const input = 'Match brackets:\n\n```js\nconst re = /\\[(\\d+)\\]/\n```\n\nor `\\(x\\)` inline, then \\(y_1\\).'
         expect(format(input))

@@ -6,6 +6,7 @@ import { gfm, gfmHtml } from 'micromark-extension-gfm'
 import type { Content, Heading, Parent, Root } from 'mdast'
 import type { HtmlExtension } from 'micromark-extension-gfm'
 import type { Node } from 'unist'
+import { protectMath } from './latex'
 
 // ref: https://github.com/rxliuli/mdbook/blob/master/libs/markdown-util
 
@@ -74,18 +75,55 @@ export function toMarkdown(ast: Content | Root, source: string): string {
  * stay at 6. Headings already at `depth` or below are left as they are.
  */
 export function nestHeadings(tree: Root, depth: number): void {
+    const headings = collectHeadings(tree)
+    const shift = depth - Math.min(...headings.map(heading => heading.depth))
+    if (shift <= 0) return
+    for (const heading of headings) {
+        heading.depth = Math.min(heading.depth + shift, 6) as Heading['depth']
+    }
+}
+
+/**
+ * Like `nestHeadings`, for Markdown that is not re-serialized, such as a
+ * prompt or the thinking process: only the heading markers change, and the
+ * rest of `source` stays as written. A setext heading becomes ATX.
+ */
+export function nestHeadingsInSource(source: string, depth: number): string {
+    // A `=` line inside a `$$` block would read as a setext underline
+    const { text: markdown, restoreSource } = protectMath(source)
+    const headings = collectHeadings(fromMarkdown(markdown))
+    const shift = depth - Math.min(...headings.map(heading => heading.depth))
+    if (shift <= 0) return source
+
+    let output = markdown
+    // From the end, so the offsets of earlier headings stay valid
+    for (const heading of headings.reverse()) {
+        const start = heading.position!.start.offset!
+        const end = heading.position!.end.offset!
+        const marker = '#'.repeat(Math.min(heading.depth + shift, 6))
+        const atx = /^[ \t]*(#{1,6})/.exec(markdown.slice(start, end))
+        if (atx) {
+            const markerStart = start + atx[0].length - atx[1].length
+            output = output.slice(0, markerStart) + marker + output.slice(start + atx[0].length)
+        }
+        else {
+            // Setext: the text lines, then a `===` or `---` underline
+            const lines = markdown.slice(start, end).split(/\r?\n/).slice(0, -1)
+            const text = lines.map((line, i) => i ? line.replace(/^[ \t>]*/, '') : line).join(' ')
+            output = `${output.slice(0, start)}${marker} ${text}${output.slice(end)}`
+        }
+    }
+    return restoreSource(output)
+}
+
+function collectHeadings(tree: Root): Heading[] {
     const headings: Heading[] = []
     const collect = (node: Content | Root) => {
         if (node.type === 'heading') headings.push(node)
         if ('children' in node) (node.children as Content[]).forEach(collect)
     }
     collect(tree)
-
-    const shift = depth - Math.min(...headings.map(heading => heading.depth))
-    if (shift <= 0) return
-    for (const heading of headings) {
-        heading.depth = Math.min(heading.depth + shift, 6) as Heading['depth']
-    }
+    return headings
 }
 
 const words = new Intl.Segmenter(undefined, { granularity: 'word' })
@@ -100,7 +138,7 @@ function toPlainText(node: Content | Root): string {
         case 'imageReference':
             return ''
         case 'break':
-            return ' '
+            return '\n'
     }
     if ('value' in node) return node.value
     if ('children' in node) return (node.children as Content[]).map(toPlainText).join('')
@@ -117,47 +155,63 @@ function sliceGraphemes(text: string, length: number): string {
     return text.slice(0, end)
 }
 
-const FENCE = /^ {0,3}(`{3,}|~{3,})/
+// A formula swapped out by `protectMath`
+const MATH_PLACEHOLDER = /╬\d+╬/g
 
-/** The lines of `markdown` outside fenced code blocks, and the lines inside them. */
-function splitFencedLines(markdown: string): { text: string[], code: string[] } {
-    const text: string[] = []
-    const code: string[] = []
-    let fence = ''
-    for (const line of markdown.split(/\r\n?|\n/)) {
-        const marker = FENCE.exec(line)
-        if (!fence) {
-            if (marker) fence = marker[1]
-            else text.push(line)
-        }
-        else if (marker && marker[1][0] === fence[0] && marker[1].length >= fence.length && !line.slice(marker[0].length).trim()) {
-            fence = ''
-        }
-        else {
-            code.push(line)
-        }
+/**
+ * The first line of `text` that has something to read, with whitespace
+ * collapsed. A line that is only math, such as a display formula, is
+ * skipped.
+ */
+function firstTextLine(text: string): string {
+    for (const raw of text.split(/\r\n?|\n/)) {
+        const line = raw.replace(/\s+/g, ' ').trim()
+        if (line.replace(MATH_PLACEHOLDER, '').trim()) return line
     }
-    return { text, code }
+    return ''
 }
 
 /**
  * A short title for a prompt, like ChatGPT's prompt navigation: the first
  * line with text, without Markdown syntax, cut after about ten words. Code
- * blocks are skipped, so a prompt that starts with code is titled by the
- * text after it, and a prompt that is only code by its first line of code.
- * Words are found with `Intl.Segmenter`, so text without spaces, such as
- * Chinese, is cut too.
+ * and math blocks, rules, and HTML tags are skipped, so a prompt that starts
+ * with code is titled by the text after it, and a prompt that is only code
+ * by its first line of code. Words are found with `Intl.Segmenter`, so text
+ * without spaces, such as Chinese, is cut too.
  *
  * Returns an empty string when the prompt has no text or code.
  */
 export function getPromptTitle(prompt: string): string {
-    const { text: lines, code } = splitFencedLines(prompt)
-    for (const line of lines) {
-        const title = toPlainText(fromMarkdown(line.trim())).replace(/\s+/g, ' ').trim()
-        if (title) return shortenTitle(title)
+    let codeLine = ''
+    // The first line with text, in document order, including inside quotes and lists
+    const visit = (node: Content | Root): string => {
+        switch (node.type) {
+            case 'code':
+                codeLine ||= firstTextLine(node.value)
+                return ''
+            case 'html':
+                return firstTextLine(node.value.replace(/<!--[\s\S]*?(?:-->|$)|<[^>]*>/g, '\n'))
+            case 'table':
+                return firstTextLine(node.children[0]?.children.map(toPlainText).join(' | ') ?? '')
+            case 'paragraph':
+            case 'heading':
+                return firstTextLine(toPlainText(node))
+            case 'thematicBreak':
+            case 'definition':
+                return ''
+        }
+        if ('children' in node) {
+            for (const child of node.children as Content[]) {
+                const line = visit(child)
+                if (line) return line
+            }
+        }
+        return ''
     }
-    const codeLine = code.find(line => line.trim())
-    return codeLine ? shortenTitle(codeLine.replace(/\s+/g, ' ').trim()) : ''
+    // The parser has no math syntax, so keep formulas out of it
+    const { text, restoreSource } = protectMath(prompt)
+    const title = restoreSource(visit(fromMarkdown(text)) || codeLine)
+    return title ? shortenTitle(title) : ''
 }
 
 /** Cuts `text` after about ten words, marking the cut with `…`. */

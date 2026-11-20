@@ -8,7 +8,7 @@ import { transformContentReferences } from '../utils/citations'
 import { buildZipFileName, downloadFile, getFileNameWithFormat } from '../utils/download'
 import { addImageFilesToZip, extractImageFiles, getImageMode } from '../utils/imageFiles'
 import { protectMath } from '../utils/latex'
-import { escapeMarkdownText, fromMarkdown, getPromptTitle, nestHeadings, toMarkdown } from '../utils/markdown'
+import { escapeMarkdownText, fromMarkdown, getPromptTitle, nestHeadings, nestHeadingsInSource, toMarkdown } from '../utils/markdown'
 import { ScriptStorage } from '../utils/storage'
 import { standardizeLineBreaks } from '../utils/text'
 import { transformAuthor } from '../utils/author'
@@ -158,7 +158,7 @@ function conversationToMarkdown(conversation: ConversationResult, metaList: Expo
                 header = `# ${escapeMarkdownText(title)}\n\n${header}`
             }
         }
-        const thinkingBlock = thinking ? formatThinkingMarkdown(thinking) : ''
+        const thinkingBlock = thinking ? formatThinkingMarkdown(thinking, enablePromptHeadings) : ''
 
         const postSteps: Array<(input: string) => string> = []
         if (message.author.role === 'assistant') {
@@ -180,6 +180,10 @@ function conversationToMarkdown(conversation: ConversationResult, metaList: Expo
                 if (enablePromptHeadings) nestHeadings(tree, 2)
                 return restore(toMarkdown(tree, text))
             })
+        }
+        else if (enablePromptHeadings) {
+            // Prompts and tool output are kept as written, so move only their heading markers
+            postSteps.push(input => nestHeadingsInSource(input, 2))
         }
         const postProcess = (input: string) => postSteps.reduce((acc, fn) => fn(acc), input)
         const content = transformContent(message.content, message.metadata, postProcess, renderImage)
@@ -295,7 +299,11 @@ function transformContent(
     }
 }
 
-function formatThinkingMarkdown(thinking: ThinkingContent): string {
+/**
+ * With `nestHeadings`, headings in the thoughts move down below the prompt
+ * heading, so the outline lists only prompts at the top level.
+ */
+function formatThinkingMarkdown(thinking: ThinkingContent, nestHeadings: boolean): string {
     const durationLabel = thinking.durationSeconds != null
         ? `Thought for ${thinking.durationSeconds} seconds`
         : 'Thinking'
@@ -310,7 +318,7 @@ function formatThinkingMarkdown(thinking: ThinkingContent): string {
         .map(t => t.content || t.summary)
         .filter(Boolean)
         .join('\n\n')
-    if (thoughts) parts.push(thoughts)
+    if (thoughts) parts.push(nestHeadings ? nestHeadingsInSource(thoughts, 2) : thoughts)
 
     const body = parts.join('\n\n')
 
