@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.39.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.38.3...userscript-v2.39.0) (2026-11-20)
+
+
+### Features
+
+* add prompt headings to Markdown exports ([5879a14](https://github.com/pionxzh/chatgpt-exporter/commit/5879a142d3f5208a7f8e4b1e374012e568fe1ac4)), closes [#370](https://github.com/pionxzh/chatgpt-exporter/issues/370)
+* import an official export split across several files ([023cf2b](https://github.com/pionxzh/chatgpt-exporter/commit/023cf2b1ece2d41d9be326c026f7ae6ae10c9ae5))
+* use # prompt headings and title code-first prompts by their text ([e2eb460](https://github.com/pionxzh/chatgpt-exporter/commit/e2eb460b56b81b765bed0c3d6570a081a9a68958))
+
+
+### Bug Fixes
+
+* hide thinking preambles in official data exports ([8e5bd2a](https://github.com/pionxzh/chatgpt-exporter/commit/8e5bd2a4ad8e3f87a64f0abb7dd4090f86828145))
+* keep prompt and thinking headings under the prompt heading ([ac320be](https://github.com/pionxzh/chatgpt-exporter/commit/ac320be62538d9dbbdb03886d1f3b06adf782815))
+* keep scheduled task runs as separate replies ([8b924f5](https://github.com/pionxzh/chatgpt-exporter/commit/8b924f57f4e2ce0b5bffb55661f8b48ede3bc0b6))
+* retain official JSON messages with missing recipient ([44affd4](https://github.com/pionxzh/chatgpt-exporter/commit/44affd4d68c88f73be59f8adda521da08ba95ba0))
+
 ## [2.38.3](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.38.2...userscript-v2.38.3) (2026-11-04)
 
 
