@@ -90,11 +90,24 @@ describe('getPromptTitle', () => {
         expect(title).toBe(`${'👍'.repeat(40)}…`)
     })
 
-    it('returns an empty string when the first line has no text', () => {
+    it('skips lines without text, such as a code block, to the first line of text', () => {
+        expect(getPromptTitle('```js\nuseEffect(() => {}, [count])\n```\nWhy does this loop?\nMore text'))
+            .toBe('Why does this loop?')
+        expect(getPromptTitle('~~~\ncode\n~~~\n\nAfter a tilde fence')).toBe('After a tilde fence')
+        expect(getPromptTitle('````md\n```\nnot the end\n````\nAfter a longer fence')).toBe('After a longer fence')
+        expect(getPromptTitle('---\nAfter a rule')).toBe('After a rule')
+        expect(getPromptTitle('![](a.png)\nAfter an image')).toBe('After an image')
+    })
+
+    it('uses the first line of code when the prompt is only code', () => {
+        expect(getPromptTitle('```python\n\n    print("hi")\nprint("bye")\n```')).toBe('print("hi")')
+        expect(getPromptTitle('```\nunclosed fence')).toBe('unclosed fence')
+    })
+
+    it('returns an empty string when the prompt has no text or code', () => {
         expect(getPromptTitle('')).toBe('')
         expect(getPromptTitle('  \n\t\n ')).toBe('')
-        expect(getPromptTitle('```python\nprint("hi")\n```')).toBe('')
-        expect(getPromptTitle('---\nAfter a rule')).toBe('')
+        expect(getPromptTitle('```\n```')).toBe('')
         expect(getPromptTitle('![](a.png)')).toBe('')
     })
 })

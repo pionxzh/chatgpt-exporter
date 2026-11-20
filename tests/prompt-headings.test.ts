@@ -30,13 +30,13 @@ vi.mock('../src/utils/download', async importOriginal => ({
 const { exportAllToMarkdown } = await import('../src/exporter/markdown')
 const { KEY_PROMPT_HEADINGS_ENABLED } = await import('../src/constants')
 
-function conversation(messages: Array<{ role: string, content: unknown }>): ApiConversationWithId {
+function conversation(messages: Array<{ role: string, content: unknown, metadata?: unknown }>): ApiConversationWithId {
     const ids = messages.map((_, i) => `m${i}`)
     const mapping = Object.fromEntries(messages.map((message, i) => [ids[i], {
         id: ids[i],
         parent: ids[i - 1] ?? null,
         children: ids[i + 1] ? [ids[i + 1]] : [],
-        message: { id: ids[i], author: { role: message.role }, recipient: 'all', content: message.content, metadata: {} },
+        message: { id: ids[i], author: { role: message.role }, recipient: 'all', content: message.content, metadata: message.metadata ?? {} },
     }]))
     return {
         id: 'chat-id',
@@ -98,7 +98,7 @@ describe('prompt headings in Markdown exports', () => {
         expect(await exportMarkdown(chat)).toBe([
             '# Chat',
             '',
-            '## How do I export a chat?',
+            '# How do I export a chat?',
             '',
             '**You:**',
             '',
@@ -107,12 +107,12 @@ describe('prompt headings in Markdown exports', () => {
             '',
             '**ChatGPT:**',
             '',
-            '### Steps',
+            '## Steps',
             '',
             'Use the menu.',
             '',
             '',
-            '## Thanks',
+            '# Thanks',
             '',
             '**You:**',
             '',
@@ -125,7 +125,7 @@ describe('prompt headings in Markdown exports', () => {
         ].join('\n'))
     })
 
-    it('numbers prompts that have no text to use', async () => {
+    it('titles prompts without text by their code or file, else numbers them', async () => {
         settings.set(KEY_PROMPT_HEADINGS_ENABLED, true)
         const markdown = await exportMarkdown(conversation([
             { role: 'user', content: text('```js\nconsole.log(1)\n```') },
@@ -140,8 +140,10 @@ describe('prompt headings in Markdown exports', () => {
                 content: { content_type: 'multimodal_text', parts: [{ content_type: 'image_asset_pointer', asset_pointer: 'https://example.com/b.png' }, 'And this one?'] },
             },
             { role: 'assistant', content: text('A dog.') },
+            { role: 'user', content: text(''), metadata: { attachments: [{ name: 'report.pdf', mime_type: 'application/pdf' }] } },
+            { role: 'assistant', content: text('A report.') },
         ]))
-        expect(markdown.match(/^#+ .*$/gm)).toEqual(['# Chat', '## Prompt 1', '## Prompt 2', '## And this one?'])
+        expect(markdown.match(/^#+ .*$/gm)).toEqual(['# Chat', '# console.log(1)', '# Prompt 2', '# And this one?', '# report.pdf'])
     })
 
     it('uses the transcript of a voice prompt', async () => {
@@ -153,7 +155,7 @@ describe('prompt headings in Markdown exports', () => {
             },
             { role: 'assistant', content: text('Sunny.') },
         ]))
-        expect(markdown).toContain('## What is the weather like today?\n\n**You:**\n\n[audio] What is the weather like today?')
+        expect(markdown).toContain('# What is the weather like today?\n\n**You:**\n\n[audio] What is the weather like today?')
     })
 
     it('escapes the excerpt so the heading shows it as written', async () => {
@@ -162,7 +164,7 @@ describe('prompt headings in Markdown exports', () => {
             { role: 'user', content: text('Why does a*b fail with <T> in my_func [v2]?') },
             { role: 'assistant', content: text('Because.') },
         ]))
-        expect(markdown).toContain('## Why does a\\*b fail with \\<T> in my_func \\[v2]?\n')
+        expect(markdown).toContain('# Why does a\\*b fail with \\<T> in my_func \\[v2]?\n')
     })
 
     it('adds no heading for replies and nests their headings under the prompt', async () => {
@@ -175,7 +177,7 @@ describe('prompt headings in Markdown exports', () => {
             },
             { role: 'assistant', content: text('# Here it is\n\nA cat.\n\n### Details\n\nOrange.') },
         ]))
-        expect(markdown.match(/^#+ .*$/gm)).toEqual(['# Chat', '## Draw a cat', '### Here it is', '##### Details'])
-        expect(markdown).toContain('**ChatGPT:**\n\n![image](https://example.com/cat.png)\n\n**ChatGPT:**\n\n### Here it is')
+        expect(markdown.match(/^#+ .*$/gm)).toEqual(['# Chat', '# Draw a cat', '## Here it is', '#### Details'])
+        expect(markdown).toContain('**ChatGPT:**\n\n![image](https://example.com/cat.png)\n\n**ChatGPT:**\n\n## Here it is')
     })
 })
