@@ -3,7 +3,7 @@
 // @name:zh-CN         ChatGPT Exporter
 // @name:zh-TW         ChatGPT Exporter
 // @namespace          pionxzh
-// @version            2.38.3
+// @version            2.39.0
 // @author             pionxzh
 // @description        Export ChatGPT conversations with one click — backup & share effortlessly!
 // @description:zh-CN  一键导出 ChatGPT 对话，轻松备份与分享
@@ -538,6 +538,7 @@
 	var KEY_META_LIST = "exporter:meta_list";
 	var KEY_THINKING_ENABLED = "exporter:enable_thinking";
 	var KEY_SOURCES_ENABLED = "exporter:enable_sources";
+	var KEY_PROMPT_HEADINGS_ENABLED = "exporter:enable_prompt_headings";
 	var KEY_IMAGE_MODE = "exporter:image_mode";
 	var KEY_EXPORT_ALL_LIMIT = "exporter:export_all_limit";
 	var KEY_EXPORTED_UPDATE_TIMES = "exporter:exported_update_times";
@@ -1070,7 +1071,7 @@
 	}
 	function shouldSkipMessageInExport(message) {
 		if (!message || !message.content) return true;
-		if (message.recipient !== "all") return true;
+		if (message.recipient != null && message.recipient !== "all") return true;
 		if (message.content.content_type === "thoughts") return true;
 		if (message.content.content_type === "reasoning_recap") return true;
 		if (message.metadata?.is_visually_hidden_from_conversation) return true;
@@ -1092,10 +1093,11 @@
 		const updateTime = conversation.update_time;
 		const startNodeId = conversation.current_node || Object.values(conversation.mapping).find((node) => !node.children || node.children.length === 0)?.id;
 		if (!startNodeId) throw new Error("Failed to find start node.");
-		const conversationNodes = extractConversationResult(conversation.mapping, startNodeId);
-		const { model, modelSlug } = extractModel(conversation.mapping, conversationNodes);
+		const mapping = flagOfficialExportPreambles(conversation.mapping, startNodeId);
+		const conversationNodes = extractConversationResult(mapping, startNodeId);
+		const { model, modelSlug } = extractModel(mapping, conversationNodes);
 		const mergedConversationNodes = mergeContinuationNodes(conversationNodes);
-		if (options?.enableThinking) attachThinkingToNodes(conversation.mapping, mergedConversationNodes, startNodeId);
+		if (options?.enableThinking) attachThinkingToNodes(mapping, mergedConversationNodes, startNodeId);
 		return {
 			id: conversation.id,
 			title,
@@ -1105,6 +1107,33 @@
 			updateTime,
 			conversationNodes: mergedConversationNodes
 		};
+	}
+	function flagOfficialExportPreambles(mapping, startNodeId) {
+		let result = mapping;
+		let childMessage;
+		let currentNodeId = startNodeId;
+		while (currentNodeId) {
+			const node = mapping[currentNodeId];
+			if (!node) break;
+			const { message } = node;
+			const childType = childMessage?.content.content_type;
+			if (message && message.recipient == null && message.author.role === "assistant" && message.content.content_type === "text" && (childType === "thoughts" || childType === "reasoning_recap")) {
+				if (result === mapping) result = { ...mapping };
+				result[currentNodeId] = {
+					...node,
+					message: {
+						...message,
+						metadata: {
+							...message.metadata,
+							is_thinking_preamble_message: true
+						}
+					}
+				};
+			}
+			childMessage = message;
+			currentNodeId = node.parent;
+		}
+		return result;
 	}
 	function extractModel(conversationMapping, conversationNodes) {
 		const modelSlug = (conversationNodes.findLast((node) => node.message?.metadata?.model_slug) ?? Object.values(conversationMapping).find((node) => node.message?.metadata?.model_slug))?.message?.metadata?.model_slug ?? "";
@@ -1153,7 +1182,7 @@
 		const result = [];
 		for (const node of nodes) {
 			const prevNode = result[result.length - 1];
-			if (prevNode?.message?.author.role === "assistant" && node.message?.author.role === "assistant" && prevNode.message.recipient === "all" && node.message.recipient === "all" && prevNode.message.content.content_type === "text" && node.message.content.content_type === "text") {
+			if (prevNode?.message?.author.role === "assistant" && node.message?.author.role === "assistant" && prevNode.message.recipient === "all" && node.message.recipient === "all" && prevNode.message.content.content_type === "text" && node.message.content.content_type === "text" && !node.message.metadata?.automation_id) {
 				const separator = prevNode.message.channel !== node.message.channel ? "\n\n" : "";
 				prevNode.message.content.parts[prevNode.message.content.parts.length - 1] += separator + node.message.content.parts[0];
 				prevNode.message.content.parts.push(...node.message.content.parts.slice(1));
@@ -1669,6 +1698,9 @@
 		"Export Thinking Process Description": "Include the model's thinking/reasoning process in exported Markdown and HTML files.",
 		"Export Sources": "Export Sources",
 		"Export Sources Description": "Include the source list shown at the end of each answer in exported Markdown and HTML files.",
+		"Prompt Headings": "Prompt Headings",
+		"Prompt Headings Description": "In Markdown exports, head each prompt with its first few words, so the document outline lists your prompts instead of You and ChatGPT.",
+		"Prompt Heading Fallback": "Prompt {{n}}",
 		Images: "Images",
 		"Images Description": "How images are saved in Markdown and JSON (ZIP) exports. When left out, Markdown shows [image] instead. HTML always embeds images.",
 		"Images Embed": "Embed in the file (base64)",
@@ -1742,6 +1774,9 @@
 		"Export Thinking Process Description": "Incluir el proceso de pensamiento/razonamiento del modelo en los archivos Markdown y HTML exportados.",
 		"Export Sources": "Exportar fuentes",
 		"Export Sources Description": "Incluir la lista de fuentes que se muestra al final de cada respuesta en los archivos Markdown y HTML exportados.",
+		"Prompt Headings": "Encabezados de prompts",
+		"Prompt Headings Description": "En las exportaciones Markdown, encabezar cada prompt con sus primeras palabras, para que el esquema del documento muestre tus prompts en lugar de You y ChatGPT.",
+		"Prompt Heading Fallback": "Prompt {{n}}",
 		Images: "Imágenes",
 		"Images Description": "Cómo se guardan las imágenes en las exportaciones Markdown y JSON (ZIP). Si se omiten, Markdown muestra [image] en su lugar. HTML siempre incrusta las imágenes.",
 		"Images Embed": "Incrustar en el archivo (base64)",
@@ -1815,6 +1850,9 @@
 		"Export Thinking Process Description": "Inclure le processus de réflexion/raisonnement du modèle dans les fichiers Markdown et HTML exportés.",
 		"Export Sources": "Exporter les sources",
 		"Export Sources Description": "Inclure la liste des sources affichée à la fin de chaque réponse dans les fichiers Markdown et HTML exportés.",
+		"Prompt Headings": "Titres des prompts",
+		"Prompt Headings Description": "Dans les exports Markdown, ajouter un titre avec les premiers mots de chaque prompt, pour que le plan du document liste vos prompts au lieu de You et ChatGPT.",
+		"Prompt Heading Fallback": "Prompt {{n}}",
 		Images: "Images",
 		"Images Description": "Comment les images sont enregistrées dans les exports Markdown et JSON (ZIP). Si elles sont omises, Markdown affiche [image] à la place. HTML intègre toujours les images.",
 		"Images Embed": "Intégrer dans le fichier (base64)",
@@ -1888,6 +1926,9 @@
 		"Export Thinking Process Description": "Sertakan proses berpikir/penalaran model dalam file Markdown dan HTML yang diekspor.",
 		"Export Sources": "Ekspor Sumber",
 		"Export Sources Description": "Sertakan daftar sumber yang ditampilkan di akhir setiap jawaban dalam file Markdown dan HTML yang diekspor.",
+		"Prompt Headings": "Judul Prompt",
+		"Prompt Headings Description": "Pada ekspor Markdown, beri setiap prompt judul berisi beberapa kata pertamanya, sehingga kerangka dokumen menampilkan prompt Anda, bukan You dan ChatGPT.",
+		"Prompt Heading Fallback": "Prompt {{n}}",
 		Images: "Gambar",
 		"Images Description": "Cara gambar disimpan dalam ekspor Markdown dan JSON (ZIP). Jika dihilangkan, Markdown menampilkan [image] sebagai gantinya. HTML selalu menyematkan gambar.",
 		"Images Embed": "Sematkan di file (base64)",
@@ -1961,6 +2002,9 @@
 		"Export Thinking Process Description": "エクスポートされたMarkdownおよびHTMLファイルにモデルの思考・推論プロセスを含めます。",
 		"Export Sources": "ソースをエクスポート",
 		"Export Sources Description": "各回答の末尾に表示されるソース一覧を、エクスポートされた Markdown および HTML ファイルに含めます。",
+		"Prompt Headings": "プロンプトの見出し",
+		"Prompt Headings Description": "Markdown のエクスポートで、各プロンプトの最初の数語を見出しにします。文書のアウトラインに You と ChatGPT ではなくプロンプトが並びます。",
+		"Prompt Heading Fallback": "プロンプト {{n}}",
 		Images: "画像",
 		"Images Description": "Markdown と JSON (ZIP) のエクスポートでの画像の保存方法。省略した場合、Markdown では代わりに [image] と表示されます。HTML では常に画像が埋め込まれます。",
 		"Images Embed": "ファイルに埋め込む (base64)",
@@ -2034,6 +2078,9 @@
 		"Export Thinking Process Description": "Включить процесс мышления/рассуждения модели в экспортированные файлы Markdown и HTML.",
 		"Export Sources": "Экспорт источников",
 		"Export Sources Description": "Включить список источников, показанный в конце каждого ответа, в экспортированные файлы Markdown и HTML.",
+		"Prompt Headings": "Заголовки запросов",
+		"Prompt Headings Description": "В экспорте Markdown начинать каждый запрос с заголовка из его первых слов, чтобы в структуре документа были ваши запросы, а не You и ChatGPT.",
+		"Prompt Heading Fallback": "Запрос {{n}}",
 		Images: "Изображения",
 		"Images Description": "Как сохранять изображения при экспорте в Markdown и JSON (ZIP). Если изображения пропущены, в Markdown вместо них будет [image]. HTML всегда встраивает изображения.",
 		"Images Embed": "Встроить в файл (base64)",
@@ -2107,6 +2154,9 @@
 		"Export Thinking Process Description": "Dışa aktarılan Markdown ve HTML dosyalarına modelin düşünme/akıl yürütme sürecini dahil et.",
 		"Export Sources": "Kaynakları Dışa Aktar",
 		"Export Sources Description": "Her yanıtın sonunda gösterilen kaynak listesini dışa aktarılan Markdown ve HTML dosyalarına dahil et.",
+		"Prompt Headings": "İstem Başlıkları",
+		"Prompt Headings Description": "Markdown dışa aktarımlarında her istemin başına ilk birkaç kelimesinden bir başlık ekle, böylece belge ana hattında You ve ChatGPT yerine istemleriniz listelenir.",
+		"Prompt Heading Fallback": "İstem {{n}}",
 		Images: "Görseller",
 		"Images Description": "Markdown ve JSON (ZIP) dışa aktarımlarında görsellerin nasıl kaydedileceği. Görseller çıkarıldığında Markdown yerine [image] gösterir. HTML görselleri her zaman gömer.",
 		"Images Embed": "Dosyaya göm (base64)",
@@ -2180,6 +2230,9 @@
 		"Export Thinking Process Description": "在导出的 Markdown 和 HTML 文件中包含模型的思考/推理过程。",
 		"Export Sources": "导出来源",
 		"Export Sources Description": "在导出的 Markdown 和 HTML 文件中包含每个回答末尾显示的来源列表。",
+		"Prompt Headings": "提问标题",
+		"Prompt Headings Description": "在 Markdown 导出中，用每条提问开头的几个词作为标题，让文档大纲列出你的提问，而不是 You 和 ChatGPT。",
+		"Prompt Heading Fallback": "提问 {{n}}",
 		Images: "图片",
 		"Images Description": "Markdown 和 JSON (ZIP) 导出时图片的保存方式。省略时，Markdown 会以 [image] 代替。HTML 始终嵌入图片。",
 		"Images Embed": "嵌入文件 (base64)",
@@ -2253,6 +2306,9 @@
 		"Export Thinking Process Description": "在匯出的 Markdown 和 HTML 檔案中包含模型的思考/推理過程。",
 		"Export Sources": "匯出來源",
 		"Export Sources Description": "在匯出的 Markdown 和 HTML 檔案中包含每個回答末尾顯示的來源列表。",
+		"Prompt Headings": "提問標題",
+		"Prompt Headings Description": "在 Markdown 匯出中，以每則提問開頭的幾個字作為標題，讓文件大綱列出你的提問，而不是 You 與 ChatGPT。",
+		"Prompt Heading Fallback": "提問 {{n}}",
 		Images: "圖片",
 		"Images Description": "Markdown 和 JSON (ZIP) 匯出時圖片的儲存方式。省略時，Markdown 會以 [image] 代替。HTML 一律嵌入圖片。",
 		"Images Embed": "嵌入檔案 (base64)",
@@ -2552,7 +2608,7 @@
 		output = output.replaceAll(EntityMarkerRegex, (marker, data) => {
 			const name = parseEntityName(data);
 			if (name === null) return marker;
-			return linkOutput === "markdown" ? escapeMarkdownText(name) : name;
+			return linkOutput === "markdown" ? escapeMarkdownText$1(name) : name;
 		});
 		output = output.replace(ImageGroupMarkerRegex, "");
 		output = output.replace(CitationMarkerRegex, "");
@@ -2572,9 +2628,9 @@
 	function formatCitationSource(source, output) {
 		const label = getSourceLabel(source);
 		const url = source.url?.trim();
-		if (!url) return output === "markdown" ? escapeMarkdownText(label) : label;
+		if (!url) return output === "markdown" ? escapeMarkdownText$1(label) : label;
 		if (output === "text") return `${label}: ${url}`;
-		return `[${escapeMarkdownText(label)}](<${escapeMarkdownUrl(url)}>)`;
+		return `[${escapeMarkdownText$1(label)}](<${escapeMarkdownUrl(url)}>)`;
 	}
 	function formatInlineReference(ref, output, mode) {
 		if (ref.type === "client_defined_widget" && ref.data?.widget_type === "charts_widget_v2") return formatChart(ref.data.content);
@@ -2596,7 +2652,7 @@
 			const image = entry.image_result ?? entry;
 			const src = image.content_url?.trim();
 			if (!src) return "";
-			const markdown = `![${escapeMarkdownText(image.title?.trim() || "Image")}](<${escapeMarkdownUrl(src)}>)`;
+			const markdown = `![${escapeMarkdownText$1(image.title?.trim() || "Image")}](<${escapeMarkdownUrl(src)}>)`;
 			const page = image.url?.trim();
 			return page ? `[${markdown}](<${escapeMarkdownUrl(page)}>)` : markdown;
 		}).filter(Boolean).join("\n\n");
@@ -2649,7 +2705,7 @@
 	function appendSourcesSection(input, sources, output, label) {
 		const trimmed = input.trimEnd();
 		const sourceList = output === "markdown" ? [
-			`**${escapeMarkdownText(label)}:**`,
+			`**${escapeMarkdownText$1(label)}:**`,
 			"",
 			...sources.map((source) => `- ${formatCitationSource(source, output)}`)
 		].join("\n") : [`${label}:`, ...sources.map((source, index) => `${index + 1}. ${formatCitationSource(source, output)}`)].join("\n");
@@ -2669,7 +2725,7 @@
 	function getSourceLabel(source) {
 		return source.attribution?.trim() || source.title?.trim() || source.url?.trim() || "Source";
 	}
-	function escapeMarkdownText(input) {
+	function escapeMarkdownText$1(input) {
 		return input.replaceAll("\\", "\\\\").replaceAll("[", "\\[").replaceAll("]", "\\]").replaceAll("\n", " ");
 	}
 	function escapeMarkdownUrl(input) {
@@ -2876,27 +2932,34 @@
 	].join("|"), "g");
 	function protectMath(input) {
 		const formulas = [];
-		const placeholder = (formula) => `╬${formulas.push(formula) - 1}╬`;
+		const sources = [];
+		const placeholder = (formula, source) => {
+			sources.push(source);
+			return `╬${formulas.push(formula) - 1}╬`;
+		};
 		const text = input.split(CodeRegex).map((part, index) => {
 			if (index % 2 === 1) return part;
 			return part.replace(MathRegex, (...args) => {
+				const match = args[0];
 				const groups = args.at(-1);
 				if (groups.block != null) {
 					const { blockStart = "", indent = "" } = groups;
-					return `${blockStart}${indent}${placeholder(`$$\n${groups.block.trim()}\n${indent}$$`)}`;
+					const prefix = `${blockStart}${indent}`;
+					return `${prefix}${placeholder(`$$\n${groups.block.trim()}\n${indent}$$`, match.slice(prefix.length))}`;
 				}
-				if (groups.display != null) return placeholder(`$$${groups.display.trim()}$$`);
-				if (groups.inline != null) return placeholder(`$${groups.inline.trim()}$`);
-				return placeholder(groups.dollarBlock ?? groups.dollarInline ?? "");
+				if (groups.display != null) return placeholder(`$$${groups.display.trim()}$$`, match);
+				if (groups.inline != null) return placeholder(`$${groups.inline.trim()}$`, match);
+				return placeholder(groups.dollarBlock ?? groups.dollarInline ?? "", match);
 			});
 		}).join("");
-		const restore = (output, escape = (formula) => formula) => output.replace(/╬(\d+)╬/g, (match, index) => {
-			const formula = formulas[Number(index)];
-			return formula == null ? match : escape(formula);
+		const replace = (output, values, escape = (value) => value) => output.replace(/╬(\d+)╬/g, (match, index) => {
+			const value = values[Number(index)];
+			return value == null ? match : escape(value);
 		});
 		return {
 			text,
-			restore
+			restore: (output, escape) => replace(output, formulas, escape),
+			restoreSource: (output) => replace(output, sources)
 		};
 	}
 	function toBracketDelimiters(formula) {
@@ -10850,6 +10913,110 @@
 			}
 		});
 	}
+	function nestHeadings(tree, depth) {
+		const headings = collectHeadings(tree);
+		const shift = depth - Math.min(...headings.map((heading) => heading.depth));
+		if (shift <= 0) return;
+		for (const heading of headings) heading.depth = Math.min(heading.depth + shift, 6);
+	}
+	function nestHeadingsInSource(source, depth) {
+		const { text: markdown, restoreSource } = protectMath(source);
+		const headings = collectHeadings(fromMarkdown(markdown));
+		const shift = depth - Math.min(...headings.map((heading) => heading.depth));
+		if (shift <= 0) return source;
+		let output = markdown;
+		for (const heading of headings.reverse()) {
+			const start = heading.position.start.offset;
+			const end = heading.position.end.offset;
+			const marker = "#".repeat(Math.min(heading.depth + shift, 6));
+			const atx = /^[ \t]*(#{1,6})/.exec(markdown.slice(start, end));
+			if (atx) {
+				const markerStart = start + atx[0].length - atx[1].length;
+				output = output.slice(0, markerStart) + marker + output.slice(start + atx[0].length);
+			} else {
+				const text = markdown.slice(start, end).split(/\r?\n/).slice(0, -1).map((line, i) => i ? line.replace(/^[ \t>]*/, "") : line).join(" ");
+				output = `${output.slice(0, start)}${marker} ${text}${output.slice(end)}`;
+			}
+		}
+		return restoreSource(output);
+	}
+	function collectHeadings(tree) {
+		const headings = [];
+		const collect = (node) => {
+			if (node.type === "heading") headings.push(node);
+			if ("children" in node) node.children.forEach(collect);
+		};
+		collect(tree);
+		return headings;
+	}
+	var words = new Intl.Segmenter(void 0, { granularity: "word" });
+	var PROMPT_TITLE_WORDS = 10;
+	var PROMPT_TITLE_LENGTH = 80;
+	function toPlainText(node) {
+		switch (node.type) {
+			case "code":
+			case "image":
+			case "imageReference": return "";
+			case "break": return "\n";
+		}
+		if ("value" in node) return node.value;
+		if ("children" in node) return node.children.map(toPlainText).join("");
+		return "";
+	}
+	function sliceGraphemes(text, length) {
+		let end = 0;
+		for (const { segment, index } of graphemes.segment(text)) {
+			if (index + segment.length > length) break;
+			end = index + segment.length;
+		}
+		return text.slice(0, end);
+	}
+	var MATH_PLACEHOLDER = /╬\d+╬/g;
+	function firstTextLine(text) {
+		for (const raw of text.split(/\r\n?|\n/)) {
+			const line = raw.replace(/\s+/g, " ").trim();
+			if (line.replace(MATH_PLACEHOLDER, "").trim()) return line;
+		}
+		return "";
+	}
+	function getPromptTitle(prompt) {
+		let codeLine = "";
+		const visit = (node) => {
+			switch (node.type) {
+				case "code":
+					codeLine ||= firstTextLine(node.value);
+					return "";
+				case "html": return firstTextLine(node.value.replace(/<!--[\s\S]*?(?:-->|$)|<[^>]*>/g, "\n"));
+				case "table": return firstTextLine(node.children[0]?.children.map(toPlainText).join(" | ") ?? "");
+				case "paragraph":
+				case "heading": return firstTextLine(toPlainText(node));
+				case "thematicBreak":
+				case "definition": return "";
+			}
+			if ("children" in node) for (const child of node.children) {
+				const line = visit(child);
+				if (line) return line;
+			}
+			return "";
+		};
+		const { text, restoreSource } = protectMath(prompt);
+		const title = restoreSource(visit(fromMarkdown(text)) || codeLine);
+		return title ? shortenTitle(title) : "";
+	}
+	function shortenTitle(text) {
+		let count = 0;
+		let end = 0;
+		for (const { segment, index, isWordLike } of words.segment(text)) {
+			if (!isWordLike) continue;
+			if (++count > PROMPT_TITLE_WORDS || index + segment.length > PROMPT_TITLE_LENGTH) break;
+			end = index + segment.length;
+		}
+		if (count <= PROMPT_TITLE_WORDS && text.length <= PROMPT_TITLE_LENGTH) return text;
+		return `${end > 0 ? text.slice(0, end) : sliceGraphemes(text, PROMPT_TITLE_LENGTH)}…`;
+	}
+	function escapeMarkdownText(text) {
+		return text.replace(/[\\`*[<~]|(?<![\p{L}\p{N}])_|_(?![\p{L}\p{N}])/gu, "\\$&").replace(/&(?=#?\w+;)/g, "\\&").replace(/(^|\s)(#+)$/, "$1\\$2");
+	}
 	var dropRawHtml = { exit: {
 		htmlFlowData() {},
 		htmlTextData() {}
@@ -12231,7 +12398,9 @@
 		const timeStampMarkdown = ScriptStorage.get("exporter:timestamp_markdown") ?? false;
 		const timeStamp24H = ScriptStorage.get("exporter:timestamp_24h") ?? false;
 		const enableSources = ScriptStorage.get("exporter:enable_sources") ?? true;
+		const enablePromptHeadings = ScriptStorage.get("exporter:enable_prompt_headings") ?? false;
 		const renderImage = imageMode === "omit" ? () => "[image]" : (src) => `![image](${src})`;
+		let promptCount = 0;
 		return `${frontMatter}# ${title}\n\n${conversationNodes.map(({ message, thinking }) => {
 			if (!message || !message.content) return null;
 			if (shouldSkipMessageInExport(message)) return null;
@@ -12248,7 +12417,15 @@
 				timestampHtml = `<time datetime="${date.toISOString()}" title="${date.toLocaleString()}">${conversationTime}</time>\n\n`;
 			}
 			const author = transformAuthor(message.author);
-			const thinkingBlock = thinking ? formatThinkingMarkdown(thinking) : "";
+			let header = `#### ${author}:\n`;
+			if (enablePromptHeadings) {
+				header = `**${author}:**\n\n`;
+				if (message.author.role === "user") {
+					promptCount++;
+					header = `# ${escapeMarkdownText(getPromptTitle(getPromptText(message.content)) || getFileAttachmentNames(message)[0] || i18n.t("Prompt Heading Fallback", { n: promptCount }))}\n\n${header}`;
+				}
+			}
+			const thinkingBlock = thinking ? formatThinkingMarkdown(thinking, enablePromptHeadings) : "";
 			const postSteps = [];
 			if (message.author.role === "assistant") {
 				postSteps.push((input) => transformContentReferences(input, message.metadata, {
@@ -12259,14 +12436,28 @@
 			}
 			if (message.author.role === "assistant") postSteps.push((input) => {
 				const { text, restore } = protectMath(input);
-				return restore(toMarkdown(fromMarkdown(text), text));
+				const tree = fromMarkdown(text);
+				if (enablePromptHeadings) nestHeadings(tree, 2);
+				return restore(toMarkdown(tree, text));
 			});
+			else if (enablePromptHeadings) postSteps.push((input) => nestHeadingsInSource(input, 2));
 			const postProcess = (input) => postSteps.reduce((acc, fn) => fn(acc), input);
 			const content = transformContent$1(message.content, message.metadata, postProcess, renderImage);
 			const attachments = getFileAttachmentNames(message).map((name) => `- 📎 ${name}`).join("\n");
 			const attachmentsBlock = attachments ? `\n\n${attachments}` : "";
-			return `#### ${author}:\n${timestampHtml}${thinkingBlock}${content}${attachmentsBlock}`;
+			return `${header}${timestampHtml}${thinkingBlock}${content}${attachmentsBlock}`;
 		}).filter(Boolean).join("\n\n")}`;
+	}
+	function getPromptText(content) {
+		switch (content.content_type) {
+			case "text": return content.parts?.join("\n") ?? "";
+			case "multimodal_text": return content.parts?.map((part) => {
+				if (typeof part === "string") return part;
+				if (part.content_type === "audio_transcription") return part.text;
+				return "";
+			}).join("\n") ?? "";
+			default: return "";
+		}
 	}
 	function transformFootNotes$1(input, metadata) {
 		const footNoteMarkRegex = /【(\d+)†\((.+?)\)】/g;
@@ -12309,12 +12500,12 @@
 				return postProcess(`[Unsupported Content: ${content.content_type}]`);
 		}
 	}
-	function formatThinkingMarkdown(thinking) {
+	function formatThinkingMarkdown(thinking, nestHeadings) {
 		const durationLabel = thinking.durationSeconds != null ? `Thought for ${thinking.durationSeconds} seconds` : "Thinking";
 		const parts = [];
 		if (thinking.activities?.length) parts.push(thinking.activities.map((a) => `- ${a}`).join("\n"));
 		const thoughts = thinking.thoughts.map((t) => t.content || t.summary).filter(Boolean).join("\n\n");
-		if (thoughts) parts.push(thoughts);
+		if (thoughts) parts.push(nestHeadings ? nestHeadingsInSource(thoughts, 2) : thoughts);
 		const body = parts.join("\n\n");
 		if (!body) return "";
 		return `<details>\n<summary>${durationLabel}</summary>\n\n${body}\n\n</details>\n\n`;
@@ -12537,6 +12728,24 @@
 		if (head.length === 0) return items;
 		const headIds = new Set(head.map((c) => c.id));
 		return [...head, ...items.filter((c) => !headIds.has(c.id))];
+	}
+	function collectConversations(files) {
+		const conversations = new Map();
+		for (const data of files) {
+			if (!Array.isArray(data)) continue;
+			for (const item of data) {
+				if (!item || typeof item !== "object" || !item.mapping || typeof item.mapping !== "object") continue;
+				const id = item.id ?? item.conversation_id;
+				if (typeof id !== "string") continue;
+				const existing = conversations.get(id);
+				if (existing && (existing.update_time ?? 0) >= (item.update_time ?? 0)) continue;
+				conversations.set(id, {
+					...item,
+					id
+				});
+			}
+		}
+		return [...conversations.values()];
 	}
 	function mitt_default(n) {
 		return {
@@ -12998,6 +13207,8 @@
 		setEnableThinking: (_) => {},
 		enableSources: true,
 		setEnableSources: (_) => {},
+		enablePromptHeadings: false,
+		setEnablePromptHeadings: (_) => {},
 		imageMode: defaultImageMode,
 		setImageMode: (_) => {},
 		exportAllLimit: defaultExportAllLimit,
@@ -13014,6 +13225,7 @@
 		const [exportMetaList, setExportMetaList] = useGMStorage(KEY_META_LIST, defaultExportMetaList);
 		const [enableThinking, setEnableThinking] = useGMStorage(KEY_THINKING_ENABLED, false);
 		const [enableSources, setEnableSources] = useGMStorage(KEY_SOURCES_ENABLED, true);
+		const [enablePromptHeadings, setEnablePromptHeadings] = useGMStorage(KEY_PROMPT_HEADINGS_ENABLED, false);
 		const [imageMode, setImageMode] = useGMStorage(KEY_IMAGE_MODE, defaultImageMode);
 		const [exportAllLimit, setExportAllLimit] = useGMStorage(KEY_EXPORT_ALL_LIMIT, defaultExportAllLimit);
 		const resetDefault = T$1(() => {
@@ -13023,6 +13235,7 @@
 			setExportMetaList(defaultExportMetaList);
 			setEnableThinking(false);
 			setEnableSources(true);
+			setEnablePromptHeadings(false);
 			setImageMode(defaultImageMode);
 			setExportAllLimit(defaultExportAllLimit);
 		}, [
@@ -13032,6 +13245,7 @@
 			setExportMetaList,
 			setEnableThinking,
 			setEnableSources,
+			setEnablePromptHeadings,
 			setImageMode,
 			setExportAllLimit
 		]);
@@ -13054,6 +13268,8 @@
 			setEnableThinking,
 			enableSources,
 			setEnableSources,
+			enablePromptHeadings,
+			setEnablePromptHeadings,
 			imageMode,
 			setImageMode,
 			exportAllLimit,
@@ -13078,6 +13294,8 @@
 			setEnableThinking,
 			enableSources,
 			setEnableSources,
+			enablePromptHeadings,
+			setEnablePromptHeadings,
 			imageMode,
 			setImageMode,
 			exportAllLimit,
@@ -13461,21 +13679,25 @@
 		const cancelledRef = _$1(false);
 		const skippedRef = _$1([]);
 		const fetchGenRef = _$1(0);
-		const onUpload = T$1((e) => {
-			const file = e.target?.files?.[0];
-			if (!file) return;
-			const fileReader = new FileReader();
-			fileReader.onload = () => {
-				const data = JSON.parse(fileReader.result);
-				if (!Array.isArray(data)) {
-					alert(t("Invalid File Format"));
-					return;
+		const onUpload = T$1(async (e) => {
+			const input = e.target;
+			const files = Array.from(input.files ?? []).sort((a, b) => a.name.localeCompare(b.name));
+			input.value = "";
+			if (!files.length) return;
+			const conversations = collectConversations(await Promise.all(files.map(async (file) => {
+				try {
+					return JSON.parse(await file.text());
+				} catch {
+					return null;
 				}
-				setSelected([]);
-				setExportSource("Local");
-				setLocalConversations(data);
-			};
-			fileReader.readAsText(file);
+			})));
+			if (!conversations.length) {
+				alert(t("Invalid File Format"));
+				return;
+			}
+			setSelected([]);
+			setExportSource("Local");
+			setLocalConversations(conversations);
 		}, [t]);
 		const startApiBatch = T$1((chunk) => {
 			requestQueue.clear();
@@ -13836,7 +14058,7 @@
 				className: "ce-export-source",
 				children: [
 					t("Export from official export file"),
-					" (conversations.json)\xA0",
+					" (conversations*.json)\xA0",
 					o("div", {
 						className: "ce-hstack",
 						children: [exportSource === "API" && o("button", {
@@ -13862,6 +14084,7 @@
 			o("input", {
 				type: "file",
 				accept: "application/json",
+				multiple: true,
 				hidden: true,
 				ref: fileInputRef,
 				onChange: onUpload
@@ -14219,7 +14442,7 @@
 		});
 	}
 	var SettingDialog = ({ open, onOpenChange }) => {
-		const { format, setFormat, enableTimestamp, setEnableTimestamp, timeStamp24H, setTimeStamp24H, enableTimestampHTML, setEnableTimestampHTML, enableTimestampMarkdown, setEnableTimestampMarkdown, enableMeta, setEnableMeta, exportMetaList, setExportMetaList, enableThinking, setEnableThinking, enableSources, setEnableSources, imageMode, setImageMode, exportAllLimit, setExportAllLimit } = useSettingContext();
+		const { format, setFormat, enableTimestamp, setEnableTimestamp, timeStamp24H, setTimeStamp24H, enableTimestampHTML, setEnableTimestampHTML, enableTimestampMarkdown, setEnableTimestampMarkdown, enableMeta, setEnableMeta, exportMetaList, setExportMetaList, enableThinking, setEnableThinking, enableSources, setEnableSources, enablePromptHeadings, setEnablePromptHeadings, imageMode, setImageMode, exportAllLimit, setExportAllLimit } = useSettingContext();
 		const { t, i18n } = useTranslation();
 		const _title = useTitle();
 		const date = dateStr();
@@ -14360,6 +14583,23 @@
 										label: "",
 										checked: enableSources,
 										onCheckedUpdate: setEnableSources
+									})
+								})]
+							}),
+							o("div", {
+								className: "ce-setting-card",
+								children: [o("div", { children: [o("dt", {
+									className: "ce-setting-title",
+									children: t("Prompt Headings")
+								}), o("dd", {
+									className: "ce-setting-desc",
+									children: t("Prompt Headings Description")
+								})] }), o("div", {
+									className: "ce-setting-control",
+									children: o(Toggle, {
+										label: "",
+										checked: enablePromptHeadings,
+										onCheckedUpdate: setEnablePromptHeadings
 									})
 								})]
 							}),
