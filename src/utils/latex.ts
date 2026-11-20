@@ -17,30 +17,45 @@ const MathRegex = new RegExp([
  * round trip does not escape it. `restore` puts the formulas back, passed
  * through `escape` when the output is HTML.
  */
-export function protectMath(input: string): { text: string, restore: (text: string, escape?: (formula: string) => string) => string } {
+export function protectMath(input: string): {
+    text: string
+    restore: (text: string, escape?: (formula: string) => string) => string
+    /** Puts the formulas back as they were written in `input`, without converting the delimiters */
+    restoreSource: (text: string) => string
+} {
     const formulas: string[] = []
-    const placeholder = (formula: string) => `╬${formulas.push(formula) - 1}╬`
+    const sources: string[] = []
+    const placeholder = (formula: string, source: string) => {
+        sources.push(source)
+        return `╬${formulas.push(formula) - 1}╬`
+    }
 
     const text = input.split(CodeRegex).map((part, index) => {
         if (index % 2 === 1) return part
 
         return part.replace(MathRegex, (...args) => {
+            const match: string = args[0]
             const groups: Record<string, string | undefined> = args.at(-1)
             if (groups.block != null) {
                 const { blockStart = '', indent = '' } = groups
-                return `${blockStart}${indent}${placeholder(`$$\n${groups.block.trim()}\n${indent}$$`)}`
+                const prefix = `${blockStart}${indent}`
+                return `${prefix}${placeholder(`$$\n${groups.block.trim()}\n${indent}$$`, match.slice(prefix.length))}`
             }
-            if (groups.display != null) return placeholder(`$$${groups.display.trim()}$$`)
-            if (groups.inline != null) return placeholder(`$${groups.inline.trim()}$`)
-            return placeholder(groups.dollarBlock ?? groups.dollarInline ?? '')
+            if (groups.display != null) return placeholder(`$$${groups.display.trim()}$$`, match)
+            if (groups.inline != null) return placeholder(`$${groups.inline.trim()}$`, match)
+            return placeholder(groups.dollarBlock ?? groups.dollarInline ?? '', match)
         })
     }).join('')
 
-    const restore = (output: string, escape = (formula: string) => formula) => output.replace(/╬(\d+)╬/g, (match, index: string) => {
-        const formula = formulas[Number(index)]
-        return formula == null ? match : escape(formula)
+    const replace = (output: string, values: string[], escape = (value: string) => value) => output.replace(/╬(\d+)╬/g, (match, index: string) => {
+        const value = values[Number(index)]
+        return value == null ? match : escape(value)
     })
-    return { text, restore }
+    return {
+        text,
+        restore: (output, escape) => replace(output, formulas, escape),
+        restoreSource: output => replace(output, sources),
+    }
 }
 
 /**

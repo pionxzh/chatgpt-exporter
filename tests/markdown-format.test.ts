@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { escapeMarkdownText, fromMarkdown, getPromptTitle, nestHeadings, toMarkdown } from '../src/utils/markdown'
+import { escapeMarkdownText, fromMarkdown, getPromptTitle, nestHeadings, nestHeadingsInSource, toMarkdown } from '../src/utils/markdown'
 
 function format(input: string) {
     return toMarkdown(fromMarkdown(input), input)
@@ -99,9 +99,30 @@ describe('getPromptTitle', () => {
         expect(getPromptTitle('![](a.png)\nAfter an image')).toBe('After an image')
     })
 
+    it('skips code, math and HTML that the line by line view would miss', () => {
+        expect(getPromptTitle('    indented code\n\nThen text')).toBe('Then text')
+        expect(getPromptTitle('> ```\n> quoted code\n> ```\n\nAfter a quoted fence')).toBe('After a quoted fence')
+        expect(getPromptTitle('- ```js\n  x = 1\n  ```\n\nAfter a list fence')).toBe('After a list fence')
+        expect(getPromptTitle('$$\nE = mc^2\n$$\nWhat is this?')).toBe('What is this?')
+        expect(getPromptTitle('$$E = mc^2$$\n\nAnd this?')).toBe('And this?')
+        expect(getPromptTitle('\\[\nx^2\n\\]\nBracket math')).toBe('Bracket math')
+        expect(getPromptTitle('Why is $x_1 * y_2$ zero?')).toBe('Why is $x_1 * y_2$ zero?')
+        expect(getPromptTitle('<!-- note -->\n\nReal question')).toBe('Real question')
+        expect(getPromptTitle('<details>\n<summary>Log</summary>\n</details>')).toBe('Log')
+    })
+
+    it('uses the header row of a table', () => {
+        expect(getPromptTitle('| Name | Price |\n| --- | --- |\n| a | 1 |')).toBe('Name | Price')
+    })
+
+    it('stops at a hard line break', () => {
+        expect(getPromptTitle('First line  \nsecond line')).toBe('First line')
+    })
+
     it('uses the first line of code when the prompt is only code', () => {
         expect(getPromptTitle('```python\n\n    print("hi")\nprint("bye")\n```')).toBe('print("hi")')
         expect(getPromptTitle('```\nunclosed fence')).toBe('unclosed fence')
+        expect(getPromptTitle('```\na\n```\n\n```\nb\n```')).toBe('a')
     })
 
     it('returns an empty string when the prompt has no text or code', () => {
@@ -150,5 +171,41 @@ describe('nestHeadings', () => {
     it('leaves headings that are already deep enough', () => {
         expect(nest('### A\n\n#### B', 3)).toBe('### A\n\n#### B\n')
         expect(nest('No headings', 3)).toBe('No headings\n')
+    })
+})
+
+describe('nestHeadingsInSource', () => {
+    it('moves only the heading markers and keeps the rest as written', () => {
+        expect(nestHeadingsInSource('# My *lib*\n\nUse   it_now.\n\n## Install', 2))
+            .toBe('## My *lib*\n\nUse   it_now.\n\n### Install')
+    })
+
+    it('handles indented, quoted and listed headings', () => {
+        expect(nestHeadingsInSource('  # A\n\n> # B\n\n- # C', 2)).toBe('  ## A\n\n> ## B\n\n- ## C')
+    })
+
+    it('keeps Windows line endings', () => {
+        expect(nestHeadingsInSource('# A\r\ntext\r\n', 2)).toBe('## A\r\ntext\r\n')
+    })
+
+    it('turns setext headings into ATX', () => {
+        expect(nestHeadingsInSource('Title\n=====\n\nSub\n---\n\ntext', 2)).toBe('## Title\n\n### Sub\n\ntext')
+        expect(nestHeadingsInSource('> Two\n> lines\n> ===', 2)).toBe('> ## Two lines')
+    })
+
+    it('does not take a = line in a math block for a heading', () => {
+        expect(nestHeadingsInSource('# A\n\n$$\nx\n=\ny\n$$\n\n\\[\na\n=\n\\]', 2))
+            .toBe('## A\n\n$$\nx\n=\ny\n$$\n\n\\[\na\n=\n\\]')
+        expect(nestHeadingsInSource('$$\nx\n=\ny\n$$', 2)).toBe('$$\nx\n=\ny\n$$')
+    })
+
+    it('stops at level 6 and skips code blocks', () => {
+        expect(nestHeadingsInSource('# A\n\n###### B\n\n```\n# not a heading\n```', 2))
+            .toBe('## A\n\n###### B\n\n```\n# not a heading\n```')
+    })
+
+    it('leaves headings that are already deep enough', () => {
+        expect(nestHeadingsInSource('## A\n\n### B', 2)).toBe('## A\n\n### B')
+        expect(nestHeadingsInSource('No headings', 2)).toBe('No headings')
     })
 })
