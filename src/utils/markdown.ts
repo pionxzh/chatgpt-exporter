@@ -117,18 +117,51 @@ function sliceGraphemes(text: string, length: number): string {
     return text.slice(0, end)
 }
 
+const FENCE = /^ {0,3}(`{3,}|~{3,})/
+
+/** The lines of `markdown` outside fenced code blocks, and the lines inside them. */
+function splitFencedLines(markdown: string): { text: string[], code: string[] } {
+    const text: string[] = []
+    const code: string[] = []
+    let fence = ''
+    for (const line of markdown.split(/\r\n?|\n/)) {
+        const marker = FENCE.exec(line)
+        if (!fence) {
+            if (marker) fence = marker[1]
+            else text.push(line)
+        }
+        else if (marker && marker[1][0] === fence[0] && marker[1].length >= fence.length && !line.slice(marker[0].length).trim()) {
+            fence = ''
+        }
+        else {
+            code.push(line)
+        }
+    }
+    return { text, code }
+}
+
 /**
  * A short title for a prompt, like ChatGPT's prompt navigation: the first
- * line without Markdown syntax, cut after about ten words. Words are found
- * with `Intl.Segmenter`, so text without spaces, such as Chinese, is cut too.
+ * line with text, without Markdown syntax, cut after about ten words. Code
+ * blocks are skipped, so a prompt that starts with code is titled by the
+ * text after it, and a prompt that is only code by its first line of code.
+ * Words are found with `Intl.Segmenter`, so text without spaces, such as
+ * Chinese, is cut too.
  *
- * Returns an empty string when the first line has no text, such as the
- * opening fence of a code block.
+ * Returns an empty string when the prompt has no text or code.
  */
 export function getPromptTitle(prompt: string): string {
-    const [firstLine] = prompt.trimStart().split(/\r\n?|\n/, 1)
-    const text = toPlainText(fromMarkdown(firstLine)).replace(/\s+/g, ' ').trim()
+    const { text: lines, code } = splitFencedLines(prompt)
+    for (const line of lines) {
+        const title = toPlainText(fromMarkdown(line.trim())).replace(/\s+/g, ' ').trim()
+        if (title) return shortenTitle(title)
+    }
+    const codeLine = code.find(line => line.trim())
+    return codeLine ? shortenTitle(codeLine.replace(/\s+/g, ' ').trim()) : ''
+}
 
+/** Cuts `text` after about ten words, marking the cut with `…`. */
+function shortenTitle(text: string): string {
     let count = 0
     // End of the last word that fits
     let end = 0

@@ -153,8 +153,9 @@ function conversationToMarkdown(conversation: ConversationResult, metaList: Expo
             if (message.author.role === 'user') {
                 promptCount++
                 const title = getPromptTitle(getPromptText(message.content))
+                    || getFileAttachmentNames(message)[0]
                     || i18n.t('Prompt Heading Fallback', { n: promptCount })
-                header = `## ${escapeMarkdownText(title)}\n\n${header}`
+                header = `# ${escapeMarkdownText(title)}\n\n${header}`
             }
         }
         const thinkingBlock = thinking ? formatThinkingMarkdown(thinking) : ''
@@ -176,7 +177,7 @@ function conversationToMarkdown(conversation: ConversationResult, metaList: Expo
                 const { text, restore } = protectMath(input)
                 const tree = fromMarkdown(text)
                 // Keep the reply's own headings under the prompt heading in the outline
-                if (enablePromptHeadings) nestHeadings(tree, 3)
+                if (enablePromptHeadings) nestHeadings(tree, 2)
                 return restore(toMarkdown(tree, text))
             })
         }
