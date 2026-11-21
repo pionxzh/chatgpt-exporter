@@ -49,8 +49,12 @@ if curl -sf "http://127.0.0.1:$PORT/json/version" >/dev/null; then
     exit 0
 fi
 
+# Windows marks a covered window hidden, which stops rendering and stalls
+# screenshots. Keep it rendering while other windows sit on top.
 nohup "$CHROME" --remote-debugging-port="$PORT" --user-data-dir="$PROFILE" \
-    --no-first-run --no-default-browser-check https://chatgpt.com >/dev/null 2>&1 &
+    --no-first-run --no-default-browser-check \
+    --disable-features=CalculateNativeWinOcclusion --disable-backgrounding-occluded-windows \
+    https://chatgpt.com >/dev/null 2>&1 &
 
 for _ in 1 2 3 4 5 6 7 8 9 10; do
     sleep 1

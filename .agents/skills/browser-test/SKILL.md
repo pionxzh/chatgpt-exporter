@@ -174,6 +174,9 @@ Other things that look like bugs but are not:
   never fires and `Page.captureScreenshot` hangs, so `ui-shot.mjs` and
   `readme-hero.mjs` bring the tab to the front before capturing. Exports,
   clicks and hovers still work while minimized.
+- Windows also marks a window `hidden` when other windows cover it, and the
+  Screenshot export then never finishes. `start-chrome.sh` turns that off, so
+  restart a test Chrome that was started without it.
 - A dialog that opens while no script is connected blocks the page, and a
   later connection cannot answer it. Close the tab and open a new one:
   `curl -s http://127.0.0.1:9222/json/list` for its id, then
