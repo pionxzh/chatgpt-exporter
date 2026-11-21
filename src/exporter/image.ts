@@ -6,6 +6,7 @@ import { checkIfConversationStarted, getChatIdFromUrl } from '../page'
 import { getBase64FromImg } from '../utils/dom'
 import { downloadFile, getFileNameWithFormat } from '../utils/download'
 import { Effect } from '../utils/effect'
+import { dropRemoteFontFaces } from '../utils/fontFaces'
 import { encodePng } from '../utils/png'
 import { getColorScheme, sleep } from '../utils/utils'
 import { escapeHtml } from './htmlTemplate'
@@ -124,6 +125,21 @@ const growUserBubbles: SnapdomPlugin = {
                 if (!(child instanceof HTMLImageElement)) child.style.height = 'auto'
             })
         })
+    },
+}
+
+/**
+ * An SVG image cannot load remote resources, so a `@font-face` that SnapDOM
+ * could not inline only hides the faces it did inline. ChatGPT declares the
+ * KaTeX fonts twice, the second time from cdn.openai.com, which the page CSP
+ * lets it load as a font but not fetch. That later copy wins, and formulas
+ * come out blank unless the browser happens to have it cached. Keep only
+ * faces that an image can load.
+ */
+const keepLoadableFontFaces: SnapdomPlugin = {
+    name: 'chatgpt-exporter-keep-loadable-font-faces',
+    beforeRender(context) {
+        if (context.fontsCSS) context.fontsCSS = dropRemoteFontFaces(context.fontsCSS)
     },
 }
 
@@ -851,7 +867,7 @@ async function renderPng(screenshotEl: HTMLElement, effect: Effect, backgroundCo
             embedFonts: true,
             // Keep text from re-wrapping and clipping under font fallback.
             reconcile: true,
-            plugins: [growUserBubbles],
+            plugins: [growUserBubbles, keepLoadableFontFaces],
             backgroundColor,
         })
     }
