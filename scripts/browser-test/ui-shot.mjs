@@ -72,6 +72,8 @@ try {
         // Let color transitions finish, or a theme switch shows half-way colors.
         await sleep(500)
     `)
+    // A minimized window draws no frames, and the capture waits forever.
+    await cdp.send('Page.bringToFront')
     const { data } = await cdp.send('Page.captureScreenshot', { format: 'png' }).then(m => m.result)
     mkdirSync(dirname(out), { recursive: true })
     writeFileSync(out, Buffer.from(data, 'base64'))

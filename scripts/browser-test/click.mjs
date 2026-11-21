@@ -26,7 +26,8 @@ try {
             .find(visible)
         if (!el) return null
         el.scrollIntoView({ block: 'center', inline: 'center' })
-        await new Promise(r => requestAnimationFrame(() => r()))
+        // A minimized window never fires requestAnimationFrame, so do not wait on it alone.
+        await new Promise(r => { requestAnimationFrame(() => r()); setTimeout(r, 100) })
         const r = el.getBoundingClientRect()
         const x = r.x + r.width / 2
         const y = r.y + r.height / 2

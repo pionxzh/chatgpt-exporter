@@ -170,6 +170,10 @@ Other things that look like bugs but are not:
 - Styles and fonts a test adds to `<head>` stay until the tab reloads, and a
   failed `FontFace` keeps rejecting later `document.fonts.load` calls.
 - Export All hits the conversation API once per chat. Keep test runs small.
+- A minimized test window makes the page `hidden`. `requestAnimationFrame`
+  never fires and `Page.captureScreenshot` hangs, so `ui-shot.mjs` and
+  `readme-hero.mjs` bring the tab to the front before capturing. Exports,
+  clicks and hovers still work while minimized.
 - A dialog that opens while no script is connected blocks the page, and a
   later connection cannot answer it. Close the tab and open a new one:
   `curl -s http://127.0.0.1:9222/json/list` for its id, then

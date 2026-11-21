@@ -153,6 +153,8 @@ async function shoot(theme, greeting, out) {
             // Let color transitions finish.
             await sleep(500)
         `)
+        // A minimized window draws no frames, and the capture waits forever.
+        await cdp.send('Page.bringToFront')
         const { data } = await cdp.send('Page.captureScreenshot', { format: 'png' }).then(m => m.result)
         writeFileSync(out, Buffer.from(data, 'base64'))
         console.log('saved', out)
