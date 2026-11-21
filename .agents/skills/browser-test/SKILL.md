@@ -16,7 +16,8 @@ the repository root.
 
 1. `scripts/browser-test/start-chrome.sh` starts Chrome with CDP on port 9222 and a
    separate profile in `~/.chrome-chatgpt-test`, or reuses the one that is
-   running. The default binary path is macOS; set `CHROME_BIN` elsewhere.
+   running. It finds Chrome on macOS, Linux, and Windows (run it from Git
+   Bash). Set `CHROME_BIN` to use another binary.
 2. The first time, and whenever the session expires or Cloudflare shows a
    challenge, the maintainer logs in by hand. Everything else is automatic.
 
