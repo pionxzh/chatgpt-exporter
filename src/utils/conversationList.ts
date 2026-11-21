@@ -11,6 +11,9 @@ type FetchPage = (offset: number, limit: number) => Promise<ApiConversations>
  * cached load sits before the first item that is still unchanged: paging
  * stops there, and the rest of the cached list is kept as is. Conversations
  * deleted or archived elsewhere are not detected.
+ *
+ * Project lists page by cursor, and their order has not been checked. Verify
+ * it before reusing this for them.
  */
 export async function refreshConversationList(
     cached: ApiConversationItem[],

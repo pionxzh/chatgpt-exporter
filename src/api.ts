@@ -1041,6 +1041,10 @@ export function processConversation(conversation: ApiConversationWithId, options
  * again so they are hidden and moved into the thinking block like in API
  * conversations. A reply followed by a thinking step is a preamble.
  *
+ * Progress notes before a tool call are missed, since the tool call is gone.
+ * Flagging every reply but the last in a turn would catch them, but it would
+ * also hide the runs of a scheduled task, which follow each other the same way.
+ *
  * Returns the mapping unchanged when nothing needs a flag. Flagged nodes are
  * copies, the raw mapping is left intact.
  */

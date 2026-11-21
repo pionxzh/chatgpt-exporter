@@ -7,6 +7,9 @@ import type { ApiConversationWithId } from '../api'
  * without a `mapping` are not conversations and are skipped. A conversation
  * found more than once, such as in an older and a newer export, keeps its
  * latest version.
+ *
+ * The export's zip is not accepted directly on purpose. It is mostly
+ * attachments and can run to hundreds of MB, so users pick the JSON files.
  */
 export function collectConversations(files: unknown[]): ApiConversationWithId[] {
     const conversations = new Map<string, ApiConversationWithId>()
