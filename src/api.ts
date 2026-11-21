@@ -11,6 +11,7 @@ import { getModelName } from './utils/model'
 // urlcat ships CommonJS with `exports.default`. Because this package is
 // `"type": "module"`, vite 8 (rolldown) applies Node's interop and hands the
 // default import the whole `module.exports` object, so unwrap either shape.
+// Stay on urlcat 2.x. 3.x pulls in `qs` and bloats the bundle.
 const urlcat: typeof urlcatImport = typeof urlcatImport === 'function'
     ? urlcatImport
     : (urlcatImport as unknown as { default: typeof urlcatImport }).default

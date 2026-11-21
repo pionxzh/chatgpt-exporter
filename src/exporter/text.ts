@@ -27,6 +27,7 @@ export async function exportToText() {
     // So we don't need to waste time to download them
     const rawConversation = await fetchConversation(chatId)
 
+    // Text is for quick sharing, so thinking and the source list stay out on purpose.
     const { conversationNodes } = processConversation(rawConversation)
     const text = conversationNodes
         .map(({ message }) => transformMessage(message))
