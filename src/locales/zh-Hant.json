@@ -53,7 +53,7 @@
   "Sources": "來源",
   "Canvas Created": "畫布：{{title}}",
   "Canvas Updated": "畫布：{{title}}（已編輯）",
-  "Canvas Edit Unavailable": "對話中沒有這次編輯前的內容，因此只顯示新的文字。",
+  "Canvas Edit Unavailable": "無法將這次編輯套用到之前的內容，因此只顯示新的文字。",
   "OpenAI Official Format": "OpenAI 官方格式",
   "Conversation Archive Alert": "確定要封存所有選取的對話？",
   "Conversation Archived Message": "所有選取的對話已封存。請重新整理頁面。",

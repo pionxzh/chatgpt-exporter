@@ -53,7 +53,7 @@
   "Sources": "Sources",
   "Canvas Created": "Canvas: {{title}}",
   "Canvas Updated": "Canvas: {{title}} (edited)",
-  "Canvas Edit Unavailable": "The text before this edit is not in the conversation, so only the new text is shown.",
+  "Canvas Edit Unavailable": "This edit could not be applied to the earlier text, so only the new text is shown.",
   "OpenAI Official Format": "OpenAI Official Format",
   "Conversation Archive Alert": "Are you sure you want to archive all selected conversations?",
   "Conversation Archived Message": "All selected conversations have been archived. Please refresh the page to see the changes.",
