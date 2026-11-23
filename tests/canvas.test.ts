@@ -109,6 +109,19 @@ describe('canvas export', () => {
         ])
     })
 
+    it('reads calls stored as code, as in 2026', () => {
+        const conversation = fixture('canvas-document-rewrite')
+        for (const node of Object.values(conversation.mapping)) {
+            const message = node.message
+            if (!message?.recipient?.startsWith('canmore.') || message.content.content_type !== 'text') continue
+            message.content = { content_type: 'code', language: 'json', text: message.content.parts.join('') }
+        }
+        const texts = processConversation(conversation, { canvasLabels: label }).conversationNodes
+            .filter(node => node.message?.author.role === 'assistant')
+            .map(({ message }) => message?.content.content_type === 'text' ? message.content.parts.join('') : '')
+        expect(texts).toEqual(answers('canvas-document-rewrite'))
+    })
+
     it('leaves out failed edits and shows only the new text after a hand edit', () => {
         const blocks = answers('canvas-failed-edits').filter(text => text.includes('Canvas'))
         expect(blocks).toEqual([

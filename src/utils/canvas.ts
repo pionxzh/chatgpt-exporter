@@ -101,7 +101,7 @@ function replayStep(
     documents: Map<string, CanvasDocument>,
     labels: CanvasLabels,
 ): string | null {
-    const body = parseCanvasJson(call.content.content_type === 'text' ? call.content.parts.join('') : '')
+    const body = parseCanvasJson(getCallText(call))
     const previous = documents.get(id)
 
     if (name === CREATE) {
@@ -311,6 +311,16 @@ export function expandReplacement(template: string, match: RegExpMatchArray | st
         }
     }
     return result
+}
+
+/**
+ * Calls from 2024 are `text` with the JSON in `parts`. Later ones, such as
+ * in 2026, are `code` with the JSON in `text`.
+ */
+function getCallText(call: ConversationNodeMessage): string {
+    if (call.content.content_type === 'text') return call.content.parts.join('')
+    if (call.content.content_type === 'code') return call.content.text
+    return ''
 }
 
 /**
