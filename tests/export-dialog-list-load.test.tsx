@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { render } from 'preact'
 import { act } from 'preact/test-utils'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ApiConversationItem, ApiProjectInfo } from '../src/api'
 
 // Without the GM_* APIs, `ScriptStorage` falls back to localStorage.
@@ -170,6 +170,13 @@ async function checkFirstConversation() {
     box.checked = true
     await fire(box)
 }
+
+// The first import transforms the dialog's whole module tree, about a second
+// alone and past the 5s test timeout when the suite runs in parallel. Later
+// imports after `resetModules` reuse the transform and take milliseconds.
+beforeAll(async () => {
+    await import('../src/ui/ExportDialog')
+}, 30_000)
 
 beforeEach(() => {
     vi.resetModules()
