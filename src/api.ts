@@ -88,8 +88,10 @@ export interface ContentReference {
     images?: Array<ImageSearchResult & { image_result?: ImageSearchResult }>
     /** What a `client_defined_widget` reference draws in place of `matched_text` */
     data?: {
-        widget_type?: 'code_block' | 'charts_widget_v2' | (string & {})
+        widget_type?: 'code_block' | 'charts_widget_v2' | 'writing_block' | (string & {})
         content?: unknown
+        /** Subject line of a `writing_block` email */
+        subject?: string
     }
     // Legacy fields (may still be present in some responses)
     url?: string

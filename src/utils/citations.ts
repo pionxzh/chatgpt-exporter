@@ -117,6 +117,9 @@ function formatInlineReference(ref: ContentReference, output: CitationOutput, mo
     if (ref.type === 'client_defined_widget' && ref.data?.widget_type === 'charts_widget_v2') {
         return formatChart(ref.data.content as ChartContent | undefined)
     }
+    if (ref.type === 'client_defined_widget' && ref.data?.widget_type === 'writing_block') {
+        return formatWritingBlock(ref.data, output)
+    }
 
     if (mode === 'alt') return formatAlt(ref.alt)
 
@@ -184,6 +187,20 @@ function formatChart(chart: ChartContent | undefined): string {
 
     const description = meta?.description?.trim()
     return description ? `${description}\n\n${table}` : table
+}
+
+/**
+ * A draft, such as an email, that ChatGPT shows as a card. `matched_text` is
+ * a `:::writing{...}` directive and its `alt` is empty, so the draft would
+ * disappear. `content` is the draft as Markdown.
+ */
+function formatWritingBlock(data: NonNullable<ContentReference['data']>, output: CitationOutput): string {
+    const content = typeof data.content === 'string' ? data.content.trim() : ''
+    const subject = typeof data.subject === 'string' ? data.subject.trim() : ''
+    if (!subject) return content
+
+    const heading = output === 'markdown' ? `**${escapeMarkdownText(subject)}**` : subject
+    return content ? `${heading}\n\n${content}` : heading
 }
 
 /**

@@ -157,6 +157,45 @@ describe('interactive widgets', () => {
     })
 })
 
+describe('writing blocks', () => {
+    const body = 'Hello,\n\nThe review moves to **Monday**.\n\nBest'
+    const email = `:::writing{variant="email" id="101" subject="Review [moved]"}\n${body}\n:::`
+    const note = `:::writing{variant="document" id="102"}\nShort note.\n:::`
+    const metadata = {
+        content_references: [
+            {
+                type: 'client_defined_widget',
+                category: 'writing_block',
+                matched_text: email,
+                start_idx: 0,
+                end_idx: 0,
+                alt: null,
+                data: { widget_type: 'writing_block', id: '101', variant: 'email', subject: 'Review [moved]', content: body },
+            },
+            {
+                type: 'client_defined_widget',
+                category: 'writing_block',
+                matched_text: note,
+                start_idx: 0,
+                end_idx: 0,
+                alt: null,
+                data: { widget_type: 'writing_block', id: '102', variant: 'document', content: 'Short note.' },
+            },
+        ],
+    } as unknown as ConversationNodeMessage['metadata']
+
+    it('keeps the draft with its subject', () => {
+        expect(transformContentReferences(`${email}\n\nSend it today.`, metadata))
+            .toBe(`**Review \\[moved\\]**\n\n${body}\n\nSend it today.`)
+        expect(transformContentReferences(email, metadata, { output: 'text', inlineReferenceMode: 'alt' }))
+            .toBe(`Review [moved]\n\n${body}`)
+    })
+
+    it('keeps a draft without a subject', () => {
+        expect(transformContentReferences(note, metadata)).toBe('Short note.')
+    })
+})
+
 describe('inline links', () => {
     const link = 'urlRelease [notes]https://example.com/release'
     // Shape of ChatGPT's reference: the URL is in `safe_urls` and `item`, not on the reference
