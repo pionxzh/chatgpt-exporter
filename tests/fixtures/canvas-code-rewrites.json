@@ -1,0 +1,3502 @@
+{
+  "id": "fixture",
+  "title": "Fixture",
+  "create_time": 1,
+  "update_time": 2,
+  "current_node": "n153",
+  "mapping": {
+    "n0": {
+      "id": "n0",
+      "children": [
+        "n1"
+      ]
+    },
+    "n1": {
+      "id": "n1",
+      "children": [
+        "n2"
+      ],
+      "parent": "n0",
+      "message": {
+        "id": "m-n1",
+        "author": {
+          "role": "system"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "is_visually_hidden_from_conversation": true
+        }
+      }
+    },
+    "n2": {
+      "id": "n2",
+      "children": [
+        "n3"
+      ],
+      "parent": "n1",
+      "message": {
+        "id": "m-n2",
+        "author": {
+          "role": "system"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "is_visually_hidden_from_conversation": true
+        }
+      }
+    },
+    "n3": {
+      "id": "n3",
+      "children": [
+        "n4"
+      ],
+      "parent": "n2",
+      "message": {
+        "id": "m-n3",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 1"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n4": {
+      "id": "n4",
+      "children": [
+        "n5"
+      ],
+      "parent": "n3",
+      "message": {
+        "id": "m-n4",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n5": {
+      "id": "n5",
+      "children": [
+        "n6"
+      ],
+      "parent": "n4",
+      "message": {
+        "id": "m-n5",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 1",
+              "content": "thought 1"
+            },
+            {
+              "summary": "summary 2",
+              "content": "thought 2"
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n6": {
+      "id": "n6",
+      "children": [
+        "n7"
+      ],
+      "parent": "n5",
+      "message": {
+        "id": "m-n6",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 23s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 23
+        }
+      }
+    },
+    "n7": {
+      "id": "n7",
+      "children": [
+        "n8"
+      ],
+      "parent": "n6",
+      "message": {
+        "id": "m-n7",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 1"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n8": {
+      "id": "n8",
+      "children": [
+        "n9"
+      ],
+      "parent": "n7",
+      "message": {
+        "id": "m-n8",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 2"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n9": {
+      "id": "n9",
+      "children": [
+        "n10"
+      ],
+      "parent": "n8",
+      "message": {
+        "id": "m-n9",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 3",
+              "content": "thought 3"
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n10": {
+      "id": "n10",
+      "children": [
+        "n11"
+      ],
+      "parent": "n9",
+      "message": {
+        "id": "m-n10",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 12s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 12
+        }
+      }
+    },
+    "n11": {
+      "id": "n11",
+      "children": [
+        "n12"
+      ],
+      "parent": "n10",
+      "message": {
+        "id": "m-n11",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "{\"name\":\"canvas title 1\",\"type\":\"code/html\",\"content\":\"canvas 1\"}"
+          ]
+        },
+        "recipient": "canmore.create_textdoc",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n12": {
+      "id": "n12",
+      "children": [
+        "n13"
+      ],
+      "parent": "n11",
+      "message": {
+        "id": "m-n12",
+        "author": {
+          "role": "tool",
+          "name": "canmore.create_textdoc"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "tool text 1"
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "canvas": {
+            "textdoc_type": "code/html",
+            "version": 1,
+            "create_source": "model",
+            "textdoc_id": "textdoc_1",
+            "title": "canvas title 2"
+          }
+        }
+      }
+    },
+    "n13": {
+      "id": "n13",
+      "children": [
+        "n14"
+      ],
+      "parent": "n12",
+      "message": {
+        "id": "m-n13",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "{\"name\":\"canvas title 3\",\"type\":\"code/css\",\"content\":\"canvas 2\"}"
+          ]
+        },
+        "recipient": "canmore.create_textdoc",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n14": {
+      "id": "n14",
+      "children": [
+        "n15"
+      ],
+      "parent": "n13",
+      "message": {
+        "id": "m-n14",
+        "author": {
+          "role": "tool",
+          "name": "canmore.create_textdoc"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "tool text 2"
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "canvas": {
+            "textdoc_type": "code/css",
+            "version": 1,
+            "create_source": "model",
+            "textdoc_id": "textdoc_2",
+            "title": "canvas title 4"
+          }
+        }
+      }
+    },
+    "n15": {
+      "id": "n15",
+      "children": [
+        "n16"
+      ],
+      "parent": "n14",
+      "message": {
+        "id": "m-n15",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 2"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n16": {
+      "id": "n16",
+      "children": [
+        "n17"
+      ],
+      "parent": "n15",
+      "message": {
+        "id": "m-n16",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 3"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n17": {
+      "id": "n17",
+      "children": [
+        "n18"
+      ],
+      "parent": "n16",
+      "message": {
+        "id": "m-n17",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 4",
+              "content": "thought 4"
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n18": {
+      "id": "n18",
+      "children": [
+        "n19"
+      ],
+      "parent": "n17",
+      "message": {
+        "id": "m-n18",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 13s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 13
+        }
+      }
+    },
+    "n19": {
+      "id": "n19",
+      "children": [
+        "n20"
+      ],
+      "parent": "n18",
+      "message": {
+        "id": "m-n19",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "{\"name\":\"canvas title 5\",\"type\":\"code/javascript\",\"content\":\"canvas 3\"}"
+          ]
+        },
+        "recipient": "canmore.create_textdoc",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n20": {
+      "id": "n20",
+      "children": [
+        "n21"
+      ],
+      "parent": "n19",
+      "message": {
+        "id": "m-n20",
+        "author": {
+          "role": "tool",
+          "name": "canmore.create_textdoc"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "tool text 3"
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "canvas": {
+            "textdoc_type": "code/javascript",
+            "version": 1,
+            "create_source": "model",
+            "textdoc_id": "textdoc_3",
+            "title": "canvas title 2"
+          }
+        }
+      }
+    },
+    "n21": {
+      "id": "n21",
+      "children": [
+        "n22"
+      ],
+      "parent": "n20",
+      "message": {
+        "id": "m-n21",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 3"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n22": {
+      "id": "n22",
+      "children": [
+        "n23"
+      ],
+      "parent": "n21",
+      "message": {
+        "id": "m-n22",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 4"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n23": {
+      "id": "n23",
+      "children": [
+        "n24"
+      ],
+      "parent": "n22",
+      "message": {
+        "id": "m-n23",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": []
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n24": {
+      "id": "n24",
+      "children": [
+        "n25"
+      ],
+      "parent": "n23",
+      "message": {
+        "id": "m-n24",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 5s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 5
+        }
+      }
+    },
+    "n25": {
+      "id": "n25",
+      "children": [
+        "n26"
+      ],
+      "parent": "n24",
+      "message": {
+        "id": "m-n25",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 4"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n26": {
+      "id": "n26",
+      "children": [
+        "n27"
+      ],
+      "parent": "n25",
+      "message": {
+        "id": "m-n26",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 5"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n27": {
+      "id": "n27",
+      "children": [
+        "n28"
+      ],
+      "parent": "n26",
+      "message": {
+        "id": "m-n27",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": []
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n28": {
+      "id": "n28",
+      "children": [
+        "n29"
+      ],
+      "parent": "n27",
+      "message": {
+        "id": "m-n28",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 5s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 5
+        }
+      }
+    },
+    "n29": {
+      "id": "n29",
+      "children": [
+        "n30"
+      ],
+      "parent": "n28",
+      "message": {
+        "id": "m-n29",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "{\"updates\":[{\"pattern\":\".*\",\"multiple\":false,\"replacement\":\"canvas 4\"}]}"
+          ]
+        },
+        "recipient": "canmore.update_textdoc",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n30": {
+      "id": "n30",
+      "children": [
+        "n31"
+      ],
+      "parent": "n29",
+      "message": {
+        "id": "m-n30",
+        "author": {
+          "role": "tool",
+          "name": "canmore.update_textdoc"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "tool text 4"
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "canvas": {
+            "textdoc_type": "code/javascript",
+            "version": 6,
+            "from_version": 1,
+            "textdoc_id": "textdoc_3"
+          }
+        }
+      }
+    },
+    "n31": {
+      "id": "n31",
+      "children": [
+        "n32"
+      ],
+      "parent": "n30",
+      "message": {
+        "id": "m-n31",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 5"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n32": {
+      "id": "n32",
+      "children": [
+        "n33"
+      ],
+      "parent": "n31",
+      "message": {
+        "id": "m-n32",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 6"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n33": {
+      "id": "n33",
+      "children": [
+        "n34"
+      ],
+      "parent": "n32",
+      "message": {
+        "id": "m-n33",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 5",
+              "content": "thought 5"
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n34": {
+      "id": "n34",
+      "children": [
+        "n35"
+      ],
+      "parent": "n33",
+      "message": {
+        "id": "m-n34",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 14s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 14
+        }
+      }
+    },
+    "n35": {
+      "id": "n35",
+      "children": [
+        "n36"
+      ],
+      "parent": "n34",
+      "message": {
+        "id": "m-n35",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "{\"updates\":[{\"pattern\":\".*\",\"multiple\":false,\"replacement\":\"canvas 5\"}]}"
+          ]
+        },
+        "recipient": "canmore.update_textdoc",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n36": {
+      "id": "n36",
+      "children": [
+        "n37"
+      ],
+      "parent": "n35",
+      "message": {
+        "id": "m-n36",
+        "author": {
+          "role": "tool",
+          "name": "canmore.update_textdoc"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "tool text 4"
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "canvas": {
+            "textdoc_type": "code/javascript",
+            "version": 11,
+            "from_version": 6,
+            "textdoc_id": "textdoc_3"
+          }
+        }
+      }
+    },
+    "n37": {
+      "id": "n37",
+      "children": [
+        "n38"
+      ],
+      "parent": "n36",
+      "message": {
+        "id": "m-n37",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 6"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n38": {
+      "id": "n38",
+      "children": [
+        "n39"
+      ],
+      "parent": "n37",
+      "message": {
+        "id": "m-n38",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 7"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n39": {
+      "id": "n39",
+      "children": [
+        "n40"
+      ],
+      "parent": "n38",
+      "message": {
+        "id": "m-n39",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 6",
+              "content": "thought 6"
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n40": {
+      "id": "n40",
+      "children": [
+        "n41"
+      ],
+      "parent": "n39",
+      "message": {
+        "id": "m-n40",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 16s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 16
+        }
+      }
+    },
+    "n41": {
+      "id": "n41",
+      "children": [
+        "n42"
+      ],
+      "parent": "n40",
+      "message": {
+        "id": "m-n41",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 7"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n42": {
+      "id": "n42",
+      "children": [
+        "n43"
+      ],
+      "parent": "n41",
+      "message": {
+        "id": "m-n42",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 8"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n43": {
+      "id": "n43",
+      "children": [
+        "n44"
+      ],
+      "parent": "n42",
+      "message": {
+        "id": "m-n43",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": []
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n44": {
+      "id": "n44",
+      "children": [
+        "n45"
+      ],
+      "parent": "n43",
+      "message": {
+        "id": "m-n44",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 6s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 6
+        }
+      }
+    },
+    "n45": {
+      "id": "n45",
+      "children": [
+        "n46"
+      ],
+      "parent": "n44",
+      "message": {
+        "id": "m-n45",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 8"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n46": {
+      "id": "n46",
+      "children": [
+        "n47"
+      ],
+      "parent": "n45",
+      "message": {
+        "id": "m-n46",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 9"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n47": {
+      "id": "n47",
+      "children": [
+        "n48"
+      ],
+      "parent": "n46",
+      "message": {
+        "id": "m-n47",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": []
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n48": {
+      "id": "n48",
+      "children": [
+        "n49"
+      ],
+      "parent": "n47",
+      "message": {
+        "id": "m-n48",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 3s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 3
+        }
+      }
+    },
+    "n49": {
+      "id": "n49",
+      "children": [
+        "n50"
+      ],
+      "parent": "n48",
+      "message": {
+        "id": "m-n49",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 9"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n50": {
+      "id": "n50",
+      "children": [
+        "n51"
+      ],
+      "parent": "n49",
+      "message": {
+        "id": "m-n50",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 10"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n51": {
+      "id": "n51",
+      "children": [
+        "n52"
+      ],
+      "parent": "n50",
+      "message": {
+        "id": "m-n51",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": []
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n52": {
+      "id": "n52",
+      "children": [
+        "n53"
+      ],
+      "parent": "n51",
+      "message": {
+        "id": "m-n52",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 3s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 3
+        }
+      }
+    },
+    "n53": {
+      "id": "n53",
+      "children": [
+        "n54"
+      ],
+      "parent": "n52",
+      "message": {
+        "id": "m-n53",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 10"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n54": {
+      "id": "n54",
+      "children": [
+        "n55"
+      ],
+      "parent": "n53",
+      "message": {
+        "id": "m-n54",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 11"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n55": {
+      "id": "n55",
+      "children": [
+        "n56"
+      ],
+      "parent": "n54",
+      "message": {
+        "id": "m-n55",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 7",
+              "content": "thought 7"
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n56": {
+      "id": "n56",
+      "children": [
+        "n57"
+      ],
+      "parent": "n55",
+      "message": {
+        "id": "m-n56",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 9s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 9
+        }
+      }
+    },
+    "n57": {
+      "id": "n57",
+      "children": [
+        "n58"
+      ],
+      "parent": "n56",
+      "message": {
+        "id": "m-n57",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 11"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n58": {
+      "id": "n58",
+      "children": [
+        "n59"
+      ],
+      "parent": "n57",
+      "message": {
+        "id": "m-n58",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 12"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n59": {
+      "id": "n59",
+      "children": [
+        "n60"
+      ],
+      "parent": "n58",
+      "message": {
+        "id": "m-n59",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": []
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n60": {
+      "id": "n60",
+      "children": [
+        "n61"
+      ],
+      "parent": "n59",
+      "message": {
+        "id": "m-n60",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 3s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 3
+        }
+      }
+    },
+    "n61": {
+      "id": "n61",
+      "children": [
+        "n62"
+      ],
+      "parent": "n60",
+      "message": {
+        "id": "m-n61",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 12"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n62": {
+      "id": "n62",
+      "children": [
+        "n63"
+      ],
+      "parent": "n61",
+      "message": {
+        "id": "m-n62",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 13"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n63": {
+      "id": "n63",
+      "children": [
+        "n64"
+      ],
+      "parent": "n62",
+      "message": {
+        "id": "m-n63",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 8",
+              "content": "thought 8"
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n64": {
+      "id": "n64",
+      "children": [
+        "n65"
+      ],
+      "parent": "n63",
+      "message": {
+        "id": "m-n64",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 11s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 11
+        }
+      }
+    },
+    "n65": {
+      "id": "n65",
+      "children": [
+        "n66"
+      ],
+      "parent": "n64",
+      "message": {
+        "id": "m-n65",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 13"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n66": {
+      "id": "n66",
+      "children": [
+        "n67"
+      ],
+      "parent": "n65",
+      "message": {
+        "id": "m-n66",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 14"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n67": {
+      "id": "n67",
+      "children": [
+        "n68"
+      ],
+      "parent": "n66",
+      "message": {
+        "id": "m-n67",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 9",
+              "content": "thought 9"
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n68": {
+      "id": "n68",
+      "children": [
+        "n69"
+      ],
+      "parent": "n67",
+      "message": {
+        "id": "m-n68",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 10s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 10
+        }
+      }
+    },
+    "n69": {
+      "id": "n69",
+      "children": [
+        "n70"
+      ],
+      "parent": "n68",
+      "message": {
+        "id": "m-n69",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 14"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n70": {
+      "id": "n70",
+      "children": [
+        "n71"
+      ],
+      "parent": "n69",
+      "message": {
+        "id": "m-n70",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 15"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n71": {
+      "id": "n71",
+      "children": [
+        "n72"
+      ],
+      "parent": "n70",
+      "message": {
+        "id": "m-n71",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": []
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n72": {
+      "id": "n72",
+      "children": [
+        "n73"
+      ],
+      "parent": "n71",
+      "message": {
+        "id": "m-n72",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 2s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 2
+        }
+      }
+    },
+    "n73": {
+      "id": "n73",
+      "children": [
+        "n74"
+      ],
+      "parent": "n72",
+      "message": {
+        "id": "m-n73",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 15"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n74": {
+      "id": "n74",
+      "children": [
+        "n75"
+      ],
+      "parent": "n73",
+      "message": {
+        "id": "m-n74",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 16"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n75": {
+      "id": "n75",
+      "children": [
+        "n76"
+      ],
+      "parent": "n74",
+      "message": {
+        "id": "m-n75",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": []
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n76": {
+      "id": "n76",
+      "children": [
+        "n77"
+      ],
+      "parent": "n75",
+      "message": {
+        "id": "m-n76",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 3s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 3
+        }
+      }
+    },
+    "n77": {
+      "id": "n77",
+      "children": [
+        "n78"
+      ],
+      "parent": "n76",
+      "message": {
+        "id": "m-n77",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "{\"name\":\"canvas title 6\",\"type\":\"document\",\"content\":\"canvas 6\"}"
+          ]
+        },
+        "recipient": "canmore.create_textdoc",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n78": {
+      "id": "n78",
+      "children": [
+        "n79"
+      ],
+      "parent": "n77",
+      "message": {
+        "id": "m-n78",
+        "author": {
+          "role": "tool",
+          "name": "canmore.create_textdoc"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "tool text 5"
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "canvas": {
+            "textdoc_type": "document",
+            "version": 1,
+            "create_source": "model",
+            "textdoc_id": "textdoc_4",
+            "title": "canvas title 7"
+          }
+        }
+      }
+    },
+    "n79": {
+      "id": "n79",
+      "children": [
+        "n80"
+      ],
+      "parent": "n78",
+      "message": {
+        "id": "m-n79",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 16"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3",
+          "canvas": {}
+        }
+      }
+    },
+    "n80": {
+      "id": "n80",
+      "children": [
+        "n81"
+      ],
+      "parent": "n79",
+      "message": {
+        "id": "m-n80",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 17"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n81": {
+      "id": "n81",
+      "children": [
+        "n82"
+      ],
+      "parent": "n80",
+      "message": {
+        "id": "m-n81",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": []
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n82": {
+      "id": "n82",
+      "children": [
+        "n83"
+      ],
+      "parent": "n81",
+      "message": {
+        "id": "m-n82",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 0s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 0
+        }
+      }
+    },
+    "n83": {
+      "id": "n83",
+      "children": [
+        "n84"
+      ],
+      "parent": "n82",
+      "message": {
+        "id": "m-n83",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 17"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n84": {
+      "id": "n84",
+      "children": [
+        "n85"
+      ],
+      "parent": "n83",
+      "message": {
+        "id": "m-n84",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 18"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n85": {
+      "id": "n85",
+      "children": [
+        "n86"
+      ],
+      "parent": "n84",
+      "message": {
+        "id": "m-n85",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": []
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n86": {
+      "id": "n86",
+      "children": [
+        "n87"
+      ],
+      "parent": "n85",
+      "message": {
+        "id": "m-n86",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 0s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 0
+        }
+      }
+    },
+    "n87": {
+      "id": "n87",
+      "children": [
+        "n88"
+      ],
+      "parent": "n86",
+      "message": {
+        "id": "m-n87",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 18"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n88": {
+      "id": "n88",
+      "children": [
+        "n89"
+      ],
+      "parent": "n87",
+      "message": {
+        "id": "m-n88",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 19"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n89": {
+      "id": "n89",
+      "children": [
+        "n90"
+      ],
+      "parent": "n88",
+      "message": {
+        "id": "m-n89",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "{\"comments\":[{\"pattern\":\"pattern 1\",\"comment\":\"comment 1\"}]}"
+          ]
+        },
+        "recipient": "canmore.comment_textdoc",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n90": {
+      "id": "n90",
+      "children": [
+        "n91"
+      ],
+      "parent": "n89",
+      "message": {
+        "id": "m-n90",
+        "author": {
+          "role": "tool",
+          "name": "canmore.comment_textdoc"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "tool text 6"
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "canvas": {
+            "textdoc_type": "document",
+            "version": 3,
+            "from_version": 2,
+            "textdoc_id": "textdoc_4"
+          }
+        }
+      }
+    },
+    "n91": {
+      "id": "n91",
+      "children": [
+        "n92"
+      ],
+      "parent": "n90",
+      "message": {
+        "id": "m-n91",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 19"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n92": {
+      "id": "n92",
+      "children": [
+        "n93"
+      ],
+      "parent": "n91",
+      "message": {
+        "id": "m-n92",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 20"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n93": {
+      "id": "n93",
+      "children": [
+        "n94"
+      ],
+      "parent": "n92",
+      "message": {
+        "id": "m-n93",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 10",
+              "content": "thought 10"
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n94": {
+      "id": "n94",
+      "children": [
+        "n95"
+      ],
+      "parent": "n93",
+      "message": {
+        "id": "m-n94",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 6s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 6
+        }
+      }
+    },
+    "n95": {
+      "id": "n95",
+      "children": [
+        "n96"
+      ],
+      "parent": "n94",
+      "message": {
+        "id": "m-n95",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "{\"updates\":[{\"pattern\":\"pattern 2\",\"multiple\":false,\"replacement\":\"canvas 7\"}]}"
+          ]
+        },
+        "recipient": "canmore.update_textdoc",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n96": {
+      "id": "n96",
+      "children": [
+        "n97"
+      ],
+      "parent": "n95",
+      "message": {
+        "id": "m-n96",
+        "author": {
+          "role": "tool",
+          "name": "canmore.update_textdoc"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "tool text 7"
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "canvas": {
+            "textdoc_type": "document",
+            "version": 4,
+            "from_version": 3,
+            "textdoc_id": "textdoc_4"
+          }
+        }
+      }
+    },
+    "n97": {
+      "id": "n97",
+      "children": [
+        "n98"
+      ],
+      "parent": "n96",
+      "message": {
+        "id": "m-n97",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 20"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n98": {
+      "id": "n98",
+      "children": [
+        "n99"
+      ],
+      "parent": "n97",
+      "message": {
+        "id": "m-n98",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 21"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n99": {
+      "id": "n99",
+      "children": [
+        "n100"
+      ],
+      "parent": "n98",
+      "message": {
+        "id": "m-n99",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": []
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n100": {
+      "id": "n100",
+      "children": [
+        "n101"
+      ],
+      "parent": "n99",
+      "message": {
+        "id": "m-n100",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 6s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 6
+        }
+      }
+    },
+    "n101": {
+      "id": "n101",
+      "children": [
+        "n102"
+      ],
+      "parent": "n100",
+      "message": {
+        "id": "m-n101",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 21"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n102": {
+      "id": "n102",
+      "children": [
+        "n103"
+      ],
+      "parent": "n101",
+      "message": {
+        "id": "m-n102",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 22"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n103": {
+      "id": "n103",
+      "children": [
+        "n104"
+      ],
+      "parent": "n102",
+      "message": {
+        "id": "m-n103",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": []
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n104": {
+      "id": "n104",
+      "children": [
+        "n105"
+      ],
+      "parent": "n103",
+      "message": {
+        "id": "m-n104",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 3s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 3
+        }
+      }
+    },
+    "n105": {
+      "id": "n105",
+      "children": [
+        "n106"
+      ],
+      "parent": "n104",
+      "message": {
+        "id": "m-n105",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 22"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n106": {
+      "id": "n106",
+      "children": [
+        "n107"
+      ],
+      "parent": "n105",
+      "message": {
+        "id": "m-n106",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 23"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n107": {
+      "id": "n107",
+      "children": [
+        "n108"
+      ],
+      "parent": "n106",
+      "message": {
+        "id": "m-n107",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": []
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n108": {
+      "id": "n108",
+      "children": [
+        "n109"
+      ],
+      "parent": "n107",
+      "message": {
+        "id": "m-n108",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 4s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 4
+        }
+      }
+    },
+    "n109": {
+      "id": "n109",
+      "children": [
+        "n110"
+      ],
+      "parent": "n108",
+      "message": {
+        "id": "m-n109",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "{\"updates\":[{\"pattern\":\"pattern 3\",\"multiple\":false,\"replacement\":\"canvas 8\"}]}"
+          ]
+        },
+        "recipient": "canmore.update_textdoc",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n110": {
+      "id": "n110",
+      "children": [
+        "n111"
+      ],
+      "parent": "n109",
+      "message": {
+        "id": "m-n110",
+        "author": {
+          "role": "tool",
+          "name": "canmore.update_textdoc"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "tool text 7"
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "canvas": {
+            "textdoc_type": "document",
+            "version": 5,
+            "from_version": 4,
+            "textdoc_id": "textdoc_4"
+          }
+        }
+      }
+    },
+    "n111": {
+      "id": "n111",
+      "children": [
+        "n112"
+      ],
+      "parent": "n110",
+      "message": {
+        "id": "m-n111",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 23"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n112": {
+      "id": "n112",
+      "children": [
+        "n113"
+      ],
+      "parent": "n111",
+      "message": {
+        "id": "m-n112",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 24"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n113": {
+      "id": "n113",
+      "children": [
+        "n114"
+      ],
+      "parent": "n112",
+      "message": {
+        "id": "m-n113",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": []
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n114": {
+      "id": "n114",
+      "children": [
+        "n115"
+      ],
+      "parent": "n113",
+      "message": {
+        "id": "m-n114",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 2s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 2
+        }
+      }
+    },
+    "n115": {
+      "id": "n115",
+      "children": [
+        "n116"
+      ],
+      "parent": "n114",
+      "message": {
+        "id": "m-n115",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 24"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n116": {
+      "id": "n116",
+      "children": [
+        "n117"
+      ],
+      "parent": "n115",
+      "message": {
+        "id": "m-n116",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 25"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n117": {
+      "id": "n117",
+      "children": [
+        "n118"
+      ],
+      "parent": "n116",
+      "message": {
+        "id": "m-n117",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": []
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n118": {
+      "id": "n118",
+      "children": [
+        "n119"
+      ],
+      "parent": "n117",
+      "message": {
+        "id": "m-n118",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 3s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 3
+        }
+      }
+    },
+    "n119": {
+      "id": "n119",
+      "children": [
+        "n120"
+      ],
+      "parent": "n118",
+      "message": {
+        "id": "m-n119",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 25"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n120": {
+      "id": "n120",
+      "children": [
+        "n121"
+      ],
+      "parent": "n119",
+      "message": {
+        "id": "m-n120",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 26"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n121": {
+      "id": "n121",
+      "children": [
+        "n122"
+      ],
+      "parent": "n120",
+      "message": {
+        "id": "m-n121",
+        "author": {
+          "role": "system"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "is_visually_hidden_from_conversation": true
+        }
+      }
+    },
+    "n122": {
+      "id": "n122",
+      "children": [
+        "n123"
+      ],
+      "parent": "n121",
+      "message": {
+        "id": "m-n122",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": []
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n123": {
+      "id": "n123",
+      "children": [
+        "n124"
+      ],
+      "parent": "n122",
+      "message": {
+        "id": "m-n123",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 2s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 2
+        }
+      }
+    },
+    "n124": {
+      "id": "n124",
+      "children": [
+        "n125"
+      ],
+      "parent": "n123",
+      "message": {
+        "id": "m-n124",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 26"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n125": {
+      "id": "n125",
+      "children": [
+        "n126"
+      ],
+      "parent": "n124",
+      "message": {
+        "id": "m-n125",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 27"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n126": {
+      "id": "n126",
+      "children": [
+        "n127"
+      ],
+      "parent": "n125",
+      "message": {
+        "id": "m-n126",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": []
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n127": {
+      "id": "n127",
+      "children": [
+        "n128"
+      ],
+      "parent": "n126",
+      "message": {
+        "id": "m-n127",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 1s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 1
+        }
+      }
+    },
+    "n128": {
+      "id": "n128",
+      "children": [
+        "n129"
+      ],
+      "parent": "n127",
+      "message": {
+        "id": "m-n128",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 27"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n129": {
+      "id": "n129",
+      "children": [
+        "n130"
+      ],
+      "parent": "n128",
+      "message": {
+        "id": "m-n129",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 28"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n130": {
+      "id": "n130",
+      "children": [
+        "n131"
+      ],
+      "parent": "n129",
+      "message": {
+        "id": "m-n130",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": []
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n131": {
+      "id": "n131",
+      "children": [
+        "n132"
+      ],
+      "parent": "n130",
+      "message": {
+        "id": "m-n131",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 7s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 7
+        }
+      }
+    },
+    "n132": {
+      "id": "n132",
+      "children": [
+        "n133"
+      ],
+      "parent": "n131",
+      "message": {
+        "id": "m-n132",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 28"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n133": {
+      "id": "n133",
+      "children": [
+        "n134"
+      ],
+      "parent": "n132",
+      "message": {
+        "id": "m-n133",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 29"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n134": {
+      "id": "n134",
+      "children": [
+        "n135"
+      ],
+      "parent": "n133",
+      "message": {
+        "id": "m-n134",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": []
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n135": {
+      "id": "n135",
+      "children": [
+        "n136"
+      ],
+      "parent": "n134",
+      "message": {
+        "id": "m-n135",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 6s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 6
+        }
+      }
+    },
+    "n136": {
+      "id": "n136",
+      "children": [
+        "n137"
+      ],
+      "parent": "n135",
+      "message": {
+        "id": "m-n136",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 29"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n137": {
+      "id": "n137",
+      "children": [
+        "n138"
+      ],
+      "parent": "n136",
+      "message": {
+        "id": "m-n137",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 30"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n138": {
+      "id": "n138",
+      "children": [
+        "n139"
+      ],
+      "parent": "n137",
+      "message": {
+        "id": "m-n138",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": []
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n139": {
+      "id": "n139",
+      "children": [
+        "n140"
+      ],
+      "parent": "n138",
+      "message": {
+        "id": "m-n139",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 4s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 4
+        }
+      }
+    },
+    "n140": {
+      "id": "n140",
+      "children": [
+        "n141"
+      ],
+      "parent": "n139",
+      "message": {
+        "id": "m-n140",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 30"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n141": {
+      "id": "n141",
+      "children": [
+        "n142"
+      ],
+      "parent": "n140",
+      "message": {
+        "id": "m-n141",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 31"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n142": {
+      "id": "n142",
+      "children": [
+        "n143"
+      ],
+      "parent": "n141",
+      "message": {
+        "id": "m-n142",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": []
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n143": {
+      "id": "n143",
+      "children": [
+        "n144"
+      ],
+      "parent": "n142",
+      "message": {
+        "id": "m-n143",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 5s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 5
+        }
+      }
+    },
+    "n144": {
+      "id": "n144",
+      "children": [
+        "n145"
+      ],
+      "parent": "n143",
+      "message": {
+        "id": "m-n144",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 31"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n145": {
+      "id": "n145",
+      "children": [
+        "n146"
+      ],
+      "parent": "n144",
+      "message": {
+        "id": "m-n145",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 32"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n146": {
+      "id": "n146",
+      "children": [
+        "n147"
+      ],
+      "parent": "n145",
+      "message": {
+        "id": "m-n146",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": []
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n147": {
+      "id": "n147",
+      "children": [
+        "n148"
+      ],
+      "parent": "n146",
+      "message": {
+        "id": "m-n147",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 5s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 5
+        }
+      }
+    },
+    "n148": {
+      "id": "n148",
+      "children": [
+        "n149"
+      ],
+      "parent": "n147",
+      "message": {
+        "id": "m-n148",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 32"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n149": {
+      "id": "n149",
+      "children": [
+        "n150"
+      ],
+      "parent": "n148",
+      "message": {
+        "id": "m-n149",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 33"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n150": {
+      "id": "n150",
+      "children": [
+        "n151"
+      ],
+      "parent": "n149",
+      "message": {
+        "id": "m-n150",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n151": {
+      "id": "n151",
+      "children": [
+        "n152"
+      ],
+      "parent": "n150",
+      "message": {
+        "id": "m-n151",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 11",
+              "content": "thought 11"
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n152": {
+      "id": "n152",
+      "children": [
+        "n153"
+      ],
+      "parent": "n151",
+      "message": {
+        "id": "m-n152",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 9s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 9
+        }
+      }
+    },
+    "n153": {
+      "id": "n153",
+      "children": [],
+      "parent": "n152",
+      "message": {
+        "id": "m-n153",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 33"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    }
+  }
+}

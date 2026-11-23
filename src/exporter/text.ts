@@ -28,7 +28,7 @@ export async function exportToText() {
     const rawConversation = await fetchConversation(chatId)
 
     // Text is for quick sharing, so thinking and the source list stay out on purpose.
-    const { conversationNodes } = processConversation(rawConversation)
+    const { conversationNodes } = processConversation(rawConversation, { canvasLabels: i18n.t })
     const text = conversationNodes
         .map(({ message }) => transformMessage(message))
         .filter(Boolean)

@@ -1,0 +1,356 @@
+{
+  "id": "fixture",
+  "title": "Fixture",
+  "create_time": 1,
+  "update_time": 2,
+  "current_node": "n14",
+  "mapping": {
+    "n0": {
+      "id": "n0",
+      "children": [
+        "n1"
+      ]
+    },
+    "n1": {
+      "id": "n1",
+      "children": [
+        "n2"
+      ],
+      "parent": "n0",
+      "message": {
+        "id": "m-n1",
+        "author": {
+          "role": "system"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "is_visually_hidden_from_conversation": true
+        }
+      }
+    },
+    "n2": {
+      "id": "n2",
+      "children": [
+        "n3"
+      ],
+      "parent": "n1",
+      "message": {
+        "id": "m-n2",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 1"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n3": {
+      "id": "n3",
+      "children": [
+        "n4"
+      ],
+      "parent": "n2",
+      "message": {
+        "id": "m-n3",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-4o"
+        }
+      }
+    },
+    "n4": {
+      "id": "n4",
+      "children": [
+        "n5"
+      ],
+      "parent": "n3",
+      "message": {
+        "id": "m-n4",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "{\"name\":\"canvas title 1\",\"type\":\"document\",\"content\":\"canvas 1\"}"
+          ]
+        },
+        "recipient": "canmore.create_textdoc",
+        "metadata": {
+          "model_slug": "gpt-4o"
+        }
+      }
+    },
+    "n5": {
+      "id": "n5",
+      "children": [
+        "n6"
+      ],
+      "parent": "n4",
+      "message": {
+        "id": "m-n5",
+        "author": {
+          "role": "tool",
+          "name": "canmore.create_textdoc"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "tool text 1"
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-4o",
+          "canvas": {
+            "textdoc_type": "document",
+            "version": 1,
+            "create_source": "system_hint_canvas",
+            "textdoc_id": "textdoc_1",
+            "title": "canvas title 2"
+          }
+        }
+      }
+    },
+    "n6": {
+      "id": "n6",
+      "children": [
+        "n7"
+      ],
+      "parent": "n5",
+      "message": {
+        "id": "m-n6",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "assistant text 1"
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-4o"
+        }
+      }
+    },
+    "n7": {
+      "id": "n7",
+      "children": [
+        "n8"
+      ],
+      "parent": "n6",
+      "message": {
+        "id": "m-n7",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 2"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n8": {
+      "id": "n8",
+      "children": [
+        "n9"
+      ],
+      "parent": "n7",
+      "message": {
+        "id": "m-n8",
+        "author": {
+          "role": "system"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-4o",
+          "is_visually_hidden_from_conversation": true
+        }
+      }
+    },
+    "n9": {
+      "id": "n9",
+      "children": [
+        "n10"
+      ],
+      "parent": "n8",
+      "message": {
+        "id": "m-n9",
+        "author": {
+          "role": "system"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-4o",
+          "is_visually_hidden_from_conversation": true,
+          "canvas": {
+            "textdoc_type": "document",
+            "version": 1,
+            "textdoc_id": "textdoc_1"
+          }
+        }
+      }
+    },
+    "n10": {
+      "id": "n10",
+      "children": [
+        "n11"
+      ],
+      "parent": "n9",
+      "message": {
+        "id": "m-n10",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "{\"updates\":[{\"pattern\":\".*\",\"replacement\":\"canvas 2\"}]}"
+          ]
+        },
+        "recipient": "canmore.create_textdoc",
+        "metadata": {
+          "model_slug": "gpt-4o"
+        }
+      }
+    },
+    "n11": {
+      "id": "n11",
+      "children": [
+        "n12"
+      ],
+      "parent": "n10",
+      "message": {
+        "id": "m-n11",
+        "author": {
+          "role": "tool",
+          "name": "canmore.create_textdoc"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "tool text 2"
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-4o",
+          "canvas": {
+            "is_failure": true,
+            "error_type": "pydantic_validation_error"
+          }
+        }
+      }
+    },
+    "n12": {
+      "id": "n12",
+      "children": [
+        "n13"
+      ],
+      "parent": "n11",
+      "message": {
+        "id": "m-n12",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "{\"updates\":[{\"pattern\":\".*\",\"replacement\":\"canvas 2\"}]}"
+          ]
+        },
+        "recipient": "canmore.update_textdoc",
+        "metadata": {
+          "model_slug": "gpt-4o"
+        }
+      }
+    },
+    "n13": {
+      "id": "n13",
+      "children": [
+        "n14"
+      ],
+      "parent": "n12",
+      "message": {
+        "id": "m-n13",
+        "author": {
+          "role": "tool",
+          "name": "canmore.update_textdoc"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "tool text 3"
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-4o",
+          "canvas": {
+            "textdoc_type": "document",
+            "version": 19,
+            "from_version": 1,
+            "textdoc_id": "textdoc_1"
+          }
+        }
+      }
+    },
+    "n14": {
+      "id": "n14",
+      "children": [],
+      "parent": "n13",
+      "message": {
+        "id": "m-n14",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "assistant text 2"
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "gpt-4o"
+        }
+      }
+    }
+  }
+}

@@ -19,7 +19,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import process from 'node:process'
 
-const KNOWN_TOOLS = ['web.run', 'web', 'python', 'api_tool', 'api_tool.call_tool', 'container.exec', 'container.download']
+const KNOWN_TOOLS = ['web.run', 'web', 'python', 'api_tool', 'api_tool.call_tool', 'container.exec', 'container.download', 'canmore']
 const KEEP_META = ['model_slug', 'is_thinking_preamble_message', 'is_visually_hidden_from_conversation', 'finished_duration_sec', 'reasoning_title']
 
 const [input, output, index = '0'] = process.argv.slice(2)
@@ -74,6 +74,7 @@ function cleanContent(message) {
         case 'reasoning_recap':
             return { content_type: type, content: `Thought for ${metadata.finished_duration_sec ?? 0}s` }
         case 'text': {
+            if (message.recipient?.startsWith('canmore.')) return { content_type: type, parts: [cleanCanvasCall(content.parts.join(''))] }
             const kind = metadata.is_thinking_preamble_message
                 ? 'preamble'
                 : author.role === 'user'
@@ -99,14 +100,60 @@ function cleanContent(message) {
             return { content_type: type, language: content.language ?? 'unknown', text: placeholder('code', content.text ?? '') }
         case 'execution_output':
             return { content_type: type, text: placeholder('output', content.text ?? '') }
+        case 'model_editable_context':
+            return { content_type: type, model_set_context: placeholder('memory', content.model_set_context ?? '') }
         default:
             throw new Error(`Unhandled content_type: ${type}`)
     }
 }
 
+/**
+ * A Canvas call is JSON. Keep its shape and replace the texts. Patterns made
+ * only of regex syntax, like `.*` or `$`, hold no content and stay, so the
+ * fixture keeps full rewrites and appends.
+ */
+function cleanCanvasCall(text) {
+    let body
+    try {
+        body = JSON.parse(text)
+    }
+    catch {
+        return placeholder('canvas call', text)
+    }
+    const keepPattern = pattern => /^[\s.*+?^$()[\]{}|\\sS]*$/.test(pattern) ? pattern : placeholder('pattern', pattern)
+    const result = {}
+    if ('name' in body) result.name = placeholder('canvas title', body.name)
+    if ('type' in body) result.type = body.type
+    if ('content' in body) result.content = placeholder('canvas', body.content)
+    if (Array.isArray(body.updates)) {
+        result.updates = body.updates.map(update => ({
+            pattern: keepPattern(update.pattern ?? ''),
+            ...('multiple' in update ? { multiple: update.multiple } : {}),
+            replacement: placeholder('canvas', update.replacement ?? ''),
+        }))
+    }
+    if (Array.isArray(body.comments)) {
+        result.comments = body.comments.map(comment => ({
+            pattern: keepPattern(comment.pattern ?? ''),
+            comment: placeholder('comment', comment.comment ?? ''),
+        }))
+    }
+    return JSON.stringify(result)
+}
+
+/** Ids and versions drive the Canvas replay, the title is the user's */
+function cleanCanvasMeta(canvas) {
+    const keep = ['textdoc_type', 'version', 'from_version', 'create_source', 'is_failure', 'error_type']
+    const result = Object.fromEntries(keep.filter(key => key in canvas).map(key => [key, canvas[key]]))
+    if (canvas.textdoc_id) result.textdoc_id = placeholder('textdoc', canvas.textdoc_id).replace(' ', '_')
+    if (canvas.title) result.title = placeholder('canvas title', canvas.title)
+    return result
+}
+
 function cleanMessage(message, nodeId) {
     const metadata = Object.fromEntries(KEEP_META.filter(key => key in (message.metadata ?? {})).map(key => [key, message.metadata[key]]))
     if (metadata.reasoning_title) metadata.reasoning_title = placeholder('activity', metadata.reasoning_title)
+    if (message.metadata?.canvas) metadata.canvas = cleanCanvasMeta(message.metadata.canvas)
 
     const recipient = message.recipient === 'all' || isKnownTool(message.recipient) ? message.recipient : 'internal_tool'
     const result = {
@@ -145,14 +192,25 @@ const fixture = {
 writeFileSync(output, `${JSON.stringify(fixture, null, 2)}\n`)
 
 // Report every string that is not a placeholder or a known value, for a last manual check.
-const allowed = /^(?:question|answer|preamble|summary|thought|activity|code|output|user text|assistant text|tool text) \d+$|^Thought for \d+s$|^sediment:\/\/file_\d+$|^m?-?n\d+$/
+const allowed = /^(?:question|answer|preamble|summary|thought|activity|code|output|user text|assistant text|tool text|canvas|canvas title|canvas call|pattern|comment|memory) \d+$|^Thought for \d+s$|^sediment:\/\/file_\d+$|^textdoc_\d+$|^m?-?n\d+$/
 const known = new Set(['fixture', 'Fixture', 'all', 'internal_tool', 'unknown', 'final', 'commentary', 'user', 'assistant', 'tool', 'system', ...KNOWN_TOOLS])
 const leftovers = new Set()
-JSON.stringify(fixture, (key, value) => {
-    if (typeof value !== 'string' || !value || ['content_type', 'model_slug', 'language'].includes(key)) return value
+const skipKeys = ['content_type', 'model_slug', 'language', 'textdoc_type', 'create_source', 'error_type', 'type']
+function check(key, value) {
+    if (typeof value !== 'string' || !value || skipKeys.includes(key)) return value
+    // A Canvas call is JSON in a string, so check the strings inside it
+    if (value.startsWith('{"')) {
+        try {
+            JSON.stringify(JSON.parse(value), check)
+            return value
+        }
+        catch {}
+    }
+    if (key === 'pattern' && /^[\s.*+?^$()[\]{}|\\sS]*$/.test(value)) return value
     if (!allowed.test(value) && !known.has(value) && !isKnownTool(value)) leftovers.add(value)
     return value
-})
+}
+JSON.stringify(fixture, check)
 if (leftovers.size > 0) {
     console.warn(`Check these strings before committing:\n${[...leftovers].map(s => `  ${JSON.stringify(s)}`).join('\n')}`)
 }

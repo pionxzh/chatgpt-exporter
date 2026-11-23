@@ -39,7 +39,7 @@ export async function exportToMarkdown(fileNameFormat: string, metaList: ExportM
     let rawConversation = await loadImages(await fetchConversation(chatId), imageMode)
     if (imageMode === 'files') rawConversation = await extractImageFiles(rawConversation, assets)
     const enableThinking = ScriptStorage.get<boolean>(KEY_THINKING_ENABLED) ?? false
-    const conversation = processConversation(rawConversation, { enableThinking })
+    const conversation = processConversation(rawConversation, { enableThinking, canvasLabels: i18n.t })
     const markdown = standardizeLineBreaks(conversationToMarkdown(conversation, metaList, imageMode))
 
     const fileName = getFileNameWithFormat(fileNameFormat, 'md', { title: conversation.title, chatId, createTime: conversation.createTime, updateTime: conversation.updateTime })
@@ -67,7 +67,7 @@ export async function exportAllToMarkdown(fileNameFormat: string, apiConversatio
     const rawConversations = imageMode === 'files'
         ? await Promise.all(apiConversations.map(x => extractImageFiles(x, assets)))
         : apiConversations
-    const conversations = rawConversations.map(x => processConversation(x, { enableThinking }))
+    const conversations = rawConversations.map(x => processConversation(x, { enableThinking, canvasLabels: i18n.t }))
     conversations.forEach((conversation) => {
         let fileName = getFileNameWithFormat(fileNameFormat, 'md', {
             title: conversation.title,
