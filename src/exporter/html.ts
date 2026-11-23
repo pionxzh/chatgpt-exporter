@@ -35,7 +35,7 @@ export async function exportToHtml(fileNameFormat: string, metaList: ExportMeta[
     const chatId = await getCurrentChatId()
     const rawConversation = await withImageAssets(await fetchConversation(chatId))
     const enableThinking = ScriptStorage.get<boolean>(KEY_THINKING_ENABLED) ?? false
-    const conversation = processConversation(rawConversation, { enableThinking })
+    const conversation = processConversation(rawConversation, { enableThinking, canvasLabels: i18n.t })
     const html = conversationToHtml(conversation, userAvatar, metaList)
 
     const fileName = getFileNameWithFormat(fileNameFormat, 'html', { title: conversation.title, chatId, createTime: conversation.createTime, updateTime: conversation.updateTime })
@@ -50,7 +50,7 @@ export async function exportAllToHtml(fileNameFormat: string, apiConversations: 
     const zip = new JSZip()
     const filenameMap = new Map<string, number>()
     const enableThinking = ScriptStorage.get<boolean>(KEY_THINKING_ENABLED) ?? false
-    const conversations = apiConversations.map(x => processConversation(x, { enableThinking }))
+    const conversations = apiConversations.map(x => processConversation(x, { enableThinking, canvasLabels: i18n.t }))
     conversations.forEach((conversation) => {
         let fileName = getFileNameWithFormat(fileNameFormat, 'html', {
             title: conversation.title,

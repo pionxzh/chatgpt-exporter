@@ -3,10 +3,12 @@ import { apiUrl, baseUrl } from './constants'
 import { getChatIdFromUrl, getConversationFromSharePage, isSharePage, isTemporaryChat } from './page'
 import { loadShareConversation } from './share'
 import { getTemporaryChatId } from './temporaryChat'
+import { replayCanvases } from './utils/canvas'
 import { blobToDataURL } from './utils/dom'
 import { getCachedImage, setCachedImage } from './utils/imageCache'
 import { memorize } from './utils/memorize'
 import { getModelName } from './utils/model'
+import type { CanvasLabels, CanvasToolMeta } from './utils/canvas'
 
 // urlcat ships CommonJS with `exports.default`. Because this package is
 // `"type": "module"`, vite 8 (rolldown) applies Node's interop and hands the
@@ -163,6 +165,10 @@ interface MessageMeta {
     reasoning_title?: string
     /** Set on each run of a scheduled task. Runs follow each other with no user message in between. */
     automation_id?: string
+    /** Canvas tool replies, see `src/utils/canvas.ts` */
+    canvas?: CanvasToolMeta
+    /** Set on the replies `replayCanvases` makes from Canvas tool replies */
+    is_canvas_block?: boolean
     /** Interactive replies, whose `parts` hold widget markup only ChatGPT can render */
     model_dil_v2?: {
         /** ChatGPT's own Markdown version of the reply */
@@ -1006,6 +1012,8 @@ export function shouldSkipMessageInExport(message?: ConversationNodeMessage): bo
 
 export interface ProcessConversationOptions {
     enableThinking?: boolean
+    /** Show each Canvas version where it appeared, labeled in the export's language. The JSON exports leave it out and keep the raw messages. */
+    canvasLabels?: CanvasLabels
 }
 
 export function processConversation(conversation: ApiConversationWithId, options?: ProcessConversationOptions): ConversationResult {
@@ -1016,7 +1024,8 @@ export function processConversation(conversation: ApiConversationWithId, options
         || Object.values(conversation.mapping).find(node => !node.children || node.children.length === 0)?.id
     if (!startNodeId) throw new Error('Failed to find start node.')
 
-    const mapping = flagOfficialExportPreambles(conversation.mapping, startNodeId)
+    const flagged = flagOfficialExportPreambles(conversation.mapping, startNodeId)
+    const mapping = options?.canvasLabels ? replayCanvases(flagged, startNodeId, options.canvasLabels) : flagged
     const conversationNodes = extractConversationResult(mapping, startNodeId)
     const { model, modelSlug } = extractModel(mapping, conversationNodes)
     const mergedConversationNodes = mergeContinuationNodes(conversationNodes)
@@ -1175,6 +1184,8 @@ function getInteractiveFallbackParts(message: ConversationNodeMessage): string[]
 
 function mergeContinuationNodes(nodes: ConversationNode[]): ConversationNode[] {
     const result: ConversationNode[] = []
+    // Merged nodes whose text ends with a Canvas block
+    const endsWithCanvas = new Set<ConversationNode>()
     for (const node of nodes) {
         const prevNode = result[result.length - 1]
         if (
@@ -1187,7 +1198,11 @@ function mergeContinuationNodes(nodes: ConversationNode[]): ConversationNode[] {
             // Each run of a scheduled task is its own reply.
             && !node.message.metadata?.automation_id
         ) {
-            const separator = prevNode.message.channel !== node.message.channel ? '\n\n' : ''
+            const isCanvas = !!node.message.metadata?.is_canvas_block
+            // A Canvas block is its own paragraph, never a continuation of the text around it
+            const separator = prevNode.message.channel !== node.message.channel || isCanvas || endsWithCanvas.has(prevNode) ? '\n\n' : ''
+            if (isCanvas) endsWithCanvas.add(prevNode)
+            else endsWithCanvas.delete(prevNode)
             prevNode.message.content.parts[prevNode.message.content.parts.length - 1] += separator + node.message.content.parts[0]
             prevNode.message.content.parts.push(...node.message.content.parts.slice(1))
 
@@ -1209,6 +1224,7 @@ function mergeContinuationNodes(nodes: ConversationNode[]): ConversationNode[] {
         }
         else {
             result.push(node)
+            if (node.message?.metadata?.is_canvas_block) endsWithCanvas.add(node)
         }
     }
     return result

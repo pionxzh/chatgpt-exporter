@@ -1,0 +1,1117 @@
+{
+  "id": "fixture",
+  "title": "Fixture",
+  "create_time": 1,
+  "update_time": 2,
+  "current_node": "n44",
+  "mapping": {
+    "n0": {
+      "id": "n0",
+      "children": [
+        "n1"
+      ]
+    },
+    "n1": {
+      "id": "n1",
+      "children": [
+        "n2"
+      ],
+      "parent": "n0",
+      "message": {
+        "id": "m-n1",
+        "author": {
+          "role": "system"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "is_visually_hidden_from_conversation": true
+        }
+      }
+    },
+    "n2": {
+      "id": "n2",
+      "children": [
+        "n3"
+      ],
+      "parent": "n1",
+      "message": {
+        "id": "m-n2",
+        "author": {
+          "role": "system"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "is_visually_hidden_from_conversation": true
+        }
+      }
+    },
+    "n3": {
+      "id": "n3",
+      "children": [
+        "n4"
+      ],
+      "parent": "n2",
+      "message": {
+        "id": "m-n3",
+        "author": {
+          "role": "system"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            ""
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "is_visually_hidden_from_conversation": true
+        }
+      }
+    },
+    "n4": {
+      "id": "n4",
+      "children": [
+        "n5"
+      ],
+      "parent": "n3",
+      "message": {
+        "id": "m-n4",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 1"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n5": {
+      "id": "n5",
+      "children": [
+        "n6"
+      ],
+      "parent": "n4",
+      "message": {
+        "id": "m-n5",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "model_editable_context",
+          "model_set_context": ""
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n6": {
+      "id": "n6",
+      "children": [
+        "n7"
+      ],
+      "parent": "n5",
+      "message": {
+        "id": "m-n6",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 1",
+              "content": "thought 1"
+            },
+            {
+              "summary": "summary 2",
+              "content": "thought 2"
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n7": {
+      "id": "n7",
+      "children": [
+        "n8"
+      ],
+      "parent": "n6",
+      "message": {
+        "id": "m-n7",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 43s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 43
+        }
+      }
+    },
+    "n8": {
+      "id": "n8",
+      "children": [
+        "n9"
+      ],
+      "parent": "n7",
+      "message": {
+        "id": "m-n8",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "{\"name\":\"canvas title 1\",\"type\":\"document\",\"content\":\"canvas 1\"}"
+          ]
+        },
+        "recipient": "canmore.create_textdoc",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n9": {
+      "id": "n9",
+      "children": [
+        "n10"
+      ],
+      "parent": "n8",
+      "message": {
+        "id": "m-n9",
+        "author": {
+          "role": "tool",
+          "name": "canmore.create_textdoc"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "tool text 1"
+          ]
+        },
+        "recipient": "all",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "o3",
+          "canvas": {
+            "textdoc_type": "document",
+            "version": 1,
+            "create_source": "model",
+            "textdoc_id": "textdoc_1",
+            "title": "canvas title 2"
+          }
+        }
+      }
+    },
+    "n10": {
+      "id": "n10",
+      "children": [
+        "n11"
+      ],
+      "parent": "n9",
+      "message": {
+        "id": "m-n10",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 1"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n11": {
+      "id": "n11",
+      "children": [
+        "n12"
+      ],
+      "parent": "n10",
+      "message": {
+        "id": "m-n11",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 2"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n12": {
+      "id": "n12",
+      "children": [
+        "n13"
+      ],
+      "parent": "n11",
+      "message": {
+        "id": "m-n12",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 3",
+              "content": "thought 3"
+            },
+            {
+              "summary": "summary 4",
+              "content": "thought 4"
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n13": {
+      "id": "n13",
+      "children": [
+        "n14"
+      ],
+      "parent": "n12",
+      "message": {
+        "id": "m-n13",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 30s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 30
+        }
+      }
+    },
+    "n14": {
+      "id": "n14",
+      "children": [
+        "n15"
+      ],
+      "parent": "n13",
+      "message": {
+        "id": "m-n14",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "{\"updates\":[{\"pattern\":\"pattern 1\",\"multiple\":false,\"replacement\":\"canvas 2\"},{\"pattern\":\"pattern 2\",\"multiple\":false,\"replacement\":\"canvas 3\"}]}"
+          ]
+        },
+        "recipient": "canmore.update_textdoc",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n15": {
+      "id": "n15",
+      "children": [
+        "n16"
+      ],
+      "parent": "n14",
+      "message": {
+        "id": "m-n15",
+        "author": {
+          "role": "tool",
+          "name": "canmore.update_textdoc"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "tool text 2"
+          ]
+        },
+        "recipient": "all",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "o3",
+          "canvas": {
+            "is_failure": true,
+            "error_type": "invalid_replacement",
+            "textdoc_id": "textdoc_1"
+          }
+        }
+      }
+    },
+    "n16": {
+      "id": "n16",
+      "children": [
+        "n17"
+      ],
+      "parent": "n15",
+      "message": {
+        "id": "m-n16",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 5",
+              "content": "thought 5"
+            },
+            {
+              "summary": "summary 6",
+              "content": "thought 6"
+            },
+            {
+              "summary": "summary 7",
+              "content": "thought 7"
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n17": {
+      "id": "n17",
+      "children": [
+        "n18"
+      ],
+      "parent": "n16",
+      "message": {
+        "id": "m-n17",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 149s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 149
+        }
+      }
+    },
+    "n18": {
+      "id": "n18",
+      "children": [
+        "n19"
+      ],
+      "parent": "n17",
+      "message": {
+        "id": "m-n18",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "{\"updates\":[{\"pattern\":\"pattern 1\",\"multiple\":false,\"replacement\":\"canvas 4\"},{\"pattern\":\"pattern 2\",\"multiple\":false,\"replacement\":\"canvas 5\"}]}"
+          ]
+        },
+        "recipient": "canmore.update_textdoc",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n19": {
+      "id": "n19",
+      "children": [
+        "n20"
+      ],
+      "parent": "n18",
+      "message": {
+        "id": "m-n19",
+        "author": {
+          "role": "tool",
+          "name": "canmore.update_textdoc"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "tool text 3"
+          ]
+        },
+        "recipient": "all",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "o3",
+          "canvas": {
+            "is_failure": true,
+            "error_type": "no_matches",
+            "textdoc_id": "textdoc_1"
+          }
+        }
+      }
+    },
+    "n20": {
+      "id": "n20",
+      "children": [
+        "n21"
+      ],
+      "parent": "n19",
+      "message": {
+        "id": "m-n20",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 2"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3",
+          "canvas": {}
+        }
+      }
+    },
+    "n21": {
+      "id": "n21",
+      "children": [
+        "n22"
+      ],
+      "parent": "n20",
+      "message": {
+        "id": "m-n21",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 3"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n22": {
+      "id": "n22",
+      "children": [
+        "n23"
+      ],
+      "parent": "n21",
+      "message": {
+        "id": "m-n22",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 8",
+              "content": "thought 8"
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n23": {
+      "id": "n23",
+      "children": [
+        "n24"
+      ],
+      "parent": "n22",
+      "message": {
+        "id": "m-n23",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 30s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 30
+        }
+      }
+    },
+    "n24": {
+      "id": "n24",
+      "children": [
+        "n25"
+      ],
+      "parent": "n23",
+      "message": {
+        "id": "m-n24",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "canvas call 1"
+          ]
+        },
+        "recipient": "canmore.update_textdoc",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n25": {
+      "id": "n25",
+      "children": [
+        "n26"
+      ],
+      "parent": "n24",
+      "message": {
+        "id": "m-n25",
+        "author": {
+          "role": "tool",
+          "name": "canmore.update_textdoc"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "tool text 4"
+          ]
+        },
+        "recipient": "all",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "o3",
+          "canvas": {
+            "is_failure": true,
+            "error_type": "invalid_replacement",
+            "textdoc_id": "textdoc_1"
+          }
+        }
+      }
+    },
+    "n26": {
+      "id": "n26",
+      "children": [
+        "n27"
+      ],
+      "parent": "n25",
+      "message": {
+        "id": "m-n26",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 9",
+              "content": "thought 9"
+            },
+            {
+              "summary": "summary 10",
+              "content": "thought 10"
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n27": {
+      "id": "n27",
+      "children": [
+        "n28"
+      ],
+      "parent": "n26",
+      "message": {
+        "id": "m-n27",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 116s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 116
+        }
+      }
+    },
+    "n28": {
+      "id": "n28",
+      "children": [
+        "n29"
+      ],
+      "parent": "n27",
+      "message": {
+        "id": "m-n28",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "{\"updates\":[{\"pattern\":\"$\",\"multiple\":false,\"replacement\":\"canvas 6\"}]}"
+          ]
+        },
+        "recipient": "canmore.update_textdoc",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n29": {
+      "id": "n29",
+      "children": [
+        "n30"
+      ],
+      "parent": "n28",
+      "message": {
+        "id": "m-n29",
+        "author": {
+          "role": "tool",
+          "name": "canmore.update_textdoc"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "tool text 5"
+          ]
+        },
+        "recipient": "all",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "o3",
+          "canvas": {
+            "textdoc_type": "document",
+            "version": 4,
+            "from_version": 3,
+            "textdoc_id": "textdoc_1"
+          }
+        }
+      }
+    },
+    "n30": {
+      "id": "n30",
+      "children": [
+        "n31"
+      ],
+      "parent": "n29",
+      "message": {
+        "id": "m-n30",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 3"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n31": {
+      "id": "n31",
+      "children": [
+        "n32"
+      ],
+      "parent": "n30",
+      "message": {
+        "id": "m-n31",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 4"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n32": {
+      "id": "n32",
+      "children": [
+        "n33"
+      ],
+      "parent": "n31",
+      "message": {
+        "id": "m-n32",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 11",
+              "content": "thought 11"
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n33": {
+      "id": "n33",
+      "children": [
+        "n34"
+      ],
+      "parent": "n32",
+      "message": {
+        "id": "m-n33",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 7s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 7
+        }
+      }
+    },
+    "n34": {
+      "id": "n34",
+      "children": [
+        "n35"
+      ],
+      "parent": "n33",
+      "message": {
+        "id": "m-n34",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 4"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n35": {
+      "id": "n35",
+      "children": [
+        "n36"
+      ],
+      "parent": "n34",
+      "message": {
+        "id": "m-n35",
+        "author": {
+          "role": "user"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "question 5"
+          ]
+        },
+        "recipient": "all"
+      }
+    },
+    "n36": {
+      "id": "n36",
+      "children": [
+        "n37"
+      ],
+      "parent": "n35",
+      "message": {
+        "id": "m-n36",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 12",
+              "content": "thought 12"
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n37": {
+      "id": "n37",
+      "children": [
+        "n38"
+      ],
+      "parent": "n36",
+      "message": {
+        "id": "m-n37",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 10s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 10
+        }
+      }
+    },
+    "n38": {
+      "id": "n38",
+      "children": [
+        "n39"
+      ],
+      "parent": "n37",
+      "message": {
+        "id": "m-n38",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "{\"updates\":[{\"pattern\":\"$\",\"multiple\":false,\"replacement\":\"canvas 7\"}]}"
+          ]
+        },
+        "recipient": "canmore.update_textdoc",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n39": {
+      "id": "n39",
+      "children": [
+        "n40"
+      ],
+      "parent": "n38",
+      "message": {
+        "id": "m-n39",
+        "author": {
+          "role": "tool",
+          "name": "canmore.update_textdoc"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "tool text 6"
+          ]
+        },
+        "recipient": "all",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "o3",
+          "canvas": {
+            "is_failure": true,
+            "error_type": "invalid_replacement",
+            "textdoc_id": "textdoc_1"
+          }
+        }
+      }
+    },
+    "n40": {
+      "id": "n40",
+      "children": [
+        "n41"
+      ],
+      "parent": "n39",
+      "message": {
+        "id": "m-n40",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "thoughts",
+          "thoughts": [
+            {
+              "summary": "summary 13",
+              "content": "thought 13"
+            },
+            {
+              "summary": "summary 14",
+              "content": "thought 14"
+            },
+            {
+              "summary": "summary 15",
+              "content": ""
+            }
+          ]
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n41": {
+      "id": "n41",
+      "children": [
+        "n42"
+      ],
+      "parent": "n40",
+      "message": {
+        "id": "m-n41",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "reasoning_recap",
+          "content": "Thought for 55s"
+        },
+        "recipient": "all",
+        "metadata": {
+          "model_slug": "o3",
+          "finished_duration_sec": 55
+        }
+      }
+    },
+    "n42": {
+      "id": "n42",
+      "children": [
+        "n43"
+      ],
+      "parent": "n41",
+      "message": {
+        "id": "m-n42",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "{\"updates\":[{\"pattern\":\"pattern 3\",\"multiple\":false,\"replacement\":\"canvas 8\"}]}"
+          ]
+        },
+        "recipient": "canmore.update_textdoc",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    },
+    "n43": {
+      "id": "n43",
+      "children": [
+        "n44"
+      ],
+      "parent": "n42",
+      "message": {
+        "id": "m-n43",
+        "author": {
+          "role": "tool",
+          "name": "canmore.update_textdoc"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "tool text 7"
+          ]
+        },
+        "recipient": "all",
+        "channel": "commentary",
+        "metadata": {
+          "model_slug": "o3",
+          "canvas": {
+            "is_failure": true,
+            "error_type": "no_matches",
+            "textdoc_id": "textdoc_1"
+          }
+        }
+      }
+    },
+    "n44": {
+      "id": "n44",
+      "children": [],
+      "parent": "n43",
+      "message": {
+        "id": "m-n44",
+        "author": {
+          "role": "assistant"
+        },
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "answer 5"
+          ]
+        },
+        "recipient": "all",
+        "channel": "final",
+        "metadata": {
+          "model_slug": "o3"
+        }
+      }
+    }
+  }
+}
