@@ -97,6 +97,8 @@ function cleanContent(message) {
             return { content_type: type, parts }
         }
         case 'code':
+            // Canvas calls from 2026 come as code
+            if (message.recipient?.startsWith('canmore.')) return { content_type: type, language: content.language ?? 'unknown', text: cleanCanvasCall(content.text ?? '') }
             return { content_type: type, language: content.language ?? 'unknown', text: placeholder('code', content.text ?? '') }
         case 'execution_output':
             return { content_type: type, text: placeholder('output', content.text ?? '') }
