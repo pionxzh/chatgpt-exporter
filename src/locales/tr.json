@@ -53,7 +53,7 @@
   "Sources": "Kaynaklar",
   "Canvas Created": "Tuval: {{title}}",
   "Canvas Updated": "Tuval: {{title}} (düzenlendi)",
-  "Canvas Edit Unavailable": "Bu düzenlemeden önceki metin sohbette yok, bu yüzden yalnızca yeni metin gösteriliyor.",
+  "Canvas Edit Unavailable": "Bu düzenleme önceki metne uygulanamadı, bu yüzden yalnızca yeni metin gösteriliyor.",
   "OpenAI Official Format": "OpenAI Resmi Format",
   "Conversation Archive Alert": "Seçilen tüm konuşmaları arşivlemek istediğinizden emin misiniz?",
   "Conversation Archived Message": "Seçilen tüm konuşmalar arşivlendi. Değişiklikleri görmek için sayfayı yenileyin.",

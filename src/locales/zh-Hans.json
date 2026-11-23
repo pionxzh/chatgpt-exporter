@@ -53,7 +53,7 @@
   "Sources": "来源",
   "Canvas Created": "画布：{{title}}",
   "Canvas Updated": "画布：{{title}}（已编辑）",
-  "Canvas Edit Unavailable": "对话中没有这次编辑前的内容，因此只显示新的文字。",
+  "Canvas Edit Unavailable": "无法将这次编辑应用到之前的内容，因此只显示新的文字。",
   "OpenAI Official Format": "OpenAI 官方格式",
   "Conversation Archive Alert": "确定要归档所有选取的对话？",
   "Conversation Archived Message": "所有所选的对话已归档。请刷新页面。",
