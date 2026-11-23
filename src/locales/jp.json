@@ -17,6 +17,7 @@
   "Select...": "一括選択…",
   "Select Not Exported": "未エクスポートの会話を選択",
   "Select Updated": "更新された会話を選択",
+  "Select Not Exported or Updated": "未エクスポートまたは更新された会話を選択",
   "Shift Select Hint": "ヒント: Shift+クリックで範囲選択",
   "Export": "エクスポート",
   "Error": "エラー",

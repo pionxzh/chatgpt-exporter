@@ -2,16 +2,17 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import type { ChangeEvent } from 'preact/compat'
 import i18n, { useTranslation } from '../i18n'
 import { RateLimitError, archiveConversation, deleteConversation, fetchAllConversations, fetchConversation, fetchConversationsPage, fetchProjects, probeApi, withImageAssets } from '../api'
-import { EXPORT_OPERATION_BATCH, KEY_EXPORTED_UPDATE_TIMES } from '../constants'
+import { EXPORT_OPERATION_BATCH } from '../constants'
 import { exportAllToHtml } from '../exporter/html'
 import { exportAllToJson, exportAllToOfficialJson, exportAllToTavern } from '../exporter/json'
 import { exportAllToMarkdown } from '../exporter/markdown'
 import { applyHead, refreshConversationList } from '../utils/conversationList'
+import { filterByExportStatus, markExported, toMs } from '../utils/exportHistory'
 import { collectConversations } from '../utils/importFiles'
 import { RequestQueue } from '../utils/queue'
-import { ScriptStorage } from '../utils/storage'
 import { sleep } from '../utils/utils'
 import type { ApiConversationItem, ApiConversationWithId, ApiProjectInfo } from '../api'
+import type { ExportStatus } from '../utils/exportHistory'
 import type { FC } from '../type'
 import { CheckBox } from './CheckBox'
 import { Dialog } from './Dialog'
@@ -51,16 +52,6 @@ const MAX_SKIPPED_SHOWN = 20
 // Utilities
 // ---------------------------------------------------------------------------
 
-/**
- * Normalise create_time / update_time to milliseconds regardless of whether
- * the API returned an ISO 8601 string (current) or a Unix-seconds number (legacy).
- */
-function toMs(time: number | string | undefined): number {
-    if (time == null) return 0
-    if (typeof time === 'number') return time * 1000
-    return new Date(time).getTime()
-}
-
 function chunkArray<T>(arr: T[], size: number): T[][] {
     const result: T[][] = []
     for (let i = 0; i < arr.length; i += size) {
@@ -80,24 +71,6 @@ function formatConvDate(time: number | string | undefined): string {
     if (diffDays === 1) return 'Yesterday'
     // Always show the year so "Jun 17" vs "Jun 17, 2025" confusion is impossible
     return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
-}
-
-/** Read the persisted per-conversation last-exported update_time map (conversation id → ms). */
-function getExportedUpdateTimes(): Record<string, number> {
-    const stored = ScriptStorage.get<Record<string, number>>(KEY_EXPORTED_UPDATE_TIMES)
-    if (stored && typeof stored === 'object') return stored
-    return {}
-}
-
-/** Persist the last-exported update_time for conversations that were actually exported successfully. */
-function markExported(conversations: { id: string, update_time?: number | string }[]): void {
-    if (conversations.length === 0) return
-    const map = getExportedUpdateTimes()
-    for (const c of conversations) {
-        const ms = toMs(c.update_time)
-        if (ms > (map[c.id] ?? 0)) map[c.id] = ms
-    }
-    ScriptStorage.set(KEY_EXPORTED_UPDATE_TIMES, map)
 }
 
 /** Text search supporting * and ? wildcards. Falls back to substring. */
@@ -181,6 +154,8 @@ interface ConversationSelectProps {
     disabled: boolean
     loading: boolean
     error: string
+    /** The chosen export format. Export status is tracked per format. */
+    exportType: string
 }
 
 const ConversationSelect: FC<ConversationSelectProps> = ({
@@ -190,6 +165,7 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
     disabled,
     loading,
     error,
+    exportType,
 }) => {
     const { t } = useTranslation()
     const [query, setQuery] = useState('')
@@ -216,19 +192,10 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
 
     const allFilteredSelected = filtered.length > 0 && filtered.every(c => selected.some(x => x.id === c.id))
 
-    const selectByExportStatus = useCallback((status: 'all' | 'not_exported' | 'updated') => {
+    const selectByExportStatus = useCallback((status: ExportStatus) => {
         lastClickedIndex.current = -1
-        const exportedMap = getExportedUpdateTimes()
-        if (status === 'all') {
-            setSelected(filtered)
-        }
-        else if (status === 'not_exported') {
-            setSelected(filtered.filter(c => !(c.id in exportedMap)))
-        }
-        else {
-            setSelected(filtered.filter(c => c.id in exportedMap && exportedMap[c.id] < toMs(c.update_time)))
-        }
-    }, [filtered, setSelected])
+        setSelected(filterByExportStatus(filtered, status, exportType))
+    }, [filtered, setSelected, exportType])
 
     return (
         <>
@@ -277,13 +244,14 @@ const ConversationSelect: FC<ConversationSelectProps> = ({
                         title="Select conversations by export status"
                         onChange={(e) => {
                             const val = e.currentTarget.value
-                            if (val) selectByExportStatus(val as 'all' | 'not_exported' | 'updated')
+                            if (val) selectByExportStatus(val as ExportStatus)
                         }}
                     >
                         <option value="" disabled>{t('Select...')}</option>
                         <option value="all">{t('Select All')}</option>
                         <option value="not_exported">{t('Select Not Exported')}</option>
                         <option value="updated">{t('Select Updated')}</option>
+                        <option value="not_exported_or_updated">{t('Select Not Exported or Updated')}</option>
                     </select>
                     <span className="ce-toolbar-hint">
                         {t('Shift Select Hint')}
@@ -569,7 +537,7 @@ const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
             if (callback && results.length > 0) {
                 await callback(format, results, metaList, selectedProject?.display.name, partIndex, totalBatches)
                 // Only conversations that were actually exported successfully get recorded
-                markExported(results)
+                markExported(exportType, results)
             }
             skippedRef.current.push(...requestQueue.getSkipped())
             if (partIndex < totalBatches) {
@@ -650,7 +618,7 @@ const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
         setProcessing(true)
         for (let i = 0; i < chunks.length; i++) {
             await callback(format, chunks[i], metaList, selectedProject?.display.name, i + 1, chunks.length)
-            markExported(chunks[i])
+            markExported(exportType, chunks[i])
             if (i < chunks.length - 1) await sleep(400)
         }
         setProcessing(false)
@@ -892,6 +860,7 @@ const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
                 disabled={processing}
                 loading={loading}
                 error={error}
+                exportType={exportType}
             />
 
             {/* Load-more button */}
