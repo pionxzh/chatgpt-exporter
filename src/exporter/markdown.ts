@@ -6,6 +6,7 @@ import { checkIfConversationStarted } from '../page'
 import { checkIfTemporaryChatIsExportable } from '../temporaryChat'
 import { transformContentReferences } from '../utils/citations'
 import { buildZipFileName, downloadFile, getFileNameWithFormat } from '../utils/download'
+import { saveZip } from '../utils/exportTarget'
 import { addImageFilesToZip, extractImageFiles, getImageMode } from '../utils/imageFiles'
 import { protectMath } from '../utils/latex'
 import { escapeMarkdownText, fromMarkdown, getPromptTitle, nestHeadings, nestHeadingsInSource, toMarkdown } from '../utils/markdown'
@@ -13,6 +14,7 @@ import { ScriptStorage } from '../utils/storage'
 import { standardizeLineBreaks } from '../utils/text'
 import { transformAuthor } from '../utils/author'
 import type { ApiConversation, ApiConversationWithId, Citation, ConversationNodeMessage, ConversationResult, ThinkingContent } from '../api'
+import type { ExportTarget } from '../utils/exportTarget'
 import type { ExportMeta, ImageMode } from '../ui/SettingContext'
 import type { PartInfo } from '../utils/download'
 import { getMetaVariables, resolveMetaList } from './meta'
@@ -57,7 +59,7 @@ export async function exportToMarkdown(fileNameFormat: string, metaList: ExportM
     return true
 }
 
-export async function exportAllToMarkdown(fileNameFormat: string, apiConversations: ApiConversationWithId[], metaList?: ExportMeta[], projectName?: string, partIndex?: number, totalParts?: number) {
+export async function exportAllToMarkdown(fileNameFormat: string, apiConversations: ApiConversationWithId[], metaList?: ExportMeta[], projectName?: string, partIndex?: number, totalParts?: number, target?: ExportTarget) {
     const zip = new JSZip()
     const filenameMap = new Map<string, number>()
     const enableThinking = ScriptStorage.get<boolean>(KEY_THINKING_ENABLED) ?? false
@@ -88,11 +90,10 @@ export async function exportAllToMarkdown(fileNameFormat: string, apiConversatio
     })
     addImageFilesToZip(zip, assets)
 
-    const blob = await generateZip(zip)
     const partInfo: PartInfo | undefined = (partIndex != null && totalParts != null)
         ? { part: partIndex, total: totalParts }
         : undefined
-    downloadFile(buildZipFileName('markdown', projectName, partInfo), 'application/zip', blob)
+    await saveZip(zip, buildZipFileName('markdown', projectName, partInfo), target)
 
     return true
 }

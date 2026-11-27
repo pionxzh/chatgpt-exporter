@@ -404,6 +404,16 @@
     color: var(--ce-text-tertiary);
 }
 
+.ce-folder-option {
+    margin-top: 10px;
+}
+
+.ce-folder-option-description {
+    margin-top: 2px;
+    font-size: 0.75rem;
+    color: var(--ce-text-tertiary);
+}
+
 .ce-progress-header {
     display: flex;
     align-items: center;

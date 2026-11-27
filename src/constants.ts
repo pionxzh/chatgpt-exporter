@@ -22,6 +22,7 @@ export const KEY_EXPORT_ALL_LIMIT = 'exporter:export_all_limit'
 /** Records from before exports were tracked per format. Read only, as a starting point. */
 export const KEY_EXPORTED_UPDATE_TIMES = 'exporter:exported_update_times'
 export const KEY_EXPORTED_UPDATE_TIMES_BY_FORMAT = 'exporter:exported_update_times_by_format'
+export const KEY_EXPORT_TO_FOLDER = 'exporter:export_to_folder'
 
 export const KEY_OAI_LOCALE = 'oai/apps/locale'
 

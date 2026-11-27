@@ -5,8 +5,10 @@ import { checkIfConversationStarted } from '../page'
 import { checkIfTemporaryChatIsExportable } from '../temporaryChat'
 import { convertToOoba, convertToTavern } from '../utils/conversion'
 import { buildJsonBatchFileName, buildZipFileName, downloadFile, getFileNameWithFormat } from '../utils/download'
+import { saveZip } from '../utils/exportTarget'
 import { addImageFilesToZip, extractImageFiles, getImageMode } from '../utils/imageFiles'
 import type { ApiConversationWithId } from '../api'
+import type { ExportTarget } from '../utils/exportTarget'
 import type { ExportMeta } from '../ui/SettingContext'
 import type { PartInfo } from '../utils/download'
 
@@ -59,7 +61,7 @@ export async function exportToTavern(fileNameFormat: string) {
     return true
 }
 
-export async function exportAllToTavern(fileNameFormat: string, apiConversations: ApiConversationWithId[], _metaList?: ExportMeta[], projectName?: string, partIndex?: number, totalParts?: number) {
+export async function exportAllToTavern(fileNameFormat: string, apiConversations: ApiConversationWithId[], _metaList?: ExportMeta[], projectName?: string, partIndex?: number, totalParts?: number, target?: ExportTarget) {
     const zip = new JSZip()
     const filenameMap = new Map<string, number>()
     const conversations = apiConversations.map(x => processConversation(x))
@@ -81,19 +83,10 @@ export async function exportAllToTavern(fileNameFormat: string, apiConversations
         zip.file(fileName, convertToTavern(conversation))
     })
 
-    const blob = await zip.generateAsync({
-        type: 'blob',
-        // A DOS-made zip makes macOS `unzip` garble non-ASCII file names
-        platform: 'UNIX',
-        compression: 'DEFLATE',
-        compressionOptions: {
-            level: 9,
-        },
-    })
     const partInfo: PartInfo | undefined = (partIndex != null && totalParts != null)
         ? { part: partIndex, total: totalParts }
         : undefined
-    downloadFile(buildZipFileName('tavern', projectName, partInfo), 'application/zip', blob)
+    await saveZip(zip, buildZipFileName('tavern', projectName, partInfo), target)
 
     return true
 }
@@ -120,7 +113,8 @@ export async function exportToOoba(fileNameFormat: string) {
     return true
 }
 
-export async function exportAllToOfficialJson(_fileNameFormat: string, apiConversations: ApiConversationWithId[], _metaList?: ExportMeta[], projectName?: string, partIndex?: number, totalParts?: number) {
+// One file holds the whole batch, so it cannot go into a folder: a partial batch would replace a full one.
+export async function exportAllToOfficialJson(_fileNameFormat: string, apiConversations: ApiConversationWithId[], _metaList?: ExportMeta[], projectName?: string, partIndex?: number, totalParts?: number, _target?: ExportTarget) {
     const partInfo: PartInfo | undefined = (partIndex != null && totalParts != null)
         ? { part: partIndex, total: totalParts }
         : undefined
@@ -130,7 +124,7 @@ export async function exportAllToOfficialJson(_fileNameFormat: string, apiConver
     return true
 }
 
-export async function exportAllToJson(fileNameFormat: string, apiConversations: ApiConversationWithId[], _metaList?: ExportMeta[], projectName?: string, partIndex?: number, totalParts?: number) {
+export async function exportAllToJson(fileNameFormat: string, apiConversations: ApiConversationWithId[], _metaList?: ExportMeta[], projectName?: string, partIndex?: number, totalParts?: number, target?: ExportTarget) {
     const zip = new JSZip()
     const filenameMap = new Map<string, number>()
     // Shared by every conversation in the zip
@@ -158,19 +152,10 @@ export async function exportAllToJson(fileNameFormat: string, apiConversations: 
     })
     addImageFilesToZip(zip, assets)
 
-    const blob = await zip.generateAsync({
-        type: 'blob',
-        // A DOS-made zip makes macOS `unzip` garble non-ASCII file names
-        platform: 'UNIX',
-        compression: 'DEFLATE',
-        compressionOptions: {
-            level: 9,
-        },
-    })
     const partInfo: PartInfo | undefined = (partIndex != null && totalParts != null)
         ? { part: partIndex, total: totalParts }
         : undefined
-    downloadFile(buildZipFileName('json', projectName, partInfo), 'application/zip', blob)
+    await saveZip(zip, buildZipFileName('json', projectName, partInfo), target)
 
     return true
 }

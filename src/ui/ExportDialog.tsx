@@ -2,17 +2,20 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import type { ChangeEvent } from 'preact/compat'
 import i18n, { useTranslation } from '../i18n'
 import { RateLimitError, archiveConversation, deleteConversation, fetchAllConversations, fetchConversation, fetchConversationsPage, fetchProjects, probeApi, withImageAssets } from '../api'
-import { EXPORT_OPERATION_BATCH } from '../constants'
+import { EXPORT_OPERATION_BATCH, KEY_EXPORT_TO_FOLDER } from '../constants'
 import { exportAllToHtml } from '../exporter/html'
 import { exportAllToJson, exportAllToOfficialJson, exportAllToTavern } from '../exporter/json'
 import { exportAllToMarkdown } from '../exporter/markdown'
 import { applyHead, refreshConversationList } from '../utils/conversationList'
+import { useGMStorage } from '../hooks/useGMStorage'
 import { filterByExportStatus, markExported, toMs } from '../utils/exportHistory'
+import { canSaveToFolder, pickExportFolder, withChatId } from '../utils/exportTarget'
 import { collectConversations } from '../utils/importFiles'
 import { RequestQueue } from '../utils/queue'
 import { sleep } from '../utils/utils'
 import type { ApiConversationItem, ApiConversationWithId, ApiProjectInfo } from '../api'
 import type { ExportStatus } from '../utils/exportHistory'
+import type { ExportTarget } from '../utils/exportTarget'
 import type { FC } from '../type'
 import { CheckBox } from './CheckBox'
 import { Dialog } from './Dialog'
@@ -384,11 +387,11 @@ const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
     const metaList = useMemo(() => enableMeta ? exportMetaList : [], [enableMeta, exportMetaList])
 
     const exportAllOptions = useMemo(() => [
-        { label: 'Markdown', callback: exportAllToMarkdown },
-        { label: 'HTML', callback: exportAllToHtml },
-        { label: 'JSON', callback: exportAllToOfficialJson },
-        { label: 'JSON (ZIP)', callback: exportAllToJson },
-        { label: 'TavernAI JSONL (ZIP)', callback: exportAllToTavern },
+        { label: 'Markdown', callback: exportAllToMarkdown, folder: true },
+        { label: 'HTML', callback: exportAllToHtml, folder: true },
+        { label: 'JSON', callback: exportAllToOfficialJson, folder: false },
+        { label: 'JSON (ZIP)', callback: exportAllToJson, folder: true },
+        { label: 'TavernAI JSONL (ZIP)', callback: exportAllToTavern, folder: true },
     ], [])
 
     const fileInputRef = useRef<HTMLInputElement>(null)
@@ -408,6 +411,12 @@ const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
 
     const [selected, setSelected] = useState<ApiConversationItem[]>([])
     const [exportType, setExportType] = useState(exportAllOptions[0].label)
+    const [saveToFolder, setSaveToFolder] = useGMStorage(KEY_EXPORT_TO_FOLDER, false)
+    const folderSupported = useMemo(() => canSaveToFolder(), [])
+    const folderAvailable = folderSupported && !!exportAllOptions.find(o => o.label === exportType)?.folder
+    const toFolder = folderAvailable && saveToFolder
+    // Picked when Export is clicked, read by every batch of that export
+    const targetRef = useRef<ExportTarget>({ kind: 'zip' })
     // A list error leaves the loaded part exportable.
     const disabled = processing || selected.length === 0
 
@@ -521,6 +530,25 @@ const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
         return () => off()
     }, [deleteQueue])
 
+    /** Exports one batch. Returns false when it failed, which ends the export. */
+    const exportBatch = useCallback(async (conversations: ApiConversationWithId[], partIndex: number, totalParts: number) => {
+        const callback = exportAllOptions.find(o => o.label === exportType)?.callback
+        if (!callback || conversations.length === 0) return true
+        const target = targetRef.current
+        const fileNameFormat = target.kind === 'folder' ? withChatId(format) : format
+        try {
+            await callback(fileNameFormat, conversations, metaList, selectedProject?.display.name, partIndex, totalParts, target)
+        }
+        catch (err) {
+            console.error('Export failed:', err)
+            alert(t('Export Failed', { error: err instanceof Error ? err.message : String(err) }))
+            return false
+        }
+        // Only conversations that were actually exported successfully get recorded
+        markExported(exportType, conversations)
+        return true
+    }, [exportAllOptions, exportType, format, metaList, selectedProject, t])
+
     useEffect(() => {
         const off = requestQueue.on('done', async (results) => {
             // If the user cancelled, just stop — don't download or start the next batch
@@ -533,11 +561,10 @@ const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
             const batchIdx = batchIndexRef.current
             const totalBatches = totalBatchesRef.current
             const partIndex = batchIdx + 1
-            const callback = exportAllOptions.find(o => o.label === exportType)?.callback
-            if (callback && results.length > 0) {
-                await callback(format, results, metaList, selectedProject?.display.name, partIndex, totalBatches)
-                // Only conversations that were actually exported successfully get recorded
-                markExported(exportType, results)
+            if (!await exportBatch(results, partIndex, totalBatches)) {
+                setProcessing(false)
+                exportingRef.current = false
+                return
             }
             skippedRef.current.push(...requestQueue.getSkipped())
             if (partIndex < totalBatches) {
@@ -557,7 +584,7 @@ const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
             }
         })
         return () => off()
-    }, [requestQueue, exportAllOptions, exportType, format, metaList, startApiBatch, selectedProject, t])
+    }, [requestQueue, exportBatch, startApiBatch, t])
 
     useEffect(() => {
         const off = archiveQueue.on('done', () => {
@@ -612,21 +639,35 @@ const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
     const exportAllFromLocal = useCallback(async () => {
         if (disabled) return
         const results = localConversations.filter(c => selected.some(s => s.id === c.id))
-        const callback = exportAllOptions.find(o => o.label === exportType)?.callback
-        if (!callback) return
         const chunks = chunkArray(results, EXPORT_OPERATION_BATCH)
         setProcessing(true)
         for (let i = 0; i < chunks.length; i++) {
-            await callback(format, chunks[i], metaList, selectedProject?.display.name, i + 1, chunks.length)
-            markExported(exportType, chunks[i])
+            if (!await exportBatch(chunks[i], i + 1, chunks.length)) break
             if (i < chunks.length - 1) await sleep(400)
         }
         setProcessing(false)
-    }, [disabled, selected, localConversations, exportAllOptions, exportType, format, metaList, selectedProject])
+    }, [disabled, selected, localConversations, exportBatch])
 
-    const exportAll = useMemo(() => {
-        return exportSource === 'API' ? exportAllFromApi : exportAllFromLocal
-    }, [exportSource, exportAllFromApi, exportAllFromLocal])
+    const exportAll = useCallback(async () => {
+        if (disabled) return
+        targetRef.current = { kind: 'zip' }
+        if (toFolder) {
+            // The picker needs the click, so it opens before anything is fetched
+            let directory: FileSystemDirectoryHandle | null
+            try {
+                directory = await pickExportFolder()
+            }
+            catch (err) {
+                console.error('Folder picker failed:', err)
+                alert(t('Export Failed', { error: err instanceof Error ? err.message : String(err) }))
+                return
+            }
+            if (!directory) return
+            targetRef.current = { kind: 'folder', directory }
+        }
+        if (exportSource === 'API') exportAllFromApi()
+        else await exportAllFromLocal()
+    }, [disabled, toFolder, exportSource, exportAllFromApi, exportAllFromLocal, t])
 
     const deleteAll = useCallback(() => {
         if (disabled) return
@@ -909,7 +950,18 @@ const DialogContent: FC<DialogContentProps> = ({ format, onClose }) => {
                     </button>
                 </div>
             </div>
-            {totalBatches > 1 && !processing && (
+            {folderAvailable && (
+                <div className="ce-folder-option">
+                    <CheckBox
+                        label={t('Save to Folder')}
+                        checked={saveToFolder}
+                        disabled={processing}
+                        onCheckedChange={setSaveToFolder}
+                    />
+                    <p className="ce-folder-option-description">{t('Save to Folder Description')}</p>
+                </div>
+            )}
+            {totalBatches > 1 && !processing && !toFolder && (
                 <p className="ce-batch-note">
                     {`${totalBatches} downloads \u00B7 100 conversations each`}
                 </p>

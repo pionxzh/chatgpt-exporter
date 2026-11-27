@@ -7,6 +7,7 @@ import templateHtml from '../template.html?raw'
 import { checkIfTemporaryChatIsExportable } from '../temporaryChat'
 import { transformContentReferences } from '../utils/citations'
 import { buildZipFileName, downloadFile, getFileNameWithFormat } from '../utils/download'
+import { saveZip } from '../utils/exportTarget'
 import { protectMath, toBracketDelimiters } from '../utils/latex'
 import { toHtml } from '../utils/markdown'
 import { ScriptStorage } from '../utils/storage'
@@ -14,6 +15,7 @@ import { standardizeLineBreaks } from '../utils/text'
 import { dateStr, getColorScheme } from '../utils/utils'
 import { transformAuthor } from '../utils/author'
 import type { ApiConversationWithId, ConversationNodeMessage, ConversationResult, ThinkingContent } from '../api'
+import type { ExportTarget } from '../utils/exportTarget'
 import type { ExportMeta } from '../ui/SettingContext'
 import type { PartInfo } from '../utils/download'
 import { escapeHtml, fillTemplate, metaDetailsHtml } from './htmlTemplate'
@@ -44,7 +46,7 @@ export async function exportToHtml(fileNameFormat: string, metaList: ExportMeta[
     return true
 }
 
-export async function exportAllToHtml(fileNameFormat: string, apiConversations: ApiConversationWithId[], metaList?: ExportMeta[], projectName?: string, partIndex?: number, totalParts?: number) {
+export async function exportAllToHtml(fileNameFormat: string, apiConversations: ApiConversationWithId[], metaList?: ExportMeta[], projectName?: string, partIndex?: number, totalParts?: number, target?: ExportTarget) {
     const userAvatar = await getUserAvatar()
 
     const zip = new JSZip()
@@ -70,19 +72,10 @@ export async function exportAllToHtml(fileNameFormat: string, apiConversations: 
         zip.file(fileName, content)
     })
 
-    const blob = await zip.generateAsync({
-        type: 'blob',
-        // A DOS-made zip makes macOS `unzip` garble non-ASCII file names
-        platform: 'UNIX',
-        compression: 'DEFLATE',
-        compressionOptions: {
-            level: 9,
-        },
-    })
     const partInfo: PartInfo | undefined = (partIndex != null && totalParts != null)
         ? { part: partIndex, total: totalParts }
         : undefined
-    downloadFile(buildZipFileName('html', projectName, partInfo), 'application/zip', blob)
+    await saveZip(zip, buildZipFileName('html', projectName, partInfo), target)
 
     return true
 }
