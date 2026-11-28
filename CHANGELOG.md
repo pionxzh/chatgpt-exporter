@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.40.1](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.40.0...userscript-v2.40.1) (2026-11-28)
+
+
+### Bug Fixes
+
+* format writing blocks in official exports ([0cf6b87](https://github.com/pionxzh/chatgpt-exporter/commit/0cf6b876619f38a05e5e0fa6d1cb4ed05b35827d))
+
 ## [2.40.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.39.0...userscript-v2.40.0) (2026-11-28)
 
 
