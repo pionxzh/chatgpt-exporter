@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.40.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.39.0...userscript-v2.40.0) (2026-11-28)
+
+
+### Features
+
+* export Canvas documents ([#260](https://github.com/pionxzh/chatgpt-exporter/issues/260)) ([907ec83](https://github.com/pionxzh/chatgpt-exporter/commit/907ec83010578efe3629cf7156c618556be2665d))
+* save Export All straight into a folder ([#425](https://github.com/pionxzh/chatgpt-exporter/issues/425)) ([5d0b1f7](https://github.com/pionxzh/chatgpt-exporter/commit/5d0b1f7e2a8c99dc1f8398176815cea55821386f))
+* track exports per format and select not exported or updated ([#425](https://github.com/pionxzh/chatgpt-exporter/issues/425)) ([55408e1](https://github.com/pionxzh/chatgpt-exporter/commit/55408e19ac0c04a0a1e8d785496b55b67864f47d))
+
+
+### Bug Fixes
+
+* explain Canvas edits that cannot be replayed ([9df0ce2](https://github.com/pionxzh/chatgpt-exporter/commit/9df0ce2e4f0aa64c604c9ff689ba3e544d06c5e5))
+* keep math formulas visible in screenshots ([7fece4b](https://github.com/pionxzh/chatgpt-exporter/commit/7fece4b120133b30dd0f9b7e6505bbf577b3ad80))
+* keep writing block drafts in exports ([416772e](https://github.com/pionxzh/chatgpt-exporter/commit/416772e09e97fe9e76c80de5758c1a0d1dcb046b))
+* read Canvas calls stored as code ([f3833f7](https://github.com/pionxzh/chatgpt-exporter/commit/f3833f7428605c1e252e3b0608121f9d4e40ad12))
+
 ## [2.39.0](https://github.com/pionxzh/chatgpt-exporter/compare/userscript-v2.38.3...userscript-v2.39.0) (2026-11-20)
 
 
