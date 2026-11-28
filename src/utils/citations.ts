@@ -23,6 +23,12 @@ const UrlMarkerRegex = /\uE200url\uE202([^\uE200\uE201\uE202]*)\uE202([^\uE200\u
 const EntityMarkerRegex = /\uE200entity\uE202([^\uE200\uE201]*)\uE201/gu
 /** An image carousel. Without a content reference there are no images to show. */
 const ImageGroupMarkerRegex = /\uE200image_group\uE202[^\uE200\uE201]*\uE201/gu
+/**
+ * A draft such as an email, `:::writing{variant="email" subject="..."}` up to
+ * a closing `:::`. Official exports keep it in the text with no content
+ * reference.
+ */
+const WritingDirectiveRegex = /^:::writing\{([^}\n]*)\}[ \t]*\n([\s\S]*?)\n:::[ \t]*$/gm
 
 export function normalizeCitationText(input: string): string {
     return input
@@ -60,6 +66,11 @@ export function transformContentReferences(
         output = output.replaceAll(matchedText, () => replacement)
         if (ref.type === 'file' && replacement) fileReplacements.add(replacement)
     }
+
+    output = output.replaceAll(WritingDirectiveRegex, (_, attributes: string, content: string) => {
+        const subject = /(?:^|\s)subject="([^"]*)"/.exec(attributes)?.[1]
+        return formatWritingBlock({ content, subject }, outputType)
+    })
 
     // Citations of different lines in the same file would repeat its name
     for (const replacement of fileReplacements) {

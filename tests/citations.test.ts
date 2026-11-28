@@ -194,6 +194,14 @@ describe('writing blocks', () => {
     it('keeps a draft without a subject', () => {
         expect(transformContentReferences(note, metadata)).toBe('Short note.')
     })
+
+    it('reads drafts written as directives, as official exports keep them', () => {
+        const text = `Two options:\n\n${email}\n\n:::writing{variant="chat_message" id="103"}\nRunning late.\n:::\n\nPick one.`
+        expect(transformContentReferences(text, {}))
+            .toBe(`Two options:\n\n**Review \\[moved\\]**\n\n${body}\n\nRunning late.\n\nPick one.`)
+        expect(transformContentReferences(email, {}, { output: 'text', inlineReferenceMode: 'alt' }))
+            .toBe(`Review [moved]\n\n${body}`)
+    })
 })
 
 describe('inline links', () => {
